@@ -128,16 +128,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -315,16 +317,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -390,7 +394,7 @@ impl<'a, C, A> Coordinate<C, A>
 /// 
 /// * [list location](struct.LocationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationListResponse {
     /// A token to provide to get the next page of results.
     #[serde(rename="nextPageToken")]
@@ -428,7 +432,7 @@ impl Part for JobChange {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnumItemDef {
     /// Whether the enum item is active. Jobs may contain inactive enum values; however, setting an enum to an inactive value when creating or updating a job will result in a 500 error.
     pub active: bool,
@@ -450,7 +454,7 @@ impl Part for EnumItemDef {}
 /// 
 /// * [list custom field def](struct.CustomFieldDefListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomFieldDefListResponse {
     /// Collection of custom field definitions in a team.
     pub items: Vec<CustomFieldDef>,
@@ -465,7 +469,7 @@ impl ResponseResult for CustomFieldDefListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TokenPagination {
     /// A token to provide to get the next page of results.
     #[serde(rename="nextPageToken")]
@@ -504,7 +508,7 @@ impl Part for Location {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Team {
     /// Identifies this object as a team.
     pub kind: String,
@@ -574,7 +578,7 @@ impl Part for CustomFields {}
 /// 
 /// * [list worker](struct.WorkerListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WorkerListResponse {
     /// Workers in the collection.
     pub items: Vec<Worker>,
@@ -589,7 +593,7 @@ impl ResponseResult for WorkerListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationRecord {
     /// Latitude.
     pub latitude: f64,
@@ -649,7 +653,7 @@ impl ResponseResult for Schedule {}
 /// 
 /// * [list team](struct.TeamListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamListResponse {
     /// Teams in the collection.
     pub items: Vec<Team>,
@@ -669,7 +673,7 @@ impl ResponseResult for TeamListResponse {}
 /// 
 /// * [list jobs](struct.JobListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobListResponse {
     /// A token to provide to get the next page of results.
     #[serde(rename="nextPageToken")]
@@ -687,7 +691,7 @@ impl ResponseResult for JobListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Worker {
     /// Identifies this object as a worker.
     pub kind: String,
@@ -733,7 +737,7 @@ impl ResponseResult for Job {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomFieldDef {
     /// Identifies this object as a custom field definition.
     pub kind: String,
@@ -1475,33 +1479,32 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
 
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> JobGetCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
+    /// Job number
+    ///
     /// Sets the *job id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Job number
     pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1531,8 +1534,8 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1787,123 +1790,112 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Job) -> JobUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
+    /// Job number
+    ///
     /// Sets the *job id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Job number
     pub fn job_id(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
-    /// Sets the *title* query property to the given value.
-    ///
-    /// 
     /// Job title
+    ///
+    /// Sets the *title* query property to the given value.
     pub fn title(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._title = Some(new_value.to_string());
         self
     }
-    /// Sets the *progress* query property to the given value.
-    ///
-    /// 
     /// Job progress
+    ///
+    /// Sets the *progress* query property to the given value.
     pub fn progress(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._progress = Some(new_value.to_string());
         self
     }
-    /// Sets the *note* query property to the given value.
-    ///
-    /// 
     /// Job note as newline (Unix) separated string
+    ///
+    /// Sets the *note* query property to the given value.
     pub fn note(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._note = Some(new_value.to_string());
         self
     }
-    /// Sets the *lng* query property to the given value.
-    ///
-    /// 
     /// The longitude coordinate of this job's location.
+    ///
+    /// Sets the *lng* query property to the given value.
     pub fn lng(mut self, new_value: f64) -> JobUpdateCall<'a, C, A> {
         self._lng = Some(new_value);
         self
     }
-    /// Sets the *lat* query property to the given value.
-    ///
-    /// 
     /// The latitude coordinate of this job's location.
+    ///
+    /// Sets the *lat* query property to the given value.
     pub fn lat(mut self, new_value: f64) -> JobUpdateCall<'a, C, A> {
         self._lat = Some(new_value);
         self
     }
-    /// Sets the *customer phone number* query property to the given value.
-    ///
-    /// 
     /// Customer phone number
+    ///
+    /// Sets the *customer phone number* query property to the given value.
     pub fn customer_phone_number(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._customer_phone_number = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer name* query property to the given value.
-    ///
-    /// 
     /// Customer name
+    ///
+    /// Sets the *customer name* query property to the given value.
     pub fn customer_name(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._customer_name = Some(new_value.to_string());
         self
     }
+    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
+    ///
     /// Append the given value to the *custom field* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
     pub fn add_custom_field(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._custom_field.push(new_value.to_string());
         self
     }
-    /// Sets the *assignee* query property to the given value.
-    ///
-    /// 
     /// Assignee email address, or empty string to unassign.
+    ///
+    /// Sets the *assignee* query property to the given value.
     pub fn assignee(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._assignee = Some(new_value.to_string());
         self
     }
-    /// Sets the *address* query property to the given value.
-    ///
-    /// 
     /// Job address as newline (Unix) separated string
+    ///
+    /// Sets the *address* query property to the given value.
     pub fn address(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._address = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1933,8 +1925,8 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2189,123 +2181,112 @@ impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Job) -> JobPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
+    /// Job number
+    ///
     /// Sets the *job id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Job number
     pub fn job_id(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
-    /// Sets the *title* query property to the given value.
-    ///
-    /// 
     /// Job title
+    ///
+    /// Sets the *title* query property to the given value.
     pub fn title(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._title = Some(new_value.to_string());
         self
     }
-    /// Sets the *progress* query property to the given value.
-    ///
-    /// 
     /// Job progress
+    ///
+    /// Sets the *progress* query property to the given value.
     pub fn progress(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._progress = Some(new_value.to_string());
         self
     }
-    /// Sets the *note* query property to the given value.
-    ///
-    /// 
     /// Job note as newline (Unix) separated string
+    ///
+    /// Sets the *note* query property to the given value.
     pub fn note(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._note = Some(new_value.to_string());
         self
     }
-    /// Sets the *lng* query property to the given value.
-    ///
-    /// 
     /// The longitude coordinate of this job's location.
+    ///
+    /// Sets the *lng* query property to the given value.
     pub fn lng(mut self, new_value: f64) -> JobPatchCall<'a, C, A> {
         self._lng = Some(new_value);
         self
     }
-    /// Sets the *lat* query property to the given value.
-    ///
-    /// 
     /// The latitude coordinate of this job's location.
+    ///
+    /// Sets the *lat* query property to the given value.
     pub fn lat(mut self, new_value: f64) -> JobPatchCall<'a, C, A> {
         self._lat = Some(new_value);
         self
     }
-    /// Sets the *customer phone number* query property to the given value.
-    ///
-    /// 
     /// Customer phone number
+    ///
+    /// Sets the *customer phone number* query property to the given value.
     pub fn customer_phone_number(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._customer_phone_number = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer name* query property to the given value.
-    ///
-    /// 
     /// Customer name
+    ///
+    /// Sets the *customer name* query property to the given value.
     pub fn customer_name(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._customer_name = Some(new_value.to_string());
         self
     }
+    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
+    ///
     /// Append the given value to the *custom field* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
     pub fn add_custom_field(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._custom_field.push(new_value.to_string());
         self
     }
-    /// Sets the *assignee* query property to the given value.
-    ///
-    /// 
     /// Assignee email address, or empty string to unassign.
+    ///
+    /// Sets the *assignee* query property to the given value.
     pub fn assignee(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._assignee = Some(new_value.to_string());
         self
     }
-    /// Sets the *address* query property to the given value.
-    ///
-    /// 
     /// Job address as newline (Unix) separated string
+    ///
+    /// Sets the *address* query property to the given value.
     pub fn address(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._address = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2335,8 +2316,8 @@ impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2535,47 +2516,43 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Continuation token
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *min modified timestamp ms* query property to the given value.
-    ///
-    /// 
     /// Minimum time a job was modified in milliseconds since epoch.
+    ///
+    /// Sets the *min modified timestamp ms* query property to the given value.
     pub fn min_modified_timestamp_ms(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._min_modified_timestamp_ms = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return in one page.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> JobListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2605,8 +2582,8 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2842,113 +2819,107 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Job) -> JobInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
+    /// Job address as newline (Unix) separated string
+    ///
     /// Sets the *address* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Job address as newline (Unix) separated string
     pub fn address(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._address = new_value.to_string();
         self
     }
+    /// The latitude coordinate of this job's location.
+    ///
     /// Sets the *lat* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The latitude coordinate of this job's location.
     pub fn lat(mut self, new_value: f64) -> JobInsertCall<'a, C, A> {
         self._lat = new_value;
         self
     }
+    /// The longitude coordinate of this job's location.
+    ///
     /// Sets the *lng* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The longitude coordinate of this job's location.
     pub fn lng(mut self, new_value: f64) -> JobInsertCall<'a, C, A> {
         self._lng = new_value;
         self
     }
+    /// Job title
+    ///
     /// Sets the *title* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Job title
     pub fn title(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._title = new_value.to_string();
         self
     }
-    /// Sets the *note* query property to the given value.
-    ///
-    /// 
     /// Job note as newline (Unix) separated string
+    ///
+    /// Sets the *note* query property to the given value.
     pub fn note(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._note = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer phone number* query property to the given value.
-    ///
-    /// 
     /// Customer phone number
+    ///
+    /// Sets the *customer phone number* query property to the given value.
     pub fn customer_phone_number(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._customer_phone_number = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer name* query property to the given value.
-    ///
-    /// 
     /// Customer name
+    ///
+    /// Sets the *customer name* query property to the given value.
     pub fn customer_name(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._customer_name = Some(new_value.to_string());
         self
     }
+    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
+    ///
     /// Append the given value to the *custom field* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
     pub fn add_custom_field(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._custom_field.push(new_value.to_string());
         self
     }
-    /// Sets the *assignee* query property to the given value.
-    ///
-    /// 
     /// Assignee email address, or empty string to unassign.
+    ///
+    /// Sets the *assignee* query property to the given value.
     pub fn assignee(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._assignee = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2978,8 +2949,8 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3200,74 +3171,69 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Schedule) -> ScheduleUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
+    /// Job number
+    ///
     /// Sets the *job id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Job number
     pub fn job_id(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
-    /// Sets the *start time* query property to the given value.
-    ///
-    /// 
     /// Scheduled start time in milliseconds since epoch.
+    ///
+    /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *end time* query property to the given value.
-    ///
-    /// 
     /// Scheduled end time in milliseconds since epoch.
+    ///
+    /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *duration* query property to the given value.
-    ///
-    /// 
     /// Job duration in milliseconds.
+    ///
+    /// Sets the *duration* query property to the given value.
     pub fn duration(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, A> {
         self._duration = Some(new_value.to_string());
         self
     }
-    /// Sets the *all day* query property to the given value.
-    ///
-    /// 
     /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
+    ///
+    /// Sets the *all day* query property to the given value.
     pub fn all_day(mut self, new_value: bool) -> ScheduleUpdateCall<'a, C, A> {
         self._all_day = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScheduleUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3297,8 +3263,8 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3519,74 +3485,69 @@ impl<'a, C, A> SchedulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Schedule) -> SchedulePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> SchedulePatchCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
+    /// Job number
+    ///
     /// Sets the *job id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Job number
     pub fn job_id(mut self, new_value: &str) -> SchedulePatchCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
-    /// Sets the *start time* query property to the given value.
-    ///
-    /// 
     /// Scheduled start time in milliseconds since epoch.
+    ///
+    /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> SchedulePatchCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *end time* query property to the given value.
-    ///
-    /// 
     /// Scheduled end time in milliseconds since epoch.
+    ///
+    /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> SchedulePatchCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *duration* query property to the given value.
-    ///
-    /// 
     /// Job duration in milliseconds.
+    ///
+    /// Sets the *duration* query property to the given value.
     pub fn duration(mut self, new_value: &str) -> SchedulePatchCall<'a, C, A> {
         self._duration = Some(new_value.to_string());
         self
     }
-    /// Sets the *all day* query property to the given value.
-    ///
-    /// 
     /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
+    ///
+    /// Sets the *all day* query property to the given value.
     pub fn all_day(mut self, new_value: bool) -> SchedulePatchCall<'a, C, A> {
         self._all_day = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchedulePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3616,8 +3577,8 @@ impl<'a, C, A> SchedulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3803,33 +3764,32 @@ impl<'a, C, A> ScheduleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> ScheduleGetCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
+    /// Job number
+    ///
     /// Sets the *job id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Job number
     pub fn job_id(mut self, new_value: &str) -> ScheduleGetCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScheduleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3859,8 +3819,8 @@ impl<'a, C, A> ScheduleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4044,23 +4004,22 @@ impl<'a, C, A> WorkerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> WorkerListCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> WorkerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4090,8 +4049,8 @@ impl<'a, C, A> WorkerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4289,59 +4248,56 @@ impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> LocationListCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
+    /// Worker email address.
+    ///
     /// Sets the *worker email* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Worker email address.
     pub fn worker_email(mut self, new_value: &str) -> LocationListCall<'a, C, A> {
         self._worker_email = new_value.to_string();
         self
     }
+    /// Start timestamp in milliseconds since the epoch.
+    ///
     /// Sets the *start timestamp ms* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Start timestamp in milliseconds since the epoch.
     pub fn start_timestamp_ms(mut self, new_value: &str) -> LocationListCall<'a, C, A> {
         self._start_timestamp_ms = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Continuation token
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LocationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return in one page.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LocationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LocationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4371,8 +4327,8 @@ impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4545,37 +4501,33 @@ impl<'a, C, A> TeamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Sets the *worker* query property to the given value.
-    ///
-    /// 
     /// Whether to include teams for which the user has the Worker role.
+    ///
+    /// Sets the *worker* query property to the given value.
     pub fn worker(mut self, new_value: bool) -> TeamListCall<'a, C, A> {
         self._worker = Some(new_value);
         self
     }
-    /// Sets the *dispatcher* query property to the given value.
-    ///
-    /// 
     /// Whether to include teams for which the user has the Dispatcher role.
+    ///
+    /// Sets the *dispatcher* query property to the given value.
     pub fn dispatcher(mut self, new_value: bool) -> TeamListCall<'a, C, A> {
         self._dispatcher = Some(new_value);
         self
     }
-    /// Sets the *admin* query property to the given value.
-    ///
-    /// 
     /// Whether to include teams for which the user has the Admin role.
+    ///
+    /// Sets the *admin* query property to the given value.
     pub fn admin(mut self, new_value: bool) -> TeamListCall<'a, C, A> {
         self._admin = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TeamListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4605,8 +4557,8 @@ impl<'a, C, A> TeamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4790,23 +4742,22 @@ impl<'a, C, A> CustomFieldDefListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Team ID
+    ///
     /// Sets the *team id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> CustomFieldDefListCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomFieldDefListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4836,8 +4787,8 @@ impl<'a, C, A> CustomFieldDefListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

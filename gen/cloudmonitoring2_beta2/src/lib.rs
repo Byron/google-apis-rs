@@ -113,16 +113,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -289,16 +291,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -371,7 +375,7 @@ impl Part for PointDistributionUnderflowBucket {}
 /// 
 /// * [list metric descriptors](struct.MetricDescriptorListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListMetricDescriptorsResponse {
     /// The returned metric descriptors.
     pub metrics: Vec<MetricDescriptor>,
@@ -565,7 +569,7 @@ impl ResponseResult for MetricDescriptor {}
 /// 
 /// * [write timeseries](struct.TimeseryWriteCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WriteTimeseriesResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#writeTimeseriesResponse".
     pub kind: String,
@@ -583,7 +587,7 @@ impl ResponseResult for WriteTimeseriesResponse {}
 /// 
 /// * [delete metric descriptors](struct.MetricDescriptorDeleteCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeleteMetricDescriptorResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#deleteMetricDescriptorResponse".
     pub kind: String,
@@ -669,7 +673,7 @@ impl Resource for TimeseriesDescriptor {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Timeseries {
     /// The descriptor of this time series.
     #[serde(rename="timeseriesDesc")]
@@ -706,7 +710,7 @@ impl Part for PointDistributionOverflowBucket {}
 /// 
 /// * [list timeseries descriptors](struct.TimeseriesDescriptorListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTimeseriesDescriptorsResponse {
     /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, set this value to the pageToken query parameter.
     #[serde(rename="nextPageToken")]
@@ -733,7 +737,7 @@ impl ResponseResult for ListTimeseriesDescriptorsResponse {}
 /// 
 /// * [list timeseries](struct.TimeseryListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTimeseriesResponse {
     /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, set the pageToken query parameter to this value. All of the points of a time series will be returned before returning any point of the subsequent time series.
     #[serde(rename="nextPageToken")]
@@ -1250,60 +1254,56 @@ impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ListTimeseriesDescriptorsRequest) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     pub fn project(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
+    ///
     /// Sets the *metric* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     pub fn metric(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._metric = new_value.to_string();
         self
     }
+    /// End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
+    ///
     /// Sets the *youngest* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
     pub fn youngest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._youngest = new_value.to_string();
         self
     }
-    /// Sets the *window* query property to the given value.
-    ///
-    /// 
     /// The sampling window. At most one data point will be returned for each window in the requested time interval. This parameter is only valid for non-cumulative metric types. Units:  
     /// - m: minute 
     /// - h: hour 
     /// - d: day 
     /// - w: week  Examples: 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
+    ///
+    /// Sets the *window* query property to the given value.
     pub fn window(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._window = Some(new_value.to_string());
         self
     }
-    /// Sets the *timespan* query property to the given value.
-    ///
-    /// 
     /// Length of the time interval to query, which is an alternative way to declare the interval: (youngest - timespan, youngest]. The timespan and oldest parameters should not be used together. Units:  
     /// - s: second 
     /// - m: minute 
@@ -1312,63 +1312,59 @@ impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::
     /// - w: week  Examples: 2s, 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
     /// 
     /// If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest].
+    ///
+    /// Sets the *timespan* query property to the given value.
     pub fn timespan(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._timespan = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *oldest* query property to the given value.
-    ///
-    /// 
     /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]
+    ///
+    /// Sets the *oldest* query property to the given value.
     pub fn oldest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._oldest = Some(new_value.to_string());
         self
     }
-    /// Append the given value to the *labels* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
     /// A collection of labels for the matching time series, which are represented as:  
     /// - key==value: key equals the value 
     /// - key=~value: key regex matches the value 
     /// - key!=value: key does not equal the value 
     /// - key!~value: key regex does not match the value  For example, to list all of the time series descriptors for the region us-central1, you could specify:
     /// label=cloud.googleapis.com%2Flocation=~us-central1.*
+    ///
+    /// Append the given value to the *labels* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     pub fn add_labels(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._labels.push(new_value.to_string());
         self
     }
-    /// Sets the *count* query property to the given value.
-    ///
-    /// 
     /// Maximum number of time series descriptors per page. Used for pagination. If not specified, count = 100.
+    ///
+    /// Sets the *count* query property to the given value.
     pub fn count(mut self, new_value: i32) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._count = Some(new_value);
         self
     }
-    /// Sets the *aggregator* query property to the given value.
-    ///
-    /// 
     /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
+    ///
+    /// Sets the *aggregator* query property to the given value.
     pub fn aggregator(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._aggregator = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1398,8 +1394,8 @@ impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Monitoring`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1598,32 +1594,31 @@ impl<'a, C, A> TimeseryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &WriteTimeseriesRequest) -> TimeseryWriteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The project ID. The value can be the numeric project ID or string-based project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project ID. The value can be the numeric project ID or string-based project name.
     pub fn project(mut self, new_value: &str) -> TimeseryWriteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimeseryWriteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1653,8 +1648,8 @@ impl<'a, C, A> TimeseryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Monitoring`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1896,60 +1891,56 @@ impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ListTimeseriesRequest) -> TimeseryListCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     pub fn project(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
+    ///
     /// Sets the *metric* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     pub fn metric(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._metric = new_value.to_string();
         self
     }
+    /// End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
+    ///
     /// Sets the *youngest* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
     pub fn youngest(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._youngest = new_value.to_string();
         self
     }
-    /// Sets the *window* query property to the given value.
-    ///
-    /// 
     /// The sampling window. At most one data point will be returned for each window in the requested time interval. This parameter is only valid for non-cumulative metric types. Units:  
     /// - m: minute 
     /// - h: hour 
     /// - d: day 
     /// - w: week  Examples: 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
+    ///
+    /// Sets the *window* query property to the given value.
     pub fn window(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._window = Some(new_value.to_string());
         self
     }
-    /// Sets the *timespan* query property to the given value.
-    ///
-    /// 
     /// Length of the time interval to query, which is an alternative way to declare the interval: (youngest - timespan, youngest]. The timespan and oldest parameters should not be used together. Units:  
     /// - s: second 
     /// - m: minute 
@@ -1958,63 +1949,59 @@ impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// - w: week  Examples: 2s, 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
     /// 
     /// If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest].
+    ///
+    /// Sets the *timespan* query property to the given value.
     pub fn timespan(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._timespan = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *oldest* query property to the given value.
-    ///
-    /// 
     /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]
+    ///
+    /// Sets the *oldest* query property to the given value.
     pub fn oldest(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._oldest = Some(new_value.to_string());
         self
     }
-    /// Append the given value to the *labels* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
     /// A collection of labels for the matching time series, which are represented as:  
     /// - key==value: key equals the value 
     /// - key=~value: key regex matches the value 
     /// - key!=value: key does not equal the value 
     /// - key!~value: key regex does not match the value  For example, to list all of the time series descriptors for the region us-central1, you could specify:
     /// label=cloud.googleapis.com%2Flocation=~us-central1.*
+    ///
+    /// Append the given value to the *labels* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     pub fn add_labels(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._labels.push(new_value.to_string());
         self
     }
-    /// Sets the *count* query property to the given value.
-    ///
-    /// 
     /// Maximum number of data points per page, which is used for pagination of results.
+    ///
+    /// Sets the *count* query property to the given value.
     pub fn count(mut self, new_value: i32) -> TimeseryListCall<'a, C, A> {
         self._count = Some(new_value);
         self
     }
-    /// Sets the *aggregator* query property to the given value.
-    ///
-    /// 
     /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
+    ///
+    /// Sets the *aggregator* query property to the given value.
     pub fn aggregator(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._aggregator = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimeseryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2044,8 +2031,8 @@ impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Monitoring`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2259,56 +2246,52 @@ impl<'a, C, A> MetricDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ListMetricDescriptorsRequest) -> MetricDescriptorListCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The project id. The value can be the numeric project ID or string-based project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project id. The value can be the numeric project ID or string-based project name.
     pub fn project(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *query* query property to the given value.
-    ///
-    /// 
     /// The query used to search against existing metrics. Separate keywords with a space; the service joins all keywords with AND, meaning that all keywords must match for a metric to be returned. If this field is omitted, all metrics are returned. If an empty string is passed with this field, no metrics are returned.
+    ///
+    /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *count* query property to the given value.
-    ///
-    /// 
     /// Maximum number of metric descriptors per page. Used for pagination. If not specified, count = 100.
+    ///
+    /// Sets the *count* query property to the given value.
     pub fn count(mut self, new_value: i32) -> MetricDescriptorListCall<'a, C, A> {
         self._count = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetricDescriptorListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2338,8 +2321,8 @@ impl<'a, C, A> MetricDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Monitoring`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2525,33 +2508,32 @@ impl<'a, C, A> MetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The project ID to which the metric belongs.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project ID to which the metric belongs.
     pub fn project(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Name of the metric.
+    ///
     /// Sets the *metric* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the metric.
     pub fn metric(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, C, A> {
         self._metric = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetricDescriptorDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2581,8 +2563,8 @@ impl<'a, C, A> MetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Monitoring`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2781,32 +2763,31 @@ impl<'a, C, A> MetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &MetricDescriptor) -> MetricDescriptorCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The project id. The value can be the numeric project ID or string-based project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project id. The value can be the numeric project ID or string-based project name.
     pub fn project(mut self, new_value: &str) -> MetricDescriptorCreateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetricDescriptorCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2836,8 +2817,8 @@ impl<'a, C, A> MetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Monitoring`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

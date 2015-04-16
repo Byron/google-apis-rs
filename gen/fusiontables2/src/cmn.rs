@@ -4,6 +4,7 @@ use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};
 use std;
 use std::fmt::{self, Display};
 use std::str::FromStr;
+use std::error;
 use std::thread::sleep_ms;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
@@ -217,7 +218,7 @@ pub struct DefaultDelegate;
 impl Delegate for DefaultDelegate {}
 
 
-
+#[derive(Debug)]
 pub enum Error {
     /// The http connection failed
     HttpError(hyper::HttpError),
@@ -245,6 +246,49 @@ pub enum Error {
 
     /// Indicates an HTTP repsonse with a non-success status code
     Failure(hyper::client::Response),
+}
+
+
+impl Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Error::HttpError(ref err) => err.fmt(f),
+            Error::UploadSizeLimitExceeded(ref resource_size, ref max_size) =>
+                writeln!(f, "The media size {} exceeds the maximum allowed upload size of {}"
+                         , resource_size, max_size),
+            Error::MissingAPIKey => {
+                writeln!(f, "The application's API key was not found in the configuration").ok();
+                writeln!(f, "It is used as there are no Scopes defined for this method.")
+            },
+            Error::MissingToken =>
+                writeln!(f, "Didn't obtain authentication token from authenticator"),
+            Error::Cancelled => 
+                writeln!(f, "Operation cancelled by delegate"),
+            Error::FieldClash(field) =>
+                writeln!(f, "The custom parameter '{}' is already provided natively by the CallBuilder.", field),
+            Error::JsonDecodeError(ref err) => err.fmt(f),
+            Error::Failure(ref response) => 
+                writeln!(f, "Http status indicates failure: {:?}", response),
+        }
+    }
+}
+
+impl error::Error for Error {
+    fn description(&self) -> &str {
+        match *self {
+            Error::HttpError(ref err) => err.description(),
+            Error::JsonDecodeError(ref err) => err.description(),
+            _ => "NO DESCRIPTION POSSIBLE - use `Display.fmt()` instead"
+        }
+    }
+
+    fn cause(&self) -> Option<&error::Error> {
+        match *self {
+            Error::HttpError(ref err) => err.cause(),
+            Error::JsonDecodeError(ref err) => err.cause(),
+            _ => None
+        }
+    }
 }
 
 /// A universal result type used as return for all calls.

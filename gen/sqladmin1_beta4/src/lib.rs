@@ -140,16 +140,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -317,16 +319,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -399,7 +403,7 @@ impl<'a, C, A> SQLAdmin<C, A>
 /// * [get backup runs](struct.BackupRunGetCall.html) (response)
 /// * [list backup runs](struct.BackupRunListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupRun {
     /// The status of this run.
     pub status: String,
@@ -436,7 +440,7 @@ impl ResponseResult for BackupRun {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCertDetail {
     /// The public information about the cert.
     #[serde(rename="certInfo")]
@@ -589,7 +593,7 @@ impl Part for ReplicaConfiguration {}
 /// 
 /// * [insert ssl certs](struct.SslCertInsertCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCertsInsertResponse {
     /// This is always sql#sslCertsInsert.
     pub kind: String,
@@ -613,7 +617,7 @@ impl ResponseResult for SslCertsInsertResponse {}
 /// 
 /// * [list operations](struct.OperationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationsListResponse {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -636,7 +640,7 @@ impl ResponseResult for OperationsListResponse {}
 /// 
 /// * [list tiers](struct.TierListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TiersListResponse {
     /// List of tiers.
     pub items: Vec<Tier>,
@@ -726,7 +730,7 @@ impl Part for ExportContext {}
 /// 
 /// * [list backup runs](struct.BackupRunListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupRunsListResponse {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -820,7 +824,7 @@ impl Part for IpConfiguration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationError {
     /// This is always sql#operationError.
     pub kind: String,
@@ -842,7 +846,7 @@ impl Part for OperationError {}
 /// 
 /// * [list flags](struct.FlagListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Flag {
     /// This is always sql#flag.
     pub kind: Option<String>,
@@ -911,7 +915,7 @@ impl Resource for User {}
 /// 
 /// * [list tiers](struct.TierListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tier {
     /// The maximum disk size of this tier in bytes.
     #[serde(rename="DiskQuota")]
@@ -992,7 +996,7 @@ impl Part for DatabaseFlags {}
 /// 
 /// * [list flags](struct.FlagListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FlagsListResponse {
     /// List of flags.
     pub items: Vec<Flag>,
@@ -1123,7 +1127,7 @@ impl RequestValue for SslCertsInsertRequest {}
 /// 
 /// * [list ssl certs](struct.SslCertListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCertsListResponse {
     /// List of client certificates for the instance.
     pub items: Vec<SslCert>,
@@ -1163,7 +1167,7 @@ impl Part for AclEntry {}
 /// 
 /// * [list instances](struct.InstanceListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesListResponse {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1181,7 +1185,7 @@ impl ResponseResult for InstancesListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationErrorNested {
     /// The list of errors encountered while processing this operation.
     pub errors: Vec<OperationError>,
@@ -1219,7 +1223,7 @@ impl RequestValue for InstancesExportRequest {}
 /// 
 /// * [list users](struct.UserListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersListResponse {
     /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.
     #[serde(rename="nextPageToken")]
@@ -1342,7 +1346,7 @@ impl RequestValue for InstancesImportRequest {}
 /// 
 /// * [list databases](struct.DatabaseListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabasesListResponse {
     /// List of database resources in the instance.
     pub items: Vec<Database>,
@@ -1403,7 +1407,7 @@ impl Part for BinLogCoordinates {}
 /// * [export instances](struct.InstanceExportCall.html) (response)
 /// * [restore backup instances](struct.InstanceRestoreBackupCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// The status of an operation. Valid values are PENDING, RUNNING, DONE, UNKNOWN.
     pub status: String,
@@ -2724,49 +2728,46 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A previously-returned page token representing part of the larger set of results to view.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of operations per response.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> OperationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2796,8 +2797,8 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2983,33 +2984,32 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> OperationGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Instance operation ID.
+    ///
     /// Sets the *operation* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Instance operation ID.
     pub fn operation(mut self, new_value: &str) -> OperationGetCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3039,8 +3039,8 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3224,23 +3224,22 @@ impl<'a, C, A> TierListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// Project ID of the project for which to list tiers.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project for which to list tiers.
     pub fn project(mut self, new_value: &str) -> TierListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TierListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3270,8 +3269,8 @@ impl<'a, C, A> TierListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3457,33 +3456,32 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Database instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3513,8 +3511,8 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3704,53 +3702,52 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> UserDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Database instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> UserDeleteCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
+    /// Host of the user in the instance.
+    ///
     /// Sets the *host* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Host of the user in the instance.
     pub fn host(mut self, new_value: &str) -> UserDeleteCall<'a, C, A> {
         self._host = new_value.to_string();
         self
     }
+    /// Name of the user in the instance.
+    ///
     /// Sets the *name* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the user in the instance.
     pub fn name(mut self, new_value: &str) -> UserDeleteCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3780,8 +3777,8 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3986,62 +3983,61 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &User) -> UserUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> UserUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Database instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> UserUpdateCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
+    /// Host of the user in the instance.
+    ///
     /// Sets the *host* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Host of the user in the instance.
     pub fn host(mut self, new_value: &str) -> UserUpdateCall<'a, C, A> {
         self._host = new_value.to_string();
         self
     }
+    /// Name of the user in the instance.
+    ///
     /// Sets the *name* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the user in the instance.
     pub fn name(mut self, new_value: &str) -> UserUpdateCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4071,8 +4067,8 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4273,42 +4269,41 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &User) -> UserInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> UserInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Database instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> UserInsertCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4338,8 +4333,8 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4525,33 +4520,32 @@ impl<'a, C, A> InstanceResetSslConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstanceResetSslConfigCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceResetSslConfigCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceResetSslConfigCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4581,8 +4575,8 @@ impl<'a, C, A> InstanceResetSslConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4768,33 +4762,32 @@ impl<'a, C, A> InstancePromoteReplicaCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// ID of the project that contains the read replica.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the project that contains the read replica.
     pub fn project(mut self, new_value: &str) -> InstancePromoteReplicaCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL read replica instance name.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL read replica instance name.
     pub fn instance(mut self, new_value: &str) -> InstancePromoteReplicaCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstancePromoteReplicaCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4824,8 +4817,8 @@ impl<'a, C, A> InstancePromoteReplicaCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5011,33 +5004,32 @@ impl<'a, C, A> InstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstanceGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Database instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceGetCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5067,8 +5059,8 @@ impl<'a, C, A> InstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5269,42 +5261,41 @@ impl<'a, C, A> InstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &DatabaseInstance) -> InstancePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstancePatchCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstancePatchCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstancePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5334,8 +5325,8 @@ impl<'a, C, A> InstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5521,33 +5512,32 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Project ID of the project that contains the instance to be restarted.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance to be restarted.
     pub fn project(mut self, new_value: &str) -> InstanceRestartCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceRestartCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceRestartCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5577,8 +5567,8 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5764,33 +5754,32 @@ impl<'a, C, A> InstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// Project ID of the project that contains the instance to be deleted.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance to be deleted.
     pub fn project(mut self, new_value: &str) -> InstanceDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceDeleteCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5820,8 +5809,8 @@ impl<'a, C, A> InstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6007,33 +5996,32 @@ impl<'a, C, A> InstanceStopReplicaCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// ID of the project that contains the read replica.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the project that contains the read replica.
     pub fn project(mut self, new_value: &str) -> InstanceStopReplicaCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL read replica instance name.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL read replica instance name.
     pub fn instance(mut self, new_value: &str) -> InstanceStopReplicaCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceStopReplicaCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6063,8 +6051,8 @@ impl<'a, C, A> InstanceStopReplicaCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6250,33 +6238,32 @@ impl<'a, C, A> InstanceStartReplicaCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// ID of the project that contains the read replica.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the project that contains the read replica.
     pub fn project(mut self, new_value: &str) -> InstanceStartReplicaCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL read replica instance name.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL read replica instance name.
     pub fn instance(mut self, new_value: &str) -> InstanceStartReplicaCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceStartReplicaCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6306,8 +6293,8 @@ impl<'a, C, A> InstanceStartReplicaCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6506,32 +6493,31 @@ impl<'a, C, A> InstanceInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &DatabaseInstance) -> InstanceInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project to which the newly created Cloud SQL instances should belong.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project to which the newly created Cloud SQL instances should belong.
     pub fn project(mut self, new_value: &str) -> InstanceInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6561,8 +6547,8 @@ impl<'a, C, A> InstanceInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6756,39 +6742,36 @@ impl<'a, C, A> InstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Project ID of the project for which to list Cloud SQL instances.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project for which to list Cloud SQL instances.
     pub fn project(mut self, new_value: &str) -> InstanceListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A previously-returned page token representing part of the larger set of results to view.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> InstanceListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of results to return per response.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> InstanceListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6818,8 +6801,8 @@ impl<'a, C, A> InstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7020,42 +7003,41 @@ impl<'a, C, A> InstanceImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InstancesImportRequest) -> InstanceImportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstanceImportCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceImportCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7085,8 +7067,8 @@ impl<'a, C, A> InstanceImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7287,42 +7269,41 @@ impl<'a, C, A> InstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &DatabaseInstance) -> InstanceUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstanceUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceUpdateCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7352,8 +7333,8 @@ impl<'a, C, A> InstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7554,42 +7535,41 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InstancesCloneRequest) -> InstanceCloneCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the source as well as the clone Cloud SQL instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the source as well as the clone Cloud SQL instance.
     pub fn project(mut self, new_value: &str) -> InstanceCloneCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceCloneCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceCloneCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7619,8 +7599,8 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7821,42 +7801,41 @@ impl<'a, C, A> InstanceExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InstancesExportRequest) -> InstanceExportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that contains the instance to be exported.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance to be exported.
     pub fn project(mut self, new_value: &str) -> InstanceExportCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceExportCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceExportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7886,8 +7865,8 @@ impl<'a, C, A> InstanceExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8088,42 +8067,41 @@ impl<'a, C, A> InstanceRestoreBackupCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InstancesRestoreBackupRequest) -> InstanceRestoreBackupCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstanceRestoreBackupCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceRestoreBackupCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceRestoreBackupCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8153,8 +8131,8 @@ impl<'a, C, A> InstanceRestoreBackupCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8312,13 +8290,12 @@ impl<'a, C, A> FlagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FlagListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8348,8 +8325,8 @@ impl<'a, C, A> FlagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8537,43 +8514,42 @@ impl<'a, C, A> DatabaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Database instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
+    /// Name of the database to be deleted in the instance.
+    ///
     /// Sets the *database* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the database to be deleted in the instance.
     pub fn database(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, A> {
         self._database = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8603,8 +8579,8 @@ impl<'a, C, A> DatabaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8807,52 +8783,51 @@ impl<'a, C, A> DatabasePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Database) -> DatabasePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> DatabasePatchCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Database instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabasePatchCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
+    /// Name of the database to be updated in the instance.
+    ///
     /// Sets the *database* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the database to be updated in the instance.
     pub fn database(mut self, new_value: &str) -> DatabasePatchCall<'a, C, A> {
         self._database = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabasePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8882,8 +8857,8 @@ impl<'a, C, A> DatabasePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9069,33 +9044,32 @@ impl<'a, C, A> DatabaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Project ID of the project for which to list Cloud SQL instances.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project for which to list Cloud SQL instances.
     pub fn project(mut self, new_value: &str) -> DatabaseListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabaseListCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9125,8 +9099,8 @@ impl<'a, C, A> DatabaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9327,42 +9301,41 @@ impl<'a, C, A> DatabaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Database) -> DatabaseInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> DatabaseInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Database instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabaseInsertCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9392,8 +9365,8 @@ impl<'a, C, A> DatabaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9581,43 +9554,42 @@ impl<'a, C, A> DatabaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> DatabaseGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Database instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabaseGetCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
+    /// Name of the database in the instance.
+    ///
     /// Sets the *database* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the database in the instance.
     pub fn database(mut self, new_value: &str) -> DatabaseGetCall<'a, C, A> {
         self._database = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9647,8 +9619,8 @@ impl<'a, C, A> DatabaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9851,52 +9823,51 @@ impl<'a, C, A> DatabaseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Database) -> DatabaseUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Database instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
+    /// Name of the database to be updated in the instance.
+    ///
     /// Sets the *database* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the database to be updated in the instance.
     pub fn database(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, A> {
         self._database = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9926,8 +9897,8 @@ impl<'a, C, A> DatabaseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10128,42 +10099,41 @@ impl<'a, C, A> SslCertInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SslCertsInsertRequest) -> SslCertInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project to which the newly created Cloud SQL instances should belong.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project to which the newly created Cloud SQL instances should belong.
     pub fn project(mut self, new_value: &str) -> SslCertInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> SslCertInsertCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10193,8 +10163,8 @@ impl<'a, C, A> SslCertInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10382,43 +10352,42 @@ impl<'a, C, A> SslCertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Project ID of the project that contains the instance to be deleted.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance to be deleted.
     pub fn project(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
+    /// Sha1 FingerPrint.
+    ///
     /// Sets the *sha1 fingerprint* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Sha1 FingerPrint.
     pub fn sha1_fingerprint(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, A> {
         self._sha1_fingerprint = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10448,8 +10417,8 @@ impl<'a, C, A> SslCertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10637,43 +10606,42 @@ impl<'a, C, A> SslCertGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> SslCertGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> SslCertGetCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
+    /// Sha1 FingerPrint.
+    ///
     /// Sets the *sha1 fingerprint* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Sha1 FingerPrint.
     pub fn sha1_fingerprint(mut self, new_value: &str) -> SslCertGetCall<'a, C, A> {
         self._sha1_fingerprint = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10703,8 +10671,8 @@ impl<'a, C, A> SslCertGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10890,33 +10858,32 @@ impl<'a, C, A> SslCertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Project ID of the project for which to list Cloud SQL instances.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project for which to list Cloud SQL instances.
     pub fn project(mut self, new_value: &str) -> SslCertListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> SslCertListCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10946,8 +10913,8 @@ impl<'a, C, A> SslCertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11143,49 +11110,46 @@ impl<'a, C, A> BackupRunListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> BackupRunListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> BackupRunListCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A previously-returned page token representing part of the larger set of results to view.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> BackupRunListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of backup runs per response.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> BackupRunListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BackupRunListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11215,8 +11179,8 @@ impl<'a, C, A> BackupRunListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11404,43 +11368,42 @@ impl<'a, C, A> BackupRunGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Project ID of the project that contains the instance.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> BackupRunGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> BackupRunGetCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
+    /// The ID of this Backup Run.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of this Backup Run.
     pub fn id(mut self, new_value: &str) -> BackupRunGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BackupRunGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11470,8 +11433,8 @@ impl<'a, C, A> BackupRunGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

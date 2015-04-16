@@ -129,16 +129,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -306,16 +308,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -490,7 +494,7 @@ impl Part for Notification {}
 /// 
 /// * [list timeline](struct.TimelineListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimelineListResponse {
     /// The next page token. Provide this as the pageToken parameter in the request to retrieve the next page of results.
     #[serde(rename="nextPageToken")]
@@ -513,7 +517,7 @@ impl ResponseResult for TimelineListResponse {}
 /// 
 /// * [list contacts](struct.ContactListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContactsListResponse {
     /// Contact list.
     pub items: Vec<Contact>,
@@ -758,7 +762,7 @@ impl ResponseResult for Location {}
 /// 
 /// * [list subscriptions](struct.SubscriptionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionsListResponse {
     /// The list of subscriptions.
     pub items: Vec<Subscription>,
@@ -810,7 +814,7 @@ impl Part for UserData {}
 /// 
 /// * [attachments list timeline](struct.TimelineAttachmentListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AttachmentsListResponse {
     /// The list of attachments.
     pub items: Vec<Attachment>,
@@ -847,7 +851,7 @@ impl Part for NotificationConfig {}
 /// 
 /// * [get settings](struct.SettingGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Setting {
     /// The type of resource. This is always mirror#setting.
     pub kind: String,
@@ -915,7 +919,7 @@ impl Part for MenuItem {}
 /// 
 /// * [list locations](struct.LocationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationsListResponse {
     /// The list of locations.
     pub items: Vec<Location>,
@@ -1748,7 +1752,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/mirror/v1/subscriptions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         
@@ -1828,22 +1832,21 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Subscription) -> SubscriptionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1873,8 +1876,8 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1961,7 +1964,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/mirror/v1/subscriptions/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -2047,23 +2050,22 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The ID of the subscription.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the subscription.
     pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2093,8 +2095,8 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2189,7 +2191,7 @@ impl<'a, C, A> SubscriptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/mirror/v1/subscriptions/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -2293,32 +2295,31 @@ impl<'a, C, A> SubscriptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Subscription) -> SubscriptionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the subscription.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the subscription.
     pub fn id(mut self, new_value: &str) -> SubscriptionUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2348,8 +2349,8 @@ impl<'a, C, A> SubscriptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2435,7 +2436,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/mirror/v1/subscriptions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         
@@ -2507,13 +2508,12 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2543,8 +2543,8 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2632,7 +2632,7 @@ impl<'a, C, A> TimelineAttachmentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/mirror/v1/timeline/{itemId}/attachments".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{itemId}", "itemId")].iter() {
@@ -2728,23 +2728,22 @@ impl<'a, C, A> TimelineAttachmentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The ID of the timeline item whose attachments should be listed.
+    ///
     /// Sets the *item id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the timeline item whose attachments should be listed.
     pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentListCall<'a, C, A> {
         self._item_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimelineAttachmentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2774,8 +2773,8 @@ impl<'a, C, A> TimelineAttachmentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3063,22 +3062,21 @@ impl<'a, C, A> TimelineInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &TimelineItem) -> TimelineInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimelineInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3108,8 +3106,8 @@ impl<'a, C, A> TimelineInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasLocation`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3308,32 +3306,31 @@ impl<'a, C, A> TimelinePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &TimelineItem) -> TimelinePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the timeline item.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the timeline item.
     pub fn id(mut self, new_value: &str) -> TimelinePatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimelinePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3363,8 +3360,8 @@ impl<'a, C, A> TimelinePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasLocation`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3557,69 +3554,61 @@ impl<'a, C, A> TimelineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Sets the *source item id* query property to the given value.
-    ///
-    /// 
     /// If provided, only items with the given sourceItemId will be returned.
+    ///
+    /// Sets the *source item id* query property to the given value.
     pub fn source_item_id(mut self, new_value: &str) -> TimelineListCall<'a, C, A> {
         self._source_item_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *pinned only* query property to the given value.
-    ///
-    /// 
     /// If true, only pinned items will be returned.
+    ///
+    /// Sets the *pinned only* query property to the given value.
     pub fn pinned_only(mut self, new_value: bool) -> TimelineListCall<'a, C, A> {
         self._pinned_only = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token for the page of results to return.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TimelineListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// Controls the order in which timeline items are returned.
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> TimelineListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of items to include in the response, used for paging.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> TimelineListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *include deleted* query property to the given value.
-    ///
-    /// 
     /// If true, tombstone records for deleted items will be returned.
+    ///
+    /// Sets the *include deleted* query property to the given value.
     pub fn include_deleted(mut self, new_value: bool) -> TimelineListCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
-    /// Sets the *bundle id* query property to the given value.
-    ///
-    /// 
     /// If provided, only items with the given bundleId will be returned.
+    ///
+    /// Sets the *bundle id* query property to the given value.
     pub fn bundle_id(mut self, new_value: &str) -> TimelineListCall<'a, C, A> {
         self._bundle_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimelineListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3649,8 +3638,8 @@ impl<'a, C, A> TimelineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasLocation`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3747,7 +3736,7 @@ impl<'a, C, A> TimelineAttachmentInsertCall<'a, C, A> where C: BorrowMut<hyper::
         };
         params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{itemId}", "itemId")].iter() {
@@ -3944,23 +3933,22 @@ impl<'a, C, A> TimelineAttachmentInsertCall<'a, C, A> where C: BorrowMut<hyper::
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    /// The ID of the timeline item the attachment belongs to.
+    ///
     /// Sets the *item id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the timeline item the attachment belongs to.
     pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentInsertCall<'a, C, A> {
         self._item_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimelineAttachmentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3990,8 +3978,8 @@ impl<'a, C, A> TimelineAttachmentInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4080,7 +4068,7 @@ impl<'a, C, A> TimelineAttachmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/mirror/v1/timeline/{itemId}/attachments/{attachmentId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
@@ -4166,33 +4154,32 @@ impl<'a, C, A> TimelineAttachmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The ID of the timeline item the attachment belongs to.
+    ///
     /// Sets the *item id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the timeline item the attachment belongs to.
     pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentDeleteCall<'a, C, A> {
         self._item_id = new_value.to_string();
         self
     }
+    /// The ID of the attachment.
+    ///
     /// Sets the *attachment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the attachment.
     pub fn attachment_id(mut self, new_value: &str) -> TimelineAttachmentDeleteCall<'a, C, A> {
         self._attachment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimelineAttachmentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4222,8 +4209,8 @@ impl<'a, C, A> TimelineAttachmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4396,23 +4383,22 @@ impl<'a, C, A> TimelineDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID of the timeline item.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the timeline item.
     pub fn id(mut self, new_value: &str) -> TimelineDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimelineDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4442,8 +4428,8 @@ impl<'a, C, A> TimelineDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasLocation`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4757,32 +4743,31 @@ impl<'a, C, A> TimelineUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &TimelineItem) -> TimelineUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the timeline item.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the timeline item.
     pub fn id(mut self, new_value: &str) -> TimelineUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimelineUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4812,8 +4797,8 @@ impl<'a, C, A> TimelineUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasLocation`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4924,7 +4909,7 @@ impl<'a, C, A> TimelineAttachmentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/mirror/v1/timeline/{itemId}/attachments/{attachmentId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
@@ -5020,33 +5005,32 @@ impl<'a, C, A> TimelineAttachmentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// The ID of the timeline item the attachment belongs to.
+    ///
     /// Sets the *item id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the timeline item the attachment belongs to.
     pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentGetCall<'a, C, A> {
         self._item_id = new_value.to_string();
         self
     }
+    /// The ID of the attachment.
+    ///
     /// Sets the *attachment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the attachment.
     pub fn attachment_id(mut self, new_value: &str) -> TimelineAttachmentGetCall<'a, C, A> {
         self._attachment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimelineAttachmentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5076,8 +5060,8 @@ impl<'a, C, A> TimelineAttachmentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5261,23 +5245,22 @@ impl<'a, C, A> TimelineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the timeline item.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the timeline item.
     pub fn id(mut self, new_value: &str) -> TimelineGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimelineGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5307,8 +5290,8 @@ impl<'a, C, A> TimelineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasLocation`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5396,7 +5379,7 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/mirror/v1/settings/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -5492,25 +5475,24 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the setting. The following IDs are valid: 
+    /// - locale - The key to the user’s language/locale (BCP 47 identifier) that Glassware should use to render localized content. 
+    /// - timezone - The key to the user’s current time zone region as defined in the tz database. Example: America/Los_Angeles.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the setting. The following IDs are valid: 
-    /// - locale - The key to the user’s language/locale (BCP 47 identifier) that Glassware should use to render localized content. 
-    /// - timezone - The key to the user’s current time zone region as defined in the tz database. Example: America/Los_Angeles.
     pub fn id(mut self, new_value: &str) -> SettingGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SettingGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5540,8 +5522,8 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5725,23 +5707,22 @@ impl<'a, C, A> LocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the location or latest for the last known location.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the location or latest for the last known location.
     pub fn id(mut self, new_value: &str) -> LocationGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LocationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5771,8 +5752,8 @@ impl<'a, C, A> LocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasLocation`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5930,13 +5911,12 @@ impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LocationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5966,8 +5946,8 @@ impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasLocation`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6029,7 +6009,6 @@ pub struct AccountInsertCall<'a, C, A>
     _account_name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for AccountInsertCall<'a, C, A> {}
@@ -6065,8 +6044,17 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/mirror/v1/accounts/{userToken}/{accountType}/{accountName}".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
         }
 
         for &(find_this, param_name) in [("{userToken}", "userToken"), ("{accountType}", "accountType"), ("{accountName}", "accountName")].iter() {
@@ -6106,22 +6094,11 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -6170,52 +6147,51 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Account) -> AccountInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID for the user.
+    ///
     /// Sets the *user token* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the user.
     pub fn user_token(mut self, new_value: &str) -> AccountInsertCall<'a, C, A> {
         self._user_token = new_value.to_string();
         self
     }
+    /// Account type to be passed to Android Account Manager.
+    ///
     /// Sets the *account type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account type to be passed to Android Account Manager.
     pub fn account_type(mut self, new_value: &str) -> AccountInsertCall<'a, C, A> {
         self._account_type = new_value.to_string();
         self
     }
+    /// The name of the account to be passed to the Android Account Manager.
+    ///
     /// Sets the *account name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the account to be passed to the Android Account Manager.
     pub fn account_name(mut self, new_value: &str) -> AccountInsertCall<'a, C, A> {
         self._account_name = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6243,22 +6219,6 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self
     }
 
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountInsertCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
 }
 
 
@@ -6334,7 +6294,7 @@ impl<'a, C, A> ContactGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/mirror/v1/contacts/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -6430,23 +6390,22 @@ impl<'a, C, A> ContactGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the contact.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the contact.
     pub fn id(mut self, new_value: &str) -> ContactGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6476,8 +6435,8 @@ impl<'a, C, A> ContactGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6564,7 +6523,7 @@ impl<'a, C, A> ContactDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/mirror/v1/contacts/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -6650,23 +6609,22 @@ impl<'a, C, A> ContactDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the contact.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the contact.
     pub fn id(mut self, new_value: &str) -> ContactDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6696,8 +6654,8 @@ impl<'a, C, A> ContactDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6790,7 +6748,7 @@ impl<'a, C, A> ContactInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/mirror/v1/contacts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         
@@ -6870,22 +6828,21 @@ impl<'a, C, A> ContactInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Contact) -> ContactInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6915,8 +6872,8 @@ impl<'a, C, A> ContactInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7011,7 +6968,7 @@ impl<'a, C, A> ContactPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/mirror/v1/contacts/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -7115,32 +7072,31 @@ impl<'a, C, A> ContactPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Contact) -> ContactPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the contact.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the contact.
     pub fn id(mut self, new_value: &str) -> ContactPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7170,8 +7126,8 @@ impl<'a, C, A> ContactPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7257,7 +7213,7 @@ impl<'a, C, A> ContactListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/mirror/v1/contacts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         
@@ -7329,13 +7285,12 @@ impl<'a, C, A> ContactListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7365,8 +7320,8 @@ impl<'a, C, A> ContactListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7461,7 +7416,7 @@ impl<'a, C, A> ContactUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/mirror/v1/contacts/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GlasLocation.as_ref().to_string(), ());
+            self._scopes.insert(Scope::GlasTimeline.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -7565,32 +7520,31 @@ impl<'a, C, A> ContactUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Contact) -> ContactUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the contact.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the contact.
     pub fn id(mut self, new_value: &str) -> ContactUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContactUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7620,8 +7574,8 @@ impl<'a, C, A> ContactUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GlasTimeline`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

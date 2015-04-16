@@ -109,16 +109,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -291,16 +293,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -355,7 +359,7 @@ impl<'a, C, A> Plus<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachmentsThumbnails {
     /// URL of the webpage containing the image.
     pub url: String,
@@ -373,7 +377,7 @@ impl Part for ActivityObjectAttachmentsThumbnails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityActorName {
     /// The given name ("first name") of the actor.
     #[serde(rename="givenName")]
@@ -397,7 +401,7 @@ impl Part for ActivityActorName {}
 /// * [list activities](struct.ActivityListCall.html) (response)
 /// * [search activities](struct.ActivitySearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -429,7 +433,7 @@ impl ResponseResult for ActivityFeed {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonUrls {
     /// The type of URL. Possible values include, but are not limited to, the following values:  
     /// - "otherProfile" - URL for another profile. 
@@ -452,7 +456,7 @@ impl Part for PersonUrls {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonEmails {
     /// The type of address. Possible values include, but are not limited to, the following values:  
     /// - "account" - Google account email address. 
@@ -473,7 +477,7 @@ impl Part for PersonEmails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonOrganizations {
     /// The date that the person joined this organization.
     #[serde(rename="startDate")]
@@ -508,7 +512,7 @@ impl Part for PersonOrganizations {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectReplies {
     /// Total number of comments on this activity.
     #[serde(rename="totalItems")]
@@ -526,7 +530,7 @@ impl Part for ActivityObjectReplies {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachmentsEmbed {
     /// URL of the link.
     pub url: String,
@@ -543,7 +547,7 @@ impl Part for ActivityObjectAttachmentsEmbed {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlusAclentryResource {
     /// A descriptive name for this entry. Suitable for display.
     #[serde(rename="displayName")]
@@ -568,7 +572,7 @@ impl Part for PlusAclentryResource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonPlacesLived {
     /// If "true", this place of residence is this person's primary residence.
     pub primary: bool,
@@ -584,7 +588,7 @@ impl Part for PersonPlacesLived {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentObject {
     /// The HTML-formatted content, suitable for display.
     pub content: String,
@@ -756,7 +760,7 @@ impl Part for ItemScope {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachmentsImage {
     /// Image URL.
     pub url: String,
@@ -777,7 +781,7 @@ impl Part for ActivityObjectAttachmentsImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentInReplyTo {
     /// The URL of the activity.
     pub url: String,
@@ -800,7 +804,7 @@ impl Part for CommentInReplyTo {}
 /// * [list people](struct.PeopleListCall.html) (response)
 /// * [list by activity people](struct.PeopleListByActivityCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PeopleFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -828,7 +832,7 @@ impl ResponseResult for PeopleFeed {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentActor {
     /// A link to the Person resource for this actor.
     pub url: String,
@@ -849,7 +853,7 @@ impl Part for CommentActor {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityActor {
     /// The link to the actor's Google profile.
     pub url: String,
@@ -872,7 +876,7 @@ impl Part for ActivityActor {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityProvider {
     /// Name of the service provider.
     pub title: String,
@@ -886,7 +890,7 @@ impl Part for ActivityProvider {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlacePosition {
     /// The latitude of this position.
     pub latitude: f64,
@@ -902,7 +906,7 @@ impl Part for PlacePosition {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectPlusoners {
     /// Total number of people who +1'd this activity.
     #[serde(rename="totalItems")]
@@ -920,7 +924,7 @@ impl Part for ActivityObjectPlusoners {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonCoverCoverInfo {
     /// The difference between the left position of the cover image and the actual displayed cover image. Only valid for banner layout.
     #[serde(rename="leftImageOffset")]
@@ -974,7 +978,7 @@ impl ResponseResult for Moment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentActorImage {
     /// The URL of the actor's profile photo. To resize the image and crop it to a square, append the query string ?sz=x, where x is the dimension in pixels of each side.
     pub url: String,
@@ -988,7 +992,7 @@ impl Part for CommentActorImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonImage {
     /// The URL of the person's profile photo. To resize the image and crop it to a square, append the query string ?sz=x, where x is the dimension in pixels of each side.
     pub url: String,
@@ -1005,7 +1009,7 @@ impl Part for PersonImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentPlusoners {
     /// Total number of people who +1'd this comment.
     #[serde(rename="totalItems")]
@@ -1020,7 +1024,7 @@ impl Part for CommentPlusoners {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachments {
     /// The title of the attachment, such as a photo caption or an article title.
     #[serde(rename="displayName")]
@@ -1057,7 +1061,7 @@ impl Part for ActivityObjectAttachments {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonCoverCoverPhoto {
     /// The URL of the image.
     pub url: String,
@@ -1075,7 +1079,7 @@ impl Part for PersonCoverCoverPhoto {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachmentsFullImage {
     /// URL of the image.
     pub url: String,
@@ -1096,7 +1100,7 @@ impl Part for ActivityObjectAttachmentsFullImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonCover {
     /// Extra information about the cover photo.
     #[serde(rename="coverInfo")]
@@ -1117,7 +1121,7 @@ impl Part for PersonCover {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Acl {
     /// The list of access entries.
     pub items: Vec<PlusAclentryResource>,
@@ -1139,7 +1143,7 @@ impl Part for Acl {}
 /// 
 /// * [get people](struct.PeopleGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Person {
     /// The "bragging rights" line of this person.
     #[serde(rename="braggingRights")]
@@ -1235,7 +1239,7 @@ impl ResponseResult for Person {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectActor {
     /// A link to the original actor's Google profile.
     pub url: String,
@@ -1261,7 +1265,7 @@ impl Part for ActivityObjectActor {}
 /// 
 /// * [list moments](struct.MomentListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MomentsFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1296,7 +1300,7 @@ impl ResponseResult for MomentsFeed {}
 /// 
 /// * [get activities](struct.ActivityGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activity {
     /// Name of the place where this activity occurred.
     #[serde(rename="placeName")]
@@ -1357,7 +1361,7 @@ impl ResponseResult for Activity {}
 /// 
 /// * [list comments](struct.CommentListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1386,7 +1390,7 @@ impl ResponseResult for CommentFeed {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectResharers {
     /// Total number of people who reshared this activity.
     #[serde(rename="totalItems")]
@@ -1404,7 +1408,7 @@ impl Part for ActivityObjectResharers {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityActorImage {
     /// The URL of the actor's profile photo. To resize the image and crop it to a square, append the query string ?sz=x, where x is the dimension in pixels of each side.
     pub url: String,
@@ -1424,7 +1428,7 @@ impl Part for ActivityActorImage {}
 /// * [list comments](struct.CommentListCall.html) (none)
 /// * [get comments](struct.CommentGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Comment {
     /// The activity this comment replied to.
     #[serde(rename="inReplyTo")]
@@ -1461,7 +1465,7 @@ impl ResponseResult for Comment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectActorImage {
     /// A URL that points to a thumbnail photo of the original actor.
     pub url: String,
@@ -1475,7 +1479,7 @@ impl Part for ActivityObjectActorImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonAgeRange {
     /// The age range's upper bound, if any. Possible values include, but are not limited to, the following:  
     /// - "17" - for age 17 
@@ -1495,7 +1499,7 @@ impl Part for PersonAgeRange {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonName {
     /// The honorific prefixes (such as "Dr." or "Mrs.") for this person.
     #[serde(rename="honorificPrefix")]
@@ -1524,7 +1528,7 @@ impl Part for PersonName {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachmentsThumbnailsImage {
     /// Image url.
     pub url: String,
@@ -1545,7 +1549,7 @@ impl Part for ActivityObjectAttachmentsThumbnailsImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaceAddress {
     /// The formatted address for display.
     pub formatted: String,
@@ -1559,7 +1563,7 @@ impl Part for PlaceAddress {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObject {
     /// The HTML-formatted content, which is suitable for display.
     pub content: String,
@@ -1595,7 +1599,7 @@ impl Part for ActivityObject {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Place {
     /// The position of the place.
     pub position: PlacePosition,
@@ -2216,50 +2220,48 @@ impl<'a, C, A> MomentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Moment) -> MomentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the user to record actions for. The only valid values are "me" and the ID of the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user to record actions for. The only valid values are "me" and the ID of the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> MomentInsertCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The collection to which to write moments.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection to which to write moments.
     pub fn collection(mut self, new_value: &str) -> MomentInsertCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *debug* query property to the given value.
-    ///
-    /// 
     /// Return the moment as written. Should be used only for debugging.
+    ///
+    /// Sets the *debug* query property to the given value.
     pub fn debug(mut self, new_value: bool) -> MomentInsertCall<'a, C, A> {
         self._debug = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MomentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2289,8 +2291,8 @@ impl<'a, C, A> MomentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2496,65 +2498,60 @@ impl<'a, C, A> MomentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the user to get moments for. The special value "me" can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user to get moments for. The special value "me" can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> MomentListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The collection of moments to list.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection of moments to list.
     pub fn collection(mut self, new_value: &str) -> MomentListCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *type* query property to the given value.
-    ///
-    /// 
     /// Only moments of this type will be returned.
+    ///
+    /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: &str) -> MomentListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Sets the *target url* query property to the given value.
-    ///
-    /// 
     /// Only moments containing this targetUrl will be returned.
+    ///
+    /// Sets the *target url* query property to the given value.
     pub fn target_url(mut self, new_value: &str) -> MomentListCall<'a, C, A> {
         self._target_url = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> MomentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of moments to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> MomentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MomentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2584,8 +2581,8 @@ impl<'a, C, A> MomentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2758,23 +2755,22 @@ impl<'a, C, A> MomentRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The ID of the moment to delete.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the moment to delete.
     pub fn id(mut self, new_value: &str) -> MomentRemoveCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MomentRemoveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2804,8 +2800,8 @@ impl<'a, C, A> MomentRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2985,55 +2981,50 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// Full-text search query string.
+    ///
     /// Sets the *query* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Full-text search query string.
     pub fn query(mut self, new_value: &str) -> ActivitySearchCall<'a, C, A> {
         self._query = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response. This token can be of any length.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ActivitySearchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// Specifies how to order search results.
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ActivitySearchCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of activities to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ActivitySearchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// Specify the preferred language to search with. See search language codes for available values.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> ActivitySearchCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivitySearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3063,8 +3054,8 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3248,23 +3239,22 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the activity to get.
+    ///
     /// Sets the *activity id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the activity to get.
     pub fn activity_id(mut self, new_value: &str) -> ActivityGetCall<'a, C, A> {
         self._activity_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3294,8 +3284,8 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3491,49 +3481,46 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The ID of the user to get activities for. The special value "me" can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user to get activities for. The special value "me" can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The collection of activities to list.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection of activities to list.
     pub fn collection(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of activities to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3563,8 +3550,8 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3763,47 +3750,43 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the activity to get comments for.
+    ///
     /// Sets the *activity id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the activity to get comments for.
     pub fn activity_id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._activity_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// The order in which to sort the list of comments.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of comments to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3833,8 +3816,8 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4018,23 +4001,22 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the comment to get.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment to get.
     pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4064,8 +4046,8 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4240,47 +4222,43 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Specify a query string for full text search of public text in all profiles.
+    ///
     /// Sets the *query* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Specify a query string for full text search of public text in all profiles.
     pub fn query(mut self, new_value: &str) -> PeopleSearchCall<'a, C, A> {
         self._query = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response. This token can be of any length.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PeopleSearchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of people to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PeopleSearchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// Specify the preferred language to search with. See search language codes for available values.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> PeopleSearchCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4310,8 +4288,8 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4507,49 +4485,46 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The ID of the activity to get the list of people for.
+    ///
     /// Sets the *activity id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the activity to get the list of people for.
     pub fn activity_id(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C, A> {
         self._activity_id = new_value.to_string();
         self
     }
+    /// The collection of people to list.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection of people to list.
     pub fn collection(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of people to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PeopleListByActivityCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleListByActivityCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4579,8 +4554,8 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4781,57 +4756,53 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Get the collection of people for the person identified. Use "me" to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Get the collection of people for the person identified. Use "me" to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> PeopleListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The collection of people to list.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection of people to list.
     pub fn collection(mut self, new_value: &str) -> PeopleListCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PeopleListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// The order to return people in.
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> PeopleListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of people to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PeopleListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4861,8 +4832,8 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5046,23 +5017,22 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The ID of the person to get the profile for. The special value "me" can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the person to get the profile for. The special value "me" can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> PeopleGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5092,8 +5062,8 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Login`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

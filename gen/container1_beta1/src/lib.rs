@@ -100,16 +100,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -267,16 +269,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -327,7 +331,7 @@ impl<'a, C, A> Container<C, A>
 /// 
 /// * [zones operations list projects](struct.ProjectZoneOperationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListOperationsResponse {
     /// A list of operations in the project in the specified zone.
     pub operations: Vec<Operation>,
@@ -345,7 +349,7 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 /// * [clusters list projects](struct.ProjectClusterListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAggregatedClustersResponse {
     /// A list of clusters in the project, across all zones.
     pub clusters: Vec<Cluster>,
@@ -363,7 +367,7 @@ impl ResponseResult for ListAggregatedClustersResponse {}
 /// 
 /// * [zones clusters list projects](struct.ProjectZoneClusterListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListClustersResponse {
     /// A list of clusters in the project in the specified zone.
     pub clusters: Vec<Cluster>,
@@ -505,7 +509,7 @@ impl Part for ServiceAccount {}
 /// * [zones clusters delete projects](struct.ProjectZoneClusterDeleteCall.html) (response)
 /// * [zones clusters create projects](struct.ProjectZoneClusterCreateCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// The current status of the operation.
     pub status: String,
@@ -541,7 +545,7 @@ impl ResponseResult for Operation {}
 /// 
 /// * [operations list projects](struct.ProjectOperationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAggregatedOperationsResponse {
     /// A list of operations in the project, across all zones.
     pub operations: Vec<Operation>,
@@ -956,43 +960,42 @@ impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// The Google Developers Console project ID or  project number.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The name of the Google Compute Engine zone in which the cluster resides.
+    ///
     /// Sets the *zone id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the Google Compute Engine zone in which the cluster resides.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
+    /// The name of the cluster to retrieve.
+    ///
     /// Sets the *cluster id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the cluster to retrieve.
     pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, A> {
         self._cluster_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1022,8 +1025,8 @@ impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1207,23 +1210,22 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The Google Developers Console project ID or  project number.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectOperationListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1253,8 +1255,8 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1444,43 +1446,42 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The Google Developers Console project ID or  project number.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The name of the Google Compute Engine zone in which the cluster resides.
+    ///
     /// Sets the *zone id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the Google Compute Engine zone in which the cluster resides.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
+    /// The name of the cluster to delete.
+    ///
     /// Sets the *cluster id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the cluster to delete.
     pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, A> {
         self._cluster_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1510,8 +1511,8 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1695,23 +1696,22 @@ impl<'a, C, A> ProjectClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The Google Developers Console project ID or  project number.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectClusterListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectClusterListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1741,8 +1741,8 @@ impl<'a, C, A> ProjectClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1930,43 +1930,42 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// The Google Developers Console project ID or  project number.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The name of the Google Compute Engine zone in which the operation resides. This is always the same zone as the cluster with which the operation is associated.
+    ///
     /// Sets the *zone id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the Google Compute Engine zone in which the operation resides. This is always the same zone as the cluster with which the operation is associated.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
+    /// The server-assigned name of the operation.
+    ///
     /// Sets the *operation id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The server-assigned name of the operation.
     pub fn operation_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
         self._operation_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1996,8 +1995,8 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2183,33 +2182,32 @@ impl<'a, C, A> ProjectZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The Google Developers Console project ID or  project number.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The name of the Google Compute Engine zone to return operations for.
+    ///
     /// Sets the *zone id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the Google Compute Engine zone to return operations for.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2239,8 +2237,8 @@ impl<'a, C, A> ProjectZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2426,33 +2424,32 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The Google Developers Console project ID or  project number.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The name of the Google Compute Engine zone in which the cluster resides.
+    ///
     /// Sets the *zone id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the Google Compute Engine zone in which the cluster resides.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2482,8 +2479,8 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2690,42 +2687,41 @@ impl<'a, C, A> ProjectZoneClusterCreateCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreateClusterRequest) -> ProjectZoneClusterCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The Google Developers Console project ID or  project number.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The name of the Google Compute Engine zone in which the cluster resides.
+    ///
     /// Sets the *zone id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the Google Compute Engine zone in which the cluster resides.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2755,8 +2751,8 @@ impl<'a, C, A> ProjectZoneClusterCreateCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

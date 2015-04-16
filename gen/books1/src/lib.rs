@@ -133,16 +133,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -312,16 +314,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -396,7 +400,7 @@ impl<'a, C, A> Books<C, A>
 /// 
 /// * [list categories onboarding](struct.OnboardingListCategoryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Category {
     /// A list of onboarding categories.
     pub items: Vec<CategoryItems>,
@@ -411,7 +415,7 @@ impl ResponseResult for Category {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CategoryItems {
     /// no description provided
     #[serde(rename="badgeUrl")]
@@ -431,7 +435,7 @@ impl Part for CategoryItems {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConcurrentAccessRestriction {
     /// Client nonce for verification. Download access and client-validation only.
     pub nonce: String,
@@ -469,7 +473,7 @@ impl Part for ConcurrentAccessRestriction {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoDimensions {
     /// Width of this volume (in cm).
     pub width: String,
@@ -487,7 +491,7 @@ impl Part for VolumeVolumeInfoDimensions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfo {
     /// Volume subtitle. (In LITE projection.)
     pub subtitle: String,
@@ -592,7 +596,7 @@ impl Part for AnnotationClientVersionRanges {}
 /// 
 /// * [request access myconfig](struct.MyconfigRequestAccesCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RequestAccess {
     /// A download access response.
     #[serde(rename="downloadAccess")]
@@ -611,7 +615,7 @@ impl ResponseResult for RequestAccess {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OffersItemsItems {
     /// no description provided
     pub description: String,
@@ -643,7 +647,7 @@ impl Part for OffersItemsItems {}
 /// 
 /// * [annotations list mylibrary](struct.MylibraryAnnotationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Annotations {
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(rename="nextPageToken")]
@@ -664,7 +668,7 @@ impl ResponseResult for Annotations {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoOffers {
     /// The rental duration (for rental offers only).
     #[serde(rename="rentalDuration")]
@@ -693,7 +697,7 @@ impl Part for VolumeSaleInfoOffers {}
 /// 
 /// * [list offline metadata dictionary](struct.DictionaryListOfflineMetadataCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
     /// A list of offline dictionary metadata.
     pub items: Vec<MetadataItems>,
@@ -719,7 +723,7 @@ impl ResponseResult for Metadata {}
 /// * [recommended list volumes](struct.VolumeRecommendedListCall.html) (none)
 /// * [mybooks list volumes](struct.VolumeMybookListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volume {
     /// Resource type for a volume. (In LITE projection.)
     pub kind: String,
@@ -761,7 +765,7 @@ impl ResponseResult for Volume {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeLayerInfo {
     /// A layer should appear here if and only if the layer exists for this book.
     pub layers: Vec<VolumeLayerInfoLayers>,
@@ -798,7 +802,7 @@ impl ResponseResult for Usersettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeRecommendedInfo {
     /// A text explaining why this volume is recommended.
     pub explanation: String,
@@ -812,7 +816,7 @@ impl Part for VolumeRecommendedInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetadataItems {
     /// no description provided
     pub encrypted_key: String,
@@ -834,7 +838,7 @@ impl Part for MetadataItems {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReviewAuthor {
     /// Name of this person.
     #[serde(rename="displayName")]
@@ -855,7 +859,7 @@ impl Part for ReviewAuthor {}
 /// * [get bookshelves](struct.BookshelveGetCall.html) (response)
 /// * [bookshelves get mylibrary](struct.MylibraryBookshelveGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bookshelf {
     /// Resource type for bookshelf metadata.
     pub kind: String,
@@ -970,7 +974,7 @@ impl ResponseResult for Annotation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Review {
     /// Star rating for this review. Possible values are ONE, TWO, THREE, FOUR, FIVE or NOT_RATED.
     pub rating: String,
@@ -1004,7 +1008,7 @@ impl Part for Review {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DownloadAccessRestriction {
     /// Client nonce for verification. Download access and client-validation only.
     pub nonce: String,
@@ -1050,7 +1054,7 @@ impl Part for DownloadAccessRestriction {}
 /// 
 /// * [release download access myconfig](struct.MyconfigReleaseDownloadAccesCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DownloadAccesses {
     /// A list of download access responses.
     #[serde(rename="downloadAccessList")]
@@ -1066,7 +1070,7 @@ impl ResponseResult for DownloadAccesses {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReviewSource {
     /// Extra text about the source of the review.
     #[serde(rename="extraDescription")]
@@ -1090,7 +1094,7 @@ impl Part for ReviewSource {}
 /// 
 /// * [readingpositions get mylibrary](struct.MylibraryReadingpositionGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReadingPosition {
     /// Position in a PDF file.
     #[serde(rename="pdfPosition")]
@@ -1120,7 +1124,7 @@ impl ResponseResult for ReadingPosition {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoOffersRetailPrice {
     /// no description provided
     #[serde(rename="currencyCode")]
@@ -1138,7 +1142,7 @@ impl Part for VolumeSaleInfoOffersRetailPrice {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSearchInfo {
     /// A text snippet containing the search query.
     #[serde(rename="textSnippet")]
@@ -1153,7 +1157,7 @@ impl Part for VolumeSearchInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationsSummaryLayers {
     /// no description provided
     #[serde(rename="limitType")]
@@ -1184,7 +1188,7 @@ impl Part for AnnotationsSummaryLayers {}
 /// 
 /// * [annotation data get layers](struct.LayerAnnotationDataGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Annotationdata {
     /// The type of annotation this data is for.
     #[serde(rename="annotationType")]
@@ -1217,7 +1221,7 @@ impl ResponseResult for Annotationdata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoImageLinks {
     /// Image link for large size (width of ~800 pixels). (In LITE projection)
     pub large: String,
@@ -1243,7 +1247,7 @@ impl Part for VolumeVolumeInfoImageLinks {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoRetailPrice {
     /// Amount in the currency listed below. (In LITE projection.)
     pub amount: f64,
@@ -1265,7 +1269,7 @@ impl Part for VolumeSaleInfoRetailPrice {}
 /// 
 /// * [get layers](struct.LayerGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Layersummary {
     /// Resource Type
     pub kind: String,
@@ -1312,7 +1316,7 @@ impl ResponseResult for Layersummary {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoOffersListPrice {
     /// no description provided
     #[serde(rename="currencyCode")]
@@ -1335,7 +1339,7 @@ impl Part for VolumeSaleInfoOffersListPrice {}
 /// 
 /// * [volume annotations get layers](struct.LayerVolumeAnnotationGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volumeannotation {
     /// The type of annotation this is.
     #[serde(rename="annotationType")]
@@ -1388,7 +1392,7 @@ impl ResponseResult for Volumeannotation {}
 /// 
 /// * [volume annotations list layers](struct.LayerVolumeAnnotationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volumeannotations {
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(rename="nextPageToken")]
@@ -1416,7 +1420,7 @@ impl ResponseResult for Volumeannotations {}
 /// 
 /// * [annotation data list layers](struct.LayerAnnotationDataListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Annotationsdata {
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(rename="nextPageToken")]
@@ -1437,7 +1441,7 @@ impl ResponseResult for Annotationsdata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoIndustryIdentifiers {
     /// Industry specific volume identifier.
     pub identifier: String,
@@ -1480,7 +1484,7 @@ impl Part for AnnotationLayerSummary {}
 /// 
 /// * [get promooffer](struct.PromoofferGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Offers {
     /// A list of offers.
     pub items: Vec<OffersItems>,
@@ -1495,7 +1499,7 @@ impl ResponseResult for Offers {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeAccessInfoEpub {
     /// Is a flowing text epub available either as public domain or for purchase. (In LITE projection.)
     #[serde(rename="isAvailable")]
@@ -1521,7 +1525,7 @@ impl Part for VolumeAccessInfoEpub {}
 /// 
 /// * [list category volumes onboarding](struct.OnboardingListCategoryVolumeCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volume2 {
     /// no description provided
     #[serde(rename="nextPageToken")]
@@ -1539,7 +1543,7 @@ impl ResponseResult for Volume2 {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeAccessInfoPdf {
     /// Is a scanned image pdf available either as public domain or for purchase. (In LITE projection.)
     #[serde(rename="isAvailable")]
@@ -1565,7 +1569,7 @@ impl Part for VolumeAccessInfoPdf {}
 /// 
 /// * [annotations summary mylibrary](struct.MylibraryAnnotationSummaryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationsSummary {
     /// no description provided
     pub layers: Vec<AnnotationsSummaryLayers>,
@@ -1586,7 +1590,7 @@ impl ResponseResult for AnnotationsSummary {}
 /// * [bookshelves list mylibrary](struct.MylibraryBookshelveListCall.html) (response)
 /// * [list bookshelves](struct.BookshelveListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bookshelves {
     /// A list of bookshelves.
     pub items: Vec<Bookshelf>,
@@ -1601,7 +1605,7 @@ impl ResponseResult for Bookshelves {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeLayerInfoLayers {
     /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.
     #[serde(rename="volumeAnnotationsVersion")]
@@ -1624,7 +1628,7 @@ impl Part for VolumeLayerInfoLayers {}
 /// 
 /// * [list layers](struct.LayerListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Layersummaries {
     /// The total number of layer summaries found.
     #[serde(rename="totalItems")]
@@ -1642,7 +1646,7 @@ impl ResponseResult for Layersummaries {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OffersItems {
     /// no description provided
     #[serde(rename="gservicesKey")]
@@ -1664,7 +1668,7 @@ impl Part for OffersItems {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeUserInfoCopy {
     /// no description provided
     #[serde(rename="limitType")]
@@ -1692,7 +1696,7 @@ impl Part for VolumeUserInfoCopy {}
 /// 
 /// * [recommended rate volumes](struct.VolumeRecommendedRateCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BooksVolumesRecommendedRateResponse {
     /// no description provided
     pub consistency_token: String,
@@ -1705,7 +1709,7 @@ impl ResponseResult for BooksVolumesRecommendedRateResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeUserInfo {
     /// Whether or not this volume is currently in "my books."
     #[serde(rename="isInMyBooks")]
@@ -1775,7 +1779,7 @@ impl ResponseResult for BooksCloudloadingResource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeUserInfoUserUploadedVolumeInfo {
     /// no description provided
     #[serde(rename="processingState")]
@@ -1790,7 +1794,7 @@ impl Part for VolumeUserInfoUserUploadedVolumeInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoListPrice {
     /// Amount in the currency listed below. (In LITE projection.)
     pub amount: f64,
@@ -1830,7 +1834,7 @@ impl Part for BooksAnnotationsRange {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeAccessInfo {
     /// URL to read this volume on the Google Books site. Link will not allow users to read non-viewable volumes.
     #[serde(rename="webReaderLink")]
@@ -1906,7 +1910,7 @@ impl Part for AnnotationCurrentVersionRanges {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfo {
     /// The two-letter ISO_3166-1 country code for which this sale information is valid. (In LITE projection.)
     pub country: String,
@@ -1951,7 +1955,7 @@ impl Part for VolumeSaleInfo {}
 /// * [bookshelves volumes list mylibrary](struct.MylibraryBookshelveVolumeListCall.html) (response)
 /// * [mybooks list volumes](struct.VolumeMybookListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volumes {
     /// Total number of volumes found. This might be greater than the number of volumes returned in this response if results have been paginated.
     #[serde(rename="totalItems")]
@@ -1969,7 +1973,7 @@ impl ResponseResult for Volumes {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeUserInfoRentalPeriod {
     /// no description provided
     #[serde(rename="startUtcSec")]
@@ -1987,7 +1991,7 @@ impl Part for VolumeUserInfoRentalPeriod {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeannotationContentRanges {
     /// Range in GB image format for this annotation for version above.
     #[serde(rename="gbImageRange")]
@@ -2011,7 +2015,7 @@ impl Part for VolumeannotationContentRanges {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoOffersRentalDuration {
     /// no description provided
     pub count: f64,
@@ -3501,101 +3505,94 @@ impl<'a, C, A> LayerAnnotationDataGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The volume to retrieve annotations for.
+    ///
     /// Sets the *volume id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The volume to retrieve annotations for.
     pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
+    /// The ID for the layer to get the annotations.
+    ///
     /// Sets the *layer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the layer to get the annotations.
     pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._layer_id = new_value.to_string();
         self
     }
+    /// The ID of the annotation data to retrieve.
+    ///
     /// Sets the *annotation data id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the annotation data to retrieve.
     pub fn annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._annotation_data_id = new_value.to_string();
         self
     }
+    /// The content version for the volume you are trying to retrieve.
+    ///
     /// Sets the *content version* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The content version for the volume you are trying to retrieve.
     pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._content_version = new_value.to_string();
         self
     }
-    /// Sets the *w* query property to the given value.
-    ///
-    /// 
     /// The requested pixel width for any images. If width is provided height must also be provided.
+    ///
+    /// Sets the *w* query property to the given value.
     pub fn w(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._w = Some(new_value);
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *scale* query property to the given value.
-    ///
-    /// 
     /// The requested scale for the image.
+    ///
+    /// Sets the *scale* query property to the given value.
     pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._scale = Some(new_value);
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *h* query property to the given value.
-    ///
-    /// 
     /// The requested pixel height for any images. If height is provided width must also be provided.
+    ///
+    /// Sets the *h* query property to the given value.
     pub fn h(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._h = Some(new_value);
         self
     }
-    /// Sets the *allow web definitions* query property to the given value.
-    ///
-    /// 
     /// For the dictionary layer. Whether or not to allow web definitions.
+    ///
+    /// Sets the *allow web definitions* query property to the given value.
     pub fn allow_web_definitions(mut self, new_value: bool) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._allow_web_definitions = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3625,8 +3622,8 @@ impl<'a, C, A> LayerAnnotationDataGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3824,59 +3821,56 @@ impl<'a, C, A> LayerVolumeAnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The volume to retrieve annotations for.
+    ///
     /// Sets the *volume id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The volume to retrieve annotations for.
     pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
+    /// The ID for the layer to get the annotations.
+    ///
     /// Sets the *layer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the layer to get the annotations.
     pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._layer_id = new_value.to_string();
         self
     }
+    /// The ID of the volume annotation to retrieve.
+    ///
     /// Sets the *annotation id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the volume annotation to retrieve.
     pub fn annotation_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3906,8 +3900,8 @@ impl<'a, C, A> LayerVolumeAnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4111,55 +4105,50 @@ impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The volume to retrieve layers for.
+    ///
     /// Sets the *volume id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The volume to retrieve layers for.
     pub fn volume_id(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of the nextToken from the previous page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LayerListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *content version* query property to the given value.
-    ///
-    /// 
     /// The content version for the requested volume.
+    ///
+    /// Sets the *content version* query property to the given value.
     pub fn content_version(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._content_version = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4189,8 +4178,8 @@ impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4386,49 +4375,46 @@ impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// The volume to retrieve layers for.
+    ///
     /// Sets the *volume id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The volume to retrieve layers for.
     pub fn volume_id(mut self, new_value: &str) -> LayerGetCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
+    /// The ID for the layer to get the summary for.
+    ///
     /// Sets the *summary id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the layer to get the summary for.
     pub fn summary_id(mut self, new_value: &str) -> LayerGetCall<'a, C, A> {
         self._summary_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> LayerGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *content version* query property to the given value.
-    ///
-    /// 
     /// The content version for the requested volume.
+    ///
+    /// Sets the *content version* query property to the given value.
     pub fn content_version(mut self, new_value: &str) -> LayerGetCall<'a, C, A> {
         self._content_version = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4458,8 +4444,8 @@ impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4707,139 +4693,126 @@ impl<'a, C, A> LayerVolumeAnnotationListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// The volume to retrieve annotations for.
+    ///
     /// Sets the *volume id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The volume to retrieve annotations for.
     pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
+    /// The ID for the layer to get the annotations.
+    ///
     /// Sets the *layer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the layer to get the annotations.
     pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._layer_id = new_value.to_string();
         self
     }
+    /// The content version for the requested volume.
+    ///
     /// Sets the *content version* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The content version for the requested volume.
     pub fn content_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._content_version = new_value.to_string();
         self
     }
-    /// Sets the *volume annotations version* query property to the given value.
-    ///
-    /// 
     /// The version of the volume annotations that you are requesting.
+    ///
+    /// Sets the *volume annotations version* query property to the given value.
     pub fn volume_annotations_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._volume_annotations_version = Some(new_value.to_string());
         self
     }
-    /// Sets the *updated min* query property to the given value.
-    ///
-    /// 
     /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
+    ///
+    /// Sets the *updated min* query property to the given value.
     pub fn updated_min(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *updated max* query property to the given value.
-    ///
-    /// 
     /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
+    ///
+    /// Sets the *updated max* query property to the given value.
     pub fn updated_max(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._updated_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *start position* query property to the given value.
-    ///
-    /// 
     /// The start position to start retrieving data from.
+    ///
+    /// Sets the *start position* query property to the given value.
     pub fn start_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._start_position = Some(new_value.to_string());
         self
     }
-    /// Sets the *start offset* query property to the given value.
-    ///
-    /// 
     /// The start offset to start retrieving data from.
+    ///
+    /// Sets the *start offset* query property to the given value.
     pub fn start_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._start_offset = Some(new_value.to_string());
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// Set to true to return deleted annotations. updatedMin must be in the request to use this. Defaults to false.
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of the nextToken from the previous page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *end position* query property to the given value.
-    ///
-    /// 
     /// The end position to end retrieving data from.
+    ///
+    /// Sets the *end position* query property to the given value.
     pub fn end_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._end_position = Some(new_value.to_string());
         self
     }
-    /// Sets the *end offset* query property to the given value.
-    ///
-    /// 
     /// The end offset to end retrieving data from.
+    ///
+    /// Sets the *end offset* query property to the given value.
     pub fn end_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._end_offset = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4869,8 +4842,8 @@ impl<'a, C, A> LayerVolumeAnnotationListCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5112,124 +5085,113 @@ impl<'a, C, A> LayerAnnotationDataListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// The volume to retrieve annotation data for.
+    ///
     /// Sets the *volume id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The volume to retrieve annotation data for.
     pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
+    /// The ID for the layer to get the annotation data.
+    ///
     /// Sets the *layer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the layer to get the annotation data.
     pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._layer_id = new_value.to_string();
         self
     }
+    /// The content version for the requested volume.
+    ///
     /// Sets the *content version* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The content version for the requested volume.
     pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._content_version = new_value.to_string();
         self
     }
-    /// Sets the *w* query property to the given value.
-    ///
-    /// 
     /// The requested pixel width for any images. If width is provided height must also be provided.
+    ///
+    /// Sets the *w* query property to the given value.
     pub fn w(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, A> {
         self._w = Some(new_value);
         self
     }
-    /// Sets the *updated min* query property to the given value.
-    ///
-    /// 
     /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
+    ///
+    /// Sets the *updated min* query property to the given value.
     pub fn updated_min(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *updated max* query property to the given value.
-    ///
-    /// 
     /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
+    ///
+    /// Sets the *updated max* query property to the given value.
     pub fn updated_max(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._updated_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *scale* query property to the given value.
-    ///
-    /// 
     /// The requested scale for the image.
+    ///
+    /// Sets the *scale* query property to the given value.
     pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, A> {
         self._scale = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of the nextToken from the previous page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LayerAnnotationDataListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *h* query property to the given value.
-    ///
-    /// 
     /// The requested pixel height for any images. If height is provided width must also be provided.
+    ///
+    /// Sets the *h* query property to the given value.
     pub fn h(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, A> {
         self._h = Some(new_value);
         self
     }
+    /// The list of Annotation Data Ids to retrieve. Pagination is ignored if this is set.
+    ///
     /// Append the given value to the *annotation data id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The list of Annotation Data Ids to retrieve. Pagination is ignored if this is set.
     pub fn add_annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._annotation_data_id.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerAnnotationDataListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5259,8 +5221,8 @@ impl<'a, C, A> LayerAnnotationDataListCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5432,49 +5394,46 @@ impl<'a, C, A> VolumeRecommendedRateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// Rating to be given to the volume.
+    ///
     /// Sets the *rating* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Rating to be given to the volume.
     pub fn rating(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, A> {
         self._rating = new_value.to_string();
         self
     }
+    /// ID of the source volume.
+    ///
     /// Sets the *volume id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the source volume.
     pub fn volume_id(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeRecommendedRateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5504,8 +5463,8 @@ impl<'a, C, A> VolumeRecommendedRateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5701,63 +5660,56 @@ impl<'a, C, A> VolumeMybookListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Sets the *start index* query property to the given value.
-    ///
-    /// 
     /// Index of the first result to return (starts at 0)
+    ///
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> VolumeMybookListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
+    /// The processing state of the user uploaded volumes to be returned. Applicable only if the UPLOADED is specified in the acquireMethod.
+    ///
     /// Append the given value to the *processing state* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The processing state of the user uploaded volumes to be returned. Applicable only if the UPLOADED is specified in the acquireMethod.
     pub fn add_processing_state(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, A> {
         self._processing_state.push(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> VolumeMybookListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Ex:'en_US'. Used for generating recommendations.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
+    /// How the book was aquired
+    ///
     /// Append the given value to the *acquire method* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// How the book was aquired
     pub fn add_acquire_method(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, A> {
         self._acquire_method.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeMybookListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5787,8 +5739,8 @@ impl<'a, C, A> VolumeMybookListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6008,119 +5960,106 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Full-text search query string.
+    ///
     /// Sets the *q* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Full-text search query string.
     pub fn q(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._q = new_value.to_string();
         self
     }
-    /// Sets the *start index* query property to the given value.
-    ///
-    /// 
     /// Index of the first result to return (starts at 0)
+    ///
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> VolumeListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *show preorders* query property to the given value.
-    ///
-    /// 
     /// Set to true to show books available for preorder. Defaults to false.
+    ///
+    /// Sets the *show preorders* query property to the given value.
     pub fn show_preorders(mut self, new_value: bool) -> VolumeListCall<'a, C, A> {
         self._show_preorders = Some(new_value);
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Restrict information returned to a set of selected fields.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *print type* query property to the given value.
-    ///
-    /// 
     /// Restrict to books or magazines.
+    ///
+    /// Sets the *print type* query property to the given value.
     pub fn print_type(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._print_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *partner* query property to the given value.
-    ///
-    /// 
     /// Restrict and brand results for partner ID.
+    ///
+    /// Sets the *partner* query property to the given value.
     pub fn partner(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._partner = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// Sort search results.
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> VolumeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *library restrict* query property to the given value.
-    ///
-    /// 
     /// Restrict search to this user's library.
+    ///
+    /// Sets the *library restrict* query property to the given value.
     pub fn library_restrict(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._library_restrict = Some(new_value.to_string());
         self
     }
-    /// Sets the *lang restrict* query property to the given value.
-    ///
-    /// 
     /// Restrict results to books with this language code.
+    ///
+    /// Sets the *lang restrict* query property to the given value.
     pub fn lang_restrict(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._lang_restrict = Some(new_value.to_string());
         self
     }
-    /// Sets the *filter* query property to the given value.
-    ///
-    /// 
     /// Filter search results.
+    ///
+    /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Sets the *download* query property to the given value.
-    ///
-    /// 
     /// Restrict to volumes by download availability.
+    ///
+    /// Sets the *download* query property to the given value.
     pub fn download(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._download = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6150,8 +6089,8 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6347,63 +6286,56 @@ impl<'a, C, A> VolumeUseruploadedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The ids of the volumes to be returned. If not specified all that match the processingState are returned.
+    ///
     /// Append the given value to the *volume id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The ids of the volumes to be returned. If not specified all that match the processingState are returned.
     pub fn add_volume_id(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
         self._volume_id.push(new_value.to_string());
         self
     }
-    /// Sets the *start index* query property to the given value.
-    ///
-    /// 
     /// Index of the first result to return (starts at 0)
+    ///
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
+    /// The processing state of the user uploaded volumes to be returned.
+    ///
     /// Append the given value to the *processing state* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The processing state of the user uploaded volumes to be returned.
     pub fn add_processing_state(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
         self._processing_state.push(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeUseruploadedListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6433,8 +6365,8 @@ impl<'a, C, A> VolumeUseruploadedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6633,47 +6565,43 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// ID of the source volume.
+    ///
     /// Sets the *volume id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the source volume.
     pub fn volume_id(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *association* query property to the given value.
-    ///
-    /// 
     /// Association type.
+    ///
+    /// Sets the *association* query property to the given value.
     pub fn association(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, A> {
         self._association = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeAssociatedListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6703,8 +6631,8 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6913,62 +6841,56 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// ID of volume to retrieve.
+    ///
     /// Sets the *volume id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of volume to retrieve.
     pub fn volume_id(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
-    /// Sets the *user_library_consistent_read* query property to the given value.
     ///
-    /// 
+    /// Sets the *user_library_consistent_read* query property to the given value.
     pub fn user_library_consistent_read(mut self, new_value: bool) -> VolumeGetCall<'a, C, A> {
         self._user_library_consistent_read = Some(new_value);
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Restrict information returned to a set of selected fields.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *partner* query property to the given value.
-    ///
-    /// 
     /// Brand results for partner ID.
+    ///
+    /// Sets the *partner* query property to the given value.
     pub fn partner(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
         self._partner = Some(new_value.to_string());
         self
     }
-    /// Sets the *country* query property to the given value.
-    ///
-    /// 
     /// ISO-3166-1 code to override the IP-based location.
+    ///
+    /// Sets the *country* query property to the given value.
     pub fn country(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
         self._country = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6998,8 +6920,8 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7167,29 +7089,26 @@ impl<'a, C, A> VolumeRecommendedListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeRecommendedListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7219,8 +7138,8 @@ impl<'a, C, A> VolumeRecommendedListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7380,23 +7299,22 @@ impl<'a, C, A> DictionaryListOfflineMetadataCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// The device/version ID from which to request the data.
+    ///
     /// Sets the *cpksver* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The device/version ID from which to request the data.
     pub fn cpksver(mut self, new_value: &str) -> DictionaryListOfflineMetadataCall<'a, C, A> {
         self._cpksver = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DictionaryListOfflineMetadataCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7426,8 +7344,8 @@ impl<'a, C, A> DictionaryListOfflineMetadataCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7633,65 +7551,60 @@ impl<'a, C, A> BookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// ID of user for whom to retrieve bookshelf volumes.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of user for whom to retrieve bookshelf volumes.
     pub fn user_id(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// ID of bookshelf to retrieve volumes.
+    ///
     /// Sets the *shelf* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of bookshelf to retrieve volumes.
     pub fn shelf(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
-    /// Sets the *start index* query property to the given value.
-    ///
-    /// 
     /// Index of the first element to return (starts at 0)
+    ///
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *show preorders* query property to the given value.
-    ///
-    /// 
     /// Set to true to show pre-ordered books. Defaults to false.
+    ///
+    /// Sets the *show preorders* query property to the given value.
     pub fn show_preorders(mut self, new_value: bool) -> BookshelveVolumeListCall<'a, C, A> {
         self._show_preorders = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BookshelveVolumeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7721,8 +7634,8 @@ impl<'a, C, A> BookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7911,31 +7824,29 @@ impl<'a, C, A> BookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// ID of user for whom to retrieve bookshelves.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of user for whom to retrieve bookshelves.
     pub fn user_id(mut self, new_value: &str) -> BookshelveListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> BookshelveListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BookshelveListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7965,8 +7876,8 @@ impl<'a, C, A> BookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8157,41 +8068,39 @@ impl<'a, C, A> BookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// ID of user for whom to retrieve bookshelves.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of user for whom to retrieve bookshelves.
     pub fn user_id(mut self, new_value: &str) -> BookshelveGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// ID of bookshelf to retrieve.
+    ///
     /// Sets the *shelf* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of bookshelf to retrieve.
     pub fn shelf(mut self, new_value: &str) -> BookshelveGetCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> BookshelveGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BookshelveGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8221,8 +8130,8 @@ impl<'a, C, A> BookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8409,76 +8318,67 @@ impl<'a, C, A> PromoofferAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Sets the *volume id* query property to the given value.
-    ///
-    /// 
     /// Volume id to exercise the offer
+    ///
+    /// Sets the *volume id* query property to the given value.
     pub fn volume_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._volume_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *serial* query property to the given value.
-    ///
-    /// 
     /// device serial
+    ///
+    /// Sets the *serial* query property to the given value.
     pub fn serial(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._serial = Some(new_value.to_string());
         self
     }
-    /// Sets the *product* query property to the given value.
-    ///
-    /// 
     /// device product
+    ///
+    /// Sets the *product* query property to the given value.
     pub fn product(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._product = Some(new_value.to_string());
         self
     }
-    /// Sets the *offer id* query property to the given value.
     ///
-    /// 
+    /// Sets the *offer id* query property to the given value.
     pub fn offer_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._offer_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *model* query property to the given value.
-    ///
-    /// 
     /// device model
+    ///
+    /// Sets the *model* query property to the given value.
     pub fn model(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._model = Some(new_value.to_string());
         self
     }
-    /// Sets the *manufacturer* query property to the given value.
-    ///
-    /// 
     /// device manufacturer
+    ///
+    /// Sets the *manufacturer* query property to the given value.
     pub fn manufacturer(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._manufacturer = Some(new_value.to_string());
         self
     }
-    /// Sets the *device* query property to the given value.
-    ///
-    /// 
     /// device device
+    ///
+    /// Sets the *device* query property to the given value.
     pub fn device(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._device = Some(new_value.to_string());
         self
     }
-    /// Sets the *android id* query property to the given value.
-    ///
-    /// 
     /// device android_id
+    ///
+    /// Sets the *android id* query property to the given value.
     pub fn android_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._android_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PromoofferAcceptCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8508,8 +8408,8 @@ impl<'a, C, A> PromoofferAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8691,69 +8591,61 @@ impl<'a, C, A> PromoofferDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Sets the *serial* query property to the given value.
-    ///
-    /// 
     /// device serial
+    ///
+    /// Sets the *serial* query property to the given value.
     pub fn serial(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._serial = Some(new_value.to_string());
         self
     }
-    /// Sets the *product* query property to the given value.
-    ///
-    /// 
     /// device product
+    ///
+    /// Sets the *product* query property to the given value.
     pub fn product(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._product = Some(new_value.to_string());
         self
     }
-    /// Sets the *offer id* query property to the given value.
-    ///
-    /// 
     /// Offer to dimiss
+    ///
+    /// Sets the *offer id* query property to the given value.
     pub fn offer_id(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._offer_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *model* query property to the given value.
-    ///
-    /// 
     /// device model
+    ///
+    /// Sets the *model* query property to the given value.
     pub fn model(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._model = Some(new_value.to_string());
         self
     }
-    /// Sets the *manufacturer* query property to the given value.
-    ///
-    /// 
     /// device manufacturer
+    ///
+    /// Sets the *manufacturer* query property to the given value.
     pub fn manufacturer(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._manufacturer = Some(new_value.to_string());
         self
     }
-    /// Sets the *device* query property to the given value.
-    ///
-    /// 
     /// device device
+    ///
+    /// Sets the *device* query property to the given value.
     pub fn device(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._device = Some(new_value.to_string());
         self
     }
-    /// Sets the *android id* query property to the given value.
-    ///
-    /// 
     /// device android_id
+    ///
+    /// Sets the *android id* query property to the given value.
     pub fn android_id(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._android_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PromoofferDismisCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8783,8 +8675,8 @@ impl<'a, C, A> PromoofferDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8972,61 +8864,54 @@ impl<'a, C, A> PromoofferGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Sets the *serial* query property to the given value.
-    ///
-    /// 
     /// device serial
+    ///
+    /// Sets the *serial* query property to the given value.
     pub fn serial(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._serial = Some(new_value.to_string());
         self
     }
-    /// Sets the *product* query property to the given value.
-    ///
-    /// 
     /// device product
+    ///
+    /// Sets the *product* query property to the given value.
     pub fn product(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._product = Some(new_value.to_string());
         self
     }
-    /// Sets the *model* query property to the given value.
-    ///
-    /// 
     /// device model
+    ///
+    /// Sets the *model* query property to the given value.
     pub fn model(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._model = Some(new_value.to_string());
         self
     }
-    /// Sets the *manufacturer* query property to the given value.
-    ///
-    /// 
     /// device manufacturer
+    ///
+    /// Sets the *manufacturer* query property to the given value.
     pub fn manufacturer(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._manufacturer = Some(new_value.to_string());
         self
     }
-    /// Sets the *device* query property to the given value.
-    ///
-    /// 
     /// device device
+    ///
+    /// Sets the *device* query property to the given value.
     pub fn device(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._device = Some(new_value.to_string());
         self
     }
-    /// Sets the *android id* query property to the given value.
-    ///
-    /// 
     /// device android_id
+    ///
+    /// Sets the *android id* query property to the given value.
     pub fn android_id(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._android_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PromoofferGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9056,8 +8941,8 @@ impl<'a, C, A> PromoofferGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9220,21 +9105,19 @@ impl<'a, C, A> OnboardingListCategoryCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OnboardingListCategoryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9264,8 +9147,8 @@ impl<'a, C, A> OnboardingListCategoryCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9447,46 +9330,41 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of the nextToken from the previous page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *page size* query property to the given value.
-    ///
-    /// 
     /// Number of maximum results per page to be included in the response.
+    ///
+    /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: u32) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
+    /// List of category ids requested.
+    ///
     /// Append the given value to the *category id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// List of category ids requested.
     pub fn add_category_id(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         self._category_id.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9516,8 +9394,8 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9693,69 +9571,66 @@ impl<'a, C, A> MyconfigRequestAccesCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// String to identify the originator of this request.
+    ///
     /// Sets the *source* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._source = new_value.to_string();
         self
     }
+    /// The volume to request concurrent/download restrictions for.
+    ///
     /// Sets the *volume id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The volume to request concurrent/download restrictions for.
     pub fn volume_id(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
+    /// The client nonce value.
+    ///
     /// Sets the *nonce* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The client nonce value.
     pub fn nonce(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._nonce = new_value.to_string();
         self
     }
+    /// The device/version ID from which to request the restrictions.
+    ///
     /// Sets the *cpksver* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The device/version ID from which to request the restrictions.
     pub fn cpksver(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._cpksver = new_value.to_string();
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *license types* query property to the given value.
-    ///
-    /// 
     /// The type of access license to request. If not specified, the default is BOTH.
+    ///
+    /// Sets the *license types* query property to the given value.
     pub fn license_types(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._license_types = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigRequestAccesCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9785,8 +9660,8 @@ impl<'a, C, A> MyconfigRequestAccesCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9964,50 +9839,47 @@ impl<'a, C, A> MyconfigReleaseDownloadAccesCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    /// The volume(s) to release restrictions for.
+    ///
     /// Append the given value to the *volume ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The volume(s) to release restrictions for.
     pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         self._volume_ids.push(new_value.to_string());
         self
     }
+    /// The device/version ID from which to release the restriction.
+    ///
     /// Sets the *cpksver* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The device/version ID from which to release the restriction.
     pub fn cpksver(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         self._cpksver = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10037,8 +9909,8 @@ impl<'a, C, A> MyconfigReleaseDownloadAccesCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10230,77 +10102,72 @@ impl<'a, C, A> MyconfigSyncVolumeLicenseCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// String to identify the originator of this request.
+    ///
     /// Sets the *source* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._source = new_value.to_string();
         self
     }
+    /// The client nonce value.
+    ///
     /// Sets the *nonce* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The client nonce value.
     pub fn nonce(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._nonce = new_value.to_string();
         self
     }
+    /// The device/version ID from which to release the restriction.
+    ///
     /// Sets the *cpksver* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The device/version ID from which to release the restriction.
     pub fn cpksver(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._cpksver = new_value.to_string();
         self
     }
+    /// The volume(s) to request download restrictions for.
+    ///
     /// Append the given value to the *volume ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The volume(s) to request download restrictions for.
     pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._volume_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *show preorders* query property to the given value.
-    ///
-    /// 
     /// Set to true to show pre-ordered books. Defaults to false.
+    ///
+    /// Sets the *show preorders* query property to the given value.
     pub fn show_preorders(mut self, new_value: bool) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._show_preorders = Some(new_value);
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
+    /// List of features supported by the client, i.e., 'RENTALS'
+    ///
     /// Append the given value to the *features* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// List of features supported by the client, i.e., 'RENTALS'
     pub fn add_features(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._features.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10330,8 +10197,8 @@ impl<'a, C, A> MyconfigSyncVolumeLicenseCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10489,13 +10356,12 @@ impl<'a, C, A> MyconfigGetUserSettingCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigGetUserSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10525,8 +10391,8 @@ impl<'a, C, A> MyconfigGetUserSettingCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10699,22 +10565,21 @@ impl<'a, C, A> MyconfigUpdateUserSettingCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Usersettings) -> MyconfigUpdateUserSettingCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigUpdateUserSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10744,8 +10609,8 @@ impl<'a, C, A> MyconfigUpdateUserSettingCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10923,31 +10788,29 @@ impl<'a, C, A> MylibraryBookshelveClearVolumeCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    /// ID of bookshelf from which to remove a volume.
+    ///
     /// Sets the *shelf* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of bookshelf from which to remove a volume.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveClearVolumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10977,8 +10840,8 @@ impl<'a, C, A> MylibraryBookshelveClearVolumeCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11160,51 +11023,49 @@ impl<'a, C, A> MylibraryBookshelveMoveVolumeCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// ID of bookshelf with the volume.
+    ///
     /// Sets the *shelf* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of bookshelf with the volume.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
+    /// ID of volume to move.
+    ///
     /// Sets the *volume id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of volume to move.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
+    /// Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)
+    ///
     /// Sets the *volume position* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)
     pub fn volume_position(mut self, new_value: i32) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         self._volume_position = new_value;
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11234,8 +11095,8 @@ impl<'a, C, A> MylibraryBookshelveMoveVolumeCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11454,79 +11315,71 @@ impl<'a, C, A> MylibraryBookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// The bookshelf ID or name retrieve volumes for.
+    ///
     /// Sets the *shelf* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The bookshelf ID or name retrieve volumes for.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
-    /// Sets the *start index* query property to the given value.
-    ///
-    /// 
     /// Index of the first element to return (starts at 0)
+    ///
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *show preorders* query property to the given value.
-    ///
-    /// 
     /// Set to true to show pre-ordered books. Defaults to false.
+    ///
+    /// Sets the *show preorders* query property to the given value.
     pub fn show_preorders(mut self, new_value: bool) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._show_preorders = Some(new_value);
         self
     }
-    /// Sets the *q* query property to the given value.
-    ///
-    /// 
     /// Full-text search query string in this bookshelf.
+    ///
+    /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Restrict information returned to a set of selected fields.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *country* query property to the given value.
-    ///
-    /// 
     /// ISO-3166-1 code to override the IP-based location.
+    ///
+    /// Sets the *country* query property to the given value.
     pub fn country(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._country = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11556,8 +11409,8 @@ impl<'a, C, A> MylibraryBookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11725,34 +11578,33 @@ impl<'a, C, A> MylibraryAnnotationSummaryCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// Array of layer IDs to get the summary for.
+    ///
     /// Append the given value to the *layer ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Array of layer IDs to get the summary for.
     pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, C, A> {
         self._layer_ids.push(new_value.to_string());
         self
     }
+    /// Volume id to get the summary for.
+    ///
     /// Sets the *volume id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Volume id to get the summary for.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationSummaryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11782,8 +11634,8 @@ impl<'a, C, A> MylibraryAnnotationSummaryCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11961,31 +11813,29 @@ impl<'a, C, A> MylibraryAnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// The ID for the annotation to delete.
+    ///
     /// Sets the *annotation id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the annotation to delete.
     pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12015,8 +11865,8 @@ impl<'a, C, A> MylibraryAnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12201,49 +12051,46 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    /// ID of bookshelf to which to add a volume.
+    ///
     /// Sets the *shelf* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of bookshelf to which to add a volume.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
+    /// ID of volume to add.
+    ///
     /// Sets the *volume id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of volume to add.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *reason* query property to the given value.
-    ///
-    /// 
     /// The reason for which the book is added to the library.
+    ///
+    /// Sets the *reason* query property to the given value.
     pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         self._reason = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12273,8 +12120,8 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12462,46 +12309,42 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Annotation) -> MylibraryAnnotationInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *show only summary in response* query property to the given value.
-    ///
-    /// 
     /// Requests that only the summary of the specified layer be provided in the response.
+    ///
+    /// Sets the *show only summary in response* query property to the given value.
     pub fn show_only_summary_in_response(mut self, new_value: bool) -> MylibraryAnnotationInsertCall<'a, C, A> {
         self._show_only_summary_in_response = Some(new_value);
         self
     }
-    /// Sets the *country* query property to the given value.
-    ///
-    /// 
     /// ISO-3166-1 code to override the IP-based location.
+    ///
+    /// Sets the *country* query property to the given value.
     pub fn country(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, C, A> {
         self._country = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12531,8 +12374,8 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12717,49 +12560,46 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    /// ID of bookshelf from which to remove a volume.
+    ///
     /// Sets the *shelf* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of bookshelf from which to remove a volume.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
+    /// ID of volume to remove.
+    ///
     /// Sets the *volume id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of volume to remove.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *reason* query property to the given value.
-    ///
-    /// 
     /// The reason for which the book is removed from the library.
+    ///
+    /// Sets the *reason* query property to the given value.
     pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         self._reason = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12789,8 +12629,8 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13002,94 +12842,83 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// Sets the *volume id* query property to the given value.
-    ///
-    /// 
     /// The volume to restrict annotations to.
+    ///
+    /// Sets the *volume id* query property to the given value.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._volume_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *updated min* query property to the given value.
-    ///
-    /// 
     /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
+    ///
+    /// Sets the *updated min* query property to the given value.
     pub fn updated_min(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *updated max* query property to the given value.
-    ///
-    /// 
     /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
+    ///
+    /// Sets the *updated max* query property to the given value.
     pub fn updated_max(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._updated_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// Set to true to return deleted annotations. updatedMin must be in the request to use this. Defaults to false.
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> MylibraryAnnotationListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of the nextToken from the previous page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> MylibraryAnnotationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// The layer ID(s) to limit annotation by.
+    ///
     /// Append the given value to the *layer ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The layer ID(s) to limit annotation by.
     pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._layer_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *layer id* query property to the given value.
-    ///
-    /// 
     /// The layer ID to limit annotation by.
+    ///
+    /// Sets the *layer id* query property to the given value.
     pub fn layer_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._layer_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *content version* query property to the given value.
-    ///
-    /// 
     /// The content version for the requested volume.
+    ///
+    /// Sets the *content version* query property to the given value.
     pub fn content_version(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._content_version = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13119,8 +12948,8 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13324,40 +13153,38 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Annotation) -> MylibraryAnnotationUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID for the annotation to update.
+    ///
     /// Sets the *annotation id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the annotation to update.
     pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13387,8 +13214,8 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13585,75 +13412,70 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
     }
 
 
+    /// ID of volume for which to update the reading position.
+    ///
     /// Sets the *volume id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of volume for which to update the reading position.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
+    /// RFC 3339 UTC format timestamp associated with this reading position.
+    ///
     /// Sets the *timestamp* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// RFC 3339 UTC format timestamp associated with this reading position.
     pub fn timestamp(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._timestamp = new_value.to_string();
         self
     }
+    /// Position string for the new volume reading position.
+    ///
     /// Sets the *position* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Position string for the new volume reading position.
     pub fn position(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._position = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *device cookie* query property to the given value.
-    ///
-    /// 
     /// Random persistent device cookie optional on set position.
+    ///
+    /// Sets the *device cookie* query property to the given value.
     pub fn device_cookie(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._device_cookie = Some(new_value.to_string());
         self
     }
-    /// Sets the *content version* query property to the given value.
-    ///
-    /// 
     /// Volume content version for which this reading position applies.
+    ///
+    /// Sets the *content version* query property to the given value.
     pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._content_version = Some(new_value.to_string());
         self
     }
-    /// Sets the *action* query property to the given value.
-    ///
-    /// 
     /// Action that caused this reading position to be set.
+    ///
+    /// Sets the *action* query property to the given value.
     pub fn action(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._action = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13683,8 +13505,8 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13873,31 +13695,29 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// ID of bookshelf to retrieve.
+    ///
     /// Sets the *shelf* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of bookshelf to retrieve.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13927,8 +13747,8 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14091,21 +13911,19 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14135,8 +13953,8 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14330,39 +14148,36 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// ID of volume for which to retrieve a reading position.
+    ///
     /// Sets the *volume id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of volume for which to retrieve a reading position.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *content version* query property to the given value.
-    ///
-    /// 
     /// Volume content version for which this reading position is requested.
+    ///
+    /// Sets the *content version* query property to the given value.
     pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, A> {
         self._content_version = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryReadingpositionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14392,8 +14207,8 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14571,44 +14386,39 @@ impl<'a, C, A> CloudloadingAddBookCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// Sets the *upload_client_token* query property to the given value.
     ///
-    /// 
+    /// Sets the *upload_client_token* query property to the given value.
     pub fn upload_client_token(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, A> {
         self._upload_client_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *name* query property to the given value.
-    ///
-    /// 
     /// The document name. It can be set only if the drive_document_id is set.
+    ///
+    /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
-    /// Sets the *mime_type* query property to the given value.
-    ///
-    /// 
     /// The document MIME type. It can be set only if the drive_document_id is set.
+    ///
+    /// Sets the *mime_type* query property to the given value.
     pub fn mime_type(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, A> {
         self._mime_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *drive_document_id* query property to the given value.
-    ///
-    /// 
     /// A drive document id. The upload_client_token must not be set.
+    ///
+    /// Sets the *drive_document_id* query property to the given value.
     pub fn drive_document_id(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, A> {
         self._drive_document_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CloudloadingAddBookCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14638,8 +14448,8 @@ impl<'a, C, A> CloudloadingAddBookCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14812,22 +14622,21 @@ impl<'a, C, A> CloudloadingUpdateBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &BooksCloudloadingResource) -> CloudloadingUpdateBookCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CloudloadingUpdateBookCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14857,8 +14666,8 @@ impl<'a, C, A> CloudloadingUpdateBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15007,23 +14816,22 @@ impl<'a, C, A> CloudloadingDeleteBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The id of the book to be removed.
+    ///
     /// Sets the *volume id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id of the book to be removed.
     pub fn volume_id(mut self, new_value: &str) -> CloudloadingDeleteBookCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CloudloadingDeleteBookCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15053,8 +14861,8 @@ impl<'a, C, A> CloudloadingDeleteBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

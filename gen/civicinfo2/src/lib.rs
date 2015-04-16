@@ -105,16 +105,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -252,16 +254,18 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -313,7 +317,7 @@ impl<'a, C, A> CivicInfo<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdministrationRegion {
     /// The election administration body for this area.
     #[serde(rename="electionAdministrationBody")]
@@ -335,7 +339,7 @@ impl Part for AdministrationRegion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Official {
     /// The official's name.
     pub name: String,
@@ -363,7 +367,7 @@ impl Part for Official {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ElectoralDistrict {
     /// The geographic scope of this district. If unspecified the district's geography is not known. One of: national, statewide, congressional, stateUpper, stateLower, countywide, judicial, schoolBoard, cityWide, township, countyCouncil, cityCouncil, ward, special
     pub scope: String,
@@ -385,7 +389,7 @@ impl Part for ElectoralDistrict {}
 /// 
 /// * [search divisions](struct.DivisionSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DivisionSearchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "civicinfo#divisionSearchResponse".
     pub kind: String,
@@ -400,7 +404,7 @@ impl ResponseResult for DivisionSearchResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Candidate {
     /// The candidate's name.
     pub name: String,
@@ -430,7 +434,7 @@ impl Part for Candidate {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Contest {
     /// The name of the office for this contest.
     pub office: String,
@@ -489,7 +493,7 @@ impl Part for Contest {}
 /// 
 /// * [election query elections](struct.ElectionElectionQueryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ElectionsQueryResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "civicinfo#electionsQueryResponse".
     pub kind: String,
@@ -509,7 +513,7 @@ impl ResponseResult for ElectionsQueryResponse {}
 /// 
 /// * [representative info by address representatives](struct.RepresentativeRepresentativeInfoByAddresCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RepresentativeInfoResponse {
     /// Political geographic divisions that contain the requested address.
     pub divisions: HashMap<String, GeographicDivision>,
@@ -531,7 +535,7 @@ impl ResponseResult for RepresentativeInfoResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Source {
     /// Whether this data comes from an official government source.
     pub official: bool,
@@ -546,7 +550,7 @@ impl Part for Source {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ElectionOfficial {
     /// The fax number of the election official.
     #[serde(rename="faxNumber")]
@@ -570,7 +574,7 @@ impl Part for ElectionOfficial {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdministrativeBody {
     /// A URL provided by this administrative body for information on absentee voting.
     #[serde(rename="absenteeVotingInfoUrl")]
@@ -618,7 +622,7 @@ impl Part for AdministrativeBody {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
     /// The type of channel. The following is a list of types of channels, but is not exhaustive. More channel types may be added at a later time. One of: GooglePlus, YouTube, Facebook, Twitter
     #[serde(rename="type")]
@@ -634,7 +638,7 @@ impl Part for Channel {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Office {
     /// A list of sources for this office. If multiple sources are listed, the data has been aggregated from those sources.
     pub sources: Vec<Source>,
@@ -659,7 +663,7 @@ impl Part for Office {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DivisionSearchResult {
     /// The unique Open Civic Data identifier for this division.
     #[serde(rename="ocdId")]
@@ -677,7 +681,7 @@ impl Part for DivisionSearchResult {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SimpleAddressType {
     /// The name of the location.
     #[serde(rename="locationName")]
@@ -703,7 +707,7 @@ impl Part for SimpleAddressType {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeographicDivision {
     /// List of indices in the offices array, one for each office elected from this division. Will only be present if includeOffices was true (or absent) in the request.
     #[serde(rename="officeIndices")]
@@ -726,7 +730,7 @@ impl Part for GeographicDivision {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PollingLocation {
     /// The first date that this early vote site or drop off location may be used. This field is not populated for polling locations.
     #[serde(rename="startDate")]
@@ -764,7 +768,7 @@ impl Part for PollingLocation {}
 /// 
 /// * [representative info by division representatives](struct.RepresentativeRepresentativeInfoByDivisionCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RepresentativeInfoData {
     /// Political geographic divisions that contain the requested address.
     pub divisions: HashMap<String, GeographicDivision>,
@@ -786,7 +790,7 @@ impl ResponseResult for RepresentativeInfoData {}
 /// 
 /// * [voter info query elections](struct.ElectionVoterInfoQueryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VoterInfoResponse {
     /// Locations where the voter is eligible to vote early, prior to election day.
     #[serde(rename="earlyVoteSites")]
@@ -829,7 +833,7 @@ impl ResponseResult for VoterInfoResponse {}
 /// * [voter info query elections](struct.ElectionVoterInfoQueryCall.html) (none)
 /// * [election query elections](struct.ElectionElectionQueryCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Election {
     /// Day of the election in YYYY-MM-DD format.
     #[serde(rename="electionDay")]
@@ -1196,21 +1200,19 @@ impl<'a, C, A> DivisionSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Sets the *query* query property to the given value.
-    ///
-    /// 
     /// The search query. Queries can cover any parts of a OCD ID or a human readable division name. All words given in the query are treated as required patterns. In addition to that, most query operators of the Apache Lucene library are supported. See http://lucene.apache.org/core/2_9_4/queryparsersyntax.html
+    ///
+    /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> DivisionSearchCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DivisionSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1380,13 +1382,12 @@ impl<'a, C, A> ElectionElectionQueryCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ElectionElectionQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1568,39 +1569,36 @@ impl<'a, C, A> ElectionVoterInfoQueryCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The registered address of the voter to look up.
+    ///
     /// Sets the *address* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The registered address of the voter to look up.
     pub fn address(mut self, new_value: &str) -> ElectionVoterInfoQueryCall<'a, C, A> {
         self._address = new_value.to_string();
         self
     }
-    /// Sets the *official only* query property to the given value.
-    ///
-    /// 
     /// If set to true, only data from official state sources will be returned.
+    ///
+    /// Sets the *official only* query property to the given value.
     pub fn official_only(mut self, new_value: bool) -> ElectionVoterInfoQueryCall<'a, C, A> {
         self._official_only = Some(new_value);
         self
     }
-    /// Sets the *election id* query property to the given value.
-    ///
-    /// 
     /// The unique ID of the election to look up. A list of election IDs can be obtained at https://www.googleapis.com/civicinfo/{version}/elections
+    ///
+    /// Sets the *election id* query property to the given value.
     pub fn election_id(mut self, new_value: &str) -> ElectionVoterInfoQueryCall<'a, C, A> {
         self._election_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ElectionVoterInfoQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1798,47 +1796,42 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> where C: B
     }
 
 
+    /// A list of office roles to filter by. Only offices fulfilling one of these roles will be returned. Divisions that don't contain a matching office will not be returned.
+    ///
     /// Append the given value to the *roles* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// A list of office roles to filter by. Only offices fulfilling one of these roles will be returned. Divisions that don't contain a matching office will not be returned.
     pub fn add_roles(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         self._roles.push(new_value.to_string());
         self
     }
+    /// A list of office levels to filter by. Only offices that serve at least one of these levels will be returned. Divisions that don't contain a matching office will not be returned.
+    ///
     /// Append the given value to the *levels* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// A list of office levels to filter by. Only offices that serve at least one of these levels will be returned. Divisions that don't contain a matching office will not be returned.
     pub fn add_levels(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         self._levels.push(new_value.to_string());
         self
     }
-    /// Sets the *include offices* query property to the given value.
-    ///
-    /// 
     /// Whether to return information about offices and officials. If false, only the top-level district information will be returned.
+    ///
+    /// Sets the *include offices* query property to the given value.
     pub fn include_offices(mut self, new_value: bool) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         self._include_offices = Some(new_value);
         self
     }
-    /// Sets the *address* query property to the given value.
-    ///
-    /// 
     /// The address to look up. May only be specified if the field ocdId is not given in the URL.
+    ///
+    /// Sets the *address* query property to the given value.
     pub fn address(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         self._address = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2057,49 +2050,45 @@ impl<'a, C, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> where C:
     }
 
 
+    /// The Open Civic Data division identifier of the division to look up.
+    ///
     /// Sets the *ocd id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Open Civic Data division identifier of the division to look up.
     pub fn ocd_id(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         self._ocd_id = new_value.to_string();
         self
     }
+    /// A list of office roles to filter by. Only offices fulfilling one of these roles will be returned. Divisions that don't contain a matching office will not be returned.
+    ///
     /// Append the given value to the *roles* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// A list of office roles to filter by. Only offices fulfilling one of these roles will be returned. Divisions that don't contain a matching office will not be returned.
     pub fn add_roles(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         self._roles.push(new_value.to_string());
         self
     }
-    /// Sets the *recursive* query property to the given value.
-    ///
-    /// 
     /// If true, information about all divisions contained in the division requested will be included as well. For example, if querying ocd-division/country:us/district:dc, this would also return all DC's wards and ANCs.
+    ///
+    /// Sets the *recursive* query property to the given value.
     pub fn recursive(mut self, new_value: bool) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         self._recursive = Some(new_value);
         self
     }
+    /// A list of office levels to filter by. Only offices that serve at least one of these levels will be returned. Divisions that don't contain a matching office will not be returned.
+    ///
     /// Append the given value to the *levels* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// A list of office levels to filter by. Only offices that serve at least one of these levels will be returned. Divisions that don't contain a matching office will not be returned.
     pub fn add_levels(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         self._levels.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self

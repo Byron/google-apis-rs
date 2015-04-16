@@ -106,16 +106,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -275,16 +277,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -395,7 +399,7 @@ impl RequestValue for LicenseAssignmentInsert {}
 /// * [list for product and sku license assignments](struct.LicenseAssignmentListForProductAndSkuCall.html) (response)
 /// * [list for product license assignments](struct.LicenseAssignmentListForProductCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LicenseAssignmentList {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -777,43 +781,42 @@ impl<'a, C, A> LicenseAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// Name for product
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
+    /// Name for sku
+    ///
     /// Sets the *sku id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for sku
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
+    /// email id or unique Id of the user
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// email id or unique Id of the user
     pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -843,8 +846,8 @@ impl<'a, C, A> LicenseAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppLicensing`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1040,49 +1043,46 @@ impl<'a, C, A> LicenseAssignmentListForProductCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    /// Name for product
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
+    /// CustomerId represents the customer for whom licenseassignments are queried
+    ///
     /// Sets the *customer id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// CustomerId represents the customer for whom licenseassignments are queried
     pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to fetch the next page.Optional. By default server will return first page
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of campaigns to return at one time. Must be positive. Optional. Default value is 100.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1112,8 +1112,8 @@ impl<'a, C, A> LicenseAssignmentListForProductCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppLicensing`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1301,43 +1301,42 @@ impl<'a, C, A> LicenseAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// Name for product
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
+    /// Name for sku
+    ///
     /// Sets the *sku id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for sku
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
+    /// email id or unique Id of the user
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// email id or unique Id of the user
     pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1367,8 +1366,8 @@ impl<'a, C, A> LicenseAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppLicensing`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1566,59 +1565,56 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
     }
 
 
+    /// Name for product
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
+    /// Name for sku
+    ///
     /// Sets the *sku id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for sku
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
+    /// CustomerId represents the customer for whom licenseassignments are queried
+    ///
     /// Sets the *customer id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// CustomerId represents the customer for whom licenseassignments are queried
     pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to fetch the next page.Optional. By default server will return first page
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of campaigns to return at one time. Must be positive. Optional. Default value is 100.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1648,8 +1644,8 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppLicensing`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1852,52 +1848,51 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LicenseAssignment) -> LicenseAssignmentUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name for product
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
+    /// Name for sku for which license would be revoked
+    ///
     /// Sets the *sku id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for sku for which license would be revoked
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
+    /// email id or unique Id of the user
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// email id or unique Id of the user
     pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1927,8 +1922,8 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppLicensing`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2131,52 +2126,51 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LicenseAssignment) -> LicenseAssignmentPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name for product
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
+    /// Name for sku for which license would be revoked
+    ///
     /// Sets the *sku id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for sku for which license would be revoked
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
+    /// email id or unique Id of the user
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// email id or unique Id of the user
     pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2206,8 +2200,8 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppLicensing`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2408,42 +2402,41 @@ impl<'a, C, A> LicenseAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LicenseAssignmentInsert) -> LicenseAssignmentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name for product
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
+    /// Name for sku
+    ///
     /// Sets the *sku id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name for sku
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2473,8 +2466,8 @@ impl<'a, C, A> LicenseAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppLicensing`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

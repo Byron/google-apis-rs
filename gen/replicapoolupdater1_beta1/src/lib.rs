@@ -111,16 +111,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -290,16 +292,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -348,7 +352,7 @@ impl<'a, C, A> Replicapoolupdater<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceUpdate {
     /// Status of the instance update. Possible values are:  
     /// - "PENDING": The instance update is pending execution. 
@@ -377,7 +381,7 @@ impl Part for InstanceUpdate {}
 /// 
 /// * [list instance updates rolling updates](struct.RollingUpdateListInstanceUpdateCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceUpdateList {
     /// A token used to continue a truncated list request.
     #[serde(rename="nextPageToken")]
@@ -398,7 +402,7 @@ impl ResponseResult for InstanceUpdateList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarningsData {
     /// [Output Only] Metadata key for this warning.
     pub key: String,
@@ -414,7 +418,7 @@ impl Part for OperationWarningsData {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceUpdateError {
     /// [Output Only] The array of errors encountered while processing this operation.
     pub errors: Vec<InstanceUpdateErrorErrors>,
@@ -546,7 +550,7 @@ impl Part for RollingUpdatePolicy {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationErrorErrors {
     /// [Output Only] An optional, human-readable error message.
     pub message: String,
@@ -564,7 +568,7 @@ impl Part for OperationErrorErrors {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceUpdateErrorErrors {
     /// [Output Only] An optional, human-readable error message.
     pub message: String,
@@ -582,7 +586,7 @@ impl Part for InstanceUpdateErrorErrors {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationError {
     /// [Output Only] The array of errors encountered while processing this operation.
     pub errors: Vec<OperationErrorErrors>,
@@ -596,7 +600,7 @@ impl Part for OperationError {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarnings {
     /// [Output only] Optional human-readable details for this warning.
     pub message: String,
@@ -624,7 +628,7 @@ impl Part for OperationWarnings {}
 /// * [insert rolling updates](struct.RollingUpdateInsertCall.html) (response)
 /// * [cancel rolling updates](struct.RollingUpdateCancelCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// [Output Only] Status of the operation. Can be one of the following: "PENDING", "RUNNING", or "DONE".
     pub status: String,
@@ -710,7 +714,7 @@ impl Part for RollingUpdateError {}
 /// 
 /// * [list rolling updates](struct.RollingUpdateListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollingUpdateList {
     /// A token used to continue a truncated list request.
     #[serde(rename="nextPageToken")]
@@ -1186,43 +1190,42 @@ impl<'a, C, A> RollingUpdatePauseCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the update's target resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the update.
+    ///
     /// Sets the *rolling update* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdatePauseCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1252,8 +1255,8 @@ impl<'a, C, A> RollingUpdatePauseCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1441,43 +1444,42 @@ impl<'a, C, A> RollingUpdateRollbackCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the update's target resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the update.
+    ///
     /// Sets the *rolling update* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateRollbackCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1507,8 +1509,8 @@ impl<'a, C, A> RollingUpdateRollbackCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1696,43 +1698,42 @@ impl<'a, C, A> RollingUpdateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the update's target resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the update.
+    ///
     /// Sets the *rolling update* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1762,8 +1763,8 @@ impl<'a, C, A> RollingUpdateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ReplicapoolReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1951,43 +1952,42 @@ impl<'a, C, A> RollingUpdateResumeCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the update's target resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the update.
+    ///
     /// Sets the *rolling update* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateResumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2017,8 +2017,8 @@ impl<'a, C, A> RollingUpdateResumeCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2224,65 +2224,60 @@ impl<'a, C, A> RollingUpdateListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the update's target resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> RollingUpdateListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *instance group manager* query property to the given value.
-    ///
-    /// 
     /// The name of the instance group manager used for filtering.
+    ///
+    /// Sets the *instance group manager* query property to the given value.
     pub fn instance_group_manager(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
         self._instance_group_manager = Some(new_value.to_string());
         self
     }
-    /// Sets the *filter* query property to the given value.
-    ///
-    /// 
     /// Optional. Filter expression for filtering listed resources.
+    ///
+    /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2312,8 +2307,8 @@ impl<'a, C, A> RollingUpdateListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ReplicapoolReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2514,42 +2509,41 @@ impl<'a, C, A> RollingUpdateInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &RollingUpdate) -> RollingUpdateInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the update's target resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateInsertCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2579,8 +2573,8 @@ impl<'a, C, A> RollingUpdateInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2783,67 +2777,63 @@ impl<'a, C, A> RollingUpdateListInstanceUpdateCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the update's target resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the update.
+    ///
     /// Sets the *rolling update* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filter* query property to the given value.
-    ///
-    /// 
     /// Optional. Filter expression for filtering listed resources.
+    ///
+    /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2873,8 +2863,8 @@ impl<'a, C, A> RollingUpdateListInstanceUpdateCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ReplicapoolReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3062,43 +3052,42 @@ impl<'a, C, A> RollingUpdateCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the update's target resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the update.
+    ///
     /// Sets the *rolling update* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateCancelCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3128,8 +3117,8 @@ impl<'a, C, A> RollingUpdateCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3221,7 +3210,7 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/{project}/zones/{zone}/operations/{operation}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ReplicapoolReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{operation}", "operation")].iter() {
@@ -3317,43 +3306,42 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// Name of the project scoping this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the project scoping this request.
     pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Name of the zone scoping this request.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the zone scoping this request.
     pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// Name of the operation resource to return.
+    ///
     /// Sets the *operation* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the operation resource to return.
     pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3383,8 +3371,8 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

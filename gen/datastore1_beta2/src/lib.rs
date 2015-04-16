@@ -104,16 +104,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -285,16 +287,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -363,7 +367,7 @@ impl Part for PartitionId {}
 /// 
 /// * [allocate ids datasets](struct.DatasetAllocateIdCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AllocateIdsResponse {
     /// The keys specified in the request (in the same order), each with its key path completed with a newly allocated ID.
     pub keys: Vec<Key>,
@@ -404,7 +408,7 @@ impl RequestValue for LookupRequest {}
 /// 
 /// * [begin transaction datasets](struct.DatasetBeginTransactionCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BeginTransactionResponse {
     /// no description provided
     pub header: ResponseHeader,
@@ -442,7 +446,7 @@ impl RequestValue for AllocateIdsRequest {}
 /// 
 /// * [run query datasets](struct.DatasetRunQueryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RunQueryResponse {
     /// no description provided
     pub header: ResponseHeader,
@@ -486,7 +490,7 @@ impl Part for Mutation {}
 /// 
 /// * [commit datasets](struct.DatasetCommitCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommitResponse {
     /// no description provided
     pub header: ResponseHeader,
@@ -502,7 +506,7 @@ impl ResponseResult for CommitResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryResultBatch {
     /// The state of the query after the current batch. One of notFinished, moreResultsAfterLimit, noMoreResults.
     #[serde(rename="moreResults")]
@@ -541,7 +545,7 @@ impl Part for PropertyReference {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityResult {
     /// The resulting entity.
     pub entity: Entity,
@@ -559,7 +563,7 @@ impl Part for EntityResult {}
 /// 
 /// * [rollback datasets](struct.DatasetRollbackCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollbackResponse {
     /// no description provided
     pub header: ResponseHeader,
@@ -627,7 +631,7 @@ impl Part for PropertyExpression {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MutationResult {
     /// Keys for insertAutoId entities. One per entity from the request, in the same order.
     #[serde(rename="insertAutoIdKeys")]
@@ -677,7 +681,7 @@ impl Part for PropertyFilter {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResponseHeader {
     /// Identifies what kind of resource this is. Value: the fixed string "datastore#responseHeader".
     pub kind: String,
@@ -825,7 +829,7 @@ impl Part for Property {}
 /// 
 /// * [lookup datasets](struct.DatasetLookupCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LookupResponse {
     /// Entities found.
     pub found: Vec<EntityResult>,
@@ -1387,32 +1391,31 @@ impl<'a, C, A> DatasetCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CommitRequest) -> DatasetCommitCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Identifies the dataset.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetCommitCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetCommitCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1442,8 +1445,8 @@ impl<'a, C, A> DatasetCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1642,32 +1645,31 @@ impl<'a, C, A> DatasetAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AllocateIdsRequest) -> DatasetAllocateIdCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Identifies the dataset.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetAllocateIdCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetAllocateIdCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1697,8 +1699,8 @@ impl<'a, C, A> DatasetAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1897,32 +1899,31 @@ impl<'a, C, A> DatasetRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &RollbackRequest) -> DatasetRollbackCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Identifies the dataset.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetRollbackCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetRollbackCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1952,8 +1953,8 @@ impl<'a, C, A> DatasetRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2152,32 +2153,31 @@ impl<'a, C, A> DatasetLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LookupRequest) -> DatasetLookupCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Identifies the dataset.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetLookupCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetLookupCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2207,8 +2207,8 @@ impl<'a, C, A> DatasetLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2407,32 +2407,31 @@ impl<'a, C, A> DatasetRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &RunQueryRequest) -> DatasetRunQueryCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Identifies the dataset.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetRunQueryCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetRunQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2462,8 +2461,8 @@ impl<'a, C, A> DatasetRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2662,32 +2661,31 @@ impl<'a, C, A> DatasetBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &BeginTransactionRequest) -> DatasetBeginTransactionCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Identifies the dataset.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetBeginTransactionCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetBeginTransactionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2717,8 +2715,8 @@ impl<'a, C, A> DatasetBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

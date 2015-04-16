@@ -215,16 +215,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -391,16 +393,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -592,7 +596,7 @@ impl<'a, C, A> Dfareporting<C, A>
 /// 
 /// * [list operating systems](struct.OperatingSystemListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperatingSystemsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#operatingSystemsListResponse".
     pub kind: String,
@@ -608,7 +612,7 @@ impl ResponseResult for OperatingSystemsListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectorySiteSettings {
     /// Whether this site accepts interstitial ads.
     #[serde(rename="interstitialPlacementAccepted")]
@@ -706,7 +710,7 @@ impl ResponseResult for Subaccount {}
 /// * [list account permission groups](struct.AccountPermissionGroupListCall.html) (none)
 /// * [get account permission groups](struct.AccountPermissionGroupGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountPermissionGroup {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#accountPermissionGroup".
     pub kind: String,
@@ -729,7 +733,7 @@ impl ResponseResult for AccountPermissionGroup {}
 /// 
 /// * [query dimension values](struct.DimensionValueQueryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DimensionValueList {
     /// Continuation token used to page through dimension values. To retrieve the next page of results, set the next request's "pageToken" to the value of this field. The page token is only valid for a limited amount of time and should not be persisted.
     #[serde(rename="nextPageToken")]
@@ -754,7 +758,7 @@ impl ResponseResult for DimensionValueList {}
 /// 
 /// * [list campaign creative associations](struct.CampaignCreativeAssociationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CampaignCreativeAssociationsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -778,7 +782,7 @@ impl ResponseResult for CampaignCreativeAssociationsListResponse {}
 /// 
 /// * [list floodlight activities](struct.FloodlightActivityListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FloodlightActivitiesListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -802,7 +806,7 @@ impl ResponseResult for FloodlightActivitiesListResponse {}
 /// 
 /// * [list user role permission groups](struct.UserRolePermissionGroupListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserRolePermissionGroupsListResponse {
     /// User role permission group collection.
     #[serde(rename="userRolePermissionGroups")]
@@ -824,7 +828,7 @@ impl ResponseResult for UserRolePermissionGroupsListResponse {}
 /// * [list files](struct.FileListCall.html) (response)
 /// * [files list reports](struct.ReportFileListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileList {
     /// Continuation token used to page through files. To retrieve the next page of results, set the next request's "pageToken" to the value of this field. The page token is only valid for a limited amount of time and should not be persisted.
     #[serde(rename="nextPageToken")]
@@ -880,7 +884,7 @@ impl Part for EventTagOverride {}
 /// 
 /// * [get account active ad summaries](struct.AccountActiveAdSummaryGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountActiveAdSummary {
     /// Ads that can be activated for the account.
     #[serde(rename="availableAds")]
@@ -927,7 +931,7 @@ impl Part for LookbackConfiguration {}
 /// 
 /// * [generatetag floodlight activities](struct.FloodlightActivityGeneratetagCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FloodlightActivitiesGenerateTagResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#floodlightActivitiesGenerateTagResponse".
     pub kind: String,
@@ -1297,7 +1301,7 @@ impl Part for DayPartTargeting {}
 /// 
 /// * [compatible fields query reports](struct.ReportCompatibleFieldQueryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CompatibleFields {
     /// The kind of resource this is, in this case dfareporting#compatibleFields.
     pub kind: String,
@@ -1386,7 +1390,7 @@ impl Part for ReportCriteria {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CrossDimensionReachReportCompatibleFields {
     /// Dimensions which are compatible to be selected in the "breakdown" section of the report.
     pub breakdown: Vec<Dimension>,
@@ -1457,7 +1461,7 @@ impl ResponseResult for UserRole {}
 /// 
 /// * [list event tags](struct.EventTagListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventTagsListResponse {
     /// Event tag collection.
     #[serde(rename="eventTags")]
@@ -1653,7 +1657,7 @@ impl ResponseResult for Campaign {}
 /// * [list change logs](struct.ChangeLogListCall.html) (none)
 /// * [get change logs](struct.ChangeLogGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChangeLog {
     /// Time when the object was modified.
     #[serde(rename="changeTime")]
@@ -1712,7 +1716,7 @@ impl ResponseResult for ChangeLog {}
 /// * [files get reports](struct.ReportFileGetCall.html) (response)
 /// * [run reports](struct.ReportRunCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct File {
     /// The status of the report file.
     pub status: String,
@@ -1838,7 +1842,7 @@ impl ResponseResult for PlacementStrategy {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlacementTag {
     /// Tags generated for this placement.
     #[serde(rename="tagDatas")]
@@ -1860,7 +1864,7 @@ impl Part for PlacementTag {}
 /// 
 /// * [list countries](struct.CountryListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CountriesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#countriesListResponse".
     pub kind: String,
@@ -1956,7 +1960,7 @@ impl ResponseResult for CampaignCreativeAssociation {}
 /// 
 /// * [list operating system versions](struct.OperatingSystemVersionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperatingSystemVersionsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#operatingSystemVersionsListResponse".
     pub kind: String,
@@ -2139,7 +2143,7 @@ impl ResponseResult for Placement {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FloodlightReportCompatibleFields {
     /// Metrics which are compatible to be selected in the "metricNames" section of the report.
     pub metrics: Vec<Metric>,
@@ -2175,7 +2179,7 @@ impl Part for CreativeAssetId {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectorySiteContactAssignment {
     /// ID of this directory site contact. This is a read-only, auto-generated field.
     #[serde(rename="contactId")]
@@ -2301,7 +2305,7 @@ impl Part for DefaultClickThroughEventTagProperties {}
 /// 
 /// * [list user profiles](struct.UserProfileListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserProfileList {
     /// The user profiles returned in this response.
     pub items: Vec<UserProfile>,
@@ -2323,7 +2327,7 @@ impl ResponseResult for UserProfileList {}
 /// 
 /// * [list subaccounts](struct.SubaccountListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubaccountsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -2441,7 +2445,7 @@ impl Resource for PlatformType {}
 /// 
 /// * [list advertisers](struct.AdvertiserListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdvertisersListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -2604,7 +2608,7 @@ impl Resource for CreativeAsset {}
 /// 
 /// * [list directory sites](struct.DirectorySiteListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectorySitesListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -2641,7 +2645,7 @@ impl Part for LastModifiedInfo {}
 /// 
 /// * [list regions](struct.RegionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RegionsListResponse {
     /// Region collection.
     pub regions: Vec<Region>,
@@ -2662,7 +2666,7 @@ impl ResponseResult for RegionsListResponse {}
 /// * [list user role permission groups](struct.UserRolePermissionGroupListCall.html) (none)
 /// * [get user role permission groups](struct.UserRolePermissionGroupGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserRolePermissionGroup {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#userRolePermissionGroup".
     pub kind: String,
@@ -2725,7 +2729,7 @@ impl Resource for ConnectionType {}
 /// 
 /// * [list browsers](struct.BrowserListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BrowsersListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#browsersListResponse".
     pub kind: String,
@@ -2775,7 +2779,7 @@ impl Part for CreativeSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Dimension {
     /// The kind of resource this is, in this case dfareporting#dimension.
     pub kind: String,
@@ -2837,7 +2841,7 @@ impl ResponseResult for CreativeField {}
 /// * [get directory sites](struct.DirectorySiteGetCall.html) (response)
 /// * [list directory sites](struct.DirectorySiteListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectorySite {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#directorySite".
     pub kind: String,
@@ -2937,7 +2941,7 @@ impl ResponseResult for DirectorySite {}
 /// 
 /// * [list cities](struct.CityListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CitiesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#citiesListResponse".
     pub kind: String,
@@ -2998,7 +3002,7 @@ impl ResponseResult for CreativeGroup {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metric {
     /// The kind of resource this is, in this case dfareporting#metric.
     pub kind: String,
@@ -3038,7 +3042,7 @@ impl Part for RichMediaExitOverride {}
 /// 
 /// * [list account permissions](struct.AccountPermissionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountPermissionsListResponse {
     /// Account permission collection.
     #[serde(rename="accountPermissions")]
@@ -3059,7 +3063,7 @@ impl ResponseResult for AccountPermissionsListResponse {}
 /// 
 /// * [generatetags placements](struct.PlacementGeneratetagCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlacementsGenerateTagsResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#placementsGenerateTagsResponse".
     pub kind: String,
@@ -3109,7 +3113,7 @@ impl ResponseResult for CreativeFieldValue {}
 /// 
 /// * [list floodlight activity groups](struct.FloodlightActivityGroupListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FloodlightActivityGroupsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -3133,7 +3137,7 @@ impl ResponseResult for FloodlightActivityGroupsListResponse {}
 /// 
 /// * [list directory site contacts](struct.DirectorySiteContactListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectorySiteContactsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -3196,7 +3200,7 @@ impl Part for CreativeCustomEvent {}
 /// 
 /// * [list creatives](struct.CreativeListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativesListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -3231,7 +3235,7 @@ impl Part for OmnitureSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PathToConversionReportCompatibleFields {
     /// Metrics which are compatible to be selected in the "metricNames" section of the report.
     pub metrics: Vec<Metric>,
@@ -3260,7 +3264,7 @@ impl Part for PathToConversionReportCompatibleFields {}
 /// 
 /// * [list mobile carriers](struct.MobileCarrierListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MobileCarriersListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#mobileCarriersListResponse".
     pub kind: String,
@@ -3517,7 +3521,7 @@ impl Part for ReportsConfiguration {}
 /// 
 /// * [list campaigns](struct.CampaignListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CampaignsListResponse {
     /// Campaign collection.
     pub campaigns: Vec<Campaign>,
@@ -3540,7 +3544,7 @@ impl ResponseResult for CampaignsListResponse {}
 /// 
 /// * [list user role permissions](struct.UserRolePermissionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserRolePermissionsListResponse {
     /// User role permission collection.
     #[serde(rename="userRolePermissions")]
@@ -3562,7 +3566,7 @@ impl ResponseResult for UserRolePermissionsListResponse {}
 /// * [list user profiles](struct.UserProfileListCall.html) (none)
 /// * [get user profiles](struct.UserProfileGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserProfile {
     /// The user name.
     #[serde(rename="userName")]
@@ -3657,7 +3661,7 @@ impl Part for ReportPathToConversionCriteria {}
 /// 
 /// * [list creative fields](struct.CreativeFieldListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeFieldsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -3797,7 +3801,7 @@ impl Part for Recipient {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportCompatibleFields {
     /// Metrics which are compatible to be selected in the "metricNames" section of the report.
     pub metrics: Vec<Metric>,
@@ -3825,7 +3829,7 @@ impl Part for ReportCompatibleFields {}
 /// 
 /// * [list advertiser groups](struct.AdvertiserGroupListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdvertiserGroupsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -3849,7 +3853,7 @@ impl ResponseResult for AdvertiserGroupsListResponse {}
 /// 
 /// * [list placement groups](struct.PlacementGroupListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlacementGroupsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -4021,7 +4025,7 @@ impl ResponseResult for CreativeAssetMetadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TagData {
     /// Tag string to record a click.
     #[serde(rename="clickTag")]
@@ -4084,7 +4088,7 @@ impl Part for ReportFloodlightCriteria {}
 /// 
 /// * [list landing pages](struct.LandingPageListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LandingPagesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#landingPagesListResponse".
     pub kind: String,
@@ -4105,7 +4109,7 @@ impl ResponseResult for LandingPagesListResponse {}
 /// 
 /// * [list sites](struct.SiteListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SitesListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -4323,7 +4327,7 @@ impl Resource for Browser {}
 /// 
 /// * [list account user profiles](struct.AccountUserProfileListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountUserProfilesListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -4406,7 +4410,7 @@ impl ResponseResult for Advertiser {}
 /// 
 /// * [list platform types](struct.PlatformTypeListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlatformTypesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#platformTypesListResponse".
     pub kind: String,
@@ -4427,7 +4431,7 @@ impl ResponseResult for PlatformTypesListResponse {}
 /// 
 /// * [list change logs](struct.ChangeLogListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChangeLogsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -4451,7 +4455,7 @@ impl ResponseResult for ChangeLogsListResponse {}
 /// 
 /// * [list placements](struct.PlacementListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlacementsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -4474,7 +4478,7 @@ impl ResponseResult for PlacementsListResponse {}
 /// 
 /// * [list ads](struct.AdListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -4527,7 +4531,7 @@ impl Part for ReportReachCriteria {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileUrls {
     /// The URL for downloading the report data through a browser.
     #[serde(rename="browserUrl")]
@@ -4858,7 +4862,7 @@ impl ResponseResult for UserRolePermission {}
 /// 
 /// * [list metros](struct.MetroListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetrosListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#metrosListResponse".
     pub kind: String,
@@ -4915,7 +4919,7 @@ impl Part for PricingSchedule {}
 /// 
 /// * [list accounts](struct.AccountListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -5001,7 +5005,7 @@ impl Part for SortedDimension {}
 /// 
 /// * [list placement strategies](struct.PlacementStrategyListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlacementStrategiesListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -5025,7 +5029,7 @@ impl ResponseResult for PlacementStrategiesListResponse {}
 /// 
 /// * [list reports](struct.ReportListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportList {
     /// Continuation token used to page through reports. To retrieve the next page of results, set the next request's "pageToken" to the value of this field. The page token is only valid for a limited amount of time and should not be persisted.
     #[serde(rename="nextPageToken")]
@@ -5127,7 +5131,7 @@ impl Part for CreativeOptimizationConfiguration {}
 /// 
 /// * [list creative groups](struct.CreativeGroupListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeGroupsListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -5322,7 +5326,7 @@ impl ResponseResult for Country {}
 /// 
 /// * [list postal codes](struct.PostalCodeListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostalCodesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#postalCodesListResponse".
     pub kind: String,
@@ -5435,7 +5439,7 @@ impl ResponseResult for EventTag {}
 /// 
 /// * [list creative field values](struct.CreativeFieldValueListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeFieldValuesListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -5460,7 +5464,7 @@ impl ResponseResult for CreativeFieldValuesListResponse {}
 /// * [get directory site contacts](struct.DirectorySiteContactGetCall.html) (response)
 /// * [list directory site contacts](struct.DirectorySiteContactListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectorySiteContact {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#directorySiteContact".
     pub kind: String,
@@ -5524,7 +5528,7 @@ impl Resource for DimensionValue {}
 /// 
 /// * [list content categories](struct.ContentCategoryListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContentCategoriesListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -5548,7 +5552,7 @@ impl ResponseResult for ContentCategoriesListResponse {}
 /// 
 /// * [list floodlight configurations](struct.FloodlightConfigurationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FloodlightConfigurationsListResponse {
     /// Floodlight configuration collection.
     #[serde(rename="floodlightConfigurations")]
@@ -5605,7 +5609,7 @@ impl Part for PopupWindowProperties {}
 /// * [list account permissions](struct.AccountPermissionListCall.html) (none)
 /// * [get account permissions](struct.AccountPermissionGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountPermission {
     /// Permission group of this account permission.
     #[serde(rename="permissionGroupId")]
@@ -5806,7 +5810,7 @@ impl Part for PlacementAssignment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReachReportCompatibleFields {
     /// Metrics which are compatible to be selected in the "metricNames" section of the report.
     pub metrics: Vec<Metric>,
@@ -5886,7 +5890,7 @@ impl ResponseResult for Site {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DfpSettings {
     /// DFP network name for this directory site.
     pub dfp_network_name: String,
@@ -5915,7 +5919,7 @@ impl Part for DfpSettings {}
 /// 
 /// * [list connection types](struct.ConnectionTypeListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConnectionTypesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#connectionTypesListResponse".
     pub kind: String,
@@ -6032,7 +6036,7 @@ impl Part for DateRange {}
 /// 
 /// * [list account permission groups](struct.AccountPermissionGroupListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountPermissionGroupsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#accountPermissionGroupsListResponse".
     pub kind: String,
@@ -6053,7 +6057,7 @@ impl ResponseResult for AccountPermissionGroupsListResponse {}
 /// 
 /// * [list sizes](struct.SizeListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SizesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#sizesListResponse".
     pub kind: String,
@@ -6073,7 +6077,7 @@ impl ResponseResult for SizesListResponse {}
 /// 
 /// * [list user roles](struct.UserRoleListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserRolesListResponse {
     /// Pagination token to be used for the next list operation.
     #[serde(rename="nextPageToken")]
@@ -11575,7 +11579,7 @@ impl<'a, C, A> UserRolePermissionGroupGetCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/userRolePermissionGroups/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -11671,33 +11675,32 @@ impl<'a, C, A> UserRolePermissionGroupGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> UserRolePermissionGroupGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// User role permission group ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User role permission group ID.
     pub fn id(mut self, new_value: &str) -> UserRolePermissionGroupGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRolePermissionGroupGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11727,8 +11730,8 @@ impl<'a, C, A> UserRolePermissionGroupGetCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11816,7 +11819,7 @@ impl<'a, C, A> UserRolePermissionGroupListCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/userRolePermissionGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -11912,23 +11915,22 @@ impl<'a, C, A> UserRolePermissionGroupListCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> UserRolePermissionGroupListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRolePermissionGroupListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11958,8 +11960,8 @@ impl<'a, C, A> UserRolePermissionGroupListCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12047,7 +12049,7 @@ impl<'a, C, A> PlatformTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/platformTypes".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -12143,23 +12145,22 @@ impl<'a, C, A> PlatformTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlatformTypeListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlatformTypeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12189,8 +12190,8 @@ impl<'a, C, A> PlatformTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12285,7 +12286,7 @@ impl<'a, C, A> CreativeFieldUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -12389,32 +12390,31 @@ impl<'a, C, A> CreativeFieldUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreativeField) -> CreativeFieldUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12444,8 +12444,8 @@ impl<'a, C, A> CreativeFieldUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12576,7 +12576,7 @@ impl<'a, C, A> CreativeFieldListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -12672,81 +12672,73 @@ impl<'a, C, A> CreativeFieldListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CreativeFieldListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> CreativeFieldListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for creative fields by name or ID. Wildcards (*) are allowed. For example, "creativefield*2015" will return creative fields with names like "creativefield June 2015", "creativefield April 2015", or simply "creativefield 2015". Most of the searches also add wild-cards implicitly at the start and the end of the search string. For example, a search string of "creativefield" will match creative fields with the name "my creativefield", "creativefield 2015", or simply "creativefield".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> CreativeFieldListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CreativeFieldListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> CreativeFieldListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only creative fields with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only creative fields with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> CreativeFieldListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
+    /// Select only creative fields that belong to these advertisers.
+    ///
     /// Append the given value to the *advertiser ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only creative fields that belong to these advertisers.
     pub fn add_advertiser_ids(mut self, new_value: &str) -> CreativeFieldListCall<'a, C, A> {
         self._advertiser_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12776,8 +12768,8 @@ impl<'a, C, A> CreativeFieldListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12866,7 +12858,7 @@ impl<'a, C, A> CreativeFieldDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -12952,33 +12944,32 @@ impl<'a, C, A> CreativeFieldDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative Field ID
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative Field ID
     pub fn id(mut self, new_value: &str) -> CreativeFieldDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13008,8 +12999,8 @@ impl<'a, C, A> CreativeFieldDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13099,7 +13090,7 @@ impl<'a, C, A> CreativeFieldGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -13195,33 +13186,32 @@ impl<'a, C, A> CreativeFieldGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative Field ID
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative Field ID
     pub fn id(mut self, new_value: &str) -> CreativeFieldGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13251,8 +13241,8 @@ impl<'a, C, A> CreativeFieldGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13347,7 +13337,7 @@ impl<'a, C, A> CreativeFieldInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -13451,32 +13441,31 @@ impl<'a, C, A> CreativeFieldInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreativeField) -> CreativeFieldInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13506,8 +13495,8 @@ impl<'a, C, A> CreativeFieldInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13604,7 +13593,7 @@ impl<'a, C, A> CreativeFieldPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -13708,42 +13697,41 @@ impl<'a, C, A> CreativeFieldPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreativeField) -> CreativeFieldPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative Field ID
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative Field ID
     pub fn id(mut self, new_value: &str) -> CreativeFieldPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13773,8 +13761,8 @@ impl<'a, C, A> CreativeFieldPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13869,7 +13857,7 @@ impl<'a, C, A> UserRoleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/userRoles".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -13973,32 +13961,31 @@ impl<'a, C, A> UserRoleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UserRole) -> UserRoleInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> UserRoleInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRoleInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14028,8 +14015,8 @@ impl<'a, C, A> UserRoleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14119,7 +14106,7 @@ impl<'a, C, A> UserRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/userRoles/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -14215,33 +14202,32 @@ impl<'a, C, A> UserRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> UserRoleGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// User role ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User role ID.
     pub fn id(mut self, new_value: &str) -> UserRoleGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRoleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14271,8 +14257,8 @@ impl<'a, C, A> UserRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14367,7 +14353,7 @@ impl<'a, C, A> UserRoleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/userRoles".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -14471,32 +14457,31 @@ impl<'a, C, A> UserRoleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UserRole) -> UserRoleUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> UserRoleUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRoleUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14526,8 +14511,8 @@ impl<'a, C, A> UserRoleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14616,7 +14601,7 @@ impl<'a, C, A> UserRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/userRoles/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -14702,33 +14687,32 @@ impl<'a, C, A> UserRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> UserRoleDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// User role ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User role ID.
     pub fn id(mut self, new_value: &str) -> UserRoleDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRoleDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14758,8 +14742,8 @@ impl<'a, C, A> UserRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14856,7 +14840,7 @@ impl<'a, C, A> UserRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/userRoles".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -14960,42 +14944,41 @@ impl<'a, C, A> UserRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UserRole) -> UserRolePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> UserRolePatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// User role ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User role ID.
     pub fn id(mut self, new_value: &str) -> UserRolePatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRolePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15025,8 +15008,8 @@ impl<'a, C, A> UserRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15158,7 +15141,7 @@ impl<'a, C, A> UserRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/userRoles".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -15254,88 +15237,79 @@ impl<'a, C, A> UserRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> UserRoleListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *subaccount id* query property to the given value.
-    ///
-    /// 
     /// Select only user roles that belong to this subaccount.
+    ///
+    /// Sets the *subaccount id* query property to the given value.
     pub fn subaccount_id(mut self, new_value: &str) -> UserRoleListCall<'a, C, A> {
         self._subaccount_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> UserRoleListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> UserRoleListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "userrole*2015" will return objects with names like "userrole June 2015", "userrole April 2015", or simply "userrole 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "userrole" will match objects with name "my userrole", "userrole 2015", or simply "userrole".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> UserRoleListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserRoleListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> UserRoleListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only user roles with the specified IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only user roles with the specified IDs.
     pub fn add_ids(mut self, new_value: &str) -> UserRoleListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *account user role only* query property to the given value.
-    ///
-    /// 
     /// Select only account level user roles not associated with any specific subaccount.
+    ///
+    /// Sets the *account user role only* query property to the given value.
     pub fn account_user_role_only(mut self, new_value: bool) -> UserRoleListCall<'a, C, A> {
         self._account_user_role_only = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRoleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15365,8 +15339,8 @@ impl<'a, C, A> UserRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15454,7 +15428,7 @@ impl<'a, C, A> OperatingSystemVersionListCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/operatingSystemVersions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -15550,23 +15524,22 @@ impl<'a, C, A> OperatingSystemVersionListCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> OperatingSystemVersionListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperatingSystemVersionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15596,8 +15569,8 @@ impl<'a, C, A> OperatingSystemVersionListCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15689,7 +15662,7 @@ impl<'a, C, A> LandingPageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns/{campaignId}/landingPages/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{campaignId}", "campaignId"), ("{id}", "id")].iter() {
@@ -15785,43 +15758,42 @@ impl<'a, C, A> LandingPageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> LandingPageGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Landing page campaign ID.
+    ///
     /// Sets the *campaign id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Landing page campaign ID.
     pub fn campaign_id(mut self, new_value: &str) -> LandingPageGetCall<'a, C, A> {
         self._campaign_id = new_value.to_string();
         self
     }
+    /// Landing page ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Landing page ID.
     pub fn id(mut self, new_value: &str) -> LandingPageGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LandingPageGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15851,8 +15823,8 @@ impl<'a, C, A> LandingPageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15949,7 +15921,7 @@ impl<'a, C, A> LandingPageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns/{campaignId}/landingPages".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{campaignId}", "campaignId")].iter() {
@@ -16053,42 +16025,41 @@ impl<'a, C, A> LandingPageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LandingPage) -> LandingPageUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> LandingPageUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Landing page campaign ID.
+    ///
     /// Sets the *campaign id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Landing page campaign ID.
     pub fn campaign_id(mut self, new_value: &str) -> LandingPageUpdateCall<'a, C, A> {
         self._campaign_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LandingPageUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16118,8 +16089,8 @@ impl<'a, C, A> LandingPageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16209,7 +16180,7 @@ impl<'a, C, A> LandingPageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns/{campaignId}/landingPages".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{campaignId}", "campaignId")].iter() {
@@ -16305,33 +16276,32 @@ impl<'a, C, A> LandingPageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> LandingPageListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Landing page campaign ID.
+    ///
     /// Sets the *campaign id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Landing page campaign ID.
     pub fn campaign_id(mut self, new_value: &str) -> LandingPageListCall<'a, C, A> {
         self._campaign_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LandingPageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16361,8 +16331,8 @@ impl<'a, C, A> LandingPageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16459,7 +16429,7 @@ impl<'a, C, A> LandingPageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns/{campaignId}/landingPages".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{campaignId}", "campaignId")].iter() {
@@ -16563,42 +16533,41 @@ impl<'a, C, A> LandingPageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LandingPage) -> LandingPageInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> LandingPageInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Landing page campaign ID.
+    ///
     /// Sets the *campaign id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Landing page campaign ID.
     pub fn campaign_id(mut self, new_value: &str) -> LandingPageInsertCall<'a, C, A> {
         self._campaign_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LandingPageInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16628,8 +16597,8 @@ impl<'a, C, A> LandingPageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16728,7 +16697,7 @@ impl<'a, C, A> LandingPagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns/{campaignId}/landingPages".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{campaignId}", "campaignId")].iter() {
@@ -16832,52 +16801,51 @@ impl<'a, C, A> LandingPagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LandingPage) -> LandingPagePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> LandingPagePatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Landing page campaign ID.
+    ///
     /// Sets the *campaign id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Landing page campaign ID.
     pub fn campaign_id(mut self, new_value: &str) -> LandingPagePatchCall<'a, C, A> {
         self._campaign_id = new_value.to_string();
         self
     }
+    /// Landing page ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Landing page ID.
     pub fn id(mut self, new_value: &str) -> LandingPagePatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LandingPagePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16907,8 +16875,8 @@ impl<'a, C, A> LandingPagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16999,7 +16967,7 @@ impl<'a, C, A> LandingPageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns/{campaignId}/landingPages/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{campaignId}", "campaignId"), ("{id}", "id")].iter() {
@@ -17085,43 +17053,42 @@ impl<'a, C, A> LandingPageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> LandingPageDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Landing page campaign ID.
+    ///
     /// Sets the *campaign id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Landing page campaign ID.
     pub fn campaign_id(mut self, new_value: &str) -> LandingPageDeleteCall<'a, C, A> {
         self._campaign_id = new_value.to_string();
         self
     }
+    /// Landing page ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Landing page ID.
     pub fn id(mut self, new_value: &str) -> LandingPageDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LandingPageDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17151,8 +17118,8 @@ impl<'a, C, A> LandingPageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17249,7 +17216,7 @@ impl<'a, C, A> CampaignCreativeAssociationInsertCall<'a, C, A> where C: BorrowMu
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns/{campaignId}/campaignCreativeAssociations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{campaignId}", "campaignId")].iter() {
@@ -17353,42 +17320,41 @@ impl<'a, C, A> CampaignCreativeAssociationInsertCall<'a, C, A> where C: BorrowMu
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CampaignCreativeAssociation) -> CampaignCreativeAssociationInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CampaignCreativeAssociationInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Campaign ID in this association.
+    ///
     /// Sets the *campaign id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Campaign ID in this association.
     pub fn campaign_id(mut self, new_value: &str) -> CampaignCreativeAssociationInsertCall<'a, C, A> {
         self._campaign_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CampaignCreativeAssociationInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17418,8 +17384,8 @@ impl<'a, C, A> CampaignCreativeAssociationInsertCall<'a, C, A> where C: BorrowMu
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17524,7 +17490,7 @@ impl<'a, C, A> CampaignCreativeAssociationListCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns/{campaignId}/campaignCreativeAssociations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{campaignId}", "campaignId")].iter() {
@@ -17620,57 +17586,53 @@ impl<'a, C, A> CampaignCreativeAssociationListCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CampaignCreativeAssociationListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Campaign ID in this association.
+    ///
     /// Sets the *campaign id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Campaign ID in this association.
     pub fn campaign_id(mut self, new_value: &str) -> CampaignCreativeAssociationListCall<'a, C, A> {
         self._campaign_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CampaignCreativeAssociationListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CampaignCreativeAssociationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> CampaignCreativeAssociationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CampaignCreativeAssociationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17700,8 +17662,8 @@ impl<'a, C, A> CampaignCreativeAssociationListCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17851,7 +17813,7 @@ impl<'a, C, A> ChangeLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/changeLogs".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -17947,106 +17909,95 @@ impl<'a, C, A> ChangeLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Select only change logs with these user profile IDs.
+    ///
     /// Append the given value to the *user profile ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only change logs with these user profile IDs.
     pub fn add_user_profile_ids(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
         self._user_profile_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Select only change logs whose object ID, user name, old or new values match the search string.
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *object type* query property to the given value.
-    ///
-    /// 
     /// Select only change logs with the specified object type.
+    ///
+    /// Sets the *object type* query property to the given value.
     pub fn object_type(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
         self._object_type = Some(new_value.to_string());
         self
     }
+    /// Select only change logs with these object IDs.
+    ///
     /// Append the given value to the *object ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only change logs with these object IDs.
     pub fn add_object_ids(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
         self._object_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *min change time* query property to the given value.
-    ///
-    /// 
     /// Select only change logs whose change time is before the specified minChangeTime.The time should be formatted as an RFC3339 date/time string. For example, for 10:54 PM on July 18th, 2015, in the America/New York time zone, the format is "2015-07-18T22:54:00-04:00". In other words, the year, month, day, the letter T, the hour (24-hour clock system), minute, second, and then the time zone offset.
+    ///
+    /// Sets the *min change time* query property to the given value.
     pub fn min_change_time(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
         self._min_change_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ChangeLogListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *max change time* query property to the given value.
-    ///
-    /// 
     /// Select only change logs whose change time is before the specified maxChangeTime.The time should be formatted as an RFC3339 date/time string. For example, for 10:54 PM on July 18th, 2015, in the America/New York time zone, the format is "2015-07-18T22:54:00-04:00". In other words, the year, month, day, the letter T, the hour (24-hour clock system), minute, second, and then the time zone offset.
+    ///
+    /// Sets the *max change time* query property to the given value.
     pub fn max_change_time(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
         self._max_change_time = Some(new_value.to_string());
         self
     }
+    /// Select only change logs with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only change logs with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *action* query property to the given value.
-    ///
-    /// 
     /// Select only change logs with the specified action.
+    ///
+    /// Sets the *action* query property to the given value.
     pub fn action(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
         self._action = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeLogListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18076,8 +18027,8 @@ impl<'a, C, A> ChangeLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18167,7 +18118,7 @@ impl<'a, C, A> ChangeLogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/changeLogs/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -18263,33 +18214,32 @@ impl<'a, C, A> ChangeLogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> ChangeLogGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Change log ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Change log ID.
     pub fn id(mut self, new_value: &str) -> ChangeLogGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeLogGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18319,8 +18269,8 @@ impl<'a, C, A> ChangeLogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18410,7 +18360,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accounts/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -18506,33 +18456,32 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Account ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID.
     pub fn id(mut self, new_value: &str) -> AccountGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18562,8 +18511,8 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18690,7 +18639,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accounts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -18786,80 +18735,72 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> AccountListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> AccountListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "account*2015" will return objects with names like "account June 2015", "account April 2015", or simply "account 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "account" will match objects with name "my account", "account 2015", or simply "account".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> AccountListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AccountListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only accounts with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only accounts with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> AccountListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *active* query property to the given value.
-    ///
-    /// 
     /// Select only active accounts. Don't set this field to select both active and non-active accounts.
+    ///
+    /// Sets the *active* query property to the given value.
     pub fn active(mut self, new_value: bool) -> AccountListCall<'a, C, A> {
         self._active = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18889,8 +18830,8 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18985,7 +18926,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accounts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -19089,32 +19030,31 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Account) -> AccountUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19144,8 +19084,8 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19242,7 +19182,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accounts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -19346,42 +19286,41 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Account) -> AccountPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Account ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID.
     pub fn id(mut self, new_value: &str) -> AccountPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19411,8 +19350,8 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19500,7 +19439,7 @@ impl<'a, C, A> PostalCodeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/postalCodes".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -19596,23 +19535,22 @@ impl<'a, C, A> PostalCodeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PostalCodeListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostalCodeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19642,8 +19580,8 @@ impl<'a, C, A> PostalCodeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19738,7 +19676,7 @@ impl<'a, C, A> AdvertiserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertisers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -19842,32 +19780,31 @@ impl<'a, C, A> AdvertiserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Advertiser) -> AdvertiserInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19897,8 +19834,8 @@ impl<'a, C, A> AdvertiserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19995,7 +19932,7 @@ impl<'a, C, A> AdvertiserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertisers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -20099,42 +20036,41 @@ impl<'a, C, A> AdvertiserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Advertiser) -> AdvertiserPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Advertiser ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Advertiser ID.
     pub fn id(mut self, new_value: &str) -> AdvertiserPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20164,8 +20100,8 @@ impl<'a, C, A> AdvertiserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20325,7 +20261,7 @@ impl<'a, C, A> AdvertiserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertisers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -20421,122 +20357,109 @@ impl<'a, C, A> AdvertiserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *subaccount id* query property to the given value.
-    ///
-    /// 
     /// Select only advertisers with these subaccount IDs.
+    ///
+    /// Sets the *subaccount id* query property to the given value.
     pub fn subaccount_id(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._subaccount_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *status* query property to the given value.
-    ///
-    /// 
     /// Select only advertisers with the specified status.
+    ///
+    /// Sets the *status* query property to the given value.
     pub fn status(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._status = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "advertiser*2015" will return objects with names like "advertiser June 2015", "advertiser April 2015", or simply "advertiser 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "advertiser" will match objects with name "my advertiser", "advertiser 2015", or simply "advertiser".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *only parent* query property to the given value.
-    ///
-    /// 
     /// Select only advertisers which use another advertiser's floodlight configuration.
+    ///
+    /// Sets the *only parent* query property to the given value.
     pub fn only_parent(mut self, new_value: bool) -> AdvertiserListCall<'a, C, A> {
         self._only_parent = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AdvertiserListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *include advertisers without groups only* query property to the given value.
-    ///
-    /// 
     /// Select only advertisers which do not belong to any advertiser group.
+    ///
+    /// Sets the *include advertisers without groups only* query property to the given value.
     pub fn include_advertisers_without_groups_only(mut self, new_value: bool) -> AdvertiserListCall<'a, C, A> {
         self._include_advertisers_without_groups_only = Some(new_value);
         self
     }
+    /// Select only advertisers with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only advertisers with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
+    /// Select only advertisers with these floodlight configuration IDs.
+    ///
     /// Append the given value to the *floodlight configuration ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only advertisers with these floodlight configuration IDs.
     pub fn add_floodlight_configuration_ids(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._floodlight_configuration_ids.push(new_value.to_string());
         self
     }
+    /// Select only advertisers with these advertiser group IDs.
+    ///
     /// Append the given value to the *advertiser group ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only advertisers with these advertiser group IDs.
     pub fn add_advertiser_group_ids(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._advertiser_group_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20566,8 +20489,8 @@ impl<'a, C, A> AdvertiserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20662,7 +20585,7 @@ impl<'a, C, A> AdvertiserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertisers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -20766,32 +20689,31 @@ impl<'a, C, A> AdvertiserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Advertiser) -> AdvertiserUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20821,8 +20743,8 @@ impl<'a, C, A> AdvertiserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20912,7 +20834,7 @@ impl<'a, C, A> AdvertiserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertisers/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -21008,33 +20930,32 @@ impl<'a, C, A> AdvertiserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Advertiser ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Advertiser ID.
     pub fn id(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -21064,8 +20985,8 @@ impl<'a, C, A> AdvertiserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21274,48 +21195,45 @@ impl<'a, C, A> DimensionValueQueryCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &DimensionValueRequest) -> DimensionValueQueryCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The DFA user profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA user profile ID.
     pub fn profile_id(mut self, new_value: &str) -> DimensionValueQueryCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of the nextToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> DimensionValueQueryCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> DimensionValueQueryCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DimensionValueQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -21345,8 +21263,8 @@ impl<'a, C, A> DimensionValueQueryCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21435,7 +21353,7 @@ impl<'a, C, A> FloodlightActivityGroupDeleteCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivityGroups/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -21521,33 +21439,32 @@ impl<'a, C, A> FloodlightActivityGroupDeleteCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityGroupDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Floodlight activity Group ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Floodlight activity Group ID.
     pub fn id(mut self, new_value: &str) -> FloodlightActivityGroupDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityGroupDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -21577,8 +21494,8 @@ impl<'a, C, A> FloodlightActivityGroupDeleteCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21668,7 +21585,7 @@ impl<'a, C, A> FloodlightActivityGroupGetCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivityGroups/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -21764,33 +21681,32 @@ impl<'a, C, A> FloodlightActivityGroupGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityGroupGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Floodlight activity Group ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Floodlight activity Group ID.
     pub fn id(mut self, new_value: &str) -> FloodlightActivityGroupGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityGroupGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -21820,8 +21736,8 @@ impl<'a, C, A> FloodlightActivityGroupGetCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21918,7 +21834,7 @@ impl<'a, C, A> FloodlightActivityGroupPatchCall<'a, C, A> where C: BorrowMut<hyp
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivityGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -22022,42 +21938,41 @@ impl<'a, C, A> FloodlightActivityGroupPatchCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &FloodlightActivityGroup) -> FloodlightActivityGroupPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityGroupPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Floodlight activity Group ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Floodlight activity Group ID.
     pub fn id(mut self, new_value: &str) -> FloodlightActivityGroupPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityGroupPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -22087,8 +22002,8 @@ impl<'a, C, A> FloodlightActivityGroupPatchCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -22225,7 +22140,7 @@ impl<'a, C, A> FloodlightActivityGroupListCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivityGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -22321,96 +22236,86 @@ impl<'a, C, A> FloodlightActivityGroupListCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *type* query property to the given value.
-    ///
-    /// 
     /// Select only floodlight activity groups with the specified floodlight activity group type.
+    ///
+    /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "floodlightactivitygroup*2015" will return objects with names like "floodlightactivitygroup June 2015", "floodlightactivitygroup April 2015", or simply "floodlightactivitygroup 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "floodlightactivitygroup" will match objects with name "my floodlightactivitygroup activity", "floodlightactivitygroup 2015", or simply "floodlightactivitygroup".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only floodlight activity groups with the specified IDs. Must specify either advertiserId or floodlightConfigurationId for a non-empty result.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only floodlight activity groups with the specified IDs. Must specify either advertiserId or floodlightConfigurationId for a non-empty result.
     pub fn add_ids(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *floodlight configuration id* query property to the given value.
-    ///
-    /// 
     /// Select only floodlight activity groups with the specified floodlight configuration ID. Must specify either advertiserId, or floodlightConfigurationId for a non-empty result.
+    ///
+    /// Sets the *floodlight configuration id* query property to the given value.
     pub fn floodlight_configuration_id(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._floodlight_configuration_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *advertiser id* query property to the given value.
-    ///
-    /// 
     /// Select only floodlight activity groups with the specified advertiser ID. Must specify either advertiserId or floodlightConfigurationId for a non-empty result.
+    ///
+    /// Sets the *advertiser id* query property to the given value.
     pub fn advertiser_id(mut self, new_value: &str) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityGroupListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -22440,8 +22345,8 @@ impl<'a, C, A> FloodlightActivityGroupListCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -22536,7 +22441,7 @@ impl<'a, C, A> FloodlightActivityGroupInsertCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivityGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -22640,32 +22545,31 @@ impl<'a, C, A> FloodlightActivityGroupInsertCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &FloodlightActivityGroup) -> FloodlightActivityGroupInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityGroupInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityGroupInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -22695,8 +22599,8 @@ impl<'a, C, A> FloodlightActivityGroupInsertCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -22791,7 +22695,7 @@ impl<'a, C, A> FloodlightActivityGroupUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivityGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -22895,32 +22799,31 @@ impl<'a, C, A> FloodlightActivityGroupUpdateCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &FloodlightActivityGroup) -> FloodlightActivityGroupUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityGroupUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityGroupUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -22950,8 +22853,8 @@ impl<'a, C, A> FloodlightActivityGroupUpdateCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -23039,7 +22942,7 @@ impl<'a, C, A> MetroListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/metros".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -23135,23 +23038,22 @@ impl<'a, C, A> MetroListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> MetroListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetroListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -23181,8 +23083,8 @@ impl<'a, C, A> MetroListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -23272,7 +23174,7 @@ impl<'a, C, A> DirectorySiteContactGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/directorySiteContacts/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -23368,33 +23270,32 @@ impl<'a, C, A> DirectorySiteContactGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> DirectorySiteContactGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Directory site contact ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Directory site contact ID.
     pub fn id(mut self, new_value: &str) -> DirectorySiteContactGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DirectorySiteContactGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -23424,8 +23325,8 @@ impl<'a, C, A> DirectorySiteContactGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -23556,7 +23457,7 @@ impl<'a, C, A> DirectorySiteContactListCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/directorySiteContacts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -23652,81 +23553,73 @@ impl<'a, C, A> DirectorySiteContactListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> DirectorySiteContactListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> DirectorySiteContactListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> DirectorySiteContactListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name, ID or email. Wildcards (*) are allowed. For example, "directory site contact*2015" will return objects with names like "directory site contact June 2015", "directory site contact April 2015", or simply "directory site contact 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "directory site contact" will match objects with name "my directory site contact", "directory site contact 2015", or simply "directory site contact".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> DirectorySiteContactListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> DirectorySiteContactListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> DirectorySiteContactListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only directory site contacts with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only directory site contacts with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> DirectorySiteContactListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
+    /// Select only directory site contacts with these directory site IDs. This is a required field.
+    ///
     /// Append the given value to the *directory site ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only directory site contacts with these directory site IDs. This is a required field.
     pub fn add_directory_site_ids(mut self, new_value: &str) -> DirectorySiteContactListCall<'a, C, A> {
         self._directory_site_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DirectorySiteContactListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -23756,8 +23649,8 @@ impl<'a, C, A> DirectorySiteContactListCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -23915,13 +23808,12 @@ impl<'a, C, A> UserProfileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserProfileListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -23951,8 +23843,8 @@ impl<'a, C, A> UserProfileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -24136,23 +24028,22 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The user profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user profile ID.
     pub fn profile_id(mut self, new_value: &str) -> UserProfileGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserProfileGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -24182,8 +24073,8 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -24280,7 +24171,7 @@ impl<'a, C, A> AdPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/ads".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -24384,42 +24275,41 @@ impl<'a, C, A> AdPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Ad) -> AdPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Ad ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Ad ID.
     pub fn id(mut self, new_value: &str) -> AdPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -24449,8 +24339,8 @@ impl<'a, C, A> AdPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -24545,7 +24435,7 @@ impl<'a, C, A> AdInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/ads".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -24649,32 +24539,31 @@ impl<'a, C, A> AdInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Ad) -> AdInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -24704,8 +24593,8 @@ impl<'a, C, A> AdInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -24953,7 +24842,7 @@ impl<'a, C, A> AdListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/ads".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -25049,225 +24938,200 @@ impl<'a, C, A> AdListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Select only ads with these types.
+    ///
     /// Append the given value to the *type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only ads with these types.
     pub fn add_type(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._type_.push(new_value.to_string());
         self
     }
-    /// Sets the *ssl required* query property to the given value.
-    ///
-    /// 
     /// Select only ads that require SSL.
+    ///
+    /// Sets the *ssl required* query property to the given value.
     pub fn ssl_required(mut self, new_value: bool) -> AdListCall<'a, C, A> {
         self._ssl_required = Some(new_value);
         self
     }
-    /// Sets the *ssl compliant* query property to the given value.
-    ///
-    /// 
     /// Select only ads that are SSL-compliant.
+    ///
+    /// Sets the *ssl compliant* query property to the given value.
     pub fn ssl_compliant(mut self, new_value: bool) -> AdListCall<'a, C, A> {
         self._ssl_compliant = Some(new_value);
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
+    /// Select only ads with these size IDs.
+    ///
     /// Append the given value to the *size ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only ads with these size IDs.
     pub fn add_size_ids(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._size_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "ad*2015" will return objects with names like "ad June 2015", "ad April 2015", or simply "ad 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "ad" will match objects with name "my ad", "ad 2015", or simply "ad".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
+    /// Select only ads whose list targeting expression use these remarketing list IDs.
+    ///
     /// Append the given value to the *remarketing list ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only ads whose list targeting expression use these remarketing list IDs.
     pub fn add_remarketing_list_ids(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._remarketing_list_ids.push(new_value.to_string());
         self
     }
+    /// Select only ads with these placement IDs assigned.
+    ///
     /// Append the given value to the *placement ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only ads with these placement IDs assigned.
     pub fn add_placement_ids(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._placement_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *overridden event tag id* query property to the given value.
-    ///
-    /// 
     /// Select only ads with this event tag override ID.
+    ///
+    /// Sets the *overridden event tag id* query property to the given value.
     pub fn overridden_event_tag_id(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._overridden_event_tag_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AdListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only ads with these landing page IDs.
+    ///
     /// Append the given value to the *landing page ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only ads with these landing page IDs.
     pub fn add_landing_page_ids(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._landing_page_ids.push(new_value.to_string());
         self
     }
+    /// Select only ads with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only ads with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *dynamic click tracker* query property to the given value.
-    ///
-    /// 
     /// Select only dynamic click trackers. Applicable when type is AD_SERVING_CLICK_TRACKER. If true, select dynamic click trackers. If false, select static click trackers. Leave unset to select both.
+    ///
+    /// Sets the *dynamic click tracker* query property to the given value.
     pub fn dynamic_click_tracker(mut self, new_value: bool) -> AdListCall<'a, C, A> {
         self._dynamic_click_tracker = Some(new_value);
         self
     }
-    /// Sets the *creative type* query property to the given value.
-    ///
-    /// 
     /// Select only ads with the specified creativeType.
+    ///
+    /// Sets the *creative type* query property to the given value.
     pub fn creative_type(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._creative_type = Some(new_value.to_string());
         self
     }
+    /// Select only ads with these creative optimization configuration IDs.
+    ///
     /// Append the given value to the *creative optimization configuration ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only ads with these creative optimization configuration IDs.
     pub fn add_creative_optimization_configuration_ids(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._creative_optimization_configuration_ids.push(new_value.to_string());
         self
     }
+    /// Select only ads with these creative IDs assigned.
+    ///
     /// Append the given value to the *creative ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only ads with these creative IDs assigned.
     pub fn add_creative_ids(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._creative_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *compatibility* query property to the given value.
-    ///
-    /// 
     /// Select default ads with the specified compatibility. Applicable when type is AD_SERVING_DEFAULT_AD. WEB and WEB_INTERSTITIAL refer to rendering either on desktop or on mobile devices for regular or interstitial ads, respectively. APP and APP_INTERSTITIAL are for rendering in mobile apps. IN_STREAM_VIDEO refers to rendering an in-stream video ads developed with the VAST standard.
+    ///
+    /// Sets the *compatibility* query property to the given value.
     pub fn compatibility(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._compatibility = Some(new_value.to_string());
         self
     }
+    /// Select only ads with these campaign IDs.
+    ///
     /// Append the given value to the *campaign ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only ads with these campaign IDs.
     pub fn add_campaign_ids(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._campaign_ids.push(new_value.to_string());
         self
     }
+    /// Select only ads with these audience segment IDs.
+    ///
     /// Append the given value to the *audience segment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only ads with these audience segment IDs.
     pub fn add_audience_segment_ids(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._audience_segment_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *archived* query property to the given value.
-    ///
-    /// 
     /// Select only archived ads.
+    ///
+    /// Sets the *archived* query property to the given value.
     pub fn archived(mut self, new_value: bool) -> AdListCall<'a, C, A> {
         self._archived = Some(new_value);
         self
     }
-    /// Sets the *advertiser id* query property to the given value.
-    ///
-    /// 
     /// Select only ads with this advertiser ID.
+    ///
+    /// Sets the *advertiser id* query property to the given value.
     pub fn advertiser_id(mut self, new_value: &str) -> AdListCall<'a, C, A> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *active* query property to the given value.
-    ///
-    /// 
     /// Select only active ads.
+    ///
+    /// Sets the *active* query property to the given value.
     pub fn active(mut self, new_value: bool) -> AdListCall<'a, C, A> {
         self._active = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -25297,8 +25161,8 @@ impl<'a, C, A> AdListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -25388,7 +25252,7 @@ impl<'a, C, A> AdGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/ads/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -25484,33 +25348,32 @@ impl<'a, C, A> AdGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2:
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Ad ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Ad ID.
     pub fn id(mut self, new_value: &str) -> AdGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -25540,8 +25403,8 @@ impl<'a, C, A> AdGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -25636,7 +25499,7 @@ impl<'a, C, A> AdUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/ads".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -25740,32 +25603,31 @@ impl<'a, C, A> AdUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Ad) -> AdUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -25795,8 +25657,8 @@ impl<'a, C, A> AdUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -25886,7 +25748,7 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accountPermissions/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -25982,33 +25844,32 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Account permission ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account permission ID.
     pub fn id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -26038,8 +25899,8 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -26127,7 +25988,7 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accountPermissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -26223,23 +26084,22 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountPermissionListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -26269,8 +26129,8 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -26358,7 +26218,7 @@ impl<'a, C, A> ConnectionTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/connectionTypes".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -26454,23 +26314,22 @@ impl<'a, C, A> ConnectionTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> ConnectionTypeListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConnectionTypeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -26500,8 +26359,8 @@ impl<'a, C, A> ConnectionTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -26591,7 +26450,7 @@ impl<'a, C, A> AdvertiserGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertiserGroups/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -26687,33 +26546,32 @@ impl<'a, C, A> AdvertiserGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserGroupGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Advertiser group ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Advertiser group ID.
     pub fn id(mut self, new_value: &str) -> AdvertiserGroupGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserGroupGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -26743,8 +26601,8 @@ impl<'a, C, A> AdvertiserGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -26866,7 +26724,7 @@ impl<'a, C, A> AdvertiserGroupListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertiserGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -26962,72 +26820,65 @@ impl<'a, C, A> AdvertiserGroupListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserGroupListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> AdvertiserGroupListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> AdvertiserGroupListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "advertiser*2015" will return objects with names like "advertiser group June 2015", "advertiser group April 2015", or simply "advertiser group 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "advertisergroup" will match objects with name "my advertisergroup", "advertisergroup 2015", or simply "advertisergroup".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> AdvertiserGroupListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AdvertiserGroupListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AdvertiserGroupListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only advertiser groups with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only advertiser groups with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> AdvertiserGroupListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserGroupListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -27057,8 +26908,8 @@ impl<'a, C, A> AdvertiserGroupListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -27153,7 +27004,7 @@ impl<'a, C, A> AdvertiserGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertiserGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -27257,32 +27108,31 @@ impl<'a, C, A> AdvertiserGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AdvertiserGroup) -> AdvertiserGroupInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserGroupInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserGroupInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -27312,8 +27162,8 @@ impl<'a, C, A> AdvertiserGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -27408,7 +27258,7 @@ impl<'a, C, A> AdvertiserGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertiserGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -27512,32 +27362,31 @@ impl<'a, C, A> AdvertiserGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AdvertiserGroup) -> AdvertiserGroupUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserGroupUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserGroupUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -27567,8 +27416,8 @@ impl<'a, C, A> AdvertiserGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -27665,7 +27514,7 @@ impl<'a, C, A> AdvertiserGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertiserGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -27769,42 +27618,41 @@ impl<'a, C, A> AdvertiserGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AdvertiserGroup) -> AdvertiserGroupPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserGroupPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Advertiser group ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Advertiser group ID.
     pub fn id(mut self, new_value: &str) -> AdvertiserGroupPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserGroupPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -27834,8 +27682,8 @@ impl<'a, C, A> AdvertiserGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -27924,7 +27772,7 @@ impl<'a, C, A> AdvertiserGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/advertiserGroups/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -28010,33 +27858,32 @@ impl<'a, C, A> AdvertiserGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AdvertiserGroupDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Advertiser group ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Advertiser group ID.
     pub fn id(mut self, new_value: &str) -> AdvertiserGroupDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserGroupDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -28066,8 +27913,8 @@ impl<'a, C, A> AdvertiserGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -28162,7 +28009,7 @@ impl<'a, C, A> SiteInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/sites".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -28266,32 +28113,31 @@ impl<'a, C, A> SiteInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Site) -> SiteInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SiteInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -28321,8 +28167,8 @@ impl<'a, C, A> SiteInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -28412,7 +28258,7 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/sites/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -28508,33 +28354,32 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SiteGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Site ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Site ID.
     pub fn id(mut self, new_value: &str) -> SiteGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -28564,8 +28409,8 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -28740,7 +28585,7 @@ impl<'a, C, A> SiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/sites".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -28836,146 +28681,130 @@ impl<'a, C, A> SiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SiteListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *unmapped site* query property to the given value.
-    ///
-    /// 
     /// Select only sites that have not been mapped to a directory site.
+    ///
+    /// Sets the *unmapped site* query property to the given value.
     pub fn unmapped_site(mut self, new_value: bool) -> SiteListCall<'a, C, A> {
         self._unmapped_site = Some(new_value);
         self
     }
-    /// Sets the *subaccount id* query property to the given value.
-    ///
-    /// 
     /// Select only sites with this subaccount ID.
+    ///
+    /// Sets the *subaccount id* query property to the given value.
     pub fn subaccount_id(mut self, new_value: &str) -> SiteListCall<'a, C, A> {
         self._subaccount_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> SiteListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> SiteListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name, ID or keyName. Wildcards (*) are allowed. For example, "site*2015" will return objects with names like "site June 2015", "site April 2015", or simply "site 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "site" will match objects with name "my site", "site 2015", or simply "site".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> SiteListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> SiteListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> SiteListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only sites with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only sites with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> SiteListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
+    /// Select only sites with these directory site IDs.
+    ///
     /// Append the given value to the *directory site ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only sites with these directory site IDs.
     pub fn add_directory_site_ids(mut self, new_value: &str) -> SiteListCall<'a, C, A> {
         self._directory_site_ids.push(new_value.to_string());
         self
     }
+    /// Select only sites with these campaign IDs.
+    ///
     /// Append the given value to the *campaign ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only sites with these campaign IDs.
     pub fn add_campaign_ids(mut self, new_value: &str) -> SiteListCall<'a, C, A> {
         self._campaign_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *approved* query property to the given value.
-    ///
-    /// 
     /// Select only approved sites.
+    ///
+    /// Sets the *approved* query property to the given value.
     pub fn approved(mut self, new_value: bool) -> SiteListCall<'a, C, A> {
         self._approved = Some(new_value);
         self
     }
-    /// Sets the *ad words site* query property to the given value.
-    ///
-    /// 
     /// Select only AdWords sites.
+    ///
+    /// Sets the *ad words site* query property to the given value.
     pub fn ad_words_site(mut self, new_value: bool) -> SiteListCall<'a, C, A> {
         self._ad_words_site = Some(new_value);
         self
     }
-    /// Sets the *accepts publisher paid placements* query property to the given value.
-    ///
-    /// 
     /// Select only sites that accept publisher paid placements.
+    ///
+    /// Sets the *accepts publisher paid placements* query property to the given value.
     pub fn accepts_publisher_paid_placements(mut self, new_value: bool) -> SiteListCall<'a, C, A> {
         self._accepts_publisher_paid_placements = Some(new_value);
         self
     }
-    /// Sets the *accepts interstitial placements* query property to the given value.
-    ///
-    /// 
     /// This search filter is no longer supported and will have no effect on the results returned.
+    ///
+    /// Sets the *accepts interstitial placements* query property to the given value.
     pub fn accepts_interstitial_placements(mut self, new_value: bool) -> SiteListCall<'a, C, A> {
         self._accepts_interstitial_placements = Some(new_value);
         self
     }
-    /// Sets the *accepts in stream video placements* query property to the given value.
-    ///
-    /// 
     /// This search filter is no longer supported and will have no effect on the results returned.
+    ///
+    /// Sets the *accepts in stream video placements* query property to the given value.
     pub fn accepts_in_stream_video_placements(mut self, new_value: bool) -> SiteListCall<'a, C, A> {
         self._accepts_in_stream_video_placements = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -29005,8 +28834,8 @@ impl<'a, C, A> SiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -29101,7 +28930,7 @@ impl<'a, C, A> SiteUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/sites".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -29205,32 +29034,31 @@ impl<'a, C, A> SiteUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Site) -> SiteUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SiteUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -29260,8 +29088,8 @@ impl<'a, C, A> SiteUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -29358,7 +29186,7 @@ impl<'a, C, A> SitePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/sites".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -29462,42 +29290,41 @@ impl<'a, C, A> SitePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Site) -> SitePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SitePatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Site ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Site ID.
     pub fn id(mut self, new_value: &str) -> SitePatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -29527,8 +29354,8 @@ impl<'a, C, A> SitePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -29618,7 +29445,7 @@ impl<'a, C, A> FloodlightActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivities/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -29714,33 +29541,32 @@ impl<'a, C, A> FloodlightActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Floodlight activity ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Floodlight activity ID.
     pub fn id(mut self, new_value: &str) -> FloodlightActivityGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -29770,8 +29596,8 @@ impl<'a, C, A> FloodlightActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -29932,7 +29758,7 @@ impl<'a, C, A> FloodlightActivityListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivities".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -30028,129 +29854,115 @@ impl<'a, C, A> FloodlightActivityListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *tag string* query property to the given value.
-    ///
-    /// 
     /// Select only floodlight activities with the specified tag string.
+    ///
+    /// Sets the *tag string* query property to the given value.
     pub fn tag_string(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._tag_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "floodlightactivity*2015" will return objects with names like "floodlightactivity June 2015", "floodlightactivity April 2015", or simply "floodlightactivity 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "floodlightactivity" will match objects with name "my floodlightactivity activity", "floodlightactivity 2015", or simply "floodlightactivity".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> FloodlightActivityListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only floodlight activities with the specified IDs. Must specify either ids, advertiserId, or floodlightConfigurationId for a non-empty result.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only floodlight activities with the specified IDs. Must specify either ids, advertiserId, or floodlightConfigurationId for a non-empty result.
     pub fn add_ids(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *floodlight configuration id* query property to the given value.
-    ///
-    /// 
     /// Select only floodlight activities for the specified floodlight configuration ID. Must specify either ids, advertiserId, or floodlightConfigurationId for a non-empty result.
+    ///
+    /// Sets the *floodlight configuration id* query property to the given value.
     pub fn floodlight_configuration_id(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._floodlight_configuration_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *floodlight activity group type* query property to the given value.
-    ///
-    /// 
     /// Select only floodlight activities with the specified floodlight activity group type.
+    ///
+    /// Sets the *floodlight activity group type* query property to the given value.
     pub fn floodlight_activity_group_type(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._floodlight_activity_group_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *floodlight activity group tag string* query property to the given value.
-    ///
-    /// 
     /// Select only floodlight activities with the specified floodlight activity group tag string.
+    ///
+    /// Sets the *floodlight activity group tag string* query property to the given value.
     pub fn floodlight_activity_group_tag_string(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._floodlight_activity_group_tag_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *floodlight activity group name* query property to the given value.
-    ///
-    /// 
     /// Select only floodlight activities with the specified floodlight activity group name.
+    ///
+    /// Sets the *floodlight activity group name* query property to the given value.
     pub fn floodlight_activity_group_name(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._floodlight_activity_group_name = Some(new_value.to_string());
         self
     }
+    /// Select only floodlight activities with the specified floodlight activity group IDs.
+    ///
     /// Append the given value to the *floodlight activity group ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only floodlight activities with the specified floodlight activity group IDs.
     pub fn add_floodlight_activity_group_ids(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._floodlight_activity_group_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *advertiser id* query property to the given value.
-    ///
-    /// 
     /// Select only floodlight activities for the specified advertiser ID. Must specify either ids, advertiserId, or floodlightConfigurationId for a non-empty result.
+    ///
+    /// Sets the *advertiser id* query property to the given value.
     pub fn advertiser_id(mut self, new_value: &str) -> FloodlightActivityListCall<'a, C, A> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -30180,8 +29992,8 @@ impl<'a, C, A> FloodlightActivityListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -30276,7 +30088,7 @@ impl<'a, C, A> FloodlightActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivities".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -30380,32 +30192,31 @@ impl<'a, C, A> FloodlightActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &FloodlightActivity) -> FloodlightActivityInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -30435,8 +30246,8 @@ impl<'a, C, A> FloodlightActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -30525,7 +30336,7 @@ impl<'a, C, A> FloodlightActivityDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivities/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -30611,33 +30422,32 @@ impl<'a, C, A> FloodlightActivityDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Floodlight activity ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Floodlight activity ID.
     pub fn id(mut self, new_value: &str) -> FloodlightActivityDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -30667,8 +30477,8 @@ impl<'a, C, A> FloodlightActivityDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -30765,7 +30575,7 @@ impl<'a, C, A> FloodlightActivityPatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivities".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -30869,42 +30679,41 @@ impl<'a, C, A> FloodlightActivityPatchCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &FloodlightActivity) -> FloodlightActivityPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Floodlight activity ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Floodlight activity ID.
     pub fn id(mut self, new_value: &str) -> FloodlightActivityPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -30934,8 +30743,8 @@ impl<'a, C, A> FloodlightActivityPatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -31028,7 +30837,7 @@ impl<'a, C, A> FloodlightActivityGeneratetagCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivities/generatetag".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -31124,31 +30933,29 @@ impl<'a, C, A> FloodlightActivityGeneratetagCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityGeneratetagCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *floodlight activity id* query property to the given value.
-    ///
-    /// 
     /// Floodlight activity ID for which we want to generate a tag.
+    ///
+    /// Sets the *floodlight activity id* query property to the given value.
     pub fn floodlight_activity_id(mut self, new_value: &str) -> FloodlightActivityGeneratetagCall<'a, C, A> {
         self._floodlight_activity_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityGeneratetagCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -31178,8 +30985,8 @@ impl<'a, C, A> FloodlightActivityGeneratetagCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -31274,7 +31081,7 @@ impl<'a, C, A> FloodlightActivityUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightActivities".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -31378,32 +31185,31 @@ impl<'a, C, A> FloodlightActivityUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &FloodlightActivity) -> FloodlightActivityUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightActivityUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightActivityUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -31433,8 +31239,8 @@ impl<'a, C, A> FloodlightActivityUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -31522,7 +31328,7 @@ impl<'a, C, A> RegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/regions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -31618,23 +31424,22 @@ impl<'a, C, A> RegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> RegionListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RegionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -31664,8 +31469,8 @@ impl<'a, C, A> RegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -31760,7 +31565,7 @@ impl<'a, C, A> CreativeGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -31864,32 +31669,31 @@ impl<'a, C, A> CreativeGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreativeGroup) -> CreativeGroupInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeGroupInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeGroupInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -31919,8 +31723,8 @@ impl<'a, C, A> CreativeGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -32010,7 +31814,7 @@ impl<'a, C, A> CreativeGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeGroups/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -32106,33 +31910,32 @@ impl<'a, C, A> CreativeGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeGroupGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative group ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative group ID.
     pub fn id(mut self, new_value: &str) -> CreativeGroupGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeGroupGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -32162,8 +31965,8 @@ impl<'a, C, A> CreativeGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -32258,7 +32061,7 @@ impl<'a, C, A> CreativeGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -32362,32 +32165,31 @@ impl<'a, C, A> CreativeGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreativeGroup) -> CreativeGroupUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeGroupUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeGroupUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -32417,8 +32219,8 @@ impl<'a, C, A> CreativeGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -32554,7 +32356,7 @@ impl<'a, C, A> CreativeGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -32650,89 +32452,80 @@ impl<'a, C, A> CreativeGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeGroupListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CreativeGroupListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> CreativeGroupListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for creative groups by name or ID. Wildcards (*) are allowed. For example, "creativegroup*2015" will return creative groups with names like "creativegroup June 2015", "creativegroup April 2015", or simply "creativegroup 2015". Most of the searches also add wild-cards implicitly at the start and the end of the search string. For example, a search string of "creativegroup" will match creative groups with the name "my creativegroup", "creativegroup 2015", or simply "creativegroup".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> CreativeGroupListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CreativeGroupListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> CreativeGroupListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only creative groups with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only creative groups with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> CreativeGroupListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *group number* query property to the given value.
-    ///
-    /// 
     /// Select only creative groups that belong to this subgroup.
+    ///
+    /// Sets the *group number* query property to the given value.
     pub fn group_number(mut self, new_value: i32) -> CreativeGroupListCall<'a, C, A> {
         self._group_number = Some(new_value);
         self
     }
+    /// Select only creative groups that belong to these advertisers.
+    ///
     /// Append the given value to the *advertiser ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only creative groups that belong to these advertisers.
     pub fn add_advertiser_ids(mut self, new_value: &str) -> CreativeGroupListCall<'a, C, A> {
         self._advertiser_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeGroupListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -32762,8 +32555,8 @@ impl<'a, C, A> CreativeGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -32860,7 +32653,7 @@ impl<'a, C, A> CreativeGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -32964,42 +32757,41 @@ impl<'a, C, A> CreativeGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreativeGroup) -> CreativeGroupPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeGroupPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative group ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative group ID.
     pub fn id(mut self, new_value: &str) -> CreativeGroupPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeGroupPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -33029,8 +32821,8 @@ impl<'a, C, A> CreativeGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -33127,7 +32919,7 @@ impl<'a, C, A> SubaccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/subaccounts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -33231,42 +33023,41 @@ impl<'a, C, A> SubaccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Subaccount) -> SubaccountPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SubaccountPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Subaccount ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Subaccount ID.
     pub fn id(mut self, new_value: &str) -> SubaccountPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubaccountPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -33296,8 +33087,8 @@ impl<'a, C, A> SubaccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -33392,7 +33183,7 @@ impl<'a, C, A> SubaccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/subaccounts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -33496,32 +33287,31 @@ impl<'a, C, A> SubaccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Subaccount) -> SubaccountInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SubaccountInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubaccountInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -33551,8 +33341,8 @@ impl<'a, C, A> SubaccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -33674,7 +33464,7 @@ impl<'a, C, A> SubaccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/subaccounts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -33770,72 +33560,65 @@ impl<'a, C, A> SubaccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SubaccountListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> SubaccountListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> SubaccountListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "subaccount*2015" will return objects with names like "subaccount June 2015", "subaccount April 2015", or simply "subaccount 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "subaccount" will match objects with name "my subaccount", "subaccount 2015", or simply "subaccount".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> SubaccountListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> SubaccountListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> SubaccountListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only subaccounts with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only subaccounts with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> SubaccountListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubaccountListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -33865,8 +33648,8 @@ impl<'a, C, A> SubaccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -33961,7 +33744,7 @@ impl<'a, C, A> SubaccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/subaccounts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -34065,32 +33848,31 @@ impl<'a, C, A> SubaccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Subaccount) -> SubaccountUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SubaccountUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubaccountUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -34120,8 +33902,8 @@ impl<'a, C, A> SubaccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -34211,7 +33993,7 @@ impl<'a, C, A> SubaccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/subaccounts/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -34307,33 +34089,32 @@ impl<'a, C, A> SubaccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SubaccountGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Subaccount ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Subaccount ID.
     pub fn id(mut self, new_value: &str) -> SubaccountGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubaccountGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -34363,8 +34144,8 @@ impl<'a, C, A> SubaccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -34452,7 +34233,7 @@ impl<'a, C, A> MobileCarrierListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/mobileCarriers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -34548,23 +34329,22 @@ impl<'a, C, A> MobileCarrierListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> MobileCarrierListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MobileCarrierListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -34594,8 +34374,8 @@ impl<'a, C, A> MobileCarrierListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -34690,7 +34470,7 @@ impl<'a, C, A> FloodlightConfigurationUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightConfigurations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -34794,32 +34574,31 @@ impl<'a, C, A> FloodlightConfigurationUpdateCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &FloodlightConfiguration) -> FloodlightConfigurationUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightConfigurationUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightConfigurationUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -34849,8 +34628,8 @@ impl<'a, C, A> FloodlightConfigurationUpdateCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -34947,7 +34726,7 @@ impl<'a, C, A> FloodlightConfigurationPatchCall<'a, C, A> where C: BorrowMut<hyp
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightConfigurations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -35051,42 +34830,41 @@ impl<'a, C, A> FloodlightConfigurationPatchCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &FloodlightConfiguration) -> FloodlightConfigurationPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightConfigurationPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Floodlight configuration ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Floodlight configuration ID.
     pub fn id(mut self, new_value: &str) -> FloodlightConfigurationPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightConfigurationPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -35116,8 +34894,8 @@ impl<'a, C, A> FloodlightConfigurationPatchCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -35207,7 +34985,7 @@ impl<'a, C, A> FloodlightConfigurationGetCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightConfigurations/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -35303,33 +35081,32 @@ impl<'a, C, A> FloodlightConfigurationGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightConfigurationGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Floodlight configuration ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Floodlight configuration ID.
     pub fn id(mut self, new_value: &str) -> FloodlightConfigurationGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightConfigurationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -35359,8 +35136,8 @@ impl<'a, C, A> FloodlightConfigurationGetCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -35457,7 +35234,7 @@ impl<'a, C, A> FloodlightConfigurationListCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/floodlightConfigurations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -35553,32 +35330,30 @@ impl<'a, C, A> FloodlightConfigurationListCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> FloodlightConfigurationListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Set of IDs of floodlight configurations to retrieve. Required field; otherwise an empty list will be returned.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Set of IDs of floodlight configurations to retrieve. Required field; otherwise an empty list will be returned.
     pub fn add_ids(mut self, new_value: &str) -> FloodlightConfigurationListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FloodlightConfigurationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -35608,8 +35383,8 @@ impl<'a, C, A> FloodlightConfigurationListCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -35697,7 +35472,7 @@ impl<'a, C, A> OperatingSystemListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/operatingSystems".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -35793,23 +35568,22 @@ impl<'a, C, A> OperatingSystemListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> OperatingSystemListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperatingSystemListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -35839,8 +35613,8 @@ impl<'a, C, A> OperatingSystemListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -36049,63 +35823,57 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// The DFA profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA profile ID.
     pub fn profile_id(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is 'DESCENDING'.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// The field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *scope* query property to the given value.
-    ///
-    /// 
     /// The scope that defines which results are returned, default is 'MINE'.
+    ///
+    /// Sets the *scope* query property to the given value.
     pub fn scope(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._scope = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of the nextToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> FileListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -36135,8 +35903,8 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -36343,33 +36111,32 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// The ID of the report.
+    ///
     /// Sets the *report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the report.
     pub fn report_id(mut self, new_value: &str) -> FileGetCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
+    /// The ID of the report file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the report file.
     pub fn file_id(mut self, new_value: &str) -> FileGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -36399,8 +36166,8 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -36595,7 +36362,7 @@ impl<'a, C, A> PlacementGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -36691,151 +36458,135 @@ impl<'a, C, A> PlacementGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
+    /// Select only placement groups that are associated with these sites.
+    ///
     /// Append the given value to the *site ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placement groups that are associated with these sites.
     pub fn add_site_ids(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._site_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for placement groups by name or ID. Wildcards (*) are allowed. For example, "placement*2015" will return placement groups with names like "placement group June 2015", "placement group May 2015", or simply "placements 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "placementgroup" will match placement groups with name "my placementgroup", "placementgroup 2015", or simply "placementgroup".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
+    /// Select only placement groups with these pricing types.
+    ///
     /// Append the given value to the *pricing types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placement groups with these pricing types.
     pub fn add_pricing_types(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._pricing_types.push(new_value.to_string());
         self
     }
+    /// Select only placement groups that are associated with these placement strategies.
+    ///
     /// Append the given value to the *placement strategy ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placement groups that are associated with these placement strategies.
     pub fn add_placement_strategy_ids(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._placement_strategy_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *placement group type* query property to the given value.
-    ///
-    /// 
     /// Select only placement groups belonging with this group type. A package is a simple group of placements that acts as a single pricing point for a group of tags. A roadblock is a group of placements that not only acts as a single pricing point but also assumes that all the tags in it will be served at the same time. A roadblock requires one of its assigned placements to be marked as primary for reporting.
+    ///
+    /// Sets the *placement group type* query property to the given value.
     pub fn placement_group_type(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._placement_group_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> PlacementGroupListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only placement groups with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placement groups with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
+    /// Select only placement groups that are associated with these directory sites.
+    ///
     /// Append the given value to the *directory site ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placement groups that are associated with these directory sites.
     pub fn add_directory_site_ids(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._directory_site_ids.push(new_value.to_string());
         self
     }
+    /// Select only placement groups that are associated with these content categories.
+    ///
     /// Append the given value to the *content category ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placement groups that are associated with these content categories.
     pub fn add_content_category_ids(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._content_category_ids.push(new_value.to_string());
         self
     }
+    /// Select only placement groups that belong to these campaigns.
+    ///
     /// Append the given value to the *campaign ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placement groups that belong to these campaigns.
     pub fn add_campaign_ids(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._campaign_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *archived* query property to the given value.
-    ///
-    /// 
     /// Select only archived placements. Don't set this field to select both archived and non-archived placements.
+    ///
+    /// Sets the *archived* query property to the given value.
     pub fn archived(mut self, new_value: bool) -> PlacementGroupListCall<'a, C, A> {
         self._archived = Some(new_value);
         self
     }
+    /// Select only placement groups that belong to these advertisers.
+    ///
     /// Append the given value to the *advertiser ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placement groups that belong to these advertisers.
     pub fn add_advertiser_ids(mut self, new_value: &str) -> PlacementGroupListCall<'a, C, A> {
         self._advertiser_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementGroupListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -36865,8 +36616,8 @@ impl<'a, C, A> PlacementGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -36961,7 +36712,7 @@ impl<'a, C, A> PlacementGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -37065,32 +36816,31 @@ impl<'a, C, A> PlacementGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &PlacementGroup) -> PlacementGroupUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementGroupUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementGroupUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -37120,8 +36870,8 @@ impl<'a, C, A> PlacementGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -37216,7 +36966,7 @@ impl<'a, C, A> PlacementGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -37320,32 +37070,31 @@ impl<'a, C, A> PlacementGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &PlacementGroup) -> PlacementGroupInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementGroupInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementGroupInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -37375,8 +37124,8 @@ impl<'a, C, A> PlacementGroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -37466,7 +37215,7 @@ impl<'a, C, A> PlacementGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementGroups/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -37562,33 +37311,32 @@ impl<'a, C, A> PlacementGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementGroupGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Placement group ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Placement group ID.
     pub fn id(mut self, new_value: &str) -> PlacementGroupGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementGroupGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -37618,8 +37366,8 @@ impl<'a, C, A> PlacementGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -37716,7 +37464,7 @@ impl<'a, C, A> PlacementGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -37820,42 +37568,41 @@ impl<'a, C, A> PlacementGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &PlacementGroup) -> PlacementGroupPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementGroupPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Placement group ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Placement group ID.
     pub fn id(mut self, new_value: &str) -> PlacementGroupPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementGroupPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -37885,8 +37632,8 @@ impl<'a, C, A> PlacementGroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -37992,7 +37739,7 @@ impl<'a, C, A> CreativeAssetInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{advertiserId}", "advertiserId")].iter() {
@@ -38202,42 +37949,41 @@ impl<'a, C, A> CreativeAssetInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreativeAssetMetadata) -> CreativeAssetInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeAssetInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Advertiser ID of this creative. This is a required field.
+    ///
     /// Sets the *advertiser id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Advertiser ID of this creative. This is a required field.
     pub fn advertiser_id(mut self, new_value: &str) -> CreativeAssetInsertCall<'a, C, A> {
         self._advertiser_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeAssetInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -38267,8 +38013,8 @@ impl<'a, C, A> CreativeAssetInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -38358,7 +38104,7 @@ impl<'a, C, A> UserRolePermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/userRolePermissions/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -38454,33 +38200,32 @@ impl<'a, C, A> UserRolePermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> UserRolePermissionGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// User role permission ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User role permission ID.
     pub fn id(mut self, new_value: &str) -> UserRolePermissionGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRolePermissionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -38510,8 +38255,8 @@ impl<'a, C, A> UserRolePermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -38608,7 +38353,7 @@ impl<'a, C, A> UserRolePermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/userRolePermissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -38704,32 +38449,30 @@ impl<'a, C, A> UserRolePermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> UserRolePermissionListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Select only user role permissions with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only user role permissions with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> UserRolePermissionListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRolePermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -38759,8 +38502,8 @@ impl<'a, C, A> UserRolePermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -38848,7 +38591,7 @@ impl<'a, C, A> AccountPermissionGroupListCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accountPermissionGroups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -38944,23 +38687,22 @@ impl<'a, C, A> AccountPermissionGroupListCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountPermissionGroupListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionGroupListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -38990,8 +38732,8 @@ impl<'a, C, A> AccountPermissionGroupListCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -39081,7 +38823,7 @@ impl<'a, C, A> AccountPermissionGroupGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accountPermissionGroups/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -39177,33 +38919,32 @@ impl<'a, C, A> AccountPermissionGroupGetCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountPermissionGroupGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Account permission group ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account permission group ID.
     pub fn id(mut self, new_value: &str) -> AccountPermissionGroupGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionGroupGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -39233,8 +38974,8 @@ impl<'a, C, A> AccountPermissionGroupGetCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -39356,7 +39097,7 @@ impl<'a, C, A> ContentCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/contentCategories".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -39452,72 +39193,65 @@ impl<'a, C, A> ContentCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> ContentCategoryListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> ContentCategoryListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> ContentCategoryListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "contentcategory*2015" will return objects with names like "contentcategory June 2015", "contentcategory April 2015", or simply "contentcategory 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "contentcategory" will match objects with name "my contentcategory", "contentcategory 2015", or simply "contentcategory".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> ContentCategoryListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ContentCategoryListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ContentCategoryListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only content categories with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only content categories with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> ContentCategoryListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContentCategoryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -39547,8 +39281,8 @@ impl<'a, C, A> ContentCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -39643,7 +39377,7 @@ impl<'a, C, A> ContentCategoryUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/contentCategories".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -39747,32 +39481,31 @@ impl<'a, C, A> ContentCategoryUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ContentCategory) -> ContentCategoryUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> ContentCategoryUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContentCategoryUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -39802,8 +39535,8 @@ impl<'a, C, A> ContentCategoryUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -39898,7 +39631,7 @@ impl<'a, C, A> ContentCategoryInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/contentCategories".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -40002,32 +39735,31 @@ impl<'a, C, A> ContentCategoryInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ContentCategory) -> ContentCategoryInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> ContentCategoryInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContentCategoryInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -40057,8 +39789,8 @@ impl<'a, C, A> ContentCategoryInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -40147,7 +39879,7 @@ impl<'a, C, A> ContentCategoryDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/contentCategories/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -40233,33 +39965,32 @@ impl<'a, C, A> ContentCategoryDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> ContentCategoryDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Content category ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Content category ID.
     pub fn id(mut self, new_value: &str) -> ContentCategoryDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContentCategoryDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -40289,8 +40020,8 @@ impl<'a, C, A> ContentCategoryDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -40380,7 +40111,7 @@ impl<'a, C, A> ContentCategoryGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/contentCategories/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -40476,33 +40207,32 @@ impl<'a, C, A> ContentCategoryGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> ContentCategoryGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Content category ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Content category ID.
     pub fn id(mut self, new_value: &str) -> ContentCategoryGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContentCategoryGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -40532,8 +40262,8 @@ impl<'a, C, A> ContentCategoryGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -40630,7 +40360,7 @@ impl<'a, C, A> ContentCategoryPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/contentCategories".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -40734,42 +40464,41 @@ impl<'a, C, A> ContentCategoryPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ContentCategory) -> ContentCategoryPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> ContentCategoryPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Content category ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Content category ID.
     pub fn id(mut self, new_value: &str) -> ContentCategoryPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ContentCategoryPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -40799,8 +40528,8 @@ impl<'a, C, A> ContentCategoryPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -40895,7 +40624,7 @@ impl<'a, C, A> CreativeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creatives".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -40999,32 +40728,31 @@ impl<'a, C, A> CreativeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Creative) -> CreativeInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -41054,8 +40782,8 @@ impl<'a, C, A> CreativeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -41150,7 +40878,7 @@ impl<'a, C, A> CreativeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creatives".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -41254,32 +40982,31 @@ impl<'a, C, A> CreativeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Creative) -> CreativeUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -41309,8 +41036,8 @@ impl<'a, C, A> CreativeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -41400,7 +41127,7 @@ impl<'a, C, A> CreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creatives/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -41496,33 +41223,32 @@ impl<'a, C, A> CreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative ID.
     pub fn id(mut self, new_value: &str) -> CreativeGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -41552,8 +41278,8 @@ impl<'a, C, A> CreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -41745,7 +41471,7 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creatives".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -41841,157 +41567,140 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Select only creatives with these creative types.
+    ///
     /// Append the given value to the *types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only creatives with these creative types.
     pub fn add_types(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._types.push(new_value.to_string());
         self
     }
-    /// Sets the *studio creative id* query property to the given value.
-    ///
-    /// 
     /// Select only creatives corresponding to this Studio creative ID.
+    ///
+    /// Sets the *studio creative id* query property to the given value.
     pub fn studio_creative_id(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._studio_creative_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
+    /// Select only creatives with these size IDs.
+    ///
     /// Append the given value to the *size ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only creatives with these size IDs.
     pub fn add_size_ids(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._size_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "creative*2015" will return objects with names like "creative June 2015", "creative April 2015", or simply "creative 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "creative" will match objects with name "my creative", "creative 2015", or simply "creative".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
+    /// Select only creatives with these rendering IDs.
+    ///
     /// Append the given value to the *rendering ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only creatives with these rendering IDs.
     pub fn add_rendering_ids(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._rendering_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> CreativeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only creatives with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only creatives with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
+    /// Select only creatives with these creative field IDs.
+    ///
     /// Append the given value to the *creative field ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only creatives with these creative field IDs.
     pub fn add_creative_field_ids(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._creative_field_ids.push(new_value.to_string());
         self
     }
+    /// Select only in-stream video creatives with these companion IDs.
+    ///
     /// Append the given value to the *companion creative ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only in-stream video creatives with these companion IDs.
     pub fn add_companion_creative_ids(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._companion_creative_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *campaign id* query property to the given value.
-    ///
-    /// 
     /// Select only creatives with this campaign ID.
+    ///
+    /// Sets the *campaign id* query property to the given value.
     pub fn campaign_id(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._campaign_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *archived* query property to the given value.
-    ///
-    /// 
     /// Select only archived creatives. Leave blank to select archived and unarchived creatives.
+    ///
+    /// Sets the *archived* query property to the given value.
     pub fn archived(mut self, new_value: bool) -> CreativeListCall<'a, C, A> {
         self._archived = Some(new_value);
         self
     }
-    /// Sets the *advertiser id* query property to the given value.
-    ///
-    /// 
     /// Select only creatives with this advertiser ID.
+    ///
+    /// Sets the *advertiser id* query property to the given value.
     pub fn advertiser_id(mut self, new_value: &str) -> CreativeListCall<'a, C, A> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *active* query property to the given value.
-    ///
-    /// 
     /// Select only active creatives. Leave blank to select active and inactive creatives.
+    ///
+    /// Sets the *active* query property to the given value.
     pub fn active(mut self, new_value: bool) -> CreativeListCall<'a, C, A> {
         self._active = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -42021,8 +41730,8 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -42119,7 +41828,7 @@ impl<'a, C, A> CreativePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creatives".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -42223,42 +41932,41 @@ impl<'a, C, A> CreativePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Creative) -> CreativePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativePatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative ID.
     pub fn id(mut self, new_value: &str) -> CreativePatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -42288,8 +41996,8 @@ impl<'a, C, A> CreativePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -42379,7 +42087,7 @@ impl<'a, C, A> CampaignGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -42475,33 +42183,32 @@ impl<'a, C, A> CampaignGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CampaignGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Campaign ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Campaign ID.
     pub fn id(mut self, new_value: &str) -> CampaignGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CampaignGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -42531,8 +42238,8 @@ impl<'a, C, A> CampaignGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -42631,7 +42338,7 @@ impl<'a, C, A> CampaignInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -42735,52 +42442,51 @@ impl<'a, C, A> CampaignInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Campaign) -> CampaignInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CampaignInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Default landing page name for this new campaign. Must be less than 256 characters long.
+    ///
     /// Sets the *default landing page name* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Default landing page name for this new campaign. Must be less than 256 characters long.
     pub fn default_landing_page_name(mut self, new_value: &str) -> CampaignInsertCall<'a, C, A> {
         self._default_landing_page_name = new_value.to_string();
         self
     }
+    /// Default landing page URL for this new campaign.
+    ///
     /// Sets the *default landing page url* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Default landing page URL for this new campaign.
     pub fn default_landing_page_url(mut self, new_value: &str) -> CampaignInsertCall<'a, C, A> {
         self._default_landing_page_url = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CampaignInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -42810,8 +42516,8 @@ impl<'a, C, A> CampaignInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -42908,7 +42614,7 @@ impl<'a, C, A> CampaignPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -43012,42 +42718,41 @@ impl<'a, C, A> CampaignPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Campaign) -> CampaignPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CampaignPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Campaign ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Campaign ID.
     pub fn id(mut self, new_value: &str) -> CampaignPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CampaignPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -43077,8 +42782,8 @@ impl<'a, C, A> CampaignPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -43173,7 +42878,7 @@ impl<'a, C, A> CampaignUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -43277,32 +42982,31 @@ impl<'a, C, A> CampaignUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Campaign) -> CampaignUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CampaignUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CampaignUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -43332,8 +43036,8 @@ impl<'a, C, A> CampaignUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -43502,7 +43206,7 @@ impl<'a, C, A> CampaignListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/campaigns".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -43598,131 +43302,117 @@ impl<'a, C, A> CampaignListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *subaccount id* query property to the given value.
-    ///
-    /// 
     /// Select only campaigns that belong to this subaccount.
+    ///
+    /// Sets the *subaccount id* query property to the given value.
     pub fn subaccount_id(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._subaccount_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for campaigns by name or ID. Wildcards (*) are allowed. For example, "campaign*2015" will return campaigns with names like "campaign June 2015", "campaign April 2015", or simply "campaign 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "campaign" will match campaigns with name "my campaign", "campaign 2015", or simply "campaign".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *overridden event tag id* query property to the given value.
-    ///
-    /// 
     /// Select only campaigns that have overridden this event tag ID.
+    ///
+    /// Sets the *overridden event tag id* query property to the given value.
     pub fn overridden_event_tag_id(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._overridden_event_tag_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> CampaignListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only campaigns with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only campaigns with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
+    /// Exclude campaigns with these IDs.
+    ///
     /// Append the given value to the *excluded ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Exclude campaigns with these IDs.
     pub fn add_excluded_ids(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._excluded_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *at least one optimization activity* query property to the given value.
-    ///
-    /// 
     /// Select only campaigns that have at least one optimization activity.
+    ///
+    /// Sets the *at least one optimization activity* query property to the given value.
     pub fn at_least_one_optimization_activity(mut self, new_value: bool) -> CampaignListCall<'a, C, A> {
         self._at_least_one_optimization_activity = Some(new_value);
         self
     }
-    /// Sets the *archived* query property to the given value.
-    ///
-    /// 
     /// Select only archived campaigns. Don't set this field to select both archived and non-archived campaigns.
+    ///
+    /// Sets the *archived* query property to the given value.
     pub fn archived(mut self, new_value: bool) -> CampaignListCall<'a, C, A> {
         self._archived = Some(new_value);
         self
     }
+    /// Select only campaigns that belong to these advertisers.
+    ///
     /// Append the given value to the *advertiser ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only campaigns that belong to these advertisers.
     pub fn add_advertiser_ids(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._advertiser_ids.push(new_value.to_string());
         self
     }
+    /// Select only campaigns whose advertisers belong to these advertiser groups.
+    ///
     /// Append the given value to the *advertiser group ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only campaigns whose advertisers belong to these advertiser groups.
     pub fn add_advertiser_group_ids(mut self, new_value: &str) -> CampaignListCall<'a, C, A> {
         self._advertiser_group_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CampaignListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -43752,8 +43442,8 @@ impl<'a, C, A> CampaignListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -43842,7 +43532,7 @@ impl<'a, C, A> EventTagDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/eventTags/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -43928,33 +43618,32 @@ impl<'a, C, A> EventTagDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> EventTagDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Event tag ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Event tag ID.
     pub fn id(mut self, new_value: &str) -> EventTagDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventTagDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -43984,8 +43673,8 @@ impl<'a, C, A> EventTagDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -44131,7 +43820,7 @@ impl<'a, C, A> EventTagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/eventTags".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -44227,105 +43916,94 @@ impl<'a, C, A> EventTagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> EventTagListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> EventTagListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> EventTagListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "eventtag*2015" will return objects with names like "eventtag June 2015", "eventtag April 2015", or simply "eventtag 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "eventtag" will match objects with name "my eventtag", "eventtag 2015", or simply "eventtag".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> EventTagListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
+    /// Select only event tags with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only event tags with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> EventTagListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
+    /// Select only event tags with the specified event tag types. Event tag types can be used to specify whether to use a third-party pixel, a third-party JavaScript URL, or a third-party click-through URL for either impression or click tracking.
+    ///
     /// Append the given value to the *event tag types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only event tags with the specified event tag types. Event tag types can be used to specify whether to use a third-party pixel, a third-party JavaScript URL, or a third-party click-through URL for either impression or click tracking.
     pub fn add_event_tag_types(mut self, new_value: &str) -> EventTagListCall<'a, C, A> {
         self._event_tag_types.push(new_value.to_string());
         self
     }
-    /// Sets the *enabled* query property to the given value.
-    ///
-    /// 
     /// Select only enabled event tags. When definitionsOnly is set to true, only the specified advertiser or campaign's event tags' enabledByDefault field is examined. When definitionsOnly is set to false, the specified ad or specified campaign's parent advertiser's or parent campaign's event tags' enabledByDefault and status fields are examined as well.
+    ///
+    /// Sets the *enabled* query property to the given value.
     pub fn enabled(mut self, new_value: bool) -> EventTagListCall<'a, C, A> {
         self._enabled = Some(new_value);
         self
     }
-    /// Sets the *definitions only* query property to the given value.
-    ///
-    /// 
     /// Examine only the specified ad or campaign or advertiser's event tags for matching selector criteria. When set to false, the parent advertiser and parent campaign is examined as well. In addition, when set to false, the status field is examined as well along with the enabledByDefault field.
+    ///
+    /// Sets the *definitions only* query property to the given value.
     pub fn definitions_only(mut self, new_value: bool) -> EventTagListCall<'a, C, A> {
         self._definitions_only = Some(new_value);
         self
     }
-    /// Sets the *campaign id* query property to the given value.
-    ///
-    /// 
     /// Select only event tags that belong to this campaign.
+    ///
+    /// Sets the *campaign id* query property to the given value.
     pub fn campaign_id(mut self, new_value: &str) -> EventTagListCall<'a, C, A> {
         self._campaign_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *advertiser id* query property to the given value.
-    ///
-    /// 
     /// Select only event tags that belong to this advertiser.
+    ///
+    /// Sets the *advertiser id* query property to the given value.
     pub fn advertiser_id(mut self, new_value: &str) -> EventTagListCall<'a, C, A> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *ad id* query property to the given value.
-    ///
-    /// 
     /// Select only event tags that belong to this ad.
+    ///
+    /// Sets the *ad id* query property to the given value.
     pub fn ad_id(mut self, new_value: &str) -> EventTagListCall<'a, C, A> {
         self._ad_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventTagListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -44355,8 +44033,8 @@ impl<'a, C, A> EventTagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -44451,7 +44129,7 @@ impl<'a, C, A> EventTagInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/eventTags".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -44555,32 +44233,31 @@ impl<'a, C, A> EventTagInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EventTag) -> EventTagInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> EventTagInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventTagInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -44610,8 +44287,8 @@ impl<'a, C, A> EventTagInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -44708,7 +44385,7 @@ impl<'a, C, A> EventTagPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/eventTags".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -44812,42 +44489,41 @@ impl<'a, C, A> EventTagPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EventTag) -> EventTagPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> EventTagPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Event tag ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Event tag ID.
     pub fn id(mut self, new_value: &str) -> EventTagPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventTagPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -44877,8 +44553,8 @@ impl<'a, C, A> EventTagPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -44973,7 +44649,7 @@ impl<'a, C, A> EventTagUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/eventTags".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -45077,32 +44753,31 @@ impl<'a, C, A> EventTagUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EventTag) -> EventTagUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> EventTagUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventTagUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -45132,8 +44807,8 @@ impl<'a, C, A> EventTagUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -45223,7 +44898,7 @@ impl<'a, C, A> EventTagGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/eventTags/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -45319,33 +44994,32 @@ impl<'a, C, A> EventTagGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> EventTagGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Event tag ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Event tag ID.
     pub fn id(mut self, new_value: &str) -> EventTagGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventTagGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -45375,8 +45049,8 @@ impl<'a, C, A> EventTagGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -45496,7 +45170,7 @@ impl<'a, C, A> CityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/cities".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -45592,58 +45266,53 @@ impl<'a, C, A> CityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CityListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Select only cities from these regions.
+    ///
     /// Append the given value to the *region dart ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only cities from these regions.
     pub fn add_region_dart_ids(mut self, new_value: &str) -> CityListCall<'a, C, A> {
         self._region_dart_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *name prefix* query property to the given value.
-    ///
-    /// 
     /// Select only cities with names starting with this prefix.
+    ///
+    /// Sets the *name prefix* query property to the given value.
     pub fn name_prefix(mut self, new_value: &str) -> CityListCall<'a, C, A> {
         self._name_prefix = Some(new_value.to_string());
         self
     }
+    /// Select only cities with these DART IDs.
+    ///
     /// Append the given value to the *dart ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only cities with these DART IDs.
     pub fn add_dart_ids(mut self, new_value: &str) -> CityListCall<'a, C, A> {
         self._dart_ids.push(new_value.to_string());
         self
     }
+    /// Select only cities from these countries.
+    ///
     /// Append the given value to the *country dart ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only cities from these countries.
     pub fn add_country_dart_ids(mut self, new_value: &str) -> CityListCall<'a, C, A> {
         self._country_dart_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -45673,8 +45342,8 @@ impl<'a, C, A> CityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -45796,7 +45465,7 @@ impl<'a, C, A> PlacementStrategyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementStrategies".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -45892,72 +45561,65 @@ impl<'a, C, A> PlacementStrategyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementStrategyListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> PlacementStrategyListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> PlacementStrategyListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name or ID. Wildcards (*) are allowed. For example, "placementstrategy*2015" will return objects with names like "placementstrategy June 2015", "placementstrategy April 2015", or simply "placementstrategy 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "placementstrategy" will match objects with name "my placementstrategy", "placementstrategy 2015", or simply "placementstrategy".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> PlacementStrategyListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PlacementStrategyListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> PlacementStrategyListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only placement strategies with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placement strategies with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> PlacementStrategyListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementStrategyListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -45987,8 +45649,8 @@ impl<'a, C, A> PlacementStrategyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -46083,7 +45745,7 @@ impl<'a, C, A> PlacementStrategyUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementStrategies".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -46187,32 +45849,31 @@ impl<'a, C, A> PlacementStrategyUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &PlacementStrategy) -> PlacementStrategyUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementStrategyUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementStrategyUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -46242,8 +45903,8 @@ impl<'a, C, A> PlacementStrategyUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -46333,7 +45994,7 @@ impl<'a, C, A> PlacementStrategyGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementStrategies/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -46429,33 +46090,32 @@ impl<'a, C, A> PlacementStrategyGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementStrategyGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Placement strategy ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Placement strategy ID.
     pub fn id(mut self, new_value: &str) -> PlacementStrategyGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementStrategyGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -46485,8 +46145,8 @@ impl<'a, C, A> PlacementStrategyGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -46575,7 +46235,7 @@ impl<'a, C, A> PlacementStrategyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementStrategies/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -46661,33 +46321,32 @@ impl<'a, C, A> PlacementStrategyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementStrategyDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Placement strategy ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Placement strategy ID.
     pub fn id(mut self, new_value: &str) -> PlacementStrategyDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementStrategyDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -46717,8 +46376,8 @@ impl<'a, C, A> PlacementStrategyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -46813,7 +46472,7 @@ impl<'a, C, A> PlacementStrategyInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementStrategies".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -46917,32 +46576,31 @@ impl<'a, C, A> PlacementStrategyInsertCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &PlacementStrategy) -> PlacementStrategyInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementStrategyInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementStrategyInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -46972,8 +46630,8 @@ impl<'a, C, A> PlacementStrategyInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -47070,7 +46728,7 @@ impl<'a, C, A> PlacementStrategyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placementStrategies".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -47174,42 +46832,41 @@ impl<'a, C, A> PlacementStrategyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &PlacementStrategy) -> PlacementStrategyPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementStrategyPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Placement strategy ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Placement strategy ID.
     pub fn id(mut self, new_value: &str) -> PlacementStrategyPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementStrategyPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -47239,8 +46896,8 @@ impl<'a, C, A> PlacementStrategyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -47397,7 +47054,7 @@ impl<'a, C, A> DirectorySiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/directorySites".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -47493,128 +47150,114 @@ impl<'a, C, A> DirectorySiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> DirectorySiteListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> DirectorySiteListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> DirectorySiteListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name, ID or URL. Wildcards (*) are allowed. For example, "directory site*2015" will return objects with names like "directory site June 2015", "directory site April 2015", or simply "directory site 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "directory site" will match objects with name "my directory site", "directory site 2015" or simply, "directory site".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> DirectorySiteListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *parent id* query property to the given value.
-    ///
-    /// 
     /// Select only directory sites with this parent ID.
+    ///
+    /// Sets the *parent id* query property to the given value.
     pub fn parent_id(mut self, new_value: &str) -> DirectorySiteListCall<'a, C, A> {
         self._parent_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> DirectorySiteListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> DirectorySiteListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only directory sites with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only directory sites with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> DirectorySiteListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *dfp_network_code* query property to the given value.
-    ///
-    /// 
     /// Select only directory sites with this DFP network code.
+    ///
+    /// Sets the *dfp_network_code* query property to the given value.
     pub fn dfp_network_code(mut self, new_value: &str) -> DirectorySiteListCall<'a, C, A> {
         self._dfp_network_code = Some(new_value.to_string());
         self
     }
-    /// Sets the *country id* query property to the given value.
-    ///
-    /// 
     /// Select only directory sites with this country ID.
+    ///
+    /// Sets the *country id* query property to the given value.
     pub fn country_id(mut self, new_value: &str) -> DirectorySiteListCall<'a, C, A> {
         self._country_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *active* query property to the given value.
-    ///
-    /// 
     /// Select only active directory sites. Leave blank to retrieve both active and inactive directory sites.
+    ///
+    /// Sets the *active* query property to the given value.
     pub fn active(mut self, new_value: bool) -> DirectorySiteListCall<'a, C, A> {
         self._active = Some(new_value);
         self
     }
-    /// Sets the *accepts publisher paid placements* query property to the given value.
-    ///
-    /// 
     /// Select only directory sites that accept publisher paid placements. This field can be left blank.
+    ///
+    /// Sets the *accepts publisher paid placements* query property to the given value.
     pub fn accepts_publisher_paid_placements(mut self, new_value: bool) -> DirectorySiteListCall<'a, C, A> {
         self._accepts_publisher_paid_placements = Some(new_value);
         self
     }
-    /// Sets the *accepts interstitial placements* query property to the given value.
-    ///
-    /// 
     /// This search filter is no longer supported and will have no effect on the results returned.
+    ///
+    /// Sets the *accepts interstitial placements* query property to the given value.
     pub fn accepts_interstitial_placements(mut self, new_value: bool) -> DirectorySiteListCall<'a, C, A> {
         self._accepts_interstitial_placements = Some(new_value);
         self
     }
-    /// Sets the *accepts in stream video placements* query property to the given value.
-    ///
-    /// 
     /// This search filter is no longer supported and will have no effect on the results returned.
+    ///
+    /// Sets the *accepts in stream video placements* query property to the given value.
     pub fn accepts_in_stream_video_placements(mut self, new_value: bool) -> DirectorySiteListCall<'a, C, A> {
         self._accepts_in_stream_video_placements = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DirectorySiteListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -47644,8 +47287,8 @@ impl<'a, C, A> DirectorySiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -47735,7 +47378,7 @@ impl<'a, C, A> DirectorySiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/directorySites/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -47831,33 +47474,32 @@ impl<'a, C, A> DirectorySiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> DirectorySiteGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Directory site ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Directory site ID.
     pub fn id(mut self, new_value: &str) -> DirectorySiteGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DirectorySiteGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -47887,8 +47529,8 @@ impl<'a, C, A> DirectorySiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -47983,7 +47625,7 @@ impl<'a, C, A> SizeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/sizes".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -48087,32 +47729,31 @@ impl<'a, C, A> SizeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Size) -> SizeInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SizeInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SizeInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -48142,8 +47783,8 @@ impl<'a, C, A> SizeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -48255,7 +47896,7 @@ impl<'a, C, A> SizeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/sizes".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -48351,56 +47992,51 @@ impl<'a, C, A> SizeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SizeListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *width* query property to the given value.
-    ///
-    /// 
     /// Select only sizes with this width.
+    ///
+    /// Sets the *width* query property to the given value.
     pub fn width(mut self, new_value: i32) -> SizeListCall<'a, C, A> {
         self._width = Some(new_value);
         self
     }
+    /// Select only sizes with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only sizes with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> SizeListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *iab standard* query property to the given value.
-    ///
-    /// 
     /// Select only IAB standard sizes.
+    ///
+    /// Sets the *iab standard* query property to the given value.
     pub fn iab_standard(mut self, new_value: bool) -> SizeListCall<'a, C, A> {
         self._iab_standard = Some(new_value);
         self
     }
-    /// Sets the *height* query property to the given value.
-    ///
-    /// 
     /// Select only sizes with this height.
+    ///
+    /// Sets the *height* query property to the given value.
     pub fn height(mut self, new_value: i32) -> SizeListCall<'a, C, A> {
         self._height = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SizeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -48430,8 +48066,8 @@ impl<'a, C, A> SizeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -48521,7 +48157,7 @@ impl<'a, C, A> SizeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/sizes/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -48617,33 +48253,32 @@ impl<'a, C, A> SizeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> SizeGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Size ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Size ID.
     pub fn id(mut self, new_value: &str) -> SizeGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SizeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -48673,8 +48308,8 @@ impl<'a, C, A> SizeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -48764,7 +48399,7 @@ impl<'a, C, A> AccountActiveAdSummaryGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accountActiveAdSummaries/{summaryAccountId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{summaryAccountId}", "summaryAccountId")].iter() {
@@ -48860,33 +48495,32 @@ impl<'a, C, A> AccountActiveAdSummaryGetCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountActiveAdSummaryGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Account ID.
+    ///
     /// Sets the *summary account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID.
     pub fn summary_account_id(mut self, new_value: &str) -> AccountActiveAdSummaryGetCall<'a, C, A> {
         self._summary_account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountActiveAdSummaryGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -48916,8 +48550,8 @@ impl<'a, C, A> AccountActiveAdSummaryGetCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -49012,7 +48646,7 @@ impl<'a, C, A> AccountUserProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accountUserProfiles".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -49116,32 +48750,31 @@ impl<'a, C, A> AccountUserProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AccountUserProfile) -> AccountUserProfileUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountUserProfileUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUserProfileUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -49171,8 +48804,8 @@ impl<'a, C, A> AccountUserProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -49309,7 +48942,7 @@ impl<'a, C, A> AccountUserProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accountUserProfiles".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -49405,96 +49038,86 @@ impl<'a, C, A> AccountUserProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountUserProfileListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *user role id* query property to the given value.
-    ///
-    /// 
     /// Select only user profiles with the specified user role ID.
+    ///
+    /// Sets the *user role id* query property to the given value.
     pub fn user_role_id(mut self, new_value: &str) -> AccountUserProfileListCall<'a, C, A> {
         self._user_role_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *subaccount id* query property to the given value.
-    ///
-    /// 
     /// Select only user profiles with the specified subaccount ID.
+    ///
+    /// Sets the *subaccount id* query property to the given value.
     pub fn subaccount_id(mut self, new_value: &str) -> AccountUserProfileListCall<'a, C, A> {
         self._subaccount_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> AccountUserProfileListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> AccountUserProfileListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for objects by name, ID or email. Wildcards (*) are allowed. For example, "user profile*2015" will return objects with names like "user profile June 2015", "user profile April 2015", or simply "user profile 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "user profile" will match objects with name "my user profile", "user profile 2015", or simply "user profile".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> AccountUserProfileListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AccountUserProfileListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AccountUserProfileListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only user profiles with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only user profiles with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> AccountUserProfileListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *active* query property to the given value.
-    ///
-    /// 
     /// Select only active user profiles.
+    ///
+    /// Sets the *active* query property to the given value.
     pub fn active(mut self, new_value: bool) -> AccountUserProfileListCall<'a, C, A> {
         self._active = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUserProfileListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -49524,8 +49147,8 @@ impl<'a, C, A> AccountUserProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -49622,7 +49245,7 @@ impl<'a, C, A> AccountUserProfilePatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accountUserProfiles".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -49726,42 +49349,41 @@ impl<'a, C, A> AccountUserProfilePatchCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AccountUserProfile) -> AccountUserProfilePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountUserProfilePatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// User profile ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID.
     pub fn id(mut self, new_value: &str) -> AccountUserProfilePatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUserProfilePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -49791,8 +49413,8 @@ impl<'a, C, A> AccountUserProfilePatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -49882,7 +49504,7 @@ impl<'a, C, A> AccountUserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/accountUserProfiles/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -49978,33 +49600,32 @@ impl<'a, C, A> AccountUserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> AccountUserProfileGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// User profile ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID.
     pub fn id(mut self, new_value: &str) -> AccountUserProfileGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUserProfileGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -50034,8 +49655,8 @@ impl<'a, C, A> AccountUserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -50123,7 +49744,7 @@ impl<'a, C, A> CountryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/countries".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -50219,23 +49840,22 @@ impl<'a, C, A> CountryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CountryListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CountryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -50265,8 +49885,8 @@ impl<'a, C, A> CountryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -50356,7 +49976,7 @@ impl<'a, C, A> CountryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/countries/{dartId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{dartId}", "dartId")].iter() {
@@ -50452,33 +50072,32 @@ impl<'a, C, A> CountryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CountryGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Country DART ID.
+    ///
     /// Sets the *dart id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Country DART ID.
     pub fn dart_id(mut self, new_value: &str) -> CountryGetCall<'a, C, A> {
         self._dart_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CountryGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -50508,8 +50127,8 @@ impl<'a, C, A> CountryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -50608,7 +50227,7 @@ impl<'a, C, A> CreativeFieldValuePatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{creativeFieldId}", "creativeFieldId")].iter() {
@@ -50712,52 +50331,51 @@ impl<'a, C, A> CreativeFieldValuePatchCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreativeFieldValue) -> CreativeFieldValuePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldValuePatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative field ID for this creative field value.
+    ///
     /// Sets the *creative field id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative field ID for this creative field value.
     pub fn creative_field_id(mut self, new_value: &str) -> CreativeFieldValuePatchCall<'a, C, A> {
         self._creative_field_id = new_value.to_string();
         self
     }
+    /// Creative Field Value ID
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative Field Value ID
     pub fn id(mut self, new_value: &str) -> CreativeFieldValuePatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldValuePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -50787,8 +50405,8 @@ impl<'a, C, A> CreativeFieldValuePatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -50879,7 +50497,7 @@ impl<'a, C, A> CreativeFieldValueDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{creativeFieldId}", "creativeFieldId"), ("{id}", "id")].iter() {
@@ -50965,43 +50583,42 @@ impl<'a, C, A> CreativeFieldValueDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldValueDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative field ID for this creative field value.
+    ///
     /// Sets the *creative field id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative field ID for this creative field value.
     pub fn creative_field_id(mut self, new_value: &str) -> CreativeFieldValueDeleteCall<'a, C, A> {
         self._creative_field_id = new_value.to_string();
         self
     }
+    /// Creative Field Value ID
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative Field Value ID
     pub fn id(mut self, new_value: &str) -> CreativeFieldValueDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldValueDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -51031,8 +50648,8 @@ impl<'a, C, A> CreativeFieldValueDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -51129,7 +50746,7 @@ impl<'a, C, A> CreativeFieldValueInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{creativeFieldId}", "creativeFieldId")].iter() {
@@ -51233,42 +50850,41 @@ impl<'a, C, A> CreativeFieldValueInsertCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreativeFieldValue) -> CreativeFieldValueInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldValueInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative field ID for this creative field value.
+    ///
     /// Sets the *creative field id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative field ID for this creative field value.
     pub fn creative_field_id(mut self, new_value: &str) -> CreativeFieldValueInsertCall<'a, C, A> {
         self._creative_field_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldValueInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -51298,8 +50914,8 @@ impl<'a, C, A> CreativeFieldValueInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -51396,7 +51012,7 @@ impl<'a, C, A> CreativeFieldValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{creativeFieldId}", "creativeFieldId")].iter() {
@@ -51500,42 +51116,41 @@ impl<'a, C, A> CreativeFieldValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreativeFieldValue) -> CreativeFieldValueUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldValueUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative field ID for this creative field value.
+    ///
     /// Sets the *creative field id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative field ID for this creative field value.
     pub fn creative_field_id(mut self, new_value: &str) -> CreativeFieldValueUpdateCall<'a, C, A> {
         self._creative_field_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldValueUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -51565,8 +51180,8 @@ impl<'a, C, A> CreativeFieldValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -51658,7 +51273,7 @@ impl<'a, C, A> CreativeFieldValueGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{creativeFieldId}", "creativeFieldId"), ("{id}", "id")].iter() {
@@ -51754,43 +51369,42 @@ impl<'a, C, A> CreativeFieldValueGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldValueGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative field ID for this creative field value.
+    ///
     /// Sets the *creative field id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative field ID for this creative field value.
     pub fn creative_field_id(mut self, new_value: &str) -> CreativeFieldValueGetCall<'a, C, A> {
         self._creative_field_id = new_value.to_string();
         self
     }
+    /// Creative Field Value ID
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative Field Value ID
     pub fn id(mut self, new_value: &str) -> CreativeFieldValueGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldValueGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -51820,8 +51434,8 @@ impl<'a, C, A> CreativeFieldValueGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -51945,7 +51559,7 @@ impl<'a, C, A> CreativeFieldValueListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/creativeFields/{creativeFieldId}/creativeFieldValues".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{creativeFieldId}", "creativeFieldId")].iter() {
@@ -52041,82 +51655,75 @@ impl<'a, C, A> CreativeFieldValueListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> CreativeFieldValueListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Creative field ID for this creative field value.
+    ///
     /// Sets the *creative field id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Creative field ID for this creative field value.
     pub fn creative_field_id(mut self, new_value: &str) -> CreativeFieldValueListCall<'a, C, A> {
         self._creative_field_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CreativeFieldValueListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> CreativeFieldValueListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for creative field values by their values. Wildcards (e.g. *) are not allowed.
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> CreativeFieldValueListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CreativeFieldValueListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> CreativeFieldValueListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only creative field values with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only creative field values with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> CreativeFieldValueListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CreativeFieldValueListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -52146,8 +51753,8 @@ impl<'a, C, A> CreativeFieldValueListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -52348,42 +51955,41 @@ impl<'a, C, A> ReportUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Report) -> ReportUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The DFA user profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA user profile ID.
     pub fn profile_id(mut self, new_value: &str) -> ReportUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// The ID of the report.
+    ///
     /// Sets the *report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the report.
     pub fn report_id(mut self, new_value: &str) -> ReportUpdateCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -52413,8 +52019,8 @@ impl<'a, C, A> ReportUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -52605,41 +52211,39 @@ impl<'a, C, A> ReportRunCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The DFA profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA profile ID.
     pub fn profile_id(mut self, new_value: &str) -> ReportRunCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// The ID of the report.
+    ///
     /// Sets the *report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the report.
     pub fn report_id(mut self, new_value: &str) -> ReportRunCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
-    /// Sets the *synchronous* query property to the given value.
-    ///
-    /// 
     /// If set and true, tries to run the report synchronously.
+    ///
+    /// Sets the *synchronous* query property to the given value.
     pub fn synchronous(mut self, new_value: bool) -> ReportRunCall<'a, C, A> {
         self._synchronous = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportRunCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -52669,8 +52273,8 @@ impl<'a, C, A> ReportRunCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -52871,42 +52475,41 @@ impl<'a, C, A> ReportPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Report) -> ReportPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The DFA user profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA user profile ID.
     pub fn profile_id(mut self, new_value: &str) -> ReportPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// The ID of the report.
+    ///
     /// Sets the *report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the report.
     pub fn report_id(mut self, new_value: &str) -> ReportPatchCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -52936,8 +52539,8 @@ impl<'a, C, A> ReportPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -53143,65 +52746,60 @@ impl<'a, C, A> ReportFileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The DFA profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA profile ID.
     pub fn profile_id(mut self, new_value: &str) -> ReportFileListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// The ID of the parent report.
+    ///
     /// Sets the *report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the parent report.
     pub fn report_id(mut self, new_value: &str) -> ReportFileListCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is 'DESCENDING'.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> ReportFileListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// The field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> ReportFileListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of the nextToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ReportFileListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ReportFileListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportFileListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -53231,8 +52829,8 @@ impl<'a, C, A> ReportFileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -53431,32 +53029,31 @@ impl<'a, C, A> ReportInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Report) -> ReportInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The DFA user profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA user profile ID.
     pub fn profile_id(mut self, new_value: &str) -> ReportInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -53486,8 +53083,8 @@ impl<'a, C, A> ReportInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -53686,32 +53283,31 @@ impl<'a, C, A> ReportCompatibleFieldQueryCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Report) -> ReportCompatibleFieldQueryCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The DFA user profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA user profile ID.
     pub fn profile_id(mut self, new_value: &str) -> ReportCompatibleFieldQueryCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportCompatibleFieldQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -53741,8 +53337,8 @@ impl<'a, C, A> ReportCompatibleFieldQueryCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -53928,33 +53524,32 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The DFA user profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA user profile ID.
     pub fn profile_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// The ID of the report.
+    ///
     /// Sets the *report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the report.
     pub fn report_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -53984,8 +53579,8 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -54194,43 +53789,42 @@ impl<'a, C, A> ReportFileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The DFA profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA profile ID.
     pub fn profile_id(mut self, new_value: &str) -> ReportFileGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// The ID of the report.
+    ///
     /// Sets the *report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the report.
     pub fn report_id(mut self, new_value: &str) -> ReportFileGetCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
+    /// The ID of the report file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the report file.
     pub fn file_id(mut self, new_value: &str) -> ReportFileGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportFileGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -54260,8 +53854,8 @@ impl<'a, C, A> ReportFileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -54436,33 +54030,32 @@ impl<'a, C, A> ReportDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The DFA user profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA user profile ID.
     pub fn profile_id(mut self, new_value: &str) -> ReportDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// The ID of the report.
+    ///
     /// Sets the *report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the report.
     pub fn report_id(mut self, new_value: &str) -> ReportDeleteCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -54492,8 +54085,8 @@ impl<'a, C, A> ReportDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -54702,63 +54295,57 @@ impl<'a, C, A> ReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The DFA user profile ID.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The DFA user profile ID.
     pub fn profile_id(mut self, new_value: &str) -> ReportListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is 'DESCENDING'.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> ReportListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// The field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> ReportListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
-    /// Sets the *scope* query property to the given value.
-    ///
-    /// 
     /// The scope that defines which results are returned, default is 'MINE'.
+    ///
+    /// Sets the *scope* query property to the given value.
     pub fn scope(mut self, new_value: &str) -> ReportListCall<'a, C, A> {
         self._scope = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of the nextToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ReportListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ReportListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -54788,8 +54375,8 @@ impl<'a, C, A> ReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -54877,7 +54464,7 @@ impl<'a, C, A> BrowserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/browsers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -54973,23 +54560,22 @@ impl<'a, C, A> BrowserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> BrowserListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BrowserListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -55019,8 +54605,8 @@ impl<'a, C, A> BrowserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -55117,7 +54703,7 @@ impl<'a, C, A> PlacementPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placements".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -55221,42 +54807,41 @@ impl<'a, C, A> PlacementPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Placement) -> PlacementPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Placement ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Placement ID.
     pub fn id(mut self, new_value: &str) -> PlacementPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -55286,8 +54871,8 @@ impl<'a, C, A> PlacementPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -55509,7 +55094,7 @@ impl<'a, C, A> PlacementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placements".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -55605,178 +55190,159 @@ impl<'a, C, A> PlacementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Order of sorted results, default is ASCENDING.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort field* query property to the given value.
-    ///
-    /// 
     /// Field by which to sort the list.
+    ///
+    /// Sets the *sort field* query property to the given value.
     pub fn sort_field(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._sort_field = Some(new_value.to_string());
         self
     }
+    /// Select only placements that are associated with these sizes.
+    ///
     /// Append the given value to the *size ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements that are associated with these sizes.
     pub fn add_size_ids(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._size_ids.push(new_value.to_string());
         self
     }
+    /// Select only placements that are associated with these sites.
+    ///
     /// Append the given value to the *site ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements that are associated with these sites.
     pub fn add_site_ids(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._site_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *search string* query property to the given value.
-    ///
-    /// 
     /// Allows searching for placements by name or ID. Wildcards (*) are allowed. For example, "placement*2015" will return placements with names like "placement June 2015", "placement May 2015", or simply "placements 2015". Most of the searches also add wildcards implicitly at the start and the end of the search string. For example, a search string of "placement" will match placements with name "my placement", "placement 2015", or simply "placement".
+    ///
+    /// Sets the *search string* query property to the given value.
     pub fn search_string(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._search_string = Some(new_value.to_string());
         self
     }
+    /// Select only placements with these pricing types.
+    ///
     /// Append the given value to the *pricing types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements with these pricing types.
     pub fn add_pricing_types(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._pricing_types.push(new_value.to_string());
         self
     }
+    /// Select only placements that are associated with these placement strategies.
+    ///
     /// Append the given value to the *placement strategy ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements that are associated with these placement strategies.
     pub fn add_placement_strategy_ids(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._placement_strategy_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *payment source* query property to the given value.
-    ///
-    /// 
     /// Select only placements with this payment source.
+    ///
+    /// Sets the *payment source* query property to the given value.
     pub fn payment_source(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._payment_source = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Value of the nextPageToken from the previous result page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> PlacementListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Select only placements with these IDs.
+    ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements with these IDs.
     pub fn add_ids(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._ids.push(new_value.to_string());
         self
     }
+    /// Select only placements that belong to these placement groups.
+    ///
     /// Append the given value to the *group ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements that belong to these placement groups.
     pub fn add_group_ids(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._group_ids.push(new_value.to_string());
         self
     }
+    /// Select only placements that are associated with these directory sites.
+    ///
     /// Append the given value to the *directory site ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements that are associated with these directory sites.
     pub fn add_directory_site_ids(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._directory_site_ids.push(new_value.to_string());
         self
     }
+    /// Select only placements that are associated with these content categories.
+    ///
     /// Append the given value to the *content category ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements that are associated with these content categories.
     pub fn add_content_category_ids(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._content_category_ids.push(new_value.to_string());
         self
     }
+    /// Select only placements that are associated with these compatibilities. WEB and WEB_INTERSTITIAL refer to rendering either on desktop or on mobile devices for regular or interstitial ads respectively. APP and APP_INTERSTITIAL are for rendering in mobile apps.IN_STREAM_VIDEO refers to rendering in in-stream video ads developed with the VAST standard.
+    ///
     /// Append the given value to the *compatibilities* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements that are associated with these compatibilities. WEB and WEB_INTERSTITIAL refer to rendering either on desktop or on mobile devices for regular or interstitial ads respectively. APP and APP_INTERSTITIAL are for rendering in mobile apps.IN_STREAM_VIDEO refers to rendering in in-stream video ads developed with the VAST standard.
     pub fn add_compatibilities(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._compatibilities.push(new_value.to_string());
         self
     }
+    /// Select only placements that belong to these campaigns.
+    ///
     /// Append the given value to the *campaign ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements that belong to these campaigns.
     pub fn add_campaign_ids(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._campaign_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *archived* query property to the given value.
-    ///
-    /// 
     /// Select only archived placements. Don't set this field to select both archived and non-archived placements.
+    ///
+    /// Sets the *archived* query property to the given value.
     pub fn archived(mut self, new_value: bool) -> PlacementListCall<'a, C, A> {
         self._archived = Some(new_value);
         self
     }
+    /// Select only placements that belong to these advertisers.
+    ///
     /// Append the given value to the *advertiser ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Select only placements that belong to these advertisers.
     pub fn add_advertiser_ids(mut self, new_value: &str) -> PlacementListCall<'a, C, A> {
         self._advertiser_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -55806,8 +55372,8 @@ impl<'a, C, A> PlacementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -55897,7 +55463,7 @@ impl<'a, C, A> PlacementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placements/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId"), ("{id}", "id")].iter() {
@@ -55993,33 +55559,32 @@ impl<'a, C, A> PlacementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Placement ID.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Placement ID.
     pub fn id(mut self, new_value: &str) -> PlacementGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -56049,8 +55614,8 @@ impl<'a, C, A> PlacementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -56145,7 +55710,7 @@ impl<'a, C, A> PlacementInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placements".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -56249,32 +55814,31 @@ impl<'a, C, A> PlacementInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Placement) -> PlacementInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -56304,8 +55868,8 @@ impl<'a, C, A> PlacementInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -56400,7 +55964,7 @@ impl<'a, C, A> PlacementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placements".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -56504,32 +56068,31 @@ impl<'a, C, A> PlacementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Placement) -> PlacementUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -56559,8 +56122,8 @@ impl<'a, C, A> PlacementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -56671,7 +56234,7 @@ impl<'a, C, A> PlacementGeneratetagCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/dfareporting/v2.0/userprofiles/{profileId}/placements/generatetags".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Dfatrafficking.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{profileId}", "profileId")].iter() {
@@ -56767,49 +56330,45 @@ impl<'a, C, A> PlacementGeneratetagCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// User profile ID associated with this request.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// User profile ID associated with this request.
     pub fn profile_id(mut self, new_value: &str) -> PlacementGeneratetagCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Tag formats to generate for these placements.
+    ///
     /// Append the given value to the *tag formats* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Tag formats to generate for these placements.
     pub fn add_tag_formats(mut self, new_value: &str) -> PlacementGeneratetagCall<'a, C, A> {
         self._tag_formats.push(new_value.to_string());
         self
     }
+    /// Generate tags for these placements.
+    ///
     /// Append the given value to the *placement ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Generate tags for these placements.
     pub fn add_placement_ids(mut self, new_value: &str) -> PlacementGeneratetagCall<'a, C, A> {
         self._placement_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *campaign id* query property to the given value.
-    ///
-    /// 
     /// Generate placements belonging to this campaign. This is a required field.
+    ///
+    /// Sets the *campaign id* query property to the given value.
     pub fn campaign_id(mut self, new_value: &str) -> PlacementGeneratetagCall<'a, C, A> {
         self._campaign_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlacementGeneratetagCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -56839,8 +56398,8 @@ impl<'a, C, A> PlacementGeneratetagCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Dfatrafficking`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

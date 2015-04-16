@@ -118,16 +118,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -292,16 +294,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -353,7 +357,7 @@ impl<'a, C, A> AndroidPublisher<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InappproductsUpdateResponse {
     /// no description provided
     pub inappproduct: InAppProduct,
@@ -420,7 +424,7 @@ impl ResponseResult for InAppProduct {}
 /// 
 /// * [images list edits](struct.EditImageListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImagesListResponse {
     /// no description provided
     pub images: Vec<Image>,
@@ -438,7 +442,7 @@ impl ResponseResult for ImagesListResponse {}
 /// 
 /// * [expansionfiles upload edits](struct.EditExpansionfileUploadCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExpansionFilesUploadResponse {
     /// no description provided
     #[serde(rename="expansionFile")]
@@ -538,7 +542,7 @@ impl Part for MonthDay {}
 /// 
 /// * [products get purchases](struct.PurchaseProductGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductPurchase {
     /// The consumption state of the inapp product. Possible values are:  
     /// - Yet to be consumed 
@@ -572,7 +576,7 @@ impl ResponseResult for ProductPurchase {}
 /// 
 /// * [apklistings list edits](struct.EditApklistingListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApkListingsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#apkListingsListResponse".
     pub kind: String,
@@ -592,7 +596,7 @@ impl ResponseResult for ApkListingsListResponse {}
 /// 
 /// * [images deleteall edits](struct.EditImageDeleteallCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImagesDeleteAllResponse {
     /// no description provided
     pub deleted: Vec<Image>,
@@ -681,7 +685,7 @@ impl RequestValue for SubscriptionPurchasesDeferRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InappproductsInsertResponse {
     /// no description provided
     pub inappproduct: InAppProduct,
@@ -781,7 +785,7 @@ impl ResponseResult for AppDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InappproductsBatchResponseEntry {
     /// no description provided
     #[serde(rename="batchId")]
@@ -854,7 +858,7 @@ impl Part for InappproductsBatchRequestEntry {}
 /// 
 /// * [tracks list edits](struct.EditTrackListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TracksListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#tracksListResponse".
     pub kind: String,
@@ -874,7 +878,7 @@ impl ResponseResult for TracksListResponse {}
 /// 
 /// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionPurchasesDeferResponse {
     /// The new expiry time for the subscription in milliseconds since the Epoch.
     #[serde(rename="newExpiryTimeMillis")]
@@ -893,7 +897,7 @@ impl ResponseResult for SubscriptionPurchasesDeferResponse {}
 /// 
 /// * [list inappproducts](struct.InappproductListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InappproductsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#inappproductsListResponse".
     pub kind: String,
@@ -914,7 +918,7 @@ impl ResponseResult for InappproductsListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TokenPagination {
     /// no description provided
     #[serde(rename="nextPageToken")]
@@ -1010,7 +1014,7 @@ impl ResponseResult for ExpansionFile {}
 /// 
 /// * [apks addexternallyhosted edits](struct.EditApkAddexternallyhostedCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApksAddExternallyHostedResponse {
     /// The definition of the externally-hosted APK and where it is located.
     #[serde(rename="externallyHostedApk")]
@@ -1029,7 +1033,7 @@ impl ResponseResult for ApksAddExternallyHostedResponse {}
 /// 
 /// * [subscriptions get purchases](struct.PurchaseSubscriptionGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionPurchase {
     /// Whether the subscription will automatically be renewed when it reaches its current expiry time.
     #[serde(rename="autoRenewing")]
@@ -1081,7 +1085,7 @@ impl ResponseResult for AppEdit {}
 /// 
 /// * [apks list edits](struct.EditApkListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApksListResponse {
     /// no description provided
     pub apks: Vec<Apk>,
@@ -1109,7 +1113,7 @@ impl Part for InappproductsUpdateRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageInfo {
     /// no description provided
     #[serde(rename="resultPerPage")]
@@ -1134,7 +1138,7 @@ impl Part for PageInfo {}
 /// 
 /// * [images upload edits](struct.EditImageUploadCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImagesUploadResponse {
     /// no description provided
     pub image: Image,
@@ -1152,7 +1156,7 @@ impl ResponseResult for ImagesUploadResponse {}
 /// 
 /// * [apks upload edits](struct.EditApkUploadCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Apk {
     /// The version code of the APK, as specified in the APK's manifest file.
     #[serde(rename="versionCode")]
@@ -1173,7 +1177,7 @@ impl ResponseResult for Apk {}
 /// 
 /// * [batch inappproducts](struct.InappproductBatchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InappproductsBatchResponse {
     /// no description provided
     pub entrys: Vec<InappproductsBatchResponseEntry>,
@@ -1188,7 +1192,7 @@ impl ResponseResult for InappproductsBatchResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Image {
     /// A URL that will serve a preview of the image.
     pub url: String,
@@ -1224,7 +1228,7 @@ impl RequestValue for ApksAddExternallyHostedRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApkBinary {
     /// A sha1 hash of the APK payload, encoded as a hex string and matching the output of the sha1sum command.
     pub sha1: String,
@@ -1258,7 +1262,7 @@ impl Part for Price {}
 /// 
 /// * [listings list edits](struct.EditListingListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListingsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#listingsListResponse".
     pub kind: String,
@@ -2635,43 +2639,42 @@ impl<'a, C, A> PurchaseSubscriptionRevokeCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// The purchased subscription ID (for example, 'monthly001').
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The purchased subscription ID (for example, 'monthly001').
     pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
+    /// The token provided to the user's device when the subscription was purchased.
+    ///
     /// Sets the *token* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The token provided to the user's device when the subscription was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionRevokeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2701,8 +2704,8 @@ impl<'a, C, A> PurchaseSubscriptionRevokeCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2890,43 +2893,42 @@ impl<'a, C, A> PurchaseProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The package name of the application the inapp product was sold in (for example, 'com.some.thing').
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The package name of the application the inapp product was sold in (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// The inapp product SKU (for example, 'com.some.thing.inapp1').
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The inapp product SKU (for example, 'com.some.thing.inapp1').
     pub fn product_id(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
+    /// The token provided to the user's device when the inapp product was purchased.
+    ///
     /// Sets the *token* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The token provided to the user's device when the inapp product was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseProductGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2956,8 +2958,8 @@ impl<'a, C, A> PurchaseProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3145,43 +3147,42 @@ impl<'a, C, A> PurchaseSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// The purchased subscription ID (for example, 'monthly001').
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The purchased subscription ID (for example, 'monthly001').
     pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
+    /// The token provided to the user's device when the subscription was purchased.
+    ///
     /// Sets the *token* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The token provided to the user's device when the subscription was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3211,8 +3212,8 @@ impl<'a, C, A> PurchaseSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3389,43 +3390,42 @@ impl<'a, C, A> PurchaseSubscriptionCancelCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// The purchased subscription ID (for example, 'monthly001').
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The purchased subscription ID (for example, 'monthly001').
     pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
+    /// The token provided to the user's device when the subscription was purchased.
+    ///
     /// Sets the *token* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The token provided to the user's device when the subscription was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionCancelCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3455,8 +3455,8 @@ impl<'a, C, A> PurchaseSubscriptionCancelCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3633,43 +3633,42 @@ impl<'a, C, A> PurchaseSubscriptionRefundCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// The purchased subscription ID (for example, 'monthly001').
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The purchased subscription ID (for example, 'monthly001').
     pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
+    /// The token provided to the user's device when the subscription was purchased.
+    ///
     /// Sets the *token* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The token provided to the user's device when the subscription was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionRefundCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3699,8 +3698,8 @@ impl<'a, C, A> PurchaseSubscriptionRefundCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3903,52 +3902,51 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SubscriptionPurchasesDeferRequest) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// The purchased subscription ID (for example, 'monthly001').
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The purchased subscription ID (for example, 'monthly001').
     pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
+    /// The token provided to the user's device when the subscription was purchased.
+    ///
     /// Sets the *token* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The token provided to the user's device when the subscription was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3978,8 +3976,8 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4279,52 +4277,51 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditImageUploadCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditImageUploadCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditImageUploadCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
+    ///
     /// Sets the *image type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn image_type(mut self, new_value: &str) -> EditImageUploadCall<'a, C, A> {
         self._image_type = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageUploadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4354,8 +4351,8 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4560,61 +4557,60 @@ impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ExpansionFile) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The version code of the APK whose Expansion File configuration is being read or modified.
+    ///
     /// Sets the *apk version code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The version code of the APK whose Expansion File configuration is being read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
+    ///
     /// Sets the *expansion file type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._expansion_file_type = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4644,8 +4640,8 @@ impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4831,33 +4827,32 @@ impl<'a, C, A> EditDetailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditDetailGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditDetailGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDetailGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4887,8 +4882,8 @@ impl<'a, C, A> EditDetailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5067,53 +5062,52 @@ impl<'a, C, A> EditApklistingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The APK version code whose APK-specific listings should be read or modified.
+    ///
     /// Sets the *apk version code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingDeleteCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
+    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5143,8 +5137,8 @@ impl<'a, C, A> EditApklistingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5319,33 +5313,32 @@ impl<'a, C, A> EditListingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingDeleteallCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteallCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingDeleteallCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5375,8 +5368,8 @@ impl<'a, C, A> EditListingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5577,42 +5570,41 @@ impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ApksAddExternallyHostedRequest) -> EditApkAddexternallyhostedCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApkAddexternallyhostedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5642,8 +5634,8 @@ impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5820,43 +5812,42 @@ impl<'a, C, A> EditApklistingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingDeleteallCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingDeleteallCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The APK version code whose APK-specific listings should be read or modified.
+    ///
     /// Sets the *apk version code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingDeleteallCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingDeleteallCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5886,8 +5877,8 @@ impl<'a, C, A> EditApklistingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6088,42 +6079,41 @@ impl<'a, C, A> EditDetailUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AppDetails) -> EditDetailUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditDetailUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditDetailUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDetailUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6153,8 +6143,8 @@ impl<'a, C, A> EditDetailUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6342,43 +6332,42 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTrackGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTrackGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The track type to read or modify.
+    ///
     /// Sets the *track* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The track type to read or modify.
     pub fn track(mut self, new_value: &str) -> EditTrackGetCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6408,8 +6397,8 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6614,61 +6603,60 @@ impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ExpansionFile) -> EditExpansionfilePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The version code of the APK whose Expansion File configuration is being read or modified.
+    ///
     /// Sets the *apk version code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The version code of the APK whose Expansion File configuration is being read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfilePatchCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
+    ///
     /// Sets the *expansion file type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, A> {
         self._expansion_file_type = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfilePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6698,8 +6686,8 @@ impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6889,52 +6877,51 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditImageListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditImageListCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditImageListCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
+    ///
     /// Sets the *image type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn image_type(mut self, new_value: &str) -> EditImageListCall<'a, C, A> {
         self._image_type = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6964,8 +6951,8 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7168,52 +7155,51 @@ impl<'a, C, A> EditTrackUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Track) -> EditTrackUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The track type to read or modify.
+    ///
     /// Sets the *track* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The track type to read or modify.
     pub fn track(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7243,8 +7229,8 @@ impl<'a, C, A> EditTrackUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7447,52 +7433,51 @@ impl<'a, C, A> EditListingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Listing) -> EditListingPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingPatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditListingPatchCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7522,8 +7507,8 @@ impl<'a, C, A> EditListingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7709,33 +7694,32 @@ impl<'a, C, A> EditGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7765,8 +7749,8 @@ impl<'a, C, A> EditGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7947,62 +7931,61 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
+    ///
     /// Sets the *image type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn image_type(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, A> {
         self._image_type = new_value.to_string();
         self
     }
+    /// Unique identifier an image within the set of images attached to this edit.
+    ///
     /// Sets the *image id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier an image within the set of images attached to this edit.
     pub fn image_id(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, A> {
         self._image_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8032,8 +8015,8 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8327,33 +8310,32 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApkUploadCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApkUploadCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApkUploadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8383,8 +8365,8 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8589,62 +8571,61 @@ impl<'a, C, A> EditApklistingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ApkListing) -> EditApklistingUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The APK version code whose APK-specific listings should be read or modified.
+    ///
     /// Sets the *apk version code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingUpdateCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
+    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8674,8 +8655,8 @@ impl<'a, C, A> EditApklistingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8859,33 +8840,32 @@ impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApkListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApkListCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8915,8 +8895,8 @@ impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9121,62 +9101,61 @@ impl<'a, C, A> EditApklistingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ApkListing) -> EditApklistingPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The APK version code whose APK-specific listings should be read or modified.
+    ///
     /// Sets the *apk version code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingPatchCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
+    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9206,8 +9185,8 @@ impl<'a, C, A> EditApklistingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9395,43 +9374,42 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditListingGetCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9461,8 +9439,8 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9648,42 +9626,41 @@ impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTesterGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTesterGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    ///
     /// Sets the *track* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn track(mut self, new_value: &str) -> EditTesterGetCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTesterGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9713,8 +9690,8 @@ impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9889,33 +9866,32 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditDeleteCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditDeleteCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9945,8 +9921,8 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10246,52 +10222,51 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The version code of the APK whose Expansion File configuration is being read or modified.
+    ///
     /// Sets the *apk version code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The version code of the APK whose Expansion File configuration is being read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUploadCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
+    ///
     /// Sets the *expansion file type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, A> {
         self._expansion_file_type = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfileUploadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10321,8 +10296,8 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10521,32 +10496,31 @@ impl<'a, C, A> EditInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AppEdit) -> EditInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditInsertCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10576,8 +10550,8 @@ impl<'a, C, A> EditInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10763,33 +10737,32 @@ impl<'a, C, A> EditListingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingListCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10819,8 +10792,8 @@ impl<'a, C, A> EditListingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11021,51 +10994,50 @@ impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Testers) -> EditTesterPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    ///
     /// Sets the *track* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn track(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTesterPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11095,8 +11067,8 @@ impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11282,33 +11254,32 @@ impl<'a, C, A> EditCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditCommitCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditCommitCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditCommitCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11338,8 +11309,8 @@ impl<'a, C, A> EditCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11525,33 +11496,32 @@ impl<'a, C, A> EditTrackListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTrackListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTrackListCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11581,8 +11551,8 @@ impl<'a, C, A> EditTrackListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11768,33 +11738,32 @@ impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditValidateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditValidateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditValidateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11824,8 +11793,8 @@ impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12028,52 +11997,51 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Listing) -> EditListingUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12103,8 +12071,8 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12294,52 +12262,51 @@ impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The version code of the APK whose Expansion File configuration is being read or modified.
+    ///
     /// Sets the *apk version code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The version code of the APK whose Expansion File configuration is being read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileGetCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
+    ///
     /// Sets the *expansion file type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, A> {
         self._expansion_file_type = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfileGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12369,8 +12336,8 @@ impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12560,52 +12527,51 @@ impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
+    ///
     /// Sets the *image type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn image_type(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, A> {
         self._image_type = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageDeleteallCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12635,8 +12601,8 @@ impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12837,42 +12803,41 @@ impl<'a, C, A> EditDetailPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AppDetails) -> EditDetailPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditDetailPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditDetailPatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDetailPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12902,8 +12867,8 @@ impl<'a, C, A> EditDetailPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13106,52 +13071,51 @@ impl<'a, C, A> EditTrackPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Track) -> EditTrackPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The track type to read or modify.
+    ///
     /// Sets the *track* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The track type to read or modify.
     pub fn track(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13181,8 +13145,8 @@ impl<'a, C, A> EditTrackPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13359,43 +13323,42 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13425,8 +13388,8 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13616,53 +13579,52 @@ impl<'a, C, A> EditApklistingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The APK version code whose APK-specific listings should be read or modified.
+    ///
     /// Sets the *apk version code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingGetCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
+    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    ///
     /// Sets the *language* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13692,8 +13654,8 @@ impl<'a, C, A> EditApklistingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13894,51 +13856,50 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Testers) -> EditTesterUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    ///
     /// Sets the *track* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn track(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTesterUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13968,8 +13929,8 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14157,43 +14118,42 @@ impl<'a, C, A> EditApklistingListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for this edit.
+    ///
     /// Sets the *edit id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingListCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
+    /// The APK version code whose APK-specific listings should be read or modified.
+    ///
     /// Sets the *apk version code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingListCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14223,8 +14183,8 @@ impl<'a, C, A> EditApklistingListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14395,22 +14355,21 @@ impl<'a, C, A> InappproductBatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InappproductsBatchRequest) -> InappproductBatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductBatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14440,8 +14399,8 @@ impl<'a, C, A> InappproductBatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14640,44 +14599,40 @@ impl<'a, C, A> InappproductListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// Unique identifier for the Android app with in-app products; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app with in-app products; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> InappproductListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
-    /// Sets the *token* query property to the given value.
     ///
-    /// 
+    /// Sets the *token* query property to the given value.
     pub fn token(mut self, new_value: &str) -> InappproductListCall<'a, C, A> {
         self._token = Some(new_value.to_string());
         self
     }
-    /// Sets the *start index* query property to the given value.
     ///
-    /// 
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> InappproductListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
     ///
-    /// 
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> InappproductListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14707,8 +14662,8 @@ impl<'a, C, A> InappproductListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14912,40 +14867,38 @@ impl<'a, C, A> InappproductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InAppProduct) -> InappproductInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> InappproductInsertCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
-    /// Sets the *auto convert missing prices* query property to the given value.
-    ///
-    /// 
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
+    ///
+    /// Sets the *auto convert missing prices* query property to the given value.
     pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductInsertCall<'a, C, A> {
         self._auto_convert_missing_prices = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14975,8 +14928,8 @@ impl<'a, C, A> InappproductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15151,33 +15104,32 @@ impl<'a, C, A> InappproductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> InappproductDeleteCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for the in-app product.
+    ///
     /// Sets the *sku* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the in-app product.
     pub fn sku(mut self, new_value: &str) -> InappproductDeleteCall<'a, C, A> {
         self._sku = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15207,8 +15159,8 @@ impl<'a, C, A> InappproductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15394,32 +15346,31 @@ impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn package_name(mut self, new_value: &str) -> InappproductGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for the in-app product.
+    ///
     /// Sets the *sku* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the in-app product.
     pub fn sku(mut self, new_value: &str) -> InappproductGetCall<'a, C, A> {
         self._sku = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15449,8 +15400,8 @@ impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15656,50 +15607,48 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InAppProduct) -> InappproductUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> InappproductUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for the in-app product.
+    ///
     /// Sets the *sku* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the in-app product.
     pub fn sku(mut self, new_value: &str) -> InappproductUpdateCall<'a, C, A> {
         self._sku = new_value.to_string();
         self
     }
-    /// Sets the *auto convert missing prices* query property to the given value.
-    ///
-    /// 
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
+    ///
+    /// Sets the *auto convert missing prices* query property to the given value.
     pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductUpdateCall<'a, C, A> {
         self._auto_convert_missing_prices = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15729,8 +15678,8 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15936,50 +15885,48 @@ impl<'a, C, A> InappproductPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InAppProduct) -> InappproductPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    ///
     /// Sets the *package name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> InappproductPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for the in-app product.
+    ///
     /// Sets the *sku* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique identifier for the in-app product.
     pub fn sku(mut self, new_value: &str) -> InappproductPatchCall<'a, C, A> {
         self._sku = new_value.to_string();
         self
     }
-    /// Sets the *auto convert missing prices* query property to the given value.
-    ///
-    /// 
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
+    ///
+    /// Sets the *auto convert missing prices* query property to the given value.
     pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductPatchCall<'a, C, A> {
         self._auto_convert_missing_prices = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16009,8 +15956,8 @@ impl<'a, C, A> InappproductPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

@@ -125,16 +125,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -323,16 +325,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -424,7 +428,7 @@ impl ResponseResult for MessagePartBody {}
 /// * [threads trash users](struct.UserThreadTrashCall.html) (response)
 /// * [threads modify users](struct.UserThreadModifyCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Thread {
     /// A short part of the message text.
     pub snippet: String,
@@ -444,7 +448,7 @@ impl ResponseResult for Thread {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HistoryMessageAdded {
     /// no description provided
     pub message: Message,
@@ -507,7 +511,7 @@ impl ResponseResult for Label {}
 /// 
 /// * [history list users](struct.UserHistoryListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListHistoryResponse {
     /// Page token to retrieve the next page of results in the list.
     #[serde(rename="nextPageToken")]
@@ -602,7 +606,7 @@ impl RequestValue for ModifyMessageRequest {}
 /// 
 /// * [drafts list users](struct.UserDraftListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListDraftsResponse {
     /// Token to retrieve the next page of results in the list.
     #[serde(rename="nextPageToken")]
@@ -621,7 +625,7 @@ impl ResponseResult for ListDraftsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HistoryMessageDeleted {
     /// no description provided
     pub message: Message,
@@ -634,7 +638,7 @@ impl Part for HistoryMessageDeleted {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct History {
     /// Labels removed from messages in this history record.
     #[serde(rename="labelsRemoved")]
@@ -666,7 +670,7 @@ impl Part for History {}
 /// 
 /// * [get profile users](struct.UserGetProfileCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Profile {
     /// The total number of messages in the mailbox.
     #[serde(rename="messagesTotal")]
@@ -689,7 +693,7 @@ impl ResponseResult for Profile {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HistoryLabelAdded {
     /// Label IDs added to the message.
     #[serde(rename="labelIds")]
@@ -710,7 +714,7 @@ impl Part for HistoryLabelAdded {}
 /// 
 /// * [threads list users](struct.UserThreadListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListThreadsResponse {
     /// Page token to retrieve the next page of results in the list.
     #[serde(rename="nextPageToken")]
@@ -756,7 +760,7 @@ impl RequestValue for ModifyThreadRequest {}
 /// 
 /// * [messages list users](struct.UserMessageListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListMessagesResponse {
     /// Token to retrieve the next page of results in the list.
     #[serde(rename="nextPageToken")]
@@ -780,7 +784,7 @@ impl ResponseResult for ListMessagesResponse {}
 /// 
 /// * [labels list users](struct.UserLabelListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLabelsResponse {
     /// List of labels.
     pub labels: Vec<Label>,
@@ -840,7 +844,7 @@ impl ResponseResult for Message {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HistoryLabelRemoved {
     /// Label IDs removed from the message.
     #[serde(rename="labelIds")]
@@ -1819,64 +1823,59 @@ impl<'a, C, A> UserMessageImportCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Message) -> UserMessageImportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageImportCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *process for calendar* query property to the given value.
-    ///
-    /// 
     /// Process calendar invites in the email and add any extracted meetings to the Google Calendar for this user.
+    ///
+    /// Sets the *process for calendar* query property to the given value.
     pub fn process_for_calendar(mut self, new_value: bool) -> UserMessageImportCall<'a, C, A> {
         self._process_for_calendar = Some(new_value);
         self
     }
-    /// Sets the *never mark spam* query property to the given value.
-    ///
-    /// 
     /// Ignore the Gmail spam classifier decision and never mark this email as SPAM in the mailbox.
+    ///
+    /// Sets the *never mark spam* query property to the given value.
     pub fn never_mark_spam(mut self, new_value: bool) -> UserMessageImportCall<'a, C, A> {
         self._never_mark_spam = Some(new_value);
         self
     }
-    /// Sets the *internal date source* query property to the given value.
-    ///
-    /// 
     /// Source for Gmail's internal date of the message.
+    ///
+    /// Sets the *internal date source* query property to the given value.
     pub fn internal_date_source(mut self, new_value: &str) -> UserMessageImportCall<'a, C, A> {
         self._internal_date_source = Some(new_value.to_string());
         self
     }
-    /// Sets the *deleted* query property to the given value.
-    ///
-    /// 
     /// Mark the email as permanently deleted (not TRASH) and only visible in Google Apps Vault to a Vault administrator. Only used for Google Apps for Work accounts.
+    ///
+    /// Sets the *deleted* query property to the given value.
     pub fn deleted(mut self, new_value: bool) -> UserMessageImportCall<'a, C, A> {
         self._deleted = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1906,8 +1905,8 @@ impl<'a, C, A> UserMessageImportCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2111,55 +2110,50 @@ impl<'a, C, A> UserHistoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *start history id* query property to the given value.
-    ///
-    /// 
     /// Required. Returns history records after the specified startHistoryId. The supplied startHistoryId should be obtained from the historyId of a message, thread, or previous list response. History IDs increase chronologically but are not contiguous with random gaps in between valid IDs. Supplying an invalid or out of date startHistoryId typically returns an HTTP 404 error code. A historyId is typically valid for at least a week, but in some circumstances may be valid for only a few hours. If you receive an HTTP 404 error response, your application should perform a full sync. If you receive no nextPageToken in the response, there are no updates to retrieve and you can store the returned historyId for a future request.
+    ///
+    /// Sets the *start history id* query property to the given value.
     pub fn start_history_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, A> {
         self._start_history_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token to retrieve a specific page of results in the list.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserHistoryListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of history records to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> UserHistoryListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *label id* query property to the given value.
-    ///
-    /// 
     /// Only return messages with a label matching the ID.
+    ///
+    /// Sets the *label id* query property to the given value.
     pub fn label_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, A> {
         self._label_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserHistoryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2189,8 +2183,8 @@ impl<'a, C, A> UserHistoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2504,32 +2498,31 @@ impl<'a, C, A> UserDraftCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Draft) -> UserDraftCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftCreateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2559,8 +2552,8 @@ impl<'a, C, A> UserDraftCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2759,32 +2752,31 @@ impl<'a, C, A> UserLabelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Label) -> UserLabelCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelCreateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2814,8 +2806,8 @@ impl<'a, C, A> UserLabelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2990,33 +2982,32 @@ impl<'a, C, A> UserLabelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the label to delete.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the label to delete.
     pub fn id(mut self, new_value: &str) -> UserLabelDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3046,8 +3037,8 @@ impl<'a, C, A> UserLabelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3233,33 +3224,32 @@ impl<'a, C, A> UserLabelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the label to retrieve.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the label to retrieve.
     pub fn id(mut self, new_value: &str) -> UserLabelGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3289,8 +3279,8 @@ impl<'a, C, A> UserLabelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3476,33 +3466,32 @@ impl<'a, C, A> UserMessageTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageTrashCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the message to Trash.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the message to Trash.
     pub fn id(mut self, new_value: &str) -> UserMessageTrashCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageTrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3532,8 +3521,8 @@ impl<'a, C, A> UserMessageTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3847,32 +3836,31 @@ impl<'a, C, A> UserDraftSendCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Draft) -> UserDraftSendCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftSendCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftSendCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3902,8 +3890,8 @@ impl<'a, C, A> UserDraftSendCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4089,33 +4077,32 @@ impl<'a, C, A> UserMessageUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageUntrashCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the message to remove from Trash.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the message to remove from Trash.
     pub fn id(mut self, new_value: &str) -> UserMessageUntrashCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageUntrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4145,8 +4132,8 @@ impl<'a, C, A> UserMessageUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4330,23 +4317,22 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4376,8 +4362,8 @@ impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4552,33 +4538,32 @@ impl<'a, C, A> UserMessageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the message to delete.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the message to delete.
     pub fn id(mut self, new_value: &str) -> UserMessageDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4608,8 +4593,8 @@ impl<'a, C, A> UserMessageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4925,42 +4910,41 @@ impl<'a, C, A> UserDraftUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Draft) -> UserDraftUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the draft to update.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the draft to update.
     pub fn id(mut self, new_value: &str) -> UserDraftUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4990,8 +4974,8 @@ impl<'a, C, A> UserDraftUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5182,41 +5166,39 @@ impl<'a, C, A> UserDraftGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the draft to retrieve.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the draft to retrieve.
     pub fn id(mut self, new_value: &str) -> UserDraftGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *format* query property to the given value.
-    ///
-    /// 
     /// The format to return the draft in.
+    ///
+    /// Sets the *format* query property to the given value.
     pub fn format(mut self, new_value: &str) -> UserDraftGetCall<'a, C, A> {
         self._format = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5246,8 +5228,8 @@ impl<'a, C, A> UserDraftGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5448,42 +5430,41 @@ impl<'a, C, A> UserLabelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Label) -> UserLabelUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the label to update.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the label to update.
     pub fn id(mut self, new_value: &str) -> UserLabelUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5513,8 +5494,8 @@ impl<'a, C, A> UserLabelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5700,33 +5681,32 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the thread to remove from Trash.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the thread to remove from Trash.
     pub fn id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadUntrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5756,8 +5736,8 @@ impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5958,42 +5938,41 @@ impl<'a, C, A> UserLabelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Label) -> UserLabelPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelPatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the label to update.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the label to update.
     pub fn id(mut self, new_value: &str) -> UserLabelPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6023,8 +6002,8 @@ impl<'a, C, A> UserLabelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6199,33 +6178,32 @@ impl<'a, C, A> UserDraftDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the draft to delete.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the draft to delete.
     pub fn id(mut self, new_value: &str) -> UserDraftDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6255,8 +6233,8 @@ impl<'a, C, A> UserDraftDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6469,64 +6447,58 @@ impl<'a, C, A> UserThreadListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *q* query property to the given value.
-    ///
-    /// 
     /// Only return threads matching the specified query. Supports the same query format as the Gmail search box. For example, "from:someuser@example.com rfc822msgid: is:unread".
+    ///
+    /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> UserThreadListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token to retrieve a specific page of results in the list.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserThreadListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of threads to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> UserThreadListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Only return threads with labels that match all of the specified label IDs.
+    ///
     /// Append the given value to the *label ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Only return threads with labels that match all of the specified label IDs.
     pub fn add_label_ids(mut self, new_value: &str) -> UserThreadListCall<'a, C, A> {
         self._label_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *include spam trash* query property to the given value.
-    ///
-    /// 
     /// Include threads from SPAM and TRASH in the results.
+    ///
+    /// Sets the *include spam trash* query property to the given value.
     pub fn include_spam_trash(mut self, new_value: bool) -> UserThreadListCall<'a, C, A> {
         self._include_spam_trash = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6556,8 +6528,8 @@ impl<'a, C, A> UserThreadListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6758,42 +6730,41 @@ impl<'a, C, A> UserThreadModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ModifyThreadRequest) -> UserThreadModifyCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadModifyCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the thread to modify.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the thread to modify.
     pub fn id(mut self, new_value: &str) -> UserThreadModifyCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadModifyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6823,8 +6794,8 @@ impl<'a, C, A> UserThreadModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6999,33 +6970,32 @@ impl<'a, C, A> UserThreadDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// ID of the Thread to delete.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the Thread to delete.
     pub fn id(mut self, new_value: &str) -> UserThreadDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7055,8 +7025,8 @@ impl<'a, C, A> UserThreadDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7244,43 +7214,42 @@ impl<'a, C, A> UserMessageAttachmentGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the message containing the attachment.
+    ///
     /// Sets the *message id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the message containing the attachment.
     pub fn message_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, A> {
         self._message_id = new_value.to_string();
         self
     }
+    /// The ID of the attachment.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the attachment.
     pub fn id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageAttachmentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7310,8 +7279,8 @@ impl<'a, C, A> UserMessageAttachmentGetCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7512,42 +7481,41 @@ impl<'a, C, A> UserMessageModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ModifyMessageRequest) -> UserMessageModifyCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the message to modify.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the message to modify.
     pub fn id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageModifyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7577,8 +7545,8 @@ impl<'a, C, A> UserMessageModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7764,33 +7732,32 @@ impl<'a, C, A> UserThreadTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadTrashCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the thread to Trash.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the thread to Trash.
     pub fn id(mut self, new_value: &str) -> UserThreadTrashCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadTrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7820,8 +7787,8 @@ impl<'a, C, A> UserThreadTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8015,39 +7982,36 @@ impl<'a, C, A> UserDraftListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token to retrieve a specific page of results in the list.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserDraftListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of drafts to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> UserDraftListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8077,8 +8041,8 @@ impl<'a, C, A> UserDraftListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8392,32 +8356,31 @@ impl<'a, C, A> UserMessageSendCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Message) -> UserMessageSendCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageSendCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageSendCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8447,8 +8410,8 @@ impl<'a, C, A> UserMessageSendCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8648,50 +8611,47 @@ impl<'a, C, A> UserMessageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the message to retrieve.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the message to retrieve.
     pub fn id(mut self, new_value: &str) -> UserMessageGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
+    /// When given and format is METADATA, only include headers specified.
+    ///
     /// Append the given value to the *metadata headers* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// When given and format is METADATA, only include headers specified.
     pub fn add_metadata_headers(mut self, new_value: &str) -> UserMessageGetCall<'a, C, A> {
         self._metadata_headers.push(new_value.to_string());
         self
     }
-    /// Sets the *format* query property to the given value.
-    ///
-    /// 
     /// The format to return the message in.
+    ///
+    /// Sets the *format* query property to the given value.
     pub fn format(mut self, new_value: &str) -> UserMessageGetCall<'a, C, A> {
         self._format = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8721,8 +8681,8 @@ impl<'a, C, A> UserMessageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8935,64 +8895,58 @@ impl<'a, C, A> UserMessageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *q* query property to the given value.
-    ///
-    /// 
     /// Only return messages matching the specified query. Supports the same query format as the Gmail search box. For example, "from:someuser@example.com rfc822msgid: is:unread".
+    ///
+    /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> UserMessageListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token to retrieve a specific page of results in the list.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserMessageListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of messages to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> UserMessageListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Only return messages with labels that match all of the specified label IDs.
+    ///
     /// Append the given value to the *label ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Only return messages with labels that match all of the specified label IDs.
     pub fn add_label_ids(mut self, new_value: &str) -> UserMessageListCall<'a, C, A> {
         self._label_ids.push(new_value.to_string());
         self
     }
-    /// Sets the *include spam trash* query property to the given value.
-    ///
-    /// 
     /// Include messages from SPAM and TRASH in the results.
+    ///
+    /// Sets the *include spam trash* query property to the given value.
     pub fn include_spam_trash(mut self, new_value: bool) -> UserMessageListCall<'a, C, A> {
         self._include_spam_trash = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9022,8 +8976,8 @@ impl<'a, C, A> UserMessageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9207,23 +9161,22 @@ impl<'a, C, A> UserGetProfileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserGetProfileCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserGetProfileCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9253,8 +9206,8 @@ impl<'a, C, A> UserGetProfileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9454,50 +9407,47 @@ impl<'a, C, A> UserThreadGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the thread to retrieve.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the thread to retrieve.
     pub fn id(mut self, new_value: &str) -> UserThreadGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
+    /// When given and format is METADATA, only include headers specified.
+    ///
     /// Append the given value to the *metadata headers* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// When given and format is METADATA, only include headers specified.
     pub fn add_metadata_headers(mut self, new_value: &str) -> UserThreadGetCall<'a, C, A> {
         self._metadata_headers.push(new_value.to_string());
         self
     }
-    /// Sets the *format* query property to the given value.
-    ///
-    /// 
     /// The format to return the messages in.
+    ///
+    /// Sets the *format* query property to the given value.
     pub fn format(mut self, new_value: &str) -> UserThreadGetCall<'a, C, A> {
         self._format = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9527,8 +9477,8 @@ impl<'a, C, A> UserThreadGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9852,48 +9802,45 @@ impl<'a, C, A> UserMessageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Message) -> UserMessageInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageInsertCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *internal date source* query property to the given value.
-    ///
-    /// 
     /// Source for Gmail's internal date of the message.
+    ///
+    /// Sets the *internal date source* query property to the given value.
     pub fn internal_date_source(mut self, new_value: &str) -> UserMessageInsertCall<'a, C, A> {
         self._internal_date_source = Some(new_value.to_string());
         self
     }
-    /// Sets the *deleted* query property to the given value.
-    ///
-    /// 
     /// Mark the email as permanently deleted (not TRASH) and only visible in Google Apps Vault to a Vault administrator. Only used for Google Apps for Work accounts.
+    ///
+    /// Sets the *deleted* query property to the given value.
     pub fn deleted(mut self, new_value: bool) -> UserMessageInsertCall<'a, C, A> {
         self._deleted = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9923,8 +9870,8 @@ impl<'a, C, A> UserMessageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Gmai`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

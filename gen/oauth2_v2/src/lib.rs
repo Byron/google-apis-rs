@@ -103,16 +103,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -282,16 +284,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -340,7 +344,7 @@ impl<'a, C, A> Oauth2<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JwkKeys {
     /// no description provided
     #[serde(rename="use")]
@@ -370,7 +374,7 @@ impl Part for JwkKeys {}
 /// 
 /// * [get cert for open id connect](struct.MethodGetCertForOpenIdConnectCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Jwk {
     /// no description provided
     pub keys: Vec<JwkKeys>,
@@ -389,7 +393,7 @@ impl ResponseResult for Jwk {}
 /// * [v2 me get userinfo](struct.UserinfoV2MeGetCall.html) (response)
 /// * [get userinfo](struct.UserinfoGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Userinfoplus {
     /// The user's last name.
     pub family_name: String,
@@ -427,7 +431,7 @@ impl ResponseResult for Userinfoplus {}
 /// 
 /// * [tokeninfo](struct.MethodTokeninfoCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tokeninfo {
     /// To whom was the token issued to. In general the same as audience.
     pub issued_to: String,
@@ -724,13 +728,12 @@ impl<'a, C, A> UserinfoV2MeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserinfoV2MeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -760,8 +763,8 @@ impl<'a, C, A> UserinfoV2MeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -917,13 +920,12 @@ impl<'a, C, A> UserinfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserinfoGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -953,8 +955,8 @@ impl<'a, C, A> UserinfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1010,7 +1012,6 @@ pub struct MethodTokeninfoCall<'a, C, A>
     _access_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for MethodTokeninfoCall<'a, C, A> {}
@@ -1052,8 +1053,17 @@ impl<'a, C, A> MethodTokeninfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/oauth2/v2/tokeninfo".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
         }
 
         
@@ -1065,21 +1075,10 @@ impl<'a, C, A> MethodTokeninfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(UserAgent(self.hub._user_agent.clone()));
 
                 dlg.pre_request();
                 req.send()
@@ -1125,34 +1124,30 @@ impl<'a, C, A> MethodTokeninfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Sets the *token_handle* query property to the given value.
     ///
-    /// 
+    /// Sets the *token_handle* query property to the given value.
     pub fn token_handle(mut self, new_value: &str) -> MethodTokeninfoCall<'a, C, A> {
         self._token_handle = Some(new_value.to_string());
         self
     }
-    /// Sets the *id_token* query property to the given value.
     ///
-    /// 
+    /// Sets the *id_token* query property to the given value.
     pub fn id_token(mut self, new_value: &str) -> MethodTokeninfoCall<'a, C, A> {
         self._id_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *access_token* query property to the given value.
     ///
-    /// 
+    /// Sets the *access_token* query property to the given value.
     pub fn access_token(mut self, new_value: &str) -> MethodTokeninfoCall<'a, C, A> {
         self._access_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodTokeninfoCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1180,22 +1175,6 @@ impl<'a, C, A> MethodTokeninfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self
     }
 
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MethodTokeninfoCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
 }
 
 
@@ -1233,7 +1212,6 @@ pub struct MethodGetCertForOpenIdConnectCall<'a, C, A>
     hub: &'a Oauth2<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for MethodGetCertForOpenIdConnectCall<'a, C, A> {}
@@ -1266,8 +1244,17 @@ impl<'a, C, A> MethodGetCertForOpenIdConnectCall<'a, C, A> where C: BorrowMut<hy
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/oauth2/v2/certs".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
         }
 
         
@@ -1279,21 +1266,10 @@ impl<'a, C, A> MethodGetCertForOpenIdConnectCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(UserAgent(self.hub._user_agent.clone()));
 
                 dlg.pre_request();
                 req.send()
@@ -1339,13 +1315,12 @@ impl<'a, C, A> MethodGetCertForOpenIdConnectCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodGetCertForOpenIdConnectCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1373,22 +1348,6 @@ impl<'a, C, A> MethodGetCertForOpenIdConnectCall<'a, C, A> where C: BorrowMut<hy
         self
     }
 
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MethodGetCertForOpenIdConnectCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
 }
 
 

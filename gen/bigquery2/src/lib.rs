@@ -121,16 +121,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -314,16 +316,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -505,7 +509,7 @@ impl Part for JsonObject {}
 /// 
 /// * [list projects](struct.ProjectListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectList {
     /// A token to request the next page of results.
     #[serde(rename="nextPageToken")]
@@ -601,7 +605,7 @@ impl ResponseResult for Dataset {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableDataInsertAllResponseInsertErrors {
     /// The index of the row that error applies to.
     pub index: u32,
@@ -617,7 +621,7 @@ impl Part for TableDataInsertAllResponseInsertErrors {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableCell {
     /// no description provided
     pub v: String,
@@ -647,7 +651,7 @@ impl Part for JobReference {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetListDatasets {
     /// A descriptive name for the dataset, if one exists.
     #[serde(rename="friendlyName")]
@@ -669,7 +673,7 @@ impl Part for DatasetListDatasets {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableListTables {
     /// The user-friendly name for this table.
     #[serde(rename="friendlyName")]
@@ -699,7 +703,7 @@ impl Part for TableListTables {}
 /// 
 /// * [list tables](struct.TableListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableList {
     /// A token to request the next page of results.
     #[serde(rename="nextPageToken")]
@@ -722,7 +726,7 @@ impl ResponseResult for TableList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectReference {
     /// [Required] ID of the project. Can be either the numeric ID or the assigned ID of the project.
     #[serde(rename="projectId")]
@@ -741,7 +745,7 @@ impl Part for ProjectReference {}
 /// 
 /// * [list tabledata](struct.TabledataListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableDataList {
     /// A token used for paging results. Providing this token instead of the startIndex parameter can help you retrieve stable results when an underlying table is changing.
     #[serde(rename="pageToken")]
@@ -806,7 +810,7 @@ impl ResponseResult for Job {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobListJobs {
     /// [Full-projection-only] Describes the state of the job.
     pub status: JobStatus,
@@ -902,7 +906,7 @@ impl Part for JobConfigurationLoad {}
 /// 
 /// * [list jobs](struct.JobListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobList {
     /// A token to request the next page of results.
     #[serde(rename="nextPageToken")]
@@ -961,7 +965,7 @@ impl Part for JobConfigurationExtract {}
 /// 
 /// * [get query results jobs](struct.JobGetQueryResultCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetQueryResultsResponse {
     /// The resource type of the response.
     pub kind: String,
@@ -1218,7 +1222,7 @@ impl RequestValue for TableDataInsertAllRequest {}
 /// 
 /// * [list datasets](struct.DatasetListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetList {
     /// A token that can be used to request the next results page. This property is omitted on the final results page.
     #[serde(rename="nextPageToken")]
@@ -1326,7 +1330,7 @@ impl Part for DatasetReference {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableRow {
     /// no description provided
     pub f: Vec<TableCell>,
@@ -1363,7 +1367,7 @@ impl Part for JobConfiguration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectListProjects {
     /// A descriptive name for this project.
     #[serde(rename="friendlyName")]
@@ -1475,7 +1479,7 @@ impl ResponseResult for Table {}
 /// 
 /// * [insert all tabledata](struct.TabledataInsertAllCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableDataInsertAllResponse {
     /// The resource type of the response.
     pub kind: String,
@@ -1496,7 +1500,7 @@ impl ResponseResult for TableDataInsertAllResponse {}
 /// 
 /// * [query jobs](struct.JobQueryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryResponse {
     /// The resource type.
     pub kind: String,
@@ -2369,52 +2373,51 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Table) -> TableUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the table to update
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the table to update
     pub fn project_id(mut self, new_value: &str) -> TableUpdateCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the table to update
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the table to update
     pub fn dataset_id(mut self, new_value: &str) -> TableUpdateCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
+    /// Table ID of the table to update
+    ///
     /// Sets the *table id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Table ID of the table to update
     pub fn table_id(mut self, new_value: &str) -> TableUpdateCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2444,8 +2447,8 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2646,42 +2649,41 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Table) -> TableInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the new table
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the new table
     pub fn project_id(mut self, new_value: &str) -> TableInsertCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the new table
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the new table
     pub fn dataset_id(mut self, new_value: &str) -> TableInsertCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2711,8 +2713,8 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2908,49 +2910,46 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Project ID of the tables to list
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the tables to list
     pub fn project_id(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the tables to list
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the tables to list
     pub fn dataset_id(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token, returned by a previous call, to request the next page of results
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> TableListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2980,8 +2979,8 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3158,43 +3157,42 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Project ID of the table to delete
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the table to delete
     pub fn project_id(mut self, new_value: &str) -> TableDeleteCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the table to delete
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the table to delete
     pub fn dataset_id(mut self, new_value: &str) -> TableDeleteCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
+    /// Table ID of the table to delete
+    ///
     /// Sets the *table id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Table ID of the table to delete
     pub fn table_id(mut self, new_value: &str) -> TableDeleteCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3224,8 +3222,8 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3413,43 +3411,42 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// Project ID of the requested table
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the requested table
     pub fn project_id(mut self, new_value: &str) -> TableGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the requested table
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the requested table
     pub fn dataset_id(mut self, new_value: &str) -> TableGetCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
+    /// Table ID of the requested table
+    ///
     /// Sets the *table id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Table ID of the requested table
     pub fn table_id(mut self, new_value: &str) -> TableGetCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3479,8 +3476,8 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3683,52 +3680,51 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Table) -> TablePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the table to update
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the table to update
     pub fn project_id(mut self, new_value: &str) -> TablePatchCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the table to update
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the table to update
     pub fn dataset_id(mut self, new_value: &str) -> TablePatchCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
+    /// Table ID of the table to update
+    ///
     /// Sets the *table id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Table ID of the table to update
     pub fn table_id(mut self, new_value: &str) -> TablePatchCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3758,8 +3754,8 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3960,42 +3956,41 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Dataset) -> DatasetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the dataset being updated
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the dataset being updated
     pub fn project_id(mut self, new_value: &str) -> DatasetPatchCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the dataset being updated
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the dataset being updated
     pub fn dataset_id(mut self, new_value: &str) -> DatasetPatchCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4025,8 +4020,8 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4212,33 +4207,32 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Project ID of the requested dataset
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the requested dataset
     pub fn project_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the requested dataset
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the requested dataset
     pub fn dataset_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4268,8 +4262,8 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4468,47 +4462,43 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Project ID of the datasets to be listed
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the datasets to be listed
     pub fn project_id(mut self, new_value: &str) -> DatasetListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token, returned by a previous call, to request the next page of results
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> DatasetListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> DatasetListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *all* query property to the given value.
-    ///
-    /// 
     /// Whether to list all datasets, including hidden ones
+    ///
+    /// Sets the *all* query property to the given value.
     pub fn all(mut self, new_value: bool) -> DatasetListCall<'a, C, A> {
         self._all = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4538,8 +4528,8 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4740,42 +4730,41 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Dataset) -> DatasetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the dataset being updated
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the dataset being updated
     pub fn project_id(mut self, new_value: &str) -> DatasetUpdateCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the dataset being updated
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the dataset being updated
     pub fn dataset_id(mut self, new_value: &str) -> DatasetUpdateCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4805,8 +4794,8 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4986,41 +4975,39 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Project ID of the dataset being deleted
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the dataset being deleted
     pub fn project_id(mut self, new_value: &str) -> DatasetDeleteCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of dataset being deleted
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of dataset being deleted
     pub fn dataset_id(mut self, new_value: &str) -> DatasetDeleteCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delete contents* query property to the given value.
-    ///
-    /// 
     /// If True, delete all the tables in the dataset. If False and the dataset contains tables, the request will fail. Default is False
+    ///
+    /// Sets the *delete contents* query property to the given value.
     pub fn delete_contents(mut self, new_value: bool) -> DatasetDeleteCall<'a, C, A> {
         self._delete_contents = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5050,8 +5037,8 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5250,32 +5237,31 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Dataset) -> DatasetInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the new dataset
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the new dataset
     pub fn project_id(mut self, new_value: &str) -> DatasetInsertCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5305,8 +5291,8 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5505,32 +5491,31 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &QueryRequest) -> JobQueryCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project billed for the query
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project billed for the query
     pub fn project_id(mut self, new_value: &str) -> JobQueryCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5560,8 +5545,8 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5767,65 +5752,60 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Project ID of the query job
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the query job
     pub fn project_id(mut self, new_value: &str) -> JobGetQueryResultCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Job ID of the query job
+    ///
     /// Sets the *job id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Job ID of the query job
     pub fn job_id(mut self, new_value: &str) -> JobGetQueryResultCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
-    /// Sets the *timeout ms* query property to the given value.
-    ///
-    /// 
     /// How long to wait for the query to complete, in milliseconds, before returning. Default is to return immediately. If the timeout passes before the job completes, the request will fail with a TIMEOUT error
+    ///
+    /// Sets the *timeout ms* query property to the given value.
     pub fn timeout_ms(mut self, new_value: u32) -> JobGetQueryResultCall<'a, C, A> {
         self._timeout_ms = Some(new_value);
         self
     }
-    /// Sets the *start index* query property to the given value.
-    ///
-    /// 
     /// Zero-based index of the starting row
+    ///
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: &str) -> JobGetQueryResultCall<'a, C, A> {
         self._start_index = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token, returned by a previous call, to request the next page of results
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> JobGetQueryResultCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to read
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> JobGetQueryResultCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobGetQueryResultCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5855,8 +5835,8 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6069,64 +6049,58 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// Project ID of the jobs to list
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the jobs to list
     pub fn project_id(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Filter for job state
+    ///
     /// Append the given value to the *state filter* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Filter for job state
     pub fn add_state_filter(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._state_filter.push(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Restrict information returned to a set of selected fields
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token, returned by a previous call, to request the next page of results
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> JobListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *all users* query property to the given value.
-    ///
-    /// 
     /// Whether to display jobs owned by all users in the project. Default false
+    ///
+    /// Sets the *all users* query property to the given value.
     pub fn all_users(mut self, new_value: bool) -> JobListCall<'a, C, A> {
         self._all_users = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6156,8 +6130,8 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6343,33 +6317,32 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
 
+    /// Project ID of the requested job
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the requested job
     pub fn project_id(mut self, new_value: &str) -> JobGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Job ID of the requested job
+    ///
     /// Sets the *job id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Job ID of the requested job
     pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6399,8 +6372,8 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6710,32 +6683,31 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Job) -> JobInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the project that will be billed for the job
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the project that will be billed for the job
     pub fn project_id(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6765,8 +6737,8 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6969,52 +6941,51 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &TableDataInsertAllRequest) -> TabledataInsertAllCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of the destination table.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the destination table.
     pub fn project_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the destination table.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the destination table.
     pub fn dataset_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
+    /// Table ID of the destination table.
+    ///
     /// Sets the *table id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Table ID of the destination table.
     pub fn table_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TabledataInsertAllCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7044,8 +7015,8 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7248,67 +7219,63 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Project ID of the table to read
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of the table to read
     pub fn project_id(mut self, new_value: &str) -> TabledataListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// Dataset ID of the table to read
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset ID of the table to read
     pub fn dataset_id(mut self, new_value: &str) -> TabledataListCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
+    /// Table ID of the table to read
+    ///
     /// Sets the *table id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Table ID of the table to read
     pub fn table_id(mut self, new_value: &str) -> TabledataListCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
-    /// Sets the *start index* query property to the given value.
-    ///
-    /// 
     /// Zero-based index of the starting row to read
+    ///
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: &str) -> TabledataListCall<'a, C, A> {
         self._start_index = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token, returned by a previous call, identifying the result set
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TabledataListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> TabledataListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TabledataListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7338,8 +7305,8 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7507,29 +7474,26 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token, returned by a previous call, to request the next page of results
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ProjectListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7559,8 +7523,8 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

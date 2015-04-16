@@ -162,16 +162,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -419,16 +421,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -694,7 +698,7 @@ impl ResponseResult for Member {}
 /// 
 /// * [list orgunits](struct.OrgunitListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrgUnits {
     /// Kind of resource this is.
     pub kind: String,
@@ -719,7 +723,7 @@ impl ResponseResult for OrgUnits {}
 /// * [delete tokens](struct.TokenDeleteCall.html) (none)
 /// * [get tokens](struct.TokenGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Token {
     /// A list of authorization scopes the application is granted.
     pub scopes: Vec<String>,
@@ -756,7 +760,7 @@ impl ResponseResult for Token {}
 /// 
 /// * [list asps](struct.AspListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Asps {
     /// A list of ASP resources.
     pub items: Vec<Asp>,
@@ -858,7 +862,7 @@ impl ResponseResult for Schema {}
 /// * [delete asps](struct.AspDeleteCall.html) (none)
 /// * [get asps](struct.AspGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Asp {
     /// The type of the API resource. This is always admin#directory#asp.
     pub kind: String,
@@ -893,7 +897,7 @@ impl ResponseResult for Asp {}
 /// 
 /// * [list tokens](struct.TokenListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tokens {
     /// A list of Token resources.
     pub items: Vec<Token>,
@@ -915,7 +919,7 @@ impl ResponseResult for Tokens {}
 /// 
 /// * [list notifications](struct.NotificationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Notifications {
     /// Token for fetching the next page of notifications.
     #[serde(rename="nextPageToken")]
@@ -1150,7 +1154,7 @@ impl ResponseResult for User {}
 /// 
 /// * [list groups](struct.GroupListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Groups {
     /// Token used to access next page of this result.
     #[serde(rename="nextPageToken")]
@@ -1187,7 +1191,7 @@ impl Part for ChromeOsDeviceRecentUsers {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MobileDeviceApplications {
     /// Version code of application
     #[serde(rename="versionCode")]
@@ -1228,7 +1232,7 @@ impl Part for UserCustomProperties {}
 /// 
 /// * [list members](struct.MemberListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Members {
     /// Token used to access next page of this result.
     #[serde(rename="nextPageToken")]
@@ -1272,7 +1276,7 @@ impl RequestValue for UserUndelete {}
 /// 
 /// * [list verification codes](struct.VerificationCodeListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerificationCodes {
     /// A list of verification code resources.
     pub items: Vec<VerificationCode>,
@@ -1323,7 +1327,7 @@ impl ResponseResult for Alias {}
 /// 
 /// * [list mobiledevices](struct.MobiledeviceListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MobileDevices {
     /// Token used to access next page of this result.
     #[serde(rename="nextPageToken")]
@@ -1439,7 +1443,7 @@ impl RequestValue for UserMakeAdmin {}
 /// 
 /// * [list users](struct.UserListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Users {
     /// Token used to access next page of this result.
     #[serde(rename="nextPageToken")]
@@ -1466,7 +1470,7 @@ impl ResponseResult for Users {}
 /// 
 /// * [get mobiledevices](struct.MobiledeviceGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MobileDevice {
     /// Mobile Device Kernel version (Read-only)
     #[serde(rename="kernelVersion")]
@@ -1551,7 +1555,7 @@ impl ResponseResult for MobileDevice {}
 /// 
 /// * [list chromeosdevices](struct.ChromeosdeviceListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChromeOsDevices {
     /// Token used to access next page of this result.
     #[serde(rename="nextPageToken")]
@@ -1622,7 +1626,7 @@ impl ResponseResult for OrgUnit {}
 /// * [list verification codes](struct.VerificationCodeListCall.html) (none)
 /// * [generate verification codes](struct.VerificationCodeGenerateCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerificationCode {
     /// The type of the resource. This is always admin#directory#verificationCode.
     pub kind: Option<String>,
@@ -1666,7 +1670,7 @@ impl Part for SchemaFieldSpecNumericIndexingSpec {}
 /// 
 /// * [list schemas](struct.SchemaListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Schemas {
     /// Kind of resource this is.
     pub kind: String,
@@ -1689,7 +1693,7 @@ impl ResponseResult for Schemas {}
 /// * [aliases list users](struct.UserAliaseListCall.html) (response)
 /// * [aliases list groups](struct.GroupAliaseListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Aliases {
     /// Kind of resource this is.
     pub kind: String,
@@ -3572,7 +3576,7 @@ impl<'a, C, A> TokenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/tokens/{clientId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{clientId}", "clientId")].iter() {
@@ -3668,33 +3672,32 @@ impl<'a, C, A> TokenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
     pub fn user_key(mut self, new_value: &str) -> TokenGetCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
+    /// The Client ID of the application the token is issued to.
+    ///
     /// Sets the *client id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Client ID of the application the token is issued to.
     pub fn client_id(mut self, new_value: &str) -> TokenGetCall<'a, C, A> {
         self._client_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TokenGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3724,8 +3727,8 @@ impl<'a, C, A> TokenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserSecurity`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3813,7 +3816,7 @@ impl<'a, C, A> TokenListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/tokens".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -3909,23 +3912,22 @@ impl<'a, C, A> TokenListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
     pub fn user_key(mut self, new_value: &str) -> TokenListCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TokenListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3955,8 +3957,8 @@ impl<'a, C, A> TokenListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserSecurity`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4045,7 +4047,7 @@ impl<'a, C, A> TokenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/tokens/{clientId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{clientId}", "clientId")].iter() {
@@ -4131,33 +4133,32 @@ impl<'a, C, A> TokenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
     pub fn user_key(mut self, new_value: &str) -> TokenDeleteCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
+    /// The Client ID of the application the token is issued to.
+    ///
     /// Sets the *client id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Client ID of the application the token is issued to.
     pub fn client_id(mut self, new_value: &str) -> TokenDeleteCall<'a, C, A> {
         self._client_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TokenDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4187,8 +4188,8 @@ impl<'a, C, A> TokenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserSecurity`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4280,7 +4281,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/admin/directory/v1//admin/directory_v1/channels/stop".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         
@@ -4350,22 +4351,21 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4395,8 +4395,8 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4491,7 +4491,7 @@ impl<'a, C, A> OrgunitInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryOrgunit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -4595,32 +4595,31 @@ impl<'a, C, A> OrgunitInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &OrgUnit) -> OrgunitInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> OrgunitInsertCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrgunitInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4650,8 +4649,8 @@ impl<'a, C, A> OrgunitInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryOrgunit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4749,7 +4748,7 @@ impl<'a, C, A> OrgunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryOrgunitReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -4845,39 +4844,36 @@ impl<'a, C, A> OrgunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> OrgunitListCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *type* query property to the given value.
-    ///
-    /// 
     /// Whether to return all sub-organizations or just immediate children
+    ///
+    /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: &str) -> OrgunitListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Sets the *org unit path* query property to the given value.
-    ///
-    /// 
     /// the URL-encoded organization unit's path or its Id
+    ///
+    /// Sets the *org unit path* query property to the given value.
     pub fn org_unit_path(mut self, new_value: &str) -> OrgunitListCall<'a, C, A> {
         self._org_unit_path = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrgunitListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4907,8 +4903,8 @@ impl<'a, C, A> OrgunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryOrgunitReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5004,7 +5000,7 @@ impl<'a, C, A> OrgunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryOrgunitReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{/orgUnitPath*}", "orgUnitPath")].iter() {
@@ -5100,34 +5096,33 @@ impl<'a, C, A> OrgunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> OrgunitGetCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Full path of the organization unit or its Id
+    ///
     /// Append the given value to the *org unit path* path property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Full path of the organization unit or its Id
     pub fn add_org_unit_path(mut self, new_value: &str) -> OrgunitGetCall<'a, C, A> {
         self._org_unit_path.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrgunitGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5157,8 +5152,8 @@ impl<'a, C, A> OrgunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryOrgunitReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5261,7 +5256,7 @@ impl<'a, C, A> OrgunitUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryOrgunit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{/orgUnitPath*}", "orgUnitPath")].iter() {
@@ -5365,43 +5360,42 @@ impl<'a, C, A> OrgunitUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &OrgUnit) -> OrgunitUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> OrgunitUpdateCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Full path of the organization unit or its Id
+    ///
     /// Append the given value to the *org unit path* path property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Full path of the organization unit or its Id
     pub fn add_org_unit_path(mut self, new_value: &str) -> OrgunitUpdateCall<'a, C, A> {
         self._org_unit_path.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrgunitUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5431,8 +5425,8 @@ impl<'a, C, A> OrgunitUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryOrgunit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5527,7 +5521,7 @@ impl<'a, C, A> OrgunitDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryOrgunit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{/orgUnitPath*}", "orgUnitPath")].iter() {
@@ -5613,34 +5607,33 @@ impl<'a, C, A> OrgunitDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> OrgunitDeleteCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Full path of the organization unit or its Id
+    ///
     /// Append the given value to the *org unit path* path property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Full path of the organization unit or its Id
     pub fn add_org_unit_path(mut self, new_value: &str) -> OrgunitDeleteCall<'a, C, A> {
         self._org_unit_path.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrgunitDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5670,8 +5663,8 @@ impl<'a, C, A> OrgunitDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryOrgunit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5774,7 +5767,7 @@ impl<'a, C, A> OrgunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryOrgunit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{/orgUnitPath*}", "orgUnitPath")].iter() {
@@ -5878,43 +5871,42 @@ impl<'a, C, A> OrgunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &OrgUnit) -> OrgunitPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> OrgunitPatchCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Full path of the organization unit or its Id
+    ///
     /// Append the given value to the *org unit path* path property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Full path of the organization unit or its Id
     pub fn add_org_unit_path(mut self, new_value: &str) -> OrgunitPatchCall<'a, C, A> {
         self._org_unit_path.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrgunitPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5944,8 +5936,8 @@ impl<'a, C, A> OrgunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryOrgunit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6038,7 +6030,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         
@@ -6118,22 +6110,21 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &User) -> UserInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6163,8 +6154,8 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6251,7 +6242,7 @@ impl<'a, C, A> UserPhotoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -6337,23 +6328,22 @@ impl<'a, C, A> UserPhotoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> UserPhotoDeleteCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserPhotoDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6383,8 +6373,8 @@ impl<'a, C, A> UserPhotoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6478,7 +6468,7 @@ impl<'a, C, A> UserUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/undelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -6572,32 +6562,31 @@ impl<'a, C, A> UserUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UserUndelete) -> UserUndeleteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The immutable id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The immutable id of the user
     pub fn user_key(mut self, new_value: &str) -> UserUndeleteCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserUndeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6627,8 +6616,8 @@ impl<'a, C, A> UserUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6722,7 +6711,7 @@ impl<'a, C, A> UserMakeAdminCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/makeAdmin".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -6816,32 +6805,31 @@ impl<'a, C, A> UserMakeAdminCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UserMakeAdmin) -> UserMakeAdminCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the user as admin
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user as admin
     pub fn user_key(mut self, new_value: &str) -> UserMakeAdminCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMakeAdminCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6871,8 +6859,8 @@ impl<'a, C, A> UserMakeAdminCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6967,7 +6955,7 @@ impl<'a, C, A> UserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -7071,32 +7059,31 @@ impl<'a, C, A> UserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &User) -> UserPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the user. If Id, it should match with id of user object
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user. If Id, it should match with id of user object
     pub fn user_key(mut self, new_value: &str) -> UserPatchCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7126,8 +7113,8 @@ impl<'a, C, A> UserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7280,7 +7267,7 @@ impl<'a, C, A> UserWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/watch".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         
@@ -7360,118 +7347,105 @@ impl<'a, C, A> UserWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> UserWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *view type* query property to the given value.
-    ///
-    /// 
     /// Whether to fetch the ADMIN_VIEW or DOMAIN_PUBLIC view of the user.
+    ///
+    /// Sets the *view type* query property to the given value.
     pub fn view_type(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._view_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Whether to return results in ascending or descending order.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// If set to true retrieves the list of deleted users. Default is false
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._show_deleted = Some(new_value.to_string());
         self
     }
-    /// Sets the *query* query property to the given value.
-    ///
-    /// 
     /// Query string search. Should be of the form "". Complete documentation is at https://developers.google.com/admin-sdk/directory/v1/guides/search-users
+    ///
+    /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// What subset of fields to fetch for this user.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page in the list
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// Column to use for sorting results
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return. Default is 100. Max allowed is 500
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> UserWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *event* query property to the given value.
-    ///
-    /// 
     /// Event on which subscription is intended (if subscribing)
+    ///
+    /// Sets the *event* query property to the given value.
     pub fn event(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._event = Some(new_value.to_string());
         self
     }
-    /// Sets the *domain* query property to the given value.
-    ///
-    /// 
     /// Name of the domain. Fill this field to get users from only this domain. To return all users in a multi-domain fill customer field instead.
+    ///
+    /// Sets the *domain* query property to the given value.
     pub fn domain(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._domain = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer* query property to the given value.
-    ///
-    /// 
     /// Immutable id of the Google Apps account. In case of multi-domain, to fetch all users for a customer, fill this field instead of domain.
+    ///
+    /// Sets the *customer* query property to the given value.
     pub fn customer(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._customer = Some(new_value.to_string());
         self
     }
-    /// Sets the *custom field mask* query property to the given value.
-    ///
-    /// 
     /// Comma-separated list of schema names. All fields from these schemas are fetched. This should only be set when projection=custom.
+    ///
+    /// Sets the *custom field mask* query property to the given value.
     pub fn custom_field_mask(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
         self._custom_field_mask = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7501,8 +7475,8 @@ impl<'a, C, A> UserWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7589,7 +7563,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -7675,23 +7649,22 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> UserDeleteCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7721,8 +7694,8 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7817,7 +7790,7 @@ impl<'a, C, A> UserPhotoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -7921,32 +7894,31 @@ impl<'a, C, A> UserPhotoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UserPhoto) -> UserPhotoUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> UserPhotoUpdateCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserPhotoUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7976,8 +7948,8 @@ impl<'a, C, A> UserPhotoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8080,7 +8052,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -8176,47 +8148,43 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> UserGetCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *view type* query property to the given value.
-    ///
-    /// 
     /// Whether to fetch the ADMIN_VIEW or DOMAIN_PUBLIC view of the user.
+    ///
+    /// Sets the *view type* query property to the given value.
     pub fn view_type(mut self, new_value: &str) -> UserGetCall<'a, C, A> {
         self._view_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// What subset of fields to fetch for this user.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> UserGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *custom field mask* query property to the given value.
-    ///
-    /// 
     /// Comma-separated list of schema names. All fields from these schemas are fetched. This should only be set when projection=custom.
+    ///
+    /// Sets the *custom field mask* query property to the given value.
     pub fn custom_field_mask(mut self, new_value: &str) -> UserGetCall<'a, C, A> {
         self._custom_field_mask = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8246,8 +8214,8 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8342,7 +8310,7 @@ impl<'a, C, A> UserAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -8446,32 +8414,31 @@ impl<'a, C, A> UserAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Alias) -> UserAliaseInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> UserAliaseInsertCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserAliaseInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8501,8 +8468,8 @@ impl<'a, C, A> UserAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8648,7 +8615,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserReadonly.as_ref().to_string(), ());
         }
 
         
@@ -8720,109 +8687,96 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Sets the *view type* query property to the given value.
-    ///
-    /// 
     /// Whether to fetch the ADMIN_VIEW or DOMAIN_PUBLIC view of the user.
+    ///
+    /// Sets the *view type* query property to the given value.
     pub fn view_type(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._view_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Whether to return results in ascending or descending order.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// If set to true retrieves the list of deleted users. Default is false
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._show_deleted = Some(new_value.to_string());
         self
     }
-    /// Sets the *query* query property to the given value.
-    ///
-    /// 
     /// Query string search. Should be of the form "". Complete documentation is at https://developers.google.com/admin-sdk/directory/v1/guides/search-users
+    ///
+    /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// What subset of fields to fetch for this user.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page in the list
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// Column to use for sorting results
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return. Default is 100. Max allowed is 500
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> UserListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *event* query property to the given value.
-    ///
-    /// 
     /// Event on which subscription is intended (if subscribing)
+    ///
+    /// Sets the *event* query property to the given value.
     pub fn event(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._event = Some(new_value.to_string());
         self
     }
-    /// Sets the *domain* query property to the given value.
-    ///
-    /// 
     /// Name of the domain. Fill this field to get users from only this domain. To return all users in a multi-domain fill customer field instead.
+    ///
+    /// Sets the *domain* query property to the given value.
     pub fn domain(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._domain = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer* query property to the given value.
-    ///
-    /// 
     /// Immutable id of the Google Apps account. In case of multi-domain, to fetch all users for a customer, fill this field instead of domain.
+    ///
+    /// Sets the *customer* query property to the given value.
     pub fn customer(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._customer = Some(new_value.to_string());
         self
     }
-    /// Sets the *custom field mask* query property to the given value.
-    ///
-    /// 
     /// Comma-separated list of schema names. All fields from these schemas are fetched. This should only be set when projection=custom.
+    ///
+    /// Sets the *custom field mask* query property to the given value.
     pub fn custom_field_mask(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._custom_field_mask = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8852,8 +8806,8 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8942,7 +8896,7 @@ impl<'a, C, A> UserAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases/{alias}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{alias}", "alias")].iter() {
@@ -9028,33 +8982,32 @@ impl<'a, C, A> UserAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> UserAliaseDeleteCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
+    /// The alias to be removed
+    ///
     /// Sets the *alias* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The alias to be removed
     pub fn alias(mut self, new_value: &str) -> UserAliaseDeleteCall<'a, C, A> {
         self._alias = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserAliaseDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9084,8 +9037,8 @@ impl<'a, C, A> UserAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9180,7 +9133,7 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -9284,32 +9237,31 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &User) -> UserUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the user. If Id, it should match with id of user object
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user. If Id, it should match with id of user object
     pub fn user_key(mut self, new_value: &str) -> UserUpdateCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9339,8 +9291,8 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9440,7 +9392,7 @@ impl<'a, C, A> UserAliaseWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases/watch".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -9544,40 +9496,38 @@ impl<'a, C, A> UserAliaseWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> UserAliaseWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> UserAliaseWatchCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *event* query property to the given value.
-    ///
-    /// 
     /// Event on which subscription is intended (if subscribing)
+    ///
+    /// Sets the *event* query property to the given value.
     pub fn event(mut self, new_value: &str) -> UserAliaseWatchCall<'a, C, A> {
         self._event = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserAliaseWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9607,8 +9557,8 @@ impl<'a, C, A> UserAliaseWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9701,7 +9651,7 @@ impl<'a, C, A> UserAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserAliaReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -9797,31 +9747,29 @@ impl<'a, C, A> UserAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> UserAliaseListCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *event* query property to the given value.
-    ///
-    /// 
     /// Event on which subscription is intended (if subscribing)
+    ///
+    /// Sets the *event* query property to the given value.
     pub fn event(mut self, new_value: &str) -> UserAliaseListCall<'a, C, A> {
         self._event = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserAliaseListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9851,8 +9799,8 @@ impl<'a, C, A> UserAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserAliaReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9940,7 +9888,7 @@ impl<'a, C, A> UserPhotoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -10036,23 +9984,22 @@ impl<'a, C, A> UserPhotoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> UserPhotoGetCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserPhotoGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10082,8 +10029,8 @@ impl<'a, C, A> UserPhotoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10178,7 +10125,7 @@ impl<'a, C, A> UserPhotoPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -10282,32 +10229,31 @@ impl<'a, C, A> UserPhotoPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UserPhoto) -> UserPhotoPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> UserPhotoPatchCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserPhotoPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10337,8 +10283,8 @@ impl<'a, C, A> UserPhotoPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10427,7 +10373,7 @@ impl<'a, C, A> MobiledeviceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile/{resourceId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceMobile.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{resourceId}", "resourceId")].iter() {
@@ -10513,33 +10459,32 @@ impl<'a, C, A> MobiledeviceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> MobiledeviceDeleteCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Immutable id of Mobile Device
+    ///
     /// Sets the *resource id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of Mobile Device
     pub fn resource_id(mut self, new_value: &str) -> MobiledeviceDeleteCall<'a, C, A> {
         self._resource_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MobiledeviceDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10569,8 +10514,8 @@ impl<'a, C, A> MobiledeviceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDeviceMobile`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10665,7 +10610,7 @@ impl<'a, C, A> MobiledeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile/{resourceId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceMobileReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{resourceId}", "resourceId")].iter() {
@@ -10761,41 +10706,39 @@ impl<'a, C, A> MobiledeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> MobiledeviceGetCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Immutable id of Mobile Device
+    ///
     /// Sets the *resource id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of Mobile Device
     pub fn resource_id(mut self, new_value: &str) -> MobiledeviceGetCall<'a, C, A> {
         self._resource_id = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Restrict information returned to a set of selected fields.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> MobiledeviceGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MobiledeviceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10825,8 +10768,8 @@ impl<'a, C, A> MobiledeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDeviceMobileReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10944,7 +10887,7 @@ impl<'a, C, A> MobiledeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceMobileReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -11040,71 +10983,64 @@ impl<'a, C, A> MobiledeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> MobiledeviceListCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Whether to return results in ascending or descending order. Only of use when orderBy is also used
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> MobiledeviceListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *query* query property to the given value.
-    ///
-    /// 
     /// Search string in the format given at http://support.google.com/a/bin/answer.py?hl=en&answer=1408863#search
+    ///
+    /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> MobiledeviceListCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Restrict information returned to a set of selected fields.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> MobiledeviceListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page in the list
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> MobiledeviceListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// Column to use for sorting results
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> MobiledeviceListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return. Default is 100
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> MobiledeviceListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MobiledeviceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11134,8 +11070,8 @@ impl<'a, C, A> MobiledeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDeviceMobileReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11231,7 +11167,7 @@ impl<'a, C, A> MobiledeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile/{resourceId}/action".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceMobile.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{resourceId}", "resourceId")].iter() {
@@ -11325,42 +11261,41 @@ impl<'a, C, A> MobiledeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &MobileDeviceAction) -> MobiledeviceActionCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> MobiledeviceActionCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Immutable id of Mobile Device
+    ///
     /// Sets the *resource id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of Mobile Device
     pub fn resource_id(mut self, new_value: &str) -> MobiledeviceActionCall<'a, C, A> {
         self._resource_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MobiledeviceActionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11390,8 +11325,8 @@ impl<'a, C, A> MobiledeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDeviceMobile`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11488,7 +11423,7 @@ impl<'a, C, A> MemberUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
@@ -11592,42 +11527,41 @@ impl<'a, C, A> MemberUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Member) -> MemberUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the group. If Id, it should match with id of group object
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group. If Id, it should match with id of group object
     pub fn group_key(mut self, new_value: &str) -> MemberUpdateCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
+    /// Email or immutable Id of the user. If Id, it should match with id of member object
+    ///
     /// Sets the *member key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user. If Id, it should match with id of member object
     pub fn member_key(mut self, new_value: &str) -> MemberUpdateCall<'a, C, A> {
         self._member_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11657,8 +11591,8 @@ impl<'a, C, A> MemberUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11748,7 +11682,7 @@ impl<'a, C, A> MemberGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroupMemberReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
@@ -11844,33 +11778,32 @@ impl<'a, C, A> MemberGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Email or immutable Id of the group
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group
     pub fn group_key(mut self, new_value: &str) -> MemberGetCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
+    /// Email or immutable Id of the member
+    ///
     /// Sets the *member key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the member
     pub fn member_key(mut self, new_value: &str) -> MemberGetCall<'a, C, A> {
         self._member_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11900,8 +11833,8 @@ impl<'a, C, A> MemberGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroupMemberReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11996,7 +11929,7 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -12100,32 +12033,31 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Member) -> MemberInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the group
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group
     pub fn group_key(mut self, new_value: &str) -> MemberInsertCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12155,8 +12087,8 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12253,7 +12185,7 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
@@ -12357,42 +12289,41 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Member) -> MemberPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the group. If Id, it should match with id of group object
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group. If Id, it should match with id of group object
     pub fn group_key(mut self, new_value: &str) -> MemberPatchCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
+    /// Email or immutable Id of the user. If Id, it should match with id of member object
+    ///
     /// Sets the *member key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user. If Id, it should match with id of member object
     pub fn member_key(mut self, new_value: &str) -> MemberPatchCall<'a, C, A> {
         self._member_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12422,8 +12353,8 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12512,7 +12443,7 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
@@ -12598,33 +12529,32 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Email or immutable Id of the group
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group
     pub fn group_key(mut self, new_value: &str) -> MemberDeleteCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
+    /// Email or immutable Id of the member
+    ///
     /// Sets the *member key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the member
     pub fn member_key(mut self, new_value: &str) -> MemberDeleteCall<'a, C, A> {
         self._member_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12654,8 +12584,8 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12758,7 +12688,7 @@ impl<'a, C, A> MemberListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroupMemberReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -12854,47 +12784,43 @@ impl<'a, C, A> MemberListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Email or immutable Id of the group
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group
     pub fn group_key(mut self, new_value: &str) -> MemberListCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// Sets the *roles* query property to the given value.
-    ///
-    /// 
     /// Comma separated role values to filter list results on.
+    ///
+    /// Sets the *roles* query property to the given value.
     pub fn roles(mut self, new_value: &str) -> MemberListCall<'a, C, A> {
         self._roles = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page in the list
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> MemberListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return. Default is 200
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> MemberListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12924,8 +12850,8 @@ impl<'a, C, A> MemberListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroupMemberReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13028,7 +12954,7 @@ impl<'a, C, A> NotificationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryNotification.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customer}", "customer")].iter() {
@@ -13124,47 +13050,43 @@ impl<'a, C, A> NotificationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The unique ID for the customer's Google account.
+    ///
     /// Sets the *customer* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID for the customer's Google account.
     pub fn customer(mut self, new_value: &str) -> NotificationListCall<'a, C, A> {
         self._customer = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token to specify the page of results to retrieve.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> NotificationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of notifications to return per page. The default is 100.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> NotificationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The ISO 639-1 code of the language notifications are returned in. The default is English (en).
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> NotificationListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13194,8 +13116,8 @@ impl<'a, C, A> NotificationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryNotification`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13284,7 +13206,7 @@ impl<'a, C, A> NotificationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryNotification.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customer}", "customer"), ("{notificationId}", "notificationId")].iter() {
@@ -13370,33 +13292,32 @@ impl<'a, C, A> NotificationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The unique ID for the customer's Google account. The customerId is also returned as part of the Users resource.
+    ///
     /// Sets the *customer* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID for the customer's Google account. The customerId is also returned as part of the Users resource.
     pub fn customer(mut self, new_value: &str) -> NotificationDeleteCall<'a, C, A> {
         self._customer = new_value.to_string();
         self
     }
+    /// The unique ID of the notification.
+    ///
     /// Sets the *notification id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID of the notification.
     pub fn notification_id(mut self, new_value: &str) -> NotificationDeleteCall<'a, C, A> {
         self._notification_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13426,8 +13347,8 @@ impl<'a, C, A> NotificationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryNotification`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13524,7 +13445,7 @@ impl<'a, C, A> NotificationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryNotification.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customer}", "customer"), ("{notificationId}", "notificationId")].iter() {
@@ -13628,42 +13549,41 @@ impl<'a, C, A> NotificationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Notification) -> NotificationPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The unique ID for the customer's Google account.
+    ///
     /// Sets the *customer* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID for the customer's Google account.
     pub fn customer(mut self, new_value: &str) -> NotificationPatchCall<'a, C, A> {
         self._customer = new_value.to_string();
         self
     }
+    /// The unique ID of the notification.
+    ///
     /// Sets the *notification id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID of the notification.
     pub fn notification_id(mut self, new_value: &str) -> NotificationPatchCall<'a, C, A> {
         self._notification_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13693,8 +13613,8 @@ impl<'a, C, A> NotificationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryNotification`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13791,7 +13711,7 @@ impl<'a, C, A> NotificationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryNotification.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customer}", "customer"), ("{notificationId}", "notificationId")].iter() {
@@ -13895,42 +13815,41 @@ impl<'a, C, A> NotificationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Notification) -> NotificationUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The unique ID for the customer's Google account.
+    ///
     /// Sets the *customer* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID for the customer's Google account.
     pub fn customer(mut self, new_value: &str) -> NotificationUpdateCall<'a, C, A> {
         self._customer = new_value.to_string();
         self
     }
+    /// The unique ID of the notification.
+    ///
     /// Sets the *notification id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID of the notification.
     pub fn notification_id(mut self, new_value: &str) -> NotificationUpdateCall<'a, C, A> {
         self._notification_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13960,8 +13879,8 @@ impl<'a, C, A> NotificationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryNotification`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14051,7 +13970,7 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryNotification.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customer}", "customer"), ("{notificationId}", "notificationId")].iter() {
@@ -14147,33 +14066,32 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The unique ID for the customer's Google account. The customerId is also returned as part of the Users resource.
+    ///
     /// Sets the *customer* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID for the customer's Google account. The customerId is also returned as part of the Users resource.
     pub fn customer(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
         self._customer = new_value.to_string();
         self
     }
+    /// The unique ID of the notification.
+    ///
     /// Sets the *notification id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID of the notification.
     pub fn notification_id(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
         self._notification_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14203,8 +14121,8 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryNotification`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14418,71 +14336,64 @@ impl<'a, C, A> ChromeosdeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> ChromeosdeviceListCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Whether to return results in ascending or descending order. Only of use when orderBy is also used
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> ChromeosdeviceListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *query* query property to the given value.
-    ///
-    /// 
     /// Search string in the format given at http://support.google.com/chromeos/a/bin/answer.py?hl=en&answer=1698333
+    ///
+    /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> ChromeosdeviceListCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Restrict information returned to a set of selected fields.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ChromeosdeviceListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page in the list
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ChromeosdeviceListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// Column to use for sorting results
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ChromeosdeviceListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return. Default is 100
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ChromeosdeviceListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChromeosdeviceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14512,8 +14423,8 @@ impl<'a, C, A> ChromeosdeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDeviceChromeoReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14719,50 +14630,48 @@ impl<'a, C, A> ChromeosdevicePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ChromeOsDevice) -> ChromeosdevicePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> ChromeosdevicePatchCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Immutable id of Chrome OS Device
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of Chrome OS Device
     pub fn device_id(mut self, new_value: &str) -> ChromeosdevicePatchCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Restrict information returned to a set of selected fields.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ChromeosdevicePatchCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChromeosdevicePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14792,8 +14701,8 @@ impl<'a, C, A> ChromeosdevicePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDeviceChromeo`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14984,41 +14893,39 @@ impl<'a, C, A> ChromeosdeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> ChromeosdeviceGetCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Immutable id of Chrome OS Device
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of Chrome OS Device
     pub fn device_id(mut self, new_value: &str) -> ChromeosdeviceGetCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Restrict information returned to a set of selected fields.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ChromeosdeviceGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChromeosdeviceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15048,8 +14955,8 @@ impl<'a, C, A> ChromeosdeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDeviceChromeoReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15255,50 +15162,48 @@ impl<'a, C, A> ChromeosdeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ChromeOsDevice) -> ChromeosdeviceUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> ChromeosdeviceUpdateCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Immutable id of Chrome OS Device
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of Chrome OS Device
     pub fn device_id(mut self, new_value: &str) -> ChromeosdeviceUpdateCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Restrict information returned to a set of selected fields.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ChromeosdeviceUpdateCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChromeosdeviceUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15328,8 +15233,8 @@ impl<'a, C, A> ChromeosdeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDeviceChromeo`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15416,7 +15321,7 @@ impl<'a, C, A> VerificationCodeGenerateCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/verificationCodes/generate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -15502,23 +15407,22 @@ impl<'a, C, A> VerificationCodeGenerateCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> VerificationCodeGenerateCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VerificationCodeGenerateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15548,8 +15452,8 @@ impl<'a, C, A> VerificationCodeGenerateCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserSecurity`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15636,7 +15540,7 @@ impl<'a, C, A> VerificationCodeInvalidateCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/verificationCodes/invalidate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -15722,23 +15626,22 @@ impl<'a, C, A> VerificationCodeInvalidateCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// Email or immutable Id of the user
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the user
     pub fn user_key(mut self, new_value: &str) -> VerificationCodeInvalidateCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VerificationCodeInvalidateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15768,8 +15671,8 @@ impl<'a, C, A> VerificationCodeInvalidateCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserSecurity`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15857,7 +15760,7 @@ impl<'a, C, A> VerificationCodeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/verificationCodes".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -15953,23 +15856,22 @@ impl<'a, C, A> VerificationCodeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
     pub fn user_key(mut self, new_value: &str) -> VerificationCodeListCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VerificationCodeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15999,8 +15901,8 @@ impl<'a, C, A> VerificationCodeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserSecurity`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16088,7 +15990,7 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -16184,23 +16086,22 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// Email or immutable Id of the group
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group
     pub fn group_key(mut self, new_value: &str) -> GroupGetCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16230,8 +16131,8 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroupReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16342,7 +16243,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
         }
 
         
@@ -16414,53 +16315,47 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Sets the *user key* query property to the given value.
-    ///
-    /// 
     /// Email or immutable Id of the user if only those groups are to be listed, the given user is a member of. If Id, it should match with id of user object
+    ///
+    /// Sets the *user key* query property to the given value.
     pub fn user_key(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
         self._user_key = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page in the list
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return. Default is 200
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> GroupListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *domain* query property to the given value.
-    ///
-    /// 
     /// Name of the domain. Fill this field to get groups from only this domain. To return all groups in a multi-domain fill customer field instead.
+    ///
+    /// Sets the *domain* query property to the given value.
     pub fn domain(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
         self._domain = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer* query property to the given value.
-    ///
-    /// 
     /// Immutable id of the Google Apps account. In case of multi-domain, to fetch all groups for a customer, fill this field instead of domain.
+    ///
+    /// Sets the *customer* query property to the given value.
     pub fn customer(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
         self._customer = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16490,8 +16385,8 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroupReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16579,7 +16474,7 @@ impl<'a, C, A> GroupAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/aliases".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -16675,23 +16570,22 @@ impl<'a, C, A> GroupAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Email or immutable Id of the group
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group
     pub fn group_key(mut self, new_value: &str) -> GroupAliaseListCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupAliaseListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16721,8 +16615,8 @@ impl<'a, C, A> GroupAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroupReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16817,7 +16711,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -16921,32 +16815,31 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Group) -> GroupPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the group. If Id, it should match with id of group object
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group. If Id, it should match with id of group object
     pub fn group_key(mut self, new_value: &str) -> GroupPatchCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16976,8 +16869,8 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17072,7 +16965,7 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -17176,32 +17069,31 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Group) -> GroupUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the group. If Id, it should match with id of group object
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group. If Id, it should match with id of group object
     pub fn group_key(mut self, new_value: &str) -> GroupUpdateCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17231,8 +17123,8 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17319,7 +17211,7 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -17405,23 +17297,22 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Email or immutable Id of the group
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group
     pub fn group_key(mut self, new_value: &str) -> GroupDeleteCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17451,8 +17342,8 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17547,7 +17438,7 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/aliases".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -17651,32 +17542,31 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Alias) -> GroupAliaseInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Email or immutable Id of the group
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group
     pub fn group_key(mut self, new_value: &str) -> GroupAliaseInsertCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupAliaseInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17706,8 +17596,8 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17796,7 +17686,7 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/aliases/{alias}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{alias}", "alias")].iter() {
@@ -17882,33 +17772,32 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Email or immutable Id of the group
+    ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Email or immutable Id of the group
     pub fn group_key(mut self, new_value: &str) -> GroupAliaseDeleteCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
+    /// The alias to be removed
+    ///
     /// Sets the *alias* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The alias to be removed
     pub fn alias(mut self, new_value: &str) -> GroupAliaseDeleteCall<'a, C, A> {
         self._alias = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupAliaseDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17938,8 +17827,8 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18032,7 +17921,7 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
         
@@ -18112,22 +18001,21 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Group) -> GroupInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18157,8 +18045,8 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18247,7 +18135,7 @@ impl<'a, C, A> AspDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/asps/{codeId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{codeId}", "codeId")].iter() {
@@ -18333,33 +18221,32 @@ impl<'a, C, A> AspDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
     pub fn user_key(mut self, new_value: &str) -> AspDeleteCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
+    /// The unique ID of the ASP to be deleted.
+    ///
     /// Sets the *code id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID of the ASP to be deleted.
     pub fn code_id(mut self, new_value: i32) -> AspDeleteCall<'a, C, A> {
         self._code_id = new_value;
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AspDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18389,8 +18276,8 @@ impl<'a, C, A> AspDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserSecurity`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18478,7 +18365,7 @@ impl<'a, C, A> AspListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/asps".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -18574,23 +18461,22 @@ impl<'a, C, A> AspListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
     pub fn user_key(mut self, new_value: &str) -> AspListCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AspListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18620,8 +18506,8 @@ impl<'a, C, A> AspListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserSecurity`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18711,7 +18597,7 @@ impl<'a, C, A> AspGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/asps/{codeId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserSecurity.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{codeId}", "codeId")].iter() {
@@ -18807,33 +18693,32 @@ impl<'a, C, A> AspGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
 
+    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the user in the API request. The value can be the user's primary email address, alias email address, or unique user ID.
     pub fn user_key(mut self, new_value: &str) -> AspGetCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
+    /// The unique ID of the ASP.
+    ///
     /// Sets the *code id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique ID of the ASP.
     pub fn code_id(mut self, new_value: i32) -> AspGetCall<'a, C, A> {
         self._code_id = new_value;
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AspGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18863,8 +18748,8 @@ impl<'a, C, A> AspGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserSecurity`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18952,7 +18837,7 @@ impl<'a, C, A> SchemaListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserschemaReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -19048,23 +18933,22 @@ impl<'a, C, A> SchemaListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> SchemaListCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchemaListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19094,8 +18978,8 @@ impl<'a, C, A> SchemaListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserschemaReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19185,7 +19069,7 @@ impl<'a, C, A> SchemaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserschemaReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{schemaKey}", "schemaKey")].iter() {
@@ -19281,33 +19165,32 @@ impl<'a, C, A> SchemaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> SchemaGetCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Name or immutable Id of the schema
+    ///
     /// Sets the *schema key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name or immutable Id of the schema
     pub fn schema_key(mut self, new_value: &str) -> SchemaGetCall<'a, C, A> {
         self._schema_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchemaGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19337,8 +19220,8 @@ impl<'a, C, A> SchemaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserschemaReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19435,7 +19318,7 @@ impl<'a, C, A> SchemaPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserschema.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{schemaKey}", "schemaKey")].iter() {
@@ -19539,42 +19422,41 @@ impl<'a, C, A> SchemaPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Schema) -> SchemaPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> SchemaPatchCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Name or immutable Id of the schema.
+    ///
     /// Sets the *schema key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name or immutable Id of the schema.
     pub fn schema_key(mut self, new_value: &str) -> SchemaPatchCall<'a, C, A> {
         self._schema_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchemaPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19604,8 +19486,8 @@ impl<'a, C, A> SchemaPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserschema`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19700,7 +19582,7 @@ impl<'a, C, A> SchemaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserschema.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -19804,32 +19686,31 @@ impl<'a, C, A> SchemaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Schema) -> SchemaInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> SchemaInsertCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchemaInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19859,8 +19740,8 @@ impl<'a, C, A> SchemaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserschema`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19949,7 +19830,7 @@ impl<'a, C, A> SchemaDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserschema.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{schemaKey}", "schemaKey")].iter() {
@@ -20035,33 +19916,32 @@ impl<'a, C, A> SchemaDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> SchemaDeleteCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Name or immutable Id of the schema
+    ///
     /// Sets the *schema key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name or immutable Id of the schema
     pub fn schema_key(mut self, new_value: &str) -> SchemaDeleteCall<'a, C, A> {
         self._schema_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchemaDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20091,8 +19971,8 @@ impl<'a, C, A> SchemaDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserschema`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20189,7 +20069,7 @@ impl<'a, C, A> SchemaUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryUserschema.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{schemaKey}", "schemaKey")].iter() {
@@ -20293,42 +20173,41 @@ impl<'a, C, A> SchemaUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Schema) -> SchemaUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Immutable id of the Google Apps account
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Immutable id of the Google Apps account
     pub fn customer_id(mut self, new_value: &str) -> SchemaUpdateCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Name or immutable Id of the schema.
+    ///
     /// Sets the *schema key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name or immutable Id of the schema.
     pub fn schema_key(mut self, new_value: &str) -> SchemaUpdateCall<'a, C, A> {
         self._schema_key = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchemaUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20358,8 +20237,8 @@ impl<'a, C, A> SchemaUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserschema`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

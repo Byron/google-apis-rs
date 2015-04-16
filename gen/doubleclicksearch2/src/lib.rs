@@ -109,16 +109,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -276,16 +278,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -452,7 +456,7 @@ impl Part for Conversion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRow(HashMap<String, String>);
 
 impl Part for ReportRow {}
@@ -462,7 +466,7 @@ impl Part for ReportRow {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportFiles {
     /// Use this url to download the report file.
     pub url: String,
@@ -680,7 +684,7 @@ impl RequestValue for ReportRequest {}
 /// * [get reports](struct.ReportGetCall.html) (response)
 /// * [request reports](struct.ReportRequestCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Report {
     /// Asynchronous report only. Contains a list of generated report files once the report has succesfully completed.
     pub files: Vec<ReportFiles>,
@@ -743,7 +747,7 @@ impl Part for ReportRequestTimeRange {}
 /// 
 /// * [list saved columns](struct.SavedColumnListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SavedColumnList {
     /// The saved columns being requested.
     pub items: Vec<SavedColumn>,
@@ -763,7 +767,7 @@ impl ResponseResult for SavedColumnList {}
 /// 
 /// * [list saved columns](struct.SavedColumnListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SavedColumn {
     /// The name of the saved column.
     #[serde(rename="savedColumnName")]
@@ -805,7 +809,7 @@ impl RequestValue for UpdateAvailabilityRequest {}
 /// 
 /// * [update availability conversion](struct.ConversionUpdateAvailabilityCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateAvailabilityResponse {
     /// The availabilities being returned.
     pub availabilities: Vec<Availability>,
@@ -1333,22 +1337,21 @@ impl<'a, C, A> ConversionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ConversionList) -> ConversionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1378,8 +1381,8 @@ impl<'a, C, A> ConversionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1595,115 +1598,110 @@ impl<'a, C, A> ConversionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Numeric ID of the agency.
+    ///
     /// Sets the *agency id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Numeric ID of the agency.
     pub fn agency_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._agency_id = new_value.to_string();
         self
     }
+    /// Numeric ID of the advertiser.
+    ///
     /// Sets the *advertiser id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Numeric ID of the advertiser.
     pub fn advertiser_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._advertiser_id = new_value.to_string();
         self
     }
+    /// Numeric ID of the engine account.
+    ///
     /// Sets the *engine account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Numeric ID of the engine account.
     pub fn engine_account_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._engine_account_id = new_value.to_string();
         self
     }
+    /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
+    ///
     /// Sets the *end date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
     pub fn end_date(mut self, new_value: i32) -> ConversionGetCall<'a, C, A> {
         self._end_date = new_value;
         self
     }
+    /// The number of conversions to return per call.
+    ///
     /// Sets the *row count* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The number of conversions to return per call.
     pub fn row_count(mut self, new_value: i32) -> ConversionGetCall<'a, C, A> {
         self._row_count = new_value;
         self
     }
+    /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
+    ///
     /// Sets the *start date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
     pub fn start_date(mut self, new_value: i32) -> ConversionGetCall<'a, C, A> {
         self._start_date = new_value;
         self
     }
+    /// The 0-based starting index for retrieving conversions results.
+    ///
     /// Sets the *start row* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The 0-based starting index for retrieving conversions results.
     pub fn start_row(mut self, new_value: u32) -> ConversionGetCall<'a, C, A> {
         self._start_row = new_value;
         self
     }
-    /// Sets the *criterion id* query property to the given value.
-    ///
-    /// 
     /// Numeric ID of the criterion.
+    ///
+    /// Sets the *criterion id* query property to the given value.
     pub fn criterion_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._criterion_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *campaign id* query property to the given value.
-    ///
-    /// 
     /// Numeric ID of the campaign.
+    ///
+    /// Sets the *campaign id* query property to the given value.
     pub fn campaign_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._campaign_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *ad id* query property to the given value.
-    ///
-    /// 
     /// Numeric ID of the ad.
+    ///
+    /// Sets the *ad id* query property to the given value.
     pub fn ad_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._ad_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *ad group id* query property to the given value.
-    ///
-    /// 
     /// Numeric ID of the ad group.
+    ///
+    /// Sets the *ad group id* query property to the given value.
     pub fn ad_group_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._ad_group_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1733,8 +1731,8 @@ impl<'a, C, A> ConversionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1907,22 +1905,21 @@ impl<'a, C, A> ConversionUpdateAvailabilityCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UpdateAvailabilityRequest) -> ConversionUpdateAvailabilityCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionUpdateAvailabilityCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1952,8 +1949,8 @@ impl<'a, C, A> ConversionUpdateAvailabilityCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2140,92 +2137,91 @@ impl<'a, C, A> ConversionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ConversionList) -> ConversionPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Numeric ID of the advertiser.
+    ///
     /// Sets the *advertiser id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Numeric ID of the advertiser.
     pub fn advertiser_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, A> {
         self._advertiser_id = new_value.to_string();
         self
     }
+    /// Numeric ID of the agency.
+    ///
     /// Sets the *agency id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Numeric ID of the agency.
     pub fn agency_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, A> {
         self._agency_id = new_value.to_string();
         self
     }
+    /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
+    ///
     /// Sets the *end date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
     pub fn end_date(mut self, new_value: i32) -> ConversionPatchCall<'a, C, A> {
         self._end_date = new_value;
         self
     }
+    /// Numeric ID of the engine account.
+    ///
     /// Sets the *engine account id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Numeric ID of the engine account.
     pub fn engine_account_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, A> {
         self._engine_account_id = new_value.to_string();
         self
     }
+    /// The number of conversions to return per call.
+    ///
     /// Sets the *row count* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The number of conversions to return per call.
     pub fn row_count(mut self, new_value: i32) -> ConversionPatchCall<'a, C, A> {
         self._row_count = new_value;
         self
     }
+    /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
+    ///
     /// Sets the *start date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
     pub fn start_date(mut self, new_value: i32) -> ConversionPatchCall<'a, C, A> {
         self._start_date = new_value;
         self
     }
+    /// The 0-based starting index for retrieving conversions results.
+    ///
     /// Sets the *start row* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The 0-based starting index for retrieving conversions results.
     pub fn start_row(mut self, new_value: u32) -> ConversionPatchCall<'a, C, A> {
         self._start_row = new_value;
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2255,8 +2251,8 @@ impl<'a, C, A> ConversionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2429,22 +2425,21 @@ impl<'a, C, A> ConversionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ConversionList) -> ConversionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2474,8 +2469,8 @@ impl<'a, C, A> ConversionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2661,33 +2656,32 @@ impl<'a, C, A> SavedColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// DS ID of the agency.
+    ///
     /// Sets the *agency id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// DS ID of the agency.
     pub fn agency_id(mut self, new_value: &str) -> SavedColumnListCall<'a, C, A> {
         self._agency_id = new_value.to_string();
         self
     }
+    /// DS ID of the advertiser.
+    ///
     /// Sets the *advertiser id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// DS ID of the advertiser.
     pub fn advertiser_id(mut self, new_value: &str) -> SavedColumnListCall<'a, C, A> {
         self._advertiser_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SavedColumnListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2717,8 +2711,8 @@ impl<'a, C, A> SavedColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2896,33 +2890,32 @@ impl<'a, C, A> ReportGetFileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// ID of the report.
+    ///
     /// Sets the *report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the report.
     pub fn report_id(mut self, new_value: &str) -> ReportGetFileCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
+    /// The index of the report fragment to download.
+    ///
     /// Sets the *report fragment* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The index of the report fragment to download.
     pub fn report_fragment(mut self, new_value: i32) -> ReportGetFileCall<'a, C, A> {
         self._report_fragment = new_value;
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGetFileCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2952,8 +2945,8 @@ impl<'a, C, A> ReportGetFileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3126,22 +3119,21 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ReportRequest) -> ReportGenerateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGenerateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3171,8 +3163,8 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3356,23 +3348,22 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// ID of the report request being polled.
+    ///
     /// Sets the *report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the report request being polled.
     pub fn report_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3402,8 +3393,8 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3576,22 +3567,21 @@ impl<'a, C, A> ReportRequestCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ReportRequest) -> ReportRequestCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportRequestCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3621,8 +3611,8 @@ impl<'a, C, A> ReportRequestCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

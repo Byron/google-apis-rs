@@ -117,16 +117,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -298,16 +300,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -451,7 +455,7 @@ impl ResponseResult for TaskList {}
 /// 
 /// * [list tasklists](struct.TasklistListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskLists {
     /// Token that can be used to request the next page of this result.
     #[serde(rename="nextPageToken")]
@@ -495,7 +499,7 @@ impl Part for TaskLinks {}
 /// 
 /// * [list tasks](struct.TaskListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tasks {
     /// Token used to access the next page of this result.
     #[serde(rename="nextPageToken")]
@@ -1091,103 +1095,92 @@ impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
-    /// Sets the *updated min* query property to the given value.
-    ///
-    /// 
     /// Lower bound for a task's last modification time (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by last modification time.
+    ///
+    /// Sets the *updated min* query property to the given value.
     pub fn updated_min(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *show hidden* query property to the given value.
-    ///
-    /// 
     /// Flag indicating whether hidden tasks are returned in the result. Optional. The default is False.
+    ///
+    /// Sets the *show hidden* query property to the given value.
     pub fn show_hidden(mut self, new_value: bool) -> TaskListCall<'a, C, A> {
         self._show_hidden = Some(new_value);
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// Flag indicating whether deleted tasks are returned in the result. Optional. The default is False.
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> TaskListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
-    /// Sets the *show completed* query property to the given value.
-    ///
-    /// 
     /// Flag indicating whether completed tasks are returned in the result. Optional. The default is True.
+    ///
+    /// Sets the *show completed* query property to the given value.
     pub fn show_completed(mut self, new_value: bool) -> TaskListCall<'a, C, A> {
         self._show_completed = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying the result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of task lists returned on one page. Optional. The default is 100.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._max_results = Some(new_value.to_string());
         self
     }
-    /// Sets the *due min* query property to the given value.
-    ///
-    /// 
     /// Lower bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
+    ///
+    /// Sets the *due min* query property to the given value.
     pub fn due_min(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._due_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *due max* query property to the given value.
-    ///
-    /// 
     /// Upper bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
+    ///
+    /// Sets the *due max* query property to the given value.
     pub fn due_max(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._due_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *completed min* query property to the given value.
-    ///
-    /// 
     /// Lower bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
+    ///
+    /// Sets the *completed min* query property to the given value.
     pub fn completed_min(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._completed_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *completed max* query property to the given value.
-    ///
-    /// 
     /// Upper bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
+    ///
+    /// Sets the *completed max* query property to the given value.
     pub fn completed_max(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._completed_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1217,8 +1210,8 @@ impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1419,42 +1412,41 @@ impl<'a, C, A> TaskUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Task) -> TaskUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskUpdateCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
+    /// Task identifier.
+    ///
     /// Sets the *task* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task identifier.
     pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a, C, A> {
         self._task = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1484,8 +1476,8 @@ impl<'a, C, A> TaskUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1686,42 +1678,41 @@ impl<'a, C, A> TaskPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Task) -> TaskPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskPatchCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
+    /// Task identifier.
+    ///
     /// Sets the *task* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task identifier.
     pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a, C, A> {
         self._task = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1751,8 +1742,8 @@ impl<'a, C, A> TaskPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1925,23 +1916,22 @@ impl<'a, C, A> TaskClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskClearCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskClearCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1971,8 +1961,8 @@ impl<'a, C, A> TaskClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2168,49 +2158,46 @@ impl<'a, C, A> TaskMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskMoveCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
+    /// Task identifier.
+    ///
     /// Sets the *task* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task identifier.
     pub fn task(mut self, new_value: &str) -> TaskMoveCall<'a, C, A> {
         self._task = new_value.to_string();
         self
     }
-    /// Sets the *previous* query property to the given value.
-    ///
-    /// 
     /// New previous sibling task identifier. If the task is moved to the first position among its siblings, this parameter is omitted. Optional.
+    ///
+    /// Sets the *previous* query property to the given value.
     pub fn previous(mut self, new_value: &str) -> TaskMoveCall<'a, C, A> {
         self._previous = Some(new_value.to_string());
         self
     }
-    /// Sets the *parent* query property to the given value.
-    ///
-    /// 
     /// New parent task identifier. If the task is moved to the top level, this parameter is omitted. Optional.
+    ///
+    /// Sets the *parent* query property to the given value.
     pub fn parent(mut self, new_value: &str) -> TaskMoveCall<'a, C, A> {
         self._parent = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskMoveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2240,8 +2227,8 @@ impl<'a, C, A> TaskMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2416,33 +2403,32 @@ impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskDeleteCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
+    /// Task identifier.
+    ///
     /// Sets the *task* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task identifier.
     pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a, C, A> {
         self._task = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2472,8 +2458,8 @@ impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2659,33 +2645,32 @@ impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskGetCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
+    /// Task identifier.
+    ///
     /// Sets the *task* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task identifier.
     pub fn task(mut self, new_value: &str) -> TaskGetCall<'a, C, A> {
         self._task = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2715,8 +2700,8 @@ impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2925,48 +2910,45 @@ impl<'a, C, A> TaskInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Task) -> TaskInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskInsertCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
-    /// Sets the *previous* query property to the given value.
-    ///
-    /// 
     /// Previous sibling task identifier. If the task is created at the first position among its siblings, this parameter is omitted. Optional.
+    ///
+    /// Sets the *previous* query property to the given value.
     pub fn previous(mut self, new_value: &str) -> TaskInsertCall<'a, C, A> {
         self._previous = Some(new_value.to_string());
         self
     }
-    /// Sets the *parent* query property to the given value.
-    ///
-    /// 
     /// Parent task identifier. If the task is created at the top level, this parameter is omitted. Optional.
+    ///
+    /// Sets the *parent* query property to the given value.
     pub fn parent(mut self, new_value: &str) -> TaskInsertCall<'a, C, A> {
         self._parent = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2996,8 +2978,8 @@ impl<'a, C, A> TaskInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3165,29 +3147,26 @@ impl<'a, C, A> TasklistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying the result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TasklistListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of task lists returned on one page. Optional. The default is 100.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: &str) -> TasklistListCall<'a, C, A> {
         self._max_results = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3217,8 +3196,8 @@ impl<'a, C, A> TasklistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3417,32 +3396,31 @@ impl<'a, C, A> TasklistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &TaskList) -> TasklistUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TasklistUpdateCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3472,8 +3450,8 @@ impl<'a, C, A> TasklistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3646,23 +3624,22 @@ impl<'a, C, A> TasklistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TasklistDeleteCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3692,8 +3669,8 @@ impl<'a, C, A> TasklistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3892,32 +3869,31 @@ impl<'a, C, A> TasklistPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &TaskList) -> TasklistPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TasklistPatchCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3947,8 +3923,8 @@ impl<'a, C, A> TasklistPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4121,22 +4097,21 @@ impl<'a, C, A> TasklistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &TaskList) -> TasklistInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4166,8 +4141,8 @@ impl<'a, C, A> TasklistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4351,23 +4326,22 @@ impl<'a, C, A> TasklistGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Task list identifier.
+    ///
     /// Sets the *tasklist* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TasklistGetCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4397,8 +4371,8 @@ impl<'a, C, A> TasklistGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

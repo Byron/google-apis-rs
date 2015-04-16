@@ -107,16 +107,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -261,16 +263,18 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -321,7 +325,7 @@ impl<'a, C, A> Audit<C, A>
 /// 
 /// * [list activities](struct.ActivityListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activities {
     /// Each record in read response.
     pub items: Vec<Activity>,
@@ -338,7 +342,7 @@ impl ResponseResult for Activities {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityActor {
     /// ID of application which interacted on behalf of the user.
     #[serde(rename="applicationId")]
@@ -360,7 +364,7 @@ impl Part for ActivityActor {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityId {
     /// Unique qualifier if multiple events have the same time.
     #[serde(rename="uniqQualifier")]
@@ -383,7 +387,7 @@ impl Part for ActivityId {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activity {
     /// Kind of resource this is.
     pub kind: String,
@@ -408,7 +412,7 @@ impl Part for Activity {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityEventsParameters {
     /// Name of the parameter.
     pub name: String,
@@ -424,7 +428,7 @@ impl Part for ActivityEventsParameters {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityEvents {
     /// Type of event.
     #[serde(rename="eventType")]
@@ -730,105 +734,95 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Represents the customer who is the owner of target object on which action was performed.
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Represents the customer who is the owner of target object on which action was performed.
     pub fn customer_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Application ID of the application on which the event was performed.
+    ///
     /// Sets the *application id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Application ID of the application on which the event was performed.
     pub fn application_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._application_id = new_value.to_string();
         self
     }
-    /// Sets the *start time* query property to the given value.
-    ///
-    /// 
     /// Return events which occured at or after this time.
+    ///
+    /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Number of activity records to be shown in each page.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ActivityListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *event name* query property to the given value.
-    ///
-    /// 
     /// Name of the event being queried.
+    ///
+    /// Sets the *event name* query property to the given value.
     pub fn event_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._event_name = Some(new_value.to_string());
         self
     }
-    /// Sets the *end time* query property to the given value.
-    ///
-    /// 
     /// Return events which occured at or before this time.
+    ///
+    /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *continuation token* query property to the given value.
-    ///
-    /// 
     /// Next page URL.
+    ///
+    /// Sets the *continuation token* query property to the given value.
     pub fn continuation_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._continuation_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *caller* query property to the given value.
-    ///
-    /// 
     /// Type of the caller.
+    ///
+    /// Sets the *caller* query property to the given value.
     pub fn caller(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._caller = Some(new_value.to_string());
         self
     }
-    /// Sets the *actor ip address* query property to the given value.
-    ///
-    /// 
     /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
+    ///
+    /// Sets the *actor ip address* query property to the given value.
     pub fn actor_ip_address(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._actor_ip_address = Some(new_value.to_string());
         self
     }
-    /// Sets the *actor email* query property to the given value.
-    ///
-    /// 
     /// Email address of the user who performed the action.
+    ///
+    /// Sets the *actor email* query property to the given value.
     pub fn actor_email(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._actor_email = Some(new_value.to_string());
         self
     }
-    /// Sets the *actor application id* query property to the given value.
-    ///
-    /// 
     /// Application ID of the application which interacted on behalf of the user while performing the event.
+    ///
+    /// Sets the *actor application id* query property to the given value.
     pub fn actor_application_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._actor_application_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self

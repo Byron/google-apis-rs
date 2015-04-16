@@ -157,16 +157,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -351,16 +353,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -459,7 +463,7 @@ impl Part for EventGadget {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FreeBusyCalendar {
     /// List of time ranges during which this calendar should be regarded as busy.
     pub busy: Vec<TimePeriod>,
@@ -500,7 +504,7 @@ impl Part for AclRuleScope {}
 /// 
 /// * [list settings](struct.SettingListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Settings {
     /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
     #[serde(rename="nextPageToken")]
@@ -643,7 +647,7 @@ impl Part for CalendarListEntryNotificationSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ColorDefinition {
     /// The foreground color that can be used to write on top of a background with 'background' color.
     pub foreground: String,
@@ -684,7 +688,7 @@ impl Part for EventDateTime {}
 /// * [watch settings](struct.SettingWatchCall.html) (none)
 /// * [get settings](struct.SettingGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Setting {
     /// Type of the resource ("calendar#setting").
     pub kind: String,
@@ -726,7 +730,7 @@ impl Part for EventCreator {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorType {
     /// Domain, or broad category, of the error.
     pub domain: String,
@@ -785,7 +789,7 @@ impl ResponseResult for AclRule {}
 /// 
 /// * [list acl](struct.AclListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Acl {
     /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
     #[serde(rename="nextPageToken")]
@@ -814,7 +818,7 @@ impl ResponseResult for Acl {}
 /// * [instances events](struct.EventInstanceCall.html) (response)
 /// * [list events](struct.EventListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Events {
     /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
     #[serde(rename="nextPageToken")]
@@ -941,7 +945,7 @@ impl Part for EventAttendee {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FreeBusyGroup {
     /// Optional error(s) (if computation for the group failed).
     pub errors: Vec<ErrorType>,
@@ -978,7 +982,7 @@ impl Part for EventReminders {}
 /// 
 /// * [list calendar list](struct.CalendarListListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CalendarList {
     /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
     #[serde(rename="nextPageToken")]
@@ -1035,7 +1039,7 @@ impl Part for FreeBusyRequestItem {}
 /// 
 /// * [query freebusy](struct.FreebusyQueryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FreeBusyResponse {
     /// The end of the interval.
     #[serde(rename="timeMax")]
@@ -1063,7 +1067,7 @@ impl ResponseResult for FreeBusyResponse {}
 /// 
 /// * [get colors](struct.ColorGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Colors {
     /// Palette of calendar colors, mapping from the color ID to its definition. A calendarListEntry resource refers to one of these color IDs in its color field. Read-only.
     pub calendar: HashMap<String, ColorDefinition>,
@@ -1171,7 +1175,7 @@ impl Part for EventReminder {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimePeriod {
     /// The (inclusive) start of the time period.
     pub start: String,
@@ -2577,22 +2581,21 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &FreeBusyRequest) -> FreebusyQueryCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FreebusyQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2622,8 +2625,8 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2796,40 +2799,36 @@ impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Sets the *sync token* query property to the given value.
-    ///
-    /// 
     /// Token obtained from the nextSyncToken field returned on the last page of results from the previous list request. It makes the result of this list request contain only entries that have changed since then.
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
+    ///
+    /// Sets the *sync token* query property to the given value.
     pub fn sync_token(mut self, new_value: &str) -> SettingListCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying which result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> SettingListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> SettingListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SettingListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2859,8 +2858,8 @@ impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3048,49 +3047,45 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> SettingWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *sync token* query property to the given value.
-    ///
-    /// 
     /// Token obtained from the nextSyncToken field returned on the last page of results from the previous list request. It makes the result of this list request contain only entries that have changed since then.
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
+    ///
+    /// Sets the *sync token* query property to the given value.
     pub fn sync_token(mut self, new_value: &str) -> SettingWatchCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying which result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> SettingWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> SettingWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SettingWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3120,8 +3115,8 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3305,23 +3300,22 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The id of the user setting.
+    ///
     /// Sets the *setting* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id of the user setting.
     pub fn setting(mut self, new_value: &str) -> SettingGetCall<'a, C, A> {
         self._setting = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SettingGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3351,8 +3345,8 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3556,40 +3550,38 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CalendarListEntry) -> CalendarListUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *color rgb format* query property to the given value.
-    ///
-    /// 
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
+    ///
+    /// Sets the *color rgb format* query property to the given value.
     pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListUpdateCall<'a, C, A> {
         self._color_rgb_format = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3619,8 +3611,8 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3793,23 +3785,22 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3839,8 +3830,8 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4024,23 +4015,22 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4070,8 +4060,8 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4259,65 +4249,58 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Sets the *sync token* query property to the given value.
-    ///
-    /// 
     /// Token obtained from the nextSyncToken field returned on the last page of results from the previous list request. It makes the result of this list request contain only entries that have changed since then. If only read-only fields such as calendar properties or ACLs have changed, the entry won't be returned. All entries deleted and hidden since the previous list request will always be in the result set and it is not allowed to set showDeleted neither showHidden to False.
     /// To ensure client state consistency minAccessRole query parameter cannot be specified together with nextSyncToken.
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
+    ///
+    /// Sets the *sync token* query property to the given value.
     pub fn sync_token(mut self, new_value: &str) -> CalendarListListCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *show hidden* query property to the given value.
-    ///
-    /// 
     /// Whether to show hidden entries. Optional. The default is False.
+    ///
+    /// Sets the *show hidden* query property to the given value.
     pub fn show_hidden(mut self, new_value: bool) -> CalendarListListCall<'a, C, A> {
         self._show_hidden = Some(new_value);
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// Whether to include deleted calendar list entries in the result. Optional. The default is False.
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> CalendarListListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying which result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CalendarListListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *min access role* query property to the given value.
-    ///
-    /// 
     /// The minimum access role for the user in the returned entires. Optional. The default is no restriction.
+    ///
+    /// Sets the *min access role* query property to the given value.
     pub fn min_access_role(mut self, new_value: &str) -> CalendarListListCall<'a, C, A> {
         self._min_access_role = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> CalendarListListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4347,8 +4330,8 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4526,30 +4509,28 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CalendarListEntry) -> CalendarListInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *color rgb format* query property to the given value.
-    ///
-    /// 
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
+    ///
+    /// Sets the *color rgb format* query property to the given value.
     pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListInsertCall<'a, C, A> {
         self._color_rgb_format = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4579,8 +4560,8 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4784,40 +4765,38 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CalendarListEntry) -> CalendarListPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *color rgb format* query property to the given value.
-    ///
-    /// 
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
+    ///
+    /// Sets the *color rgb format* query property to the given value.
     pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListPatchCall<'a, C, A> {
         self._color_rgb_format = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4847,8 +4826,8 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5051,74 +5030,67 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> CalendarListWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *sync token* query property to the given value.
-    ///
-    /// 
     /// Token obtained from the nextSyncToken field returned on the last page of results from the previous list request. It makes the result of this list request contain only entries that have changed since then. If only read-only fields such as calendar properties or ACLs have changed, the entry won't be returned. All entries deleted and hidden since the previous list request will always be in the result set and it is not allowed to set showDeleted neither showHidden to False.
     /// To ensure client state consistency minAccessRole query parameter cannot be specified together with nextSyncToken.
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
+    ///
+    /// Sets the *sync token* query property to the given value.
     pub fn sync_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *show hidden* query property to the given value.
-    ///
-    /// 
     /// Whether to show hidden entries. Optional. The default is False.
+    ///
+    /// Sets the *show hidden* query property to the given value.
     pub fn show_hidden(mut self, new_value: bool) -> CalendarListWatchCall<'a, C, A> {
         self._show_hidden = Some(new_value);
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// Whether to include deleted calendar list entries in the result. Optional. The default is False.
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> CalendarListWatchCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying which result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *min access role* query property to the given value.
-    ///
-    /// 
     /// The minimum access role for the user in the returned entires. Optional. The default is no restriction.
+    ///
+    /// Sets the *min access role* query property to the given value.
     pub fn min_access_role(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, A> {
         self._min_access_role = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> CalendarListWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5148,8 +5120,8 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5348,32 +5320,31 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Calendar) -> CalendarPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5403,8 +5374,8 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5577,23 +5548,22 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5623,8 +5593,8 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5808,23 +5778,22 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5854,8 +5823,8 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6028,23 +5997,22 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarClearCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarClearCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6074,8 +6042,8 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6248,22 +6216,21 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Calendar) -> CalendarInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6293,8 +6260,8 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6493,32 +6460,31 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Calendar) -> CalendarUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6548,8 +6514,8 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6768,67 +6734,62 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> AclWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclWatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *sync token* query property to the given value.
-    ///
-    /// 
     /// Token obtained from the nextSyncToken field returned on the last page of results from the previous list request. It makes the result of this list request contain only entries that have changed since then. All entries deleted since the previous list request will always be in the result set and it is not allowed to set showDeleted to False.
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
+    ///
+    /// Sets the *sync token* query property to the given value.
     pub fn sync_token(mut self, new_value: &str) -> AclWatchCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> AclWatchCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying which result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AclWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AclWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6858,8 +6819,8 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7058,32 +7019,31 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AclRule) -> AclInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclInsertCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7113,8 +7073,8 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7315,42 +7275,41 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AclRule) -> AclUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// ACL rule identifier.
+    ///
     /// Sets the *rule id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ACL rule identifier.
     pub fn rule_id(mut self, new_value: &str) -> AclUpdateCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7380,8 +7339,8 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7582,42 +7541,41 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AclRule) -> AclPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// ACL rule identifier.
+    ///
     /// Sets the *rule id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ACL rule identifier.
     pub fn rule_id(mut self, new_value: &str) -> AclPatchCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7647,8 +7605,8 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7756,7 +7714,7 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         let mut url = "https://www.googleapis.com/calendar/v3/calendars/{calendarId}/acl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{calendarId}", "calendarId")].iter() {
@@ -7852,58 +7810,53 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclListCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *sync token* query property to the given value.
-    ///
-    /// 
     /// Token obtained from the nextSyncToken field returned on the last page of results from the previous list request. It makes the result of this list request contain only entries that have changed since then. All entries deleted since the previous list request will always be in the result set and it is not allowed to set showDeleted to False.
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
+    ///
+    /// Sets the *sync token* query property to the given value.
     pub fn sync_token(mut self, new_value: &str) -> AclListCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> AclListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying which result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AclListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AclListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7933,8 +7886,8 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8109,33 +8062,32 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// ACL rule identifier.
+    ///
     /// Sets the *rule id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ACL rule identifier.
     pub fn rule_id(mut self, new_value: &str) -> AclDeleteCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8165,8 +8117,8 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8352,33 +8304,32 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// ACL rule identifier.
+    ///
     /// Sets the *rule id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ACL rule identifier.
     pub fn rule_id(mut self, new_value: &str) -> AclGetCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8408,8 +8359,8 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8571,22 +8522,21 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8616,8 +8566,8 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8775,13 +8725,12 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColorGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8811,8 +8760,8 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8992,41 +8941,39 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// Event identifier.
+    ///
     /// Sets the *event id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventDeleteCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
-    /// Sets the *send notifications* query property to the given value.
-    ///
-    /// 
     /// Whether to send notifications about the deletion of the event. Optional. The default is False.
+    ///
+    /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventDeleteCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9056,8 +9003,8 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9266,48 +9213,45 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Event) -> EventInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventInsertCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *send notifications* query property to the given value.
-    ///
-    /// 
     /// Whether to send notifications about the creation of the new event. Optional. The default is False.
+    ///
+    /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventInsertCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
-    /// Sets the *max attendees* query property to the given value.
-    ///
-    /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
+    ///
+    /// Sets the *max attendees* query property to the given value.
     pub fn max_attendees(mut self, new_value: i32) -> EventInsertCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9337,8 +9281,8 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9537,32 +9481,31 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Event) -> EventImportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventImportCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9592,8 +9535,8 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9824,105 +9767,95 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// Recurring event identifier.
+    ///
     /// Sets the *event id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Recurring event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
-    /// Sets the *time zone* query property to the given value.
-    ///
-    /// 
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
+    ///
+    /// Sets the *time zone* query property to the given value.
     pub fn time_zone(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._time_zone = Some(new_value.to_string());
         self
     }
-    /// Sets the *time min* query property to the given value.
-    ///
-    /// 
     /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
+    ///
+    /// Sets the *time min* query property to the given value.
     pub fn time_min(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._time_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *time max* query property to the given value.
-    ///
-    /// 
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
+    ///
+    /// Sets the *time max* query property to the given value.
     pub fn time_max(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._time_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events will still be included if singleEvents is False. Optional. The default is False.
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> EventInstanceCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying which result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *original start* query property to the given value.
-    ///
-    /// 
     /// The original start time of the instance in the result. Optional.
+    ///
+    /// Sets the *original start* query property to the given value.
     pub fn original_start(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._original_start = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> EventInstanceCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *max attendees* query property to the given value.
-    ///
-    /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
+    ///
+    /// Sets the *max attendees* query property to the given value.
     pub fn max_attendees(mut self, new_value: i32) -> EventInstanceCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
-    /// Sets the *always include email* query property to the given value.
-    ///
-    /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    ///
+    /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventInstanceCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9952,8 +9885,8 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10154,57 +10087,53 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// Event identifier.
+    ///
     /// Sets the *event id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventGetCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
-    /// Sets the *time zone* query property to the given value.
-    ///
-    /// 
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
+    ///
+    /// Sets the *time zone* query property to the given value.
     pub fn time_zone(mut self, new_value: &str) -> EventGetCall<'a, C, A> {
         self._time_zone = Some(new_value.to_string());
         self
     }
-    /// Sets the *max attendees* query property to the given value.
-    ///
-    /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
+    ///
+    /// Sets the *max attendees* query property to the given value.
     pub fn max_attendees(mut self, new_value: i32) -> EventGetCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
-    /// Sets the *always include email* query property to the given value.
-    ///
-    /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    ///
+    /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventGetCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10234,8 +10163,8 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10512,51 +10441,44 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *updated min* query property to the given value.
-    ///
-    /// 
     /// Lower bound for an event's last modification time (as a RFC 3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
+    ///
+    /// Sets the *updated min* query property to the given value.
     pub fn updated_min(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *time zone* query property to the given value.
-    ///
-    /// 
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
+    ///
+    /// Sets the *time zone* query property to the given value.
     pub fn time_zone(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._time_zone = Some(new_value.to_string());
         self
     }
-    /// Sets the *time min* query property to the given value.
-    ///
-    /// 
     /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
+    ///
+    /// Sets the *time min* query property to the given value.
     pub fn time_min(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._time_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *time max* query property to the given value.
-    ///
-    /// 
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
+    ///
+    /// Sets the *time max* query property to the given value.
     pub fn time_max(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._time_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *sync token* query property to the given value.
-    ///
-    /// 
     /// Token obtained from the nextSyncToken field returned on the last page of results from the previous list request. It makes the result of this list request contain only entries that have changed since then. All events deleted since the previous list request will always be in the result set and it is not allowed to set showDeleted to False.
     /// There are several query parameters that cannot be specified together with nextSyncToken to ensure consistency of the client state.
     /// 
@@ -10571,115 +10493,104 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// - updatedMin If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
+    ///
+    /// Sets the *sync token* query property to the given value.
     pub fn sync_token(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *single events* query property to the given value.
-    ///
-    /// 
     /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.
+    ///
+    /// Sets the *single events* query property to the given value.
     pub fn single_events(mut self, new_value: bool) -> EventListCall<'a, C, A> {
         self._single_events = Some(new_value);
         self
     }
-    /// Sets the *show hidden invitations* query property to the given value.
-    ///
-    /// 
     /// Whether to include hidden invitations in the result. Optional. The default is False.
+    ///
+    /// Sets the *show hidden invitations* query property to the given value.
     pub fn show_hidden_invitations(mut self, new_value: bool) -> EventListCall<'a, C, A> {
         self._show_hidden_invitations = Some(new_value);
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> EventListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
+    /// Extended properties constraint specified as propertyName=value. Matches only shared properties. This parameter might be repeated multiple times to return events that match all given constraints.
+    ///
     /// Append the given value to the *shared extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Extended properties constraint specified as propertyName=value. Matches only shared properties. This parameter might be repeated multiple times to return events that match all given constraints.
     pub fn add_shared_extended_property(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._shared_extended_property.push(new_value.to_string());
         self
     }
-    /// Sets the *q* query property to the given value.
-    ///
-    /// 
     /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.
+    ///
+    /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
+    /// Extended properties constraint specified as propertyName=value. Matches only private properties. This parameter might be repeated multiple times to return events that match all given constraints.
+    ///
     /// Append the given value to the *private extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Extended properties constraint specified as propertyName=value. Matches only private properties. This parameter might be repeated multiple times to return events that match all given constraints.
     pub fn add_private_extended_property(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._private_extended_property.push(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying which result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> EventListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *max attendees* query property to the given value.
-    ///
-    /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
+    ///
+    /// Sets the *max attendees* query property to the given value.
     pub fn max_attendees(mut self, new_value: i32) -> EventListCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
-    /// Sets the *i cal uid* query property to the given value.
-    ///
-    /// 
     /// Specifies event ID in the iCalendar format to be included in the response. Optional.
+    ///
+    /// Sets the *i cal uid* query property to the given value.
     pub fn i_cal_uid(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
-    /// Sets the *always include email* query property to the given value.
-    ///
-    /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    ///
+    /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventListCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10709,8 +10620,8 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10926,66 +10837,62 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Event) -> EventPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// Event identifier.
+    ///
     /// Sets the *event id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventPatchCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
-    /// Sets the *send notifications* query property to the given value.
-    ///
-    /// 
     /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.
+    ///
+    /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventPatchCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
-    /// Sets the *max attendees* query property to the given value.
-    ///
-    /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
+    ///
+    /// Sets the *max attendees* query property to the given value.
     pub fn max_attendees(mut self, new_value: i32) -> EventPatchCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
-    /// Sets the *always include email* query property to the given value.
-    ///
-    /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    ///
+    /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventPatchCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11015,8 +10922,8 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11209,51 +11116,49 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Calendar identifier of the source calendar where the event currently is on.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier of the source calendar where the event currently is on.
     pub fn calendar_id(mut self, new_value: &str) -> EventMoveCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// Event identifier.
+    ///
     /// Sets the *event id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventMoveCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
+    /// Calendar identifier of the target calendar where the event is to be moved to.
+    ///
     /// Sets the *destination* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier of the target calendar where the event is to be moved to.
     pub fn destination(mut self, new_value: &str) -> EventMoveCall<'a, C, A> {
         self._destination = new_value.to_string();
         self
     }
-    /// Sets the *send notifications* query property to the given value.
-    ///
-    /// 
     /// Whether to send notifications about the change of the event's organizer. Optional. The default is False.
+    ///
+    /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventMoveCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventMoveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11283,8 +11188,8 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11500,66 +11405,62 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Event) -> EventUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// Event identifier.
+    ///
     /// Sets the *event id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventUpdateCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
-    /// Sets the *send notifications* query property to the given value.
-    ///
-    /// 
     /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.
+    ///
+    /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventUpdateCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
-    /// Sets the *max attendees* query property to the given value.
-    ///
-    /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
+    ///
+    /// Sets the *max attendees* query property to the given value.
     pub fn max_attendees(mut self, new_value: i32) -> EventUpdateCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
-    /// Sets the *always include email* query property to the given value.
-    ///
-    /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    ///
+    /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventUpdateCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11589,8 +11490,8 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11882,60 +11783,53 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> EventWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Sets the *updated min* query property to the given value.
-    ///
-    /// 
     /// Lower bound for an event's last modification time (as a RFC 3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
+    ///
+    /// Sets the *updated min* query property to the given value.
     pub fn updated_min(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *time zone* query property to the given value.
-    ///
-    /// 
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
+    ///
+    /// Sets the *time zone* query property to the given value.
     pub fn time_zone(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._time_zone = Some(new_value.to_string());
         self
     }
-    /// Sets the *time min* query property to the given value.
-    ///
-    /// 
     /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
+    ///
+    /// Sets the *time min* query property to the given value.
     pub fn time_min(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._time_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *time max* query property to the given value.
-    ///
-    /// 
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
+    ///
+    /// Sets the *time max* query property to the given value.
     pub fn time_max(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._time_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *sync token* query property to the given value.
-    ///
-    /// 
     /// Token obtained from the nextSyncToken field returned on the last page of results from the previous list request. It makes the result of this list request contain only entries that have changed since then. All events deleted since the previous list request will always be in the result set and it is not allowed to set showDeleted to False.
     /// There are several query parameters that cannot be specified together with nextSyncToken to ensure consistency of the client state.
     /// 
@@ -11950,115 +11844,104 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// - updatedMin If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
+    ///
+    /// Sets the *sync token* query property to the given value.
     pub fn sync_token(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *single events* query property to the given value.
-    ///
-    /// 
     /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.
+    ///
+    /// Sets the *single events* query property to the given value.
     pub fn single_events(mut self, new_value: bool) -> EventWatchCall<'a, C, A> {
         self._single_events = Some(new_value);
         self
     }
-    /// Sets the *show hidden invitations* query property to the given value.
-    ///
-    /// 
     /// Whether to include hidden invitations in the result. Optional. The default is False.
+    ///
+    /// Sets the *show hidden invitations* query property to the given value.
     pub fn show_hidden_invitations(mut self, new_value: bool) -> EventWatchCall<'a, C, A> {
         self._show_hidden_invitations = Some(new_value);
         self
     }
-    /// Sets the *show deleted* query property to the given value.
-    ///
-    /// 
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.
+    ///
+    /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> EventWatchCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
+    /// Extended properties constraint specified as propertyName=value. Matches only shared properties. This parameter might be repeated multiple times to return events that match all given constraints.
+    ///
     /// Append the given value to the *shared extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Extended properties constraint specified as propertyName=value. Matches only shared properties. This parameter might be repeated multiple times to return events that match all given constraints.
     pub fn add_shared_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._shared_extended_property.push(new_value.to_string());
         self
     }
-    /// Sets the *q* query property to the given value.
-    ///
-    /// 
     /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.
+    ///
+    /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
+    /// Extended properties constraint specified as propertyName=value. Matches only private properties. This parameter might be repeated multiple times to return events that match all given constraints.
+    ///
     /// Append the given value to the *private extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Extended properties constraint specified as propertyName=value. Matches only private properties. This parameter might be repeated multiple times to return events that match all given constraints.
     pub fn add_private_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._private_extended_property.push(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token specifying which result page to return. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> EventWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *max attendees* query property to the given value.
-    ///
-    /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
+    ///
+    /// Sets the *max attendees* query property to the given value.
     pub fn max_attendees(mut self, new_value: i32) -> EventWatchCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
-    /// Sets the *i cal uid* query property to the given value.
-    ///
-    /// 
     /// Specifies event ID in the iCalendar format to be included in the response. Optional.
+    ///
+    /// Sets the *i cal uid* query property to the given value.
     pub fn i_cal_uid(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
-    /// Sets the *always include email* query property to the given value.
-    ///
-    /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    ///
+    /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventWatchCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12088,8 +11971,8 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12280,41 +12163,39 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Calendar identifier.
+    ///
     /// Sets the *calendar id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventQuickAddCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
+    /// The text describing the event to be created.
+    ///
     /// Sets the *text* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The text describing the event to be created.
     pub fn text(mut self, new_value: &str) -> EventQuickAddCall<'a, C, A> {
         self._text = new_value.to_string();
         self
     }
-    /// Sets the *send notifications* query property to the given value.
-    ///
-    /// 
     /// Whether to send notifications about the creation of the event. Optional. The default is False.
+    ///
+    /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventQuickAddCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventQuickAddCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12344,8 +12225,8 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

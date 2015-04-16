@@ -104,16 +104,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -275,16 +277,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -344,7 +348,7 @@ impl<'a, C, A> Webmasters<C, A>
 /// 
 /// * [list sitemaps](struct.SitemapListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SitemapsListResponse {
     /// Information about a sitemap entry.
     pub sitemap: Vec<WmxSitemap>,
@@ -357,7 +361,7 @@ impl ResponseResult for SitemapsListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WmxSitemapContent {
     /// The number of URLs from the sitemap that were indexed (of the content type).
     pub indexed: String,
@@ -375,7 +379,7 @@ impl Part for WmxSitemapContent {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlCrawlErrorCountsPerType {
     /// The crawl error type.
     pub category: String,
@@ -397,7 +401,7 @@ impl Part for UrlCrawlErrorCountsPerType {}
 /// 
 /// * [get sites](struct.SiteGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WmxSite {
     /// The user's permission level for the site.
     #[serde(rename="permissionLevel")]
@@ -419,7 +423,7 @@ impl ResponseResult for WmxSite {}
 /// 
 /// * [query urlcrawlerrorscounts](struct.UrlcrawlerrorscountQueryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlCrawlErrorsCountsQueryResponse {
     /// The time series of the number of URL crawl errors for per error category and platform.
     #[serde(rename="countPerTypes")]
@@ -433,7 +437,7 @@ impl ResponseResult for UrlCrawlErrorsCountsQueryResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlCrawlErrorCount {
     /// The error count at the given timestamp.
     pub count: String,
@@ -453,7 +457,7 @@ impl Part for UrlCrawlErrorCount {}
 /// 
 /// * [get sitemaps](struct.SitemapGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WmxSitemap {
     /// Number of errors in the sitemap - issues with the sitemap itself, that needs to be fixed before it can be processed correctly.
     pub errors: String,
@@ -492,7 +496,7 @@ impl ResponseResult for WmxSitemap {}
 /// 
 /// * [list sites](struct.SiteListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SitesListResponse {
     /// Access level information for a Webmaster Tools site.
     #[serde(rename="siteEntry")]
@@ -511,7 +515,7 @@ impl ResponseResult for SitesListResponse {}
 /// 
 /// * [get urlcrawlerrorssamples](struct.UrlcrawlerrorssampleGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlCrawlErrorsSample {
     /// Additional details about the URL, set only when calling get().
     #[serde(rename="urlDetails")]
@@ -536,7 +540,7 @@ impl ResponseResult for UrlCrawlErrorsSample {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlSampleDetails {
     /// List of sitemaps pointing at this URL.
     #[serde(rename="containingSitemaps")]
@@ -558,7 +562,7 @@ impl Part for UrlSampleDetails {}
 /// 
 /// * [list urlcrawlerrorssamples](struct.UrlcrawlerrorssampleListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlCrawlErrorsSamplesListResponse {
     /// Information about the sample URL and its crawl error.
     #[serde(rename="urlCrawlErrorSample")]
@@ -1127,33 +1131,32 @@ impl<'a, C, A> SitemapDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SitemapDeleteCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
+    /// The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
+    ///
     /// Sets the *feedpath* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
     pub fn feedpath(mut self, new_value: &str) -> SitemapDeleteCall<'a, C, A> {
         self._feedpath = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1183,8 +1186,8 @@ impl<'a, C, A> SitemapDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1359,33 +1362,32 @@ impl<'a, C, A> SitemapSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SitemapSubmitCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
+    /// The URL of the sitemap to add.
+    ///
     /// Sets the *feedpath* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The URL of the sitemap to add.
     pub fn feedpath(mut self, new_value: &str) -> SitemapSubmitCall<'a, C, A> {
         self._feedpath = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapSubmitCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1415,8 +1417,8 @@ impl<'a, C, A> SitemapSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1602,33 +1604,32 @@ impl<'a, C, A> SitemapGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SitemapGetCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
+    /// The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
+    ///
     /// Sets the *feedpath* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
     pub fn feedpath(mut self, new_value: &str) -> SitemapGetCall<'a, C, A> {
         self._feedpath = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1658,8 +1659,8 @@ impl<'a, C, A> SitemapGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1848,31 +1849,29 @@ impl<'a, C, A> SitemapListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SitemapListCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
-    /// Sets the *sitemap index* query property to the given value.
-    ///
-    /// 
     /// A URL of a site's sitemap index.
+    ///
+    /// Sets the *sitemap index* query property to the given value.
     pub fn sitemap_index(mut self, new_value: &str) -> SitemapListCall<'a, C, A> {
         self._sitemap_index = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1902,8 +1901,8 @@ impl<'a, C, A> SitemapListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2087,23 +2086,22 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SiteGetCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2133,8 +2131,8 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2307,23 +2305,22 @@ impl<'a, C, A> SiteAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// The URL of the site to add.
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The URL of the site to add.
     pub fn site_url(mut self, new_value: &str) -> SiteAddCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteAddCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2353,8 +2350,8 @@ impl<'a, C, A> SiteAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2512,13 +2509,12 @@ impl<'a, C, A> SiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2548,8 +2544,8 @@ impl<'a, C, A> SiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2722,23 +2718,22 @@ impl<'a, C, A> SiteDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SiteDeleteCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2768,8 +2763,8 @@ impl<'a, C, A> SiteDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2968,47 +2963,43 @@ impl<'a, C, A> UrlcrawlerrorscountQueryCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
-    /// Sets the *platform* query property to the given value.
-    ///
-    /// 
     /// The user agent type (platform) that made the request, for example 'web'. If not specified, we return results for all platforms.
+    ///
+    /// Sets the *platform* query property to the given value.
     pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         self._platform = Some(new_value.to_string());
         self
     }
-    /// Sets the *latest counts only* query property to the given value.
-    ///
-    /// 
     /// If true, returns only the latest crawl error counts.
+    ///
+    /// Sets the *latest counts only* query property to the given value.
     pub fn latest_counts_only(mut self, new_value: bool) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         self._latest_counts_only = Some(new_value);
         self
     }
-    /// Sets the *category* query property to the given value.
-    ///
-    /// 
     /// The crawl error category, for example 'serverError'. If not specified, we return results for all categories.
+    ///
+    /// Sets the *category* query property to the given value.
     pub fn category(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         self._category = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3038,8 +3029,8 @@ impl<'a, C, A> UrlcrawlerrorscountQueryCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3229,53 +3220,52 @@ impl<'a, C, A> UrlcrawlerrorssampleGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
+    /// The relative path (without the site) of the sample URL; must be one of the URLs returned by list
+    ///
     /// Sets the *url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The relative path (without the site) of the sample URL; must be one of the URLs returned by list
     pub fn url(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         self._url = new_value.to_string();
         self
     }
+    /// The crawl error category, for example 'authPermissions'
+    ///
     /// Sets the *category* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The crawl error category, for example 'authPermissions'
     pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         self._category = new_value.to_string();
         self
     }
+    /// The user agent type (platform) that made the request, for example 'web'
+    ///
     /// Sets the *platform* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user agent type (platform) that made the request, for example 'web'
     pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         self._platform = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3305,8 +3295,8 @@ impl<'a, C, A> UrlcrawlerrorssampleGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3494,43 +3484,42 @@ impl<'a, C, A> UrlcrawlerrorssampleListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
+    /// The crawl error category, for example 'authPermissions'
+    ///
     /// Sets the *category* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The crawl error category, for example 'authPermissions'
     pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, A> {
         self._category = new_value.to_string();
         self
     }
+    /// The user agent type (platform) that made the request, for example 'web'
+    ///
     /// Sets the *platform* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user agent type (platform) that made the request, for example 'web'
     pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, A> {
         self._platform = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorssampleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3560,8 +3549,8 @@ impl<'a, C, A> UrlcrawlerrorssampleListCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3740,53 +3729,52 @@ impl<'a, C, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
+    ///
     /// Sets the *site url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
+    /// The relative path (without the site) of the sample URL; must be one of the URLs returned by list
+    ///
     /// Sets the *url* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The relative path (without the site) of the sample URL; must be one of the URLs returned by list
     pub fn url(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         self._url = new_value.to_string();
         self
     }
+    /// The crawl error category, for example 'authPermissions'
+    ///
     /// Sets the *category* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The crawl error category, for example 'authPermissions'
     pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         self._category = new_value.to_string();
         self
     }
+    /// The user agent type (platform) that made the request, for example 'web'
+    ///
     /// Sets the *platform* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The user agent type (platform) that made the request, for example 'web'
     pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         self._platform = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3816,8 +3804,8 @@ impl<'a, C, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

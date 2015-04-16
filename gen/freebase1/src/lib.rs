@@ -108,16 +108,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -259,16 +261,18 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -314,7 +318,7 @@ impl<'a, C, A> Freebase<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReconcileCandidate {
     /// Language code that candidate and notable names are displayed in.
     pub lang: String,
@@ -335,7 +339,7 @@ impl Part for ReconcileCandidate {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReconcileGetWarning {
     /// Code for identifying classes of warnings.
     pub reason: String,
@@ -353,7 +357,7 @@ impl Part for ReconcileGetWarning {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReconcileGetCosts {
     /// Total number of hits found.
     pub hits: i32,
@@ -374,7 +378,7 @@ impl Part for ReconcileGetCosts {}
 /// 
 /// * [reconcile](struct.MethodReconcileCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReconcileGet {
     /// Server costs for reconciling.
     pub costs: ReconcileGetCosts,
@@ -394,7 +398,7 @@ impl ResponseResult for ReconcileGet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReconcileCandidateNotable {
     /// MID of notable category.
     pub id: String,
@@ -690,65 +694,58 @@ impl<'a, C, A> MethodReconcileCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Append the given value to the *prop* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
     /// Property values for entity formatted as
     /// :
+    ///
+    /// Append the given value to the *prop* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     pub fn add_prop(mut self, new_value: &str) -> MethodReconcileCall<'a, C, A> {
         self._prop.push(new_value.to_string());
         self
     }
-    /// Sets the *name* query property to the given value.
-    ///
-    /// 
     /// Name of entity.
+    ///
+    /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> MethodReconcileCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
-    /// Sets the *limit* query property to the given value.
-    ///
-    /// 
     /// Maximum number of candidates to return.
+    ///
+    /// Sets the *limit* query property to the given value.
     pub fn limit(mut self, new_value: i32) -> MethodReconcileCall<'a, C, A> {
         self._limit = Some(new_value);
         self
     }
+    /// Languages for names and values. First language is used for display. Default is 'en'.
+    ///
     /// Append the given value to the *lang* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Languages for names and values. First language is used for display. Default is 'en'.
     pub fn add_lang(mut self, new_value: &str) -> MethodReconcileCall<'a, C, A> {
         self._lang.push(new_value.to_string());
         self
     }
+    /// Classifications of entity e.g. type, category, title.
+    ///
     /// Append the given value to the *kind* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Classifications of entity e.g. type, category, title.
     pub fn add_kind(mut self, new_value: &str) -> MethodReconcileCall<'a, C, A> {
         self._kind.push(new_value.to_string());
         self
     }
-    /// Sets the *confidence* query property to the given value.
-    ///
-    /// 
     /// Required confidence for a candidate to match. Must be between .5 and 1.0
+    ///
+    /// Sets the *confidence* query property to the given value.
     pub fn confidence(mut self, new_value: f32) -> MethodReconcileCall<'a, C, A> {
         self._confidence = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodReconcileCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1053,204 +1050,180 @@ impl<'a, C, A> MethodSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// A rule to not match against.
+    ///
     /// Append the given value to the *without* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// A rule to not match against.
     pub fn add_without(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._without.push(new_value.to_string());
         self
     }
+    /// A rule to match against.
+    ///
     /// Append the given value to the *with* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// A rule to match against.
     pub fn add_with(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._with.push(new_value.to_string());
         self
     }
+    /// Restrict to topics with this Freebase type id.
+    ///
     /// Append the given value to the *type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Restrict to topics with this Freebase type id.
     pub fn add_type(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._type_.push(new_value.to_string());
         self
     }
-    /// Sets the *stemmed* query property to the given value.
-    ///
-    /// 
     /// Query on stemmed names and aliases. May not be used with prefixed.
+    ///
+    /// Sets the *stemmed* query property to the given value.
     pub fn stemmed(mut self, new_value: bool) -> MethodSearchCall<'a, C, A> {
         self._stemmed = Some(new_value);
         self
     }
-    /// Sets the *spell* query property to the given value.
-    ///
-    /// 
     /// Request 'did you mean' suggestions
+    ///
+    /// Sets the *spell* query property to the given value.
     pub fn spell(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._spell = Some(new_value.to_string());
         self
     }
-    /// Sets the *scoring* query property to the given value.
-    ///
-    /// 
     /// Relevance scoring algorithm to use.
+    ///
+    /// Sets the *scoring* query property to the given value.
     pub fn scoring(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._scoring = Some(new_value.to_string());
         self
     }
-    /// Sets the *query* query property to the given value.
-    ///
-    /// 
     /// Query term to search for.
+    ///
+    /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
-    /// Sets the *prefixed* query property to the given value.
-    ///
-    /// 
     /// Prefix match against names and aliases.
+    ///
+    /// Sets the *prefixed* query property to the given value.
     pub fn prefixed(mut self, new_value: bool) -> MethodSearchCall<'a, C, A> {
         self._prefixed = Some(new_value);
         self
     }
-    /// Sets the *output* query property to the given value.
-    ///
-    /// 
     /// An output expression to request data from matches.
+    ///
+    /// Sets the *output* query property to the given value.
     pub fn output(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._output = Some(new_value.to_string());
         self
     }
-    /// Sets the *mql_output* query property to the given value.
-    ///
-    /// 
     /// The MQL query to run againist the results to extract more data.
+    ///
+    /// Sets the *mql_output* query property to the given value.
     pub fn mql_output(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._mql_output = Some(new_value.to_string());
         self
     }
+    /// A mid to use instead of a query.
+    ///
     /// Append the given value to the *mid* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// A mid to use instead of a query.
     pub fn add_mid(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._mid.push(new_value.to_string());
         self
     }
-    /// Sets the *limit* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *limit* query property to the given value.
     pub fn limit(mut self, new_value: i32) -> MethodSearchCall<'a, C, A> {
         self._limit = Some(new_value);
         self
     }
+    /// The code of the language to run the query with. Default is 'en'.
+    ///
     /// Append the given value to the *lang* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The code of the language to run the query with. Default is 'en'.
     pub fn add_lang(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._lang.push(new_value.to_string());
         self
     }
-    /// Sets the *indent* query property to the given value.
-    ///
-    /// 
     /// Whether to indent the json results or not.
+    ///
+    /// Sets the *indent* query property to the given value.
     pub fn indent(mut self, new_value: bool) -> MethodSearchCall<'a, C, A> {
         self._indent = Some(new_value);
         self
     }
-    /// Sets the *help* query property to the given value.
-    ///
-    /// 
     /// The keyword to request help on.
+    ///
+    /// Sets the *help* query property to the given value.
     pub fn help(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._help = Some(new_value.to_string());
         self
     }
-    /// Sets the *format* query property to the given value.
-    ///
-    /// 
     /// Structural format of the json response.
+    ///
+    /// Sets the *format* query property to the given value.
     pub fn format(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._format = Some(new_value.to_string());
         self
     }
+    /// A filter to apply to the query.
+    ///
     /// Append the given value to the *filter* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// A filter to apply to the query.
     pub fn add_filter(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._filter.push(new_value.to_string());
         self
     }
-    /// Sets the *exact* query property to the given value.
-    ///
-    /// 
     /// Query on exact name and keys only.
+    ///
+    /// Sets the *exact* query property to the given value.
     pub fn exact(mut self, new_value: bool) -> MethodSearchCall<'a, C, A> {
         self._exact = Some(new_value);
         self
     }
-    /// Sets the *encode* query property to the given value.
-    ///
-    /// 
     /// The encoding of the response. You can use this parameter to enable html encoding.
+    ///
+    /// Sets the *encode* query property to the given value.
     pub fn encode(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._encode = Some(new_value.to_string());
         self
     }
+    /// Restrict to topics with this Freebase domain id.
+    ///
     /// Append the given value to the *domain* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Restrict to topics with this Freebase domain id.
     pub fn add_domain(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._domain.push(new_value.to_string());
         self
     }
-    /// Sets the *cursor* query property to the given value.
-    ///
-    /// 
     /// The cursor value to use for the next page of results.
+    ///
+    /// Sets the *cursor* query property to the given value.
     pub fn cursor(mut self, new_value: i32) -> MethodSearchCall<'a, C, A> {
         self._cursor = Some(new_value);
         self
     }
-    /// Sets the *callback* query property to the given value.
-    ///
-    /// 
     /// JS method name for JSONP callbacks.
+    ///
+    /// Sets the *callback* query property to the given value.
     pub fn callback(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._callback = Some(new_value.to_string());
         self
     }
-    /// Sets the *as_of_time* query property to the given value.
-    ///
-    /// 
     /// A mql as_of_time value to use with mql_output queries.
+    ///
+    /// Sets the *as_of_time* query property to the given value.
     pub fn as_of_time(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._as_of_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self

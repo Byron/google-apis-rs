@@ -114,16 +114,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -290,16 +292,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -478,7 +482,7 @@ impl Part for SubscriptionPlanCommitmentInterval {}
 /// 
 /// * [list subscriptions](struct.SubscriptionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscriptions {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1206,32 +1210,31 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Customer) -> CustomerUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> CustomerUpdateCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1261,8 +1264,8 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1440,30 +1443,28 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Customer) -> CustomerInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *customer auth token* query property to the given value.
-    ///
-    /// 
     /// An auth token needed for inserting a customer for which domain already exists. Can be generated at https://www.google.com/a/cpanel//TransferToken. Optional.
+    ///
+    /// Sets the *customer auth token* query property to the given value.
     pub fn customer_auth_token(mut self, new_value: &str) -> CustomerInsertCall<'a, C, A> {
         self._customer_auth_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1493,8 +1494,8 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1693,32 +1694,31 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Customer) -> CustomerPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> CustomerPatchCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1748,8 +1748,8 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1933,23 +1933,22 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> CustomerGetCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1979,8 +1978,8 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrderReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2184,40 +2183,38 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Subscription) -> SubscriptionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
-    /// Sets the *customer auth token* query property to the given value.
-    ///
-    /// 
     /// An auth token needed for transferring a subscription. Can be generated at https://www.google.com/a/cpanel/customer-domain/TransferToken. Optional.
+    ///
+    /// Sets the *customer auth token* query property to the given value.
     pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, A> {
         self._customer_auth_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2247,8 +2244,8 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2425,43 +2422,42 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Id of the subscription, which is unique for a customer
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
+    /// Whether the subscription is to be fully cancelled or downgraded
+    ///
     /// Sets the *deletion type* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Whether the subscription is to be fully cancelled or downgraded
     pub fn deletion_type(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._deletion_type = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2491,8 +2487,8 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2678,33 +2674,32 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Id of the subscription, which is unique for a customer
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2734,8 +2729,8 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrderReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2918,53 +2913,47 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page in the list
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *customer name prefix* query property to the given value.
-    ///
-    /// 
     /// Prefix of the customer's domain name by which the subscriptions should be filtered. Optional
+    ///
+    /// Sets the *customer name prefix* query property to the given value.
     pub fn customer_name_prefix(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._customer_name_prefix = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer id* query property to the given value.
-    ///
-    /// 
     /// Id of the Customer
+    ///
+    /// Sets the *customer id* query property to the given value.
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer auth token* query property to the given value.
-    ///
-    /// 
     /// An auth token needed if the customer is not a resold customer of this reseller. Can be generated at https://www.google.com/a/cpanel/customer-domain/TransferToken.Optional.
+    ///
+    /// Sets the *customer auth token* query property to the given value.
     pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._customer_auth_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2994,8 +2983,8 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrderReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3196,42 +3185,41 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &RenewalSettings) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Id of the subscription, which is unique for a customer
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3261,8 +3249,8 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3448,33 +3436,32 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Id of the subscription, which is unique for a customer
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionStartPaidServiceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3504,8 +3491,8 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3706,42 +3693,41 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Seats) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Id of the subscription, which is unique for a customer
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3771,8 +3757,8 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3958,33 +3944,32 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Id of the subscription, which is unique for a customer
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionSuspendCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4014,8 +3999,8 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4201,33 +4186,32 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Id of the subscription, which is unique for a customer
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionActivateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4257,8 +4241,8 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4459,42 +4443,41 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ChangePlanRequest) -> SubscriptionChangePlanCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Id of the Customer
+    ///
     /// Sets the *customer id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
+    /// Id of the subscription, which is unique for a customer
+    ///
     /// Sets the *subscription id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionChangePlanCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4524,8 +4507,8 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppOrder`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

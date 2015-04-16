@@ -109,16 +109,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -286,16 +288,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -418,7 +422,7 @@ impl Resource for ResourceRecordSet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Quota {
     /// Maximum allowed number of ResourceRecordSets per zone in the project.
     #[serde(rename="rrsetsPerManagedZone")]
@@ -454,7 +458,7 @@ impl Part for Quota {}
 /// 
 /// * [get projects](struct.ProjectGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Project {
     /// Quotas assigned to this project (output only).
     pub quota: Quota,
@@ -479,7 +483,7 @@ impl ResponseResult for Project {}
 /// 
 /// * [list changes](struct.ChangeListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChangesListResponse {
     /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
     /// 
@@ -504,7 +508,7 @@ impl ResponseResult for ChangesListResponse {}
 /// 
 /// * [list managed zones](struct.ManagedZoneListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedZonesListResponse {
     /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token.
     /// 
@@ -563,7 +567,7 @@ impl ResponseResult for Change {}
 /// 
 /// * [list resource record sets](struct.ResourceRecordSetListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceRecordSetsListResponse {
     /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
     /// 
@@ -1120,42 +1124,41 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Change) -> ChangeCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Identifies the project addressed by this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
     /// Sets the *managed zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1185,8 +1188,8 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1392,65 +1395,60 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Identifies the project addressed by this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
     /// Sets the *managed zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// Sorting order direction: 'ascending' or 'descending'.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *sort by* query property to the given value.
-    ///
-    /// 
     /// Sorting criterion. The only supported value is change sequence.
+    ///
+    /// Sets the *sort by* query property to the given value.
     pub fn sort_by(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._sort_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1480,8 +1478,8 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1669,43 +1667,42 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Identifies the project addressed by this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
     /// Sets the *managed zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
+    /// The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
+    ///
     /// Sets the *change id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
     pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
         self._change_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1735,8 +1732,8 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1935,32 +1932,31 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ManagedZone) -> ManagedZoneCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Identifies the project addressed by this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ManagedZoneCreateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1990,8 +1986,8 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2166,33 +2162,32 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Identifies the project addressed by this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
     /// Sets the *managed zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2222,8 +2217,8 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2409,33 +2404,32 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// Identifies the project addressed by this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
     /// Sets the *managed zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2465,8 +2459,8 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2660,39 +2654,36 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Identifies the project addressed by this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagedZoneListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2722,8 +2713,8 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2929,65 +2920,60 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// Identifies the project addressed by this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
     /// Sets the *managed zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Sets the *type* query property to the given value.
-    ///
-    /// 
     /// Restricts the list to return only records of this type. If present, the "name" parameter must also be present.
+    ///
+    /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *name* query property to the given value.
-    ///
-    /// 
     /// Restricts the list to return only records with this fully qualified domain name.
+    ///
+    /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ResourceRecordSetListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ResourceRecordSetListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3017,8 +3003,8 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3202,23 +3188,22 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Identifies the project addressed by this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ProjectGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3248,8 +3233,8 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

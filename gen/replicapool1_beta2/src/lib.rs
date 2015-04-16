@@ -112,16 +112,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -290,16 +292,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -348,7 +352,7 @@ impl<'a, C, A> Replicapool<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarningsData {
     /// [Output Only] Metadata key for this warning.
     pub key: String,
@@ -383,7 +387,7 @@ impl RequestValue for InstanceGroupManagersRecreateInstancesRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarnings {
     /// [Output only] Optional human-readable details for this warning.
     pub message: String,
@@ -406,7 +410,7 @@ impl Part for OperationWarnings {}
 /// 
 /// * [list zone operations](struct.ZoneOperationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationList {
     /// A token used to continue a truncated list request (output only).
     #[serde(rename="nextPageToken")]
@@ -448,7 +452,7 @@ impl RequestValue for InstanceGroupManagersSetInstanceTemplateRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationErrorErrors {
     /// [Output Only] An optional, human-readable error message.
     pub message: String,
@@ -471,7 +475,7 @@ impl Part for OperationErrorErrors {}
 /// 
 /// * [list instance group managers](struct.InstanceGroupManagerListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceGroupManagerList {
     /// A token used to continue a truncated list request (output only).
     #[serde(rename="nextPageToken")]
@@ -494,7 +498,7 @@ impl ResponseResult for InstanceGroupManagerList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationError {
     /// [Output Only] The array of errors encountered while processing this operation.
     pub errors: Vec<OperationErrorErrors>,
@@ -641,7 +645,7 @@ impl RequestValue for InstanceGroupManagersDeleteInstancesRequest {}
 /// * [resize instance group managers](struct.InstanceGroupManagerResizeCall.html) (response)
 /// * [delete instances instance group managers](struct.InstanceGroupManagerDeleteInstanceCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// [Output Only] Status of the operation.
     pub status: String,
@@ -1154,7 +1158,7 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/operations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone")].iter() {
@@ -1250,57 +1254,53 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Name of the project scoping this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the project scoping this request.
     pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Name of the zone scoping this request.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the zone scoping this request.
     pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filter* query property to the given value.
-    ///
-    /// 
     /// Optional. Filter expression for filtering listed resources.
+    ///
+    /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1330,8 +1330,8 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1423,7 +1423,7 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/operations/{operation}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{operation}", "operation")].iter() {
@@ -1519,43 +1519,42 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// Name of the project scoping this request.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the project scoping this request.
     pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Name of the zone scoping this request.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the zone scoping this request.
     pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// Name of the operation resource to return.
+    ///
     /// Sets the *operation* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the operation resource to return.
     pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1585,8 +1584,8 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1789,52 +1788,51 @@ impl<'a, C, A> InstanceGroupManagerSetTargetPoolCall<'a, C, A> where C: BorrowMu
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InstanceGroupManagersSetTargetPoolsRequest) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the instance group manager resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the instance group manager.
+    ///
     /// Sets the *instance group manager* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1864,8 +1862,8 @@ impl<'a, C, A> InstanceGroupManagerSetTargetPoolCall<'a, C, A> where C: BorrowMu
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2066,57 +2064,53 @@ impl<'a, C, A> InstanceGroupManagerListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the instance group manager resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> InstanceGroupManagerListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filter* query property to the given value.
-    ///
-    /// 
     /// Optional. Filter expression for filtering listed resources.
+    ///
+    /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2146,8 +2140,8 @@ impl<'a, C, A> InstanceGroupManagerListCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ComputeReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2350,52 +2344,51 @@ impl<'a, C, A> InstanceGroupManagerInsertCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InstanceGroupManager) -> InstanceGroupManagerInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the instance group manager resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerInsertCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// Number of instances that should exist.
+    ///
     /// Sets the *size* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Number of instances that should exist.
     pub fn size(mut self, new_value: i32) -> InstanceGroupManagerInsertCall<'a, C, A> {
         self._size = new_value;
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2425,8 +2418,8 @@ impl<'a, C, A> InstanceGroupManagerInsertCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2614,43 +2607,42 @@ impl<'a, C, A> InstanceGroupManagerGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the instance group manager resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// Name of the instance resource to return.
+    ///
     /// Sets the *instance group manager* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the instance resource to return.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2680,8 +2672,8 @@ impl<'a, C, A> InstanceGroupManagerGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ComputeReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2884,52 +2876,51 @@ impl<'a, C, A> InstanceGroupManagerAbandonInstanceCall<'a, C, A> where C: Borrow
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InstanceGroupManagersAbandonInstancesRequest) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the instance group manager resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the instance group manager.
+    ///
     /// Sets the *instance group manager* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2959,8 +2950,8 @@ impl<'a, C, A> InstanceGroupManagerAbandonInstanceCall<'a, C, A> where C: Borrow
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3163,52 +3154,51 @@ impl<'a, C, A> InstanceGroupManagerRecreateInstanceCall<'a, C, A> where C: Borro
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InstanceGroupManagersRecreateInstancesRequest) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the instance group manager resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the instance group manager.
+    ///
     /// Sets the *instance group manager* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3238,8 +3228,8 @@ impl<'a, C, A> InstanceGroupManagerRecreateInstanceCall<'a, C, A> where C: Borro
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3427,43 +3417,42 @@ impl<'a, C, A> InstanceGroupManagerDeleteCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the instance group manager resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// Name of the Instance Group Manager resource to delete.
+    ///
     /// Sets the *instance group manager* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the Instance Group Manager resource to delete.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3493,8 +3482,8 @@ impl<'a, C, A> InstanceGroupManagerDeleteCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3697,52 +3686,51 @@ impl<'a, C, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> where C: Bo
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InstanceGroupManagersSetInstanceTemplateRequest) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the instance group manager resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the instance group manager.
+    ///
     /// Sets the *instance group manager* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3772,8 +3760,8 @@ impl<'a, C, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> where C: Bo
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3963,53 +3951,52 @@ impl<'a, C, A> InstanceGroupManagerResizeCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the instance group manager resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the instance group manager.
+    ///
     /// Sets the *instance group manager* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
+    /// Number of instances that should exist in this Instance Group Manager.
+    ///
     /// Sets the *size* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Number of instances that should exist in this Instance Group Manager.
     pub fn size(mut self, new_value: i32) -> InstanceGroupManagerResizeCall<'a, C, A> {
         self._size = new_value;
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerResizeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4039,8 +4026,8 @@ impl<'a, C, A> InstanceGroupManagerResizeCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4243,52 +4230,51 @@ impl<'a, C, A> InstanceGroupManagerDeleteInstanceCall<'a, C, A> where C: BorrowM
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InstanceGroupManagersDeleteInstancesRequest) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The Google Developers Console project name.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of the zone in which the instance group manager resides.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// The name of the instance group manager.
+    ///
     /// Sets the *instance group manager* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4318,8 +4304,8 @@ impl<'a, C, A> InstanceGroupManagerDeleteInstanceCall<'a, C, A> where C: BorrowM
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

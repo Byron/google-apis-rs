@@ -119,16 +119,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -312,16 +314,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -571,7 +575,7 @@ impl RequestValue for AnalyticsDataimportDeleteUploadDataRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RealtimeDataProfileInfo {
     /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(rename="internalWebPropertyId")]
@@ -601,7 +605,7 @@ impl Part for RealtimeDataProfileInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RealtimeDataQuery {
     /// Maximum results per page.
     #[serde(rename="max-results")]
@@ -659,7 +663,7 @@ impl Part for ProfileRef {}
 /// 
 /// * [mcf get data](struct.DataMcfGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct McfData {
     /// Resource type.
     pub kind: String,
@@ -716,7 +720,7 @@ impl ResponseResult for McfData {}
 /// 
 /// * [custom data sources list management](struct.ManagementCustomDataSourceListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDataSources {
     /// Email ID of the authenticated user
     pub username: String,
@@ -753,7 +757,7 @@ impl ResponseResult for CustomDataSources {}
 /// 
 /// * [goals list management](struct.ManagementGoalListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Goals {
     /// Email ID of the authenticated user
     pub username: String,
@@ -819,7 +823,7 @@ impl Part for Account {}
 /// 
 /// * [ga get data](struct.DataGaGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaData {
     /// Determines if Analytics data contains samples.
     #[serde(rename="containsSampledData")]
@@ -1012,7 +1016,7 @@ impl Part for UserRef {}
 /// 
 /// * [accounts list management](struct.ManagementAccountListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Accounts {
     /// Email ID of the authenticated user
     pub username: String,
@@ -1086,7 +1090,7 @@ impl Part for FilterAdvancedDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebPropertySummary {
     /// Website url for this web property.
     #[serde(rename="websiteUrl")]
@@ -1143,7 +1147,7 @@ impl ResponseResult for AccountTicket {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct McfDataProfileInfo {
     /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(rename="internalWebPropertyId")]
@@ -1209,7 +1213,7 @@ impl Part for GoalVisitTimeOnSiteDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaDataDataTable {
     /// no description provided
     pub rows: Vec<GaDataDataTableRows>,
@@ -1266,7 +1270,7 @@ impl ResponseResult for EntityUserLink {}
 /// 
 /// * [account summaries list management](struct.ManagementAccountSummaryListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountSummaries {
     /// Email ID of the authenticated user
     pub username: String,
@@ -1303,7 +1307,7 @@ impl ResponseResult for AccountSummaries {}
 /// 
 /// * [custom dimensions list management](struct.ManagementCustomDimensionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDimensions {
     /// Email ID of the authenticated user
     pub username: String,
@@ -1381,7 +1385,7 @@ impl Part for GoalUrlDestinationDetails {}
 /// * [uploads get management](struct.ManagementUploadGetCall.html) (response)
 /// * [uploads upload data management](struct.ManagementUploadUploadDataCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Upload {
     /// Upload status. Possible values: PENDING, COMPLETED, FAILED, DELETING, DELETED.
     pub status: String,
@@ -1411,7 +1415,7 @@ impl ResponseResult for Upload {}
 /// 
 /// * [profiles list management](struct.ManagementProfileListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Profiles {
     /// Email ID of the authenticated user
     pub username: String,
@@ -1457,7 +1461,7 @@ impl Part for AccountPermissions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaDataProfileInfo {
     /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(rename="internalWebPropertyId")]
@@ -1509,7 +1513,7 @@ impl Part for FilterParentLink {}
 /// 
 /// * [webproperties list management](struct.ManagementWebpropertyListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Webproperties {
     /// Email ID of the authenticated user
     pub username: String,
@@ -1594,7 +1598,7 @@ impl ResponseResult for ProfileFilterLink {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountSummary {
     /// Resource type for Analytics AccountSummary.
     pub kind: String,
@@ -1680,7 +1684,7 @@ impl ResponseResult for Webproperty {}
 /// 
 /// * [realtime get data](struct.DataRealtimeGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RealtimeData {
     /// Resource type.
     pub kind: String,
@@ -1840,7 +1844,7 @@ impl ResponseResult for Experiment {}
 /// 
 /// * [custom metrics list management](struct.ManagementCustomMetricListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomMetrics {
     /// Email ID of the authenticated user
     pub username: String,
@@ -1872,7 +1876,7 @@ impl ResponseResult for CustomMetrics {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaDataQuery {
     /// Maximum results per page.
     #[serde(rename="max-results")]
@@ -1916,7 +1920,7 @@ impl Part for GaDataQuery {}
 /// 
 /// * [columns list metadata](struct.MetadataColumnListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Columns {
     /// List of columns for a report type.
     pub items: Vec<Column>,
@@ -2047,7 +2051,7 @@ impl Part for FilterExpression {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct McfDataRowsConversionPathValue {
     /// Node value of an interaction on conversion path. Such as source, medium etc.
     #[serde(rename="nodeValue")]
@@ -2065,7 +2069,7 @@ impl Part for McfDataRowsConversionPathValue {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaDataDataTableRows {
     /// no description provided
     pub c: Vec<GaDataDataTableRowsC>,
@@ -2140,7 +2144,7 @@ impl Part for WebpropertyChildLink {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaDataDataTableRowsC {
     /// no description provided
     pub v: String,
@@ -2154,7 +2158,7 @@ impl Part for GaDataDataTableRowsC {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Column {
     /// Map of attribute name and value for this column.
     pub attributes: HashMap<String, String>,
@@ -2176,7 +2180,7 @@ impl Part for Column {}
 /// 
 /// * [profile filter links list management](struct.ManagementProfileFilterLinkListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileFilterLinks {
     /// Email ID of the authenticated user
     pub username: String,
@@ -2311,7 +2315,7 @@ impl ResponseResult for EntityAdWordsLink {}
 /// 
 /// * [uploads list management](struct.ManagementUploadListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Uploads {
     /// Collection type.
     pub kind: String,
@@ -2416,7 +2420,7 @@ impl Part for CustomMetricParentLink {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct McfDataColumnHeaders {
     /// Data type. Dimension and metric values data types such as INTEGER, DOUBLE, CURRENCY, MCF_SEQUENCE etc.
     #[serde(rename="dataType")]
@@ -2458,7 +2462,7 @@ impl Part for GoalParentLink {}
 /// 
 /// * [web property ad words links list management](struct.ManagementWebPropertyAdWordsLinkListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityAdWordsLinks {
     /// Collection type.
     pub kind: String,
@@ -2535,7 +2539,7 @@ impl Part for AccountRef {}
 /// * [webproperty user links list management](struct.ManagementWebpropertyUserLinkListCall.html) (response)
 /// * [profile user links list management](struct.ManagementProfileUserLinkListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityUserLinks {
     /// Collection type.
     pub kind: String,
@@ -2570,7 +2574,7 @@ impl ResponseResult for EntityUserLinks {}
 /// 
 /// * [segments list management](struct.ManagementSegmentListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Segments {
     /// Email ID of the authenticated user
     pub username: String,
@@ -2633,7 +2637,7 @@ impl Part for FilterUppercaseDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct McfDataRows {
     /// A primitive dimension value. A primitive metric value.
     #[serde(rename="primitiveValue")]
@@ -2651,7 +2655,7 @@ impl Part for McfDataRows {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileSummary {
     /// Resource type for Analytics ProfileSummary.
     pub kind: String,
@@ -2755,7 +2759,7 @@ impl Part for ExperimentVariations {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Segment {
     /// Segment definition.
     pub definition: String,
@@ -2787,7 +2791,7 @@ impl Part for Segment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct McfDataQuery {
     /// Maximum results per page.
     #[serde(rename="max-results")]
@@ -2911,7 +2915,7 @@ impl ResponseResult for Profile {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaDataColumnHeaders {
     /// Data type. Dimension column headers have only STRING as the data type. Metric column headers have data types for metric values such as INTEGER, DOUBLE, CURRENCY etc.
     #[serde(rename="dataType")]
@@ -2931,7 +2935,7 @@ impl Part for GaDataColumnHeaders {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaDataDataTableCols {
     /// no description provided
     #[serde(rename="type")]
@@ -2968,7 +2972,7 @@ impl Part for GoalVisitNumPagesDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDataSourceChildLink {
     /// Link to the list of daily uploads for this custom data source. Link to the list of uploads for this custom data source.
     pub href: String,
@@ -2990,7 +2994,7 @@ impl Part for CustomDataSourceChildLink {}
 /// 
 /// * [unsampled reports list management](struct.ManagementUnsampledReportListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnsampledReports {
     /// Email ID of the authenticated user
     pub username: String,
@@ -3022,7 +3026,7 @@ impl ResponseResult for UnsampledReports {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RealtimeDataColumnHeaders {
     /// Data type. Dimension column headers have only STRING as the data type. Metric column headers have data types for metric values such as INTEGER, DOUBLE, CURRENCY etc.
     #[serde(rename="dataType")]
@@ -3057,7 +3061,7 @@ impl Part for EntityAdWordsLinkEntity {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDataSourceParentLink {
     /// Link to the web property to which this custom data source belongs.
     pub href: String,
@@ -3074,7 +3078,7 @@ impl Part for CustomDataSourceParentLink {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDataSource {
     /// Resource type for Analytics custom data source.
     pub kind: String,
@@ -3146,7 +3150,7 @@ impl Part for CustomDimensionParentLink {}
 /// 
 /// * [experiments list management](struct.ManagementExperimentListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Experiments {
     /// Email ID of the authenticated user
     pub username: String,
@@ -3183,7 +3187,7 @@ impl ResponseResult for Experiments {}
 /// 
 /// * [filters list management](struct.ManagementFilterListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Filters {
     /// Email ID of the authenticated user
     pub username: String,
@@ -5181,7 +5185,7 @@ impl<'a, C, A> ManagementWebpropertyInsertCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -5285,32 +5289,31 @@ impl<'a, C, A> ManagementWebpropertyInsertCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Webproperty) -> ManagementWebpropertyInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to create the web property for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to create the web property for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5340,8 +5343,8 @@ impl<'a, C, A> ManagementWebpropertyInsertCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5433,7 +5436,7 @@ impl<'a, C, A> ManagementProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -5529,43 +5532,42 @@ impl<'a, C, A> ManagementProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// Account ID to retrieve the goal for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve the goal for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve the goal for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve the goal for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to retrieve the goal for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to retrieve the goal for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5595,8 +5597,8 @@ impl<'a, C, A> ManagementProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5692,7 +5694,7 @@ impl<'a, C, A> ManagementAccountListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
@@ -5764,29 +5766,26 @@ impl<'a, C, A> ManagementAccountListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first account to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementAccountListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of accounts to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementAccountListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5816,8 +5815,8 @@ impl<'a, C, A> ManagementAccountListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5918,7 +5917,7 @@ impl<'a, C, A> ManagementProfileFilterLinkPatchCall<'a, C, A> where C: BorrowMut
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{linkId}", "linkId")].iter() {
@@ -6022,62 +6021,61 @@ impl<'a, C, A> ManagementProfileFilterLinkPatchCall<'a, C, A> where C: BorrowMut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ProfileFilterLink) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to which profile filter link belongs.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to which profile filter link belongs.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property Id to which profile filter link belongs
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property Id to which profile filter link belongs
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Profile ID to which filter link belongs
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Profile ID to which filter link belongs
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// ID of the profile filter link to be updated.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the profile filter link to be updated.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6107,8 +6105,8 @@ impl<'a, C, A> ManagementProfileFilterLinkPatchCall<'a, C, A> where C: BorrowMut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6199,7 +6197,7 @@ impl<'a, C, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> where C: Borrow
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks/{linkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{linkId}", "linkId")].iter() {
@@ -6285,43 +6283,42 @@ impl<'a, C, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> where C: Borrow
     }
 
 
+    /// Account ID to delete the user link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to delete the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web Property ID to delete the user link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web Property ID to delete the user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Link ID to delete the user link for.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Link ID to delete the user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6351,8 +6348,8 @@ impl<'a, C, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> where C: Borrow
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6445,7 +6442,7 @@ impl<'a, C, A> ManagementProfileUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks/{linkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{linkId}", "linkId")].iter() {
@@ -6531,53 +6528,52 @@ impl<'a, C, A> ManagementProfileUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    /// Account ID to delete the user link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to delete the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web Property ID to delete the user link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web Property ID to delete the user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to delete the user link for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to delete the user link for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Link ID to delete the user link for.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Link ID to delete the user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6607,8 +6603,8 @@ impl<'a, C, A> ManagementProfileUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6709,7 +6705,7 @@ impl<'a, C, A> ManagementProfileUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks/{linkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{linkId}", "linkId")].iter() {
@@ -6813,62 +6809,61 @@ impl<'a, C, A> ManagementProfileUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EntityUserLink) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to update the user link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to update the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web Property ID to update the user link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web Property ID to update the user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile ID) to update the user link for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile ID) to update the user link for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Link ID to update the user link for.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Link ID to update the user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6898,8 +6893,8 @@ impl<'a, C, A> ManagementProfileUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6994,7 +6989,7 @@ impl<'a, C, A> ManagementFilterInsertCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -7098,32 +7093,31 @@ impl<'a, C, A> ManagementFilterInsertCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Filter) -> ManagementFilterInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to create filter for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to create filter for.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7153,8 +7147,8 @@ impl<'a, C, A> ManagementFilterInsertCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7251,7 +7245,7 @@ impl<'a, C, A> ManagementAccountUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/entityUserLinks/{linkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{linkId}", "linkId")].iter() {
@@ -7355,42 +7349,41 @@ impl<'a, C, A> ManagementAccountUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EntityUserLink) -> ManagementAccountUserLinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to update the account-user link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to update the account-user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Link ID to update the account-user link for.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Link ID to update the account-user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7420,8 +7413,8 @@ impl<'a, C, A> ManagementAccountUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7518,7 +7511,7 @@ impl<'a, C, A> ManagementWebpropertyUpdateCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -7622,42 +7615,41 @@ impl<'a, C, A> ManagementWebpropertyUpdateCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Webproperty) -> ManagementWebpropertyUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to which the web property belongs
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to which the web property belongs
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7687,8 +7679,8 @@ impl<'a, C, A> ManagementWebpropertyUpdateCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7787,7 +7779,7 @@ impl<'a, C, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> where C: Borrow
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks/{linkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{linkId}", "linkId")].iter() {
@@ -7891,52 +7883,51 @@ impl<'a, C, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> where C: Borrow
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EntityUserLink) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to update the account-user link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to update the account-user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to update the account-user link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to update the account-user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Link ID to update the account-user link for.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Link ID to update the account-user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7966,8 +7957,8 @@ impl<'a, C, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> where C: Borrow
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8170,52 +8161,51 @@ impl<'a, C, A> ManagementUnsampledReportInsertCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UnsampledReport) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to create the unsampled report for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to create the unsampled report for.
     pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to create the unsampled report for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to create the unsampled report for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to create the unsampled report for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to create the unsampled report for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8245,8 +8235,8 @@ impl<'a, C, A> ManagementUnsampledReportInsertCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8338,7 +8328,7 @@ impl<'a, C, A> ManagementCustomMetricGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics/{customMetricId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{customMetricId}", "customMetricId")].iter() {
@@ -8434,43 +8424,42 @@ impl<'a, C, A> ManagementCustomMetricGetCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// Account ID for the custom metric to retrieve.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the custom metric to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the custom metric to retrieve.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the custom metric to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// The ID of the custom metric to retrieve.
+    ///
     /// Sets the *custom metric id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the custom metric to retrieve.
     pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, A> {
         self._custom_metric_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8500,8 +8489,8 @@ impl<'a, C, A> ManagementCustomMetricGetCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8595,7 +8584,7 @@ impl<'a, C, A> ManagementUploadGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/uploads/{uploadId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{customDataSourceId}", "customDataSourceId"), ("{uploadId}", "uploadId")].iter() {
@@ -8691,53 +8680,52 @@ impl<'a, C, A> ManagementUploadGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// Account Id for the upload to retrieve.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account Id for the upload to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property Id for the upload to retrieve.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property Id for the upload to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Custom data source Id for upload to retrieve.
+    ///
     /// Sets the *custom data source id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Custom data source Id for upload to retrieve.
     pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, A> {
         self._custom_data_source_id = new_value.to_string();
         self
     }
+    /// Upload Id to retrieve.
+    ///
     /// Sets the *upload id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Upload Id to retrieve.
     pub fn upload_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, A> {
         self._upload_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8767,8 +8755,8 @@ impl<'a, C, A> ManagementUploadGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8860,7 +8848,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> where C: Borrow
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{webPropertyAdWordsLinkId}", "webPropertyAdWordsLinkId")].iter() {
@@ -8956,43 +8944,42 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> where C: Borrow
     }
 
 
+    /// ID of the account which the given web property belongs to.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the account which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve the AdWords link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve the AdWords link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Web property-AdWords link ID.
+    ///
     /// Sets the *web property ad words link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property-AdWords link ID.
     pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9022,8 +9009,8 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> where C: Borrow
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9219,49 +9206,46 @@ impl<'a, C, A> ManagementWebpropertyUserLinkListCall<'a, C, A> where C: BorrowMu
     }
 
 
+    /// Account ID which the given web property belongs to.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web Property ID for the webProperty-user links to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web Property ID for the webProperty-user links to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first webProperty-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of webProperty-user Links to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9291,8 +9275,8 @@ impl<'a, C, A> ManagementWebpropertyUserLinkListCall<'a, C, A> where C: BorrowMu
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUserReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9393,7 +9377,7 @@ impl<'a, C, A> ManagementProfileFilterLinkUpdateCall<'a, C, A> where C: BorrowMu
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{linkId}", "linkId")].iter() {
@@ -9497,62 +9481,61 @@ impl<'a, C, A> ManagementProfileFilterLinkUpdateCall<'a, C, A> where C: BorrowMu
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ProfileFilterLink) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to which profile filter link belongs.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to which profile filter link belongs.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property Id to which profile filter link belongs
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property Id to which profile filter link belongs
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Profile ID to which filter link belongs
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Profile ID to which filter link belongs
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// ID of the profile filter link to be updated.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the profile filter link to be updated.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9582,8 +9565,8 @@ impl<'a, C, A> ManagementProfileFilterLinkUpdateCall<'a, C, A> where C: BorrowMu
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9677,7 +9660,7 @@ impl<'a, C, A> ManagementExperimentGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments/{experimentId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{experimentId}", "experimentId")].iter() {
@@ -9773,53 +9756,52 @@ impl<'a, C, A> ManagementExperimentGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// Account ID to retrieve the experiment for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve the experiment for.
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve the experiment for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve the experiment for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to retrieve the experiment for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to retrieve the experiment for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Experiment ID to retrieve the experiment for.
+    ///
     /// Sets the *experiment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Experiment ID to retrieve the experiment for.
     pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, A> {
         self._experiment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9849,8 +9831,8 @@ impl<'a, C, A> ManagementExperimentGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9954,7 +9936,7 @@ impl<'a, C, A> ManagementCustomDimensionUpdateCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions/{customDimensionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{customDimensionId}", "customDimensionId")].iter() {
@@ -10058,60 +10040,58 @@ impl<'a, C, A> ManagementCustomDimensionUpdateCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CustomDimension) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID for the custom dimension to update.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the custom dimension to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the custom dimension to update.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the custom dimension to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Custom dimension ID for the custom dimension to update.
+    ///
     /// Sets the *custom dimension id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Custom dimension ID for the custom dimension to update.
     pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._custom_dimension_id = new_value.to_string();
         self
     }
-    /// Sets the *ignore custom data source links* query property to the given value.
-    ///
-    /// 
     /// Force the update and ignore any warnings related to the custom dimension being linked to a custom data source / data set.
+    ///
+    /// Sets the *ignore custom data source links* query property to the given value.
     pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10141,8 +10121,8 @@ impl<'a, C, A> ManagementCustomDimensionUpdateCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10236,7 +10216,7 @@ impl<'a, C, A> ManagementUnsampledReportGetCall<'a, C, A> where C: BorrowMut<hyp
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports/{unsampledReportId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{unsampledReportId}", "unsampledReportId")].iter() {
@@ -10332,53 +10312,52 @@ impl<'a, C, A> ManagementUnsampledReportGetCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    /// Account ID to retrieve unsampled report for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve unsampled report for.
     pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve unsampled reports for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve unsampled reports for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to retrieve unsampled report for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to retrieve unsampled report for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// ID of the unsampled report to retrieve.
+    ///
     /// Sets the *unsampled report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the unsampled report to retrieve.
     pub fn unsampled_report_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, A> {
         self._unsampled_report_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUnsampledReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10408,8 +10387,8 @@ impl<'a, C, A> ManagementUnsampledReportGetCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10508,7 +10487,7 @@ impl<'a, C, A> ManagementProfileFilterLinkInsertCall<'a, C, A> where C: BorrowMu
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -10612,52 +10591,51 @@ impl<'a, C, A> ManagementProfileFilterLinkInsertCall<'a, C, A> where C: BorrowMu
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ProfileFilterLink) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to create profile filter link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to create profile filter link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property Id to create profile filter link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property Id to create profile filter link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Profile ID to create filter link for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Profile ID to create filter link for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10687,8 +10665,8 @@ impl<'a, C, A> ManagementProfileFilterLinkInsertCall<'a, C, A> where C: BorrowMu
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10785,7 +10763,7 @@ impl<'a, C, A> ManagementFilterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters/{filterId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{filterId}", "filterId")].iter() {
@@ -10889,42 +10867,41 @@ impl<'a, C, A> ManagementFilterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Filter) -> ManagementFilterUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to which the filter belongs.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to which the filter belongs.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// ID of the filter to be updated.
+    ///
     /// Sets the *filter id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the filter to be updated.
     pub fn filter_id(mut self, new_value: &str) -> ManagementFilterUpdateCall<'a, C, A> {
         self._filter_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10954,8 +10931,8 @@ impl<'a, C, A> ManagementFilterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11048,7 +11025,7 @@ impl<'a, C, A> ManagementProfileFilterLinkDeleteCall<'a, C, A> where C: BorrowMu
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{linkId}", "linkId")].iter() {
@@ -11134,53 +11111,52 @@ impl<'a, C, A> ManagementProfileFilterLinkDeleteCall<'a, C, A> where C: BorrowMu
     }
 
 
+    /// Account ID to which the profile filter link belongs.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to which the profile filter link belongs.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property Id to which the profile filter link belongs.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property Id to which the profile filter link belongs.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Profile ID to which the filter link belongs.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Profile ID to which the filter link belongs.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// ID of the profile filter link to delete.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the profile filter link to delete.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11210,8 +11186,8 @@ impl<'a, C, A> ManagementProfileFilterLinkDeleteCall<'a, C, A> where C: BorrowMu
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11307,7 +11283,7 @@ impl<'a, C, A> ManagementSegmentListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/segments".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
@@ -11379,29 +11355,26 @@ impl<'a, C, A> ManagementSegmentListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first segment to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementSegmentListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of segments to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementSegmentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementSegmentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11431,8 +11404,8 @@ impl<'a, C, A> ManagementSegmentListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11523,7 +11496,7 @@ impl<'a, C, A> ManagementProfileDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -11609,43 +11582,42 @@ impl<'a, C, A> ManagementProfileDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// Account ID to delete the view (profile) for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to delete the view (profile) for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to delete the view (profile) for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to delete the view (profile) for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// ID of the view (profile) to be deleted.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the view (profile) to be deleted.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11675,8 +11647,8 @@ impl<'a, C, A> ManagementProfileDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11777,7 +11749,7 @@ impl<'a, C, A> ManagementGoalPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals/{goalId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{goalId}", "goalId")].iter() {
@@ -11881,62 +11853,61 @@ impl<'a, C, A> ManagementGoalPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Goal) -> ManagementGoalPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to update the goal.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to update the goal.
     pub fn account_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to update the goal.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to update the goal.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to update the goal.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to update the goal.
     pub fn profile_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Index of the goal to be updated.
+    ///
     /// Sets the *goal id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Index of the goal to be updated.
     pub fn goal_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, A> {
         self._goal_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11966,8 +11937,8 @@ impl<'a, C, A> ManagementGoalPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12071,7 +12042,7 @@ impl<'a, C, A> ManagementCustomDimensionPatchCall<'a, C, A> where C: BorrowMut<h
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions/{customDimensionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{customDimensionId}", "customDimensionId")].iter() {
@@ -12175,60 +12146,58 @@ impl<'a, C, A> ManagementCustomDimensionPatchCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CustomDimension) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID for the custom dimension to update.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the custom dimension to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the custom dimension to update.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the custom dimension to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Custom dimension ID for the custom dimension to update.
+    ///
     /// Sets the *custom dimension id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Custom dimension ID for the custom dimension to update.
     pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._custom_dimension_id = new_value.to_string();
         self
     }
-    /// Sets the *ignore custom data source links* query property to the given value.
-    ///
-    /// 
     /// Force the update and ignore any warnings related to the custom dimension being linked to a custom data source / data set.
+    ///
+    /// Sets the *ignore custom data source links* query property to the given value.
     pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12258,8 +12227,8 @@ impl<'a, C, A> ManagementCustomDimensionPatchCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12464,62 +12433,61 @@ impl<'a, C, A> ManagementExperimentPatchCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Experiment) -> ManagementExperimentPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID of the experiment to update.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID of the experiment to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID of the experiment to update.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID of the experiment to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID of the experiment to update.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID of the experiment to update.
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Experiment ID of the experiment to update.
+    ///
     /// Sets the *experiment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Experiment ID of the experiment to update.
     pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, A> {
         self._experiment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12549,8 +12517,8 @@ impl<'a, C, A> ManagementExperimentPatchCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12652,7 +12620,7 @@ impl<'a, C, A> ManagementExperimentListCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/experiments".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -12748,59 +12716,56 @@ impl<'a, C, A> ManagementExperimentListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// Account ID to retrieve experiments for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve experiments for.
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve experiments for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve experiments for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to retrieve experiments for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to retrieve experiments for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first experiment to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementExperimentListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of experiments to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementExperimentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12830,8 +12795,8 @@ impl<'a, C, A> ManagementExperimentListCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12931,7 +12896,7 @@ impl<'a, C, A> ManagementProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -13027,49 +12992,46 @@ impl<'a, C, A> ManagementProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// Account ID for the view (profiles) to retrieve. Can either be a specific account ID or '~all', which refers to all the accounts to which the user has access.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the view (profiles) to retrieve. Can either be a specific account ID or '~all', which refers to all the accounts to which the user has access.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the views (profiles) to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties to which the user has access.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the views (profiles) to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties to which the user has access.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementProfileListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of views (profiles) to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementProfileListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13099,8 +13061,8 @@ impl<'a, C, A> ManagementProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13202,7 +13164,7 @@ impl<'a, C, A> ManagementGoalListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -13298,59 +13260,56 @@ impl<'a, C, A> ManagementGoalListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Account ID to retrieve goals for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve goals for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
     pub fn account_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve goals for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve goals for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to retrieve goals for. Can either be a specific view (profile) ID or '~all', which refers to all the views (profiles) that user has access to.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to retrieve goals for. Can either be a specific view (profile) ID or '~all', which refers to all the views (profiles) that user has access to.
     pub fn profile_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first goal to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementGoalListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of goals to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementGoalListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13380,8 +13339,8 @@ impl<'a, C, A> ManagementGoalListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13480,7 +13439,7 @@ impl<'a, C, A> ManagementGoalInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -13584,52 +13543,51 @@ impl<'a, C, A> ManagementGoalInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Goal) -> ManagementGoalInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to create the goal for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to create the goal for.
     pub fn account_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to create the goal for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to create the goal for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to create the goal for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to create the goal for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13659,8 +13617,8 @@ impl<'a, C, A> ManagementGoalInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13764,7 +13722,7 @@ impl<'a, C, A> ManagementCustomMetricPatchCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics/{customMetricId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{customMetricId}", "customMetricId")].iter() {
@@ -13868,60 +13826,58 @@ impl<'a, C, A> ManagementCustomMetricPatchCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CustomMetric) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID for the custom metric to update.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the custom metric to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the custom metric to update.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the custom metric to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Custom metric ID for the custom metric to update.
+    ///
     /// Sets the *custom metric id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Custom metric ID for the custom metric to update.
     pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._custom_metric_id = new_value.to_string();
         self
     }
-    /// Sets the *ignore custom data source links* query property to the given value.
-    ///
-    /// 
     /// Force the update and ignore any warnings related to the custom metric being linked to a custom data source / data set.
+    ///
+    /// Sets the *ignore custom data source links* query property to the given value.
     pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13951,8 +13907,8 @@ impl<'a, C, A> ManagementCustomMetricPatchCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14250,43 +14206,42 @@ impl<'a, C, A> ManagementUploadUploadDataCall<'a, C, A> where C: BorrowMut<hyper
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    /// Account Id associated with the upload.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account Id associated with the upload.
     pub fn account_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property UA-string associated with the upload.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property UA-string associated with the upload.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Custom data source Id to which the data being uploaded belongs.
+    ///
     /// Sets the *custom data source id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Custom data source Id to which the data being uploaded belongs.
     pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, A> {
         self._custom_data_source_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadUploadDataCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14316,8 +14271,8 @@ impl<'a, C, A> ManagementUploadUploadDataCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14412,7 +14367,7 @@ impl<'a, C, A> ManagementAccountUserLinkInsertCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/entityUserLinks".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -14516,32 +14471,31 @@ impl<'a, C, A> ManagementAccountUserLinkInsertCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EntityUserLink) -> ManagementAccountUserLinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to create the user link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to create the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14571,8 +14525,8 @@ impl<'a, C, A> ManagementAccountUserLinkInsertCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14669,7 +14623,7 @@ impl<'a, C, A> ManagementWebpropertyUserLinkInsertCall<'a, C, A> where C: Borrow
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityUserLinks".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -14773,42 +14727,41 @@ impl<'a, C, A> ManagementWebpropertyUserLinkInsertCall<'a, C, A> where C: Borrow
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EntityUserLink) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to create the user link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to create the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web Property ID to create the user link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web Property ID to create the user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14838,8 +14791,8 @@ impl<'a, C, A> ManagementWebpropertyUserLinkInsertCall<'a, C, A> where C: Borrow
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15018,53 +14971,52 @@ impl<'a, C, A> ManagementExperimentDeleteCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// Account ID to which the experiment belongs
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to which the experiment belongs
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to which the experiment belongs
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to which the experiment belongs
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to which the experiment belongs
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to which the experiment belongs
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// ID of the experiment to delete
+    ///
     /// Sets the *experiment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the experiment to delete
     pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, A> {
         self._experiment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15094,8 +15046,8 @@ impl<'a, C, A> ManagementExperimentDeleteCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15194,7 +15146,7 @@ impl<'a, C, A> ManagementProfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -15298,52 +15250,51 @@ impl<'a, C, A> ManagementProfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Profile) -> ManagementProfilePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to which the view (profile) belongs
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to which the view (profile) belongs
     pub fn account_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to which the view (profile) belongs
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to which the view (profile) belongs
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// ID of the view (profile) to be updated.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the view (profile) to be updated.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfilePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15373,8 +15324,8 @@ impl<'a, C, A> ManagementProfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15464,7 +15415,7 @@ impl<'a, C, A> ManagementFilterGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters/{filterId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{filterId}", "filterId")].iter() {
@@ -15560,33 +15511,32 @@ impl<'a, C, A> ManagementFilterGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// Account ID to retrieve filters for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve filters for.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Filter ID to retrieve filters for.
+    ///
     /// Sets the *filter id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Filter ID to retrieve filters for.
     pub fn filter_id(mut self, new_value: &str) -> ManagementFilterGetCall<'a, C, A> {
         self._filter_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15616,8 +15566,8 @@ impl<'a, C, A> ManagementFilterGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15717,7 +15667,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> where C: Borro
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -15813,49 +15763,46 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> where C: Borro
     }
 
 
+    /// ID of the account which the given web property belongs to.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the account which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve the AdWords links for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve the AdWords links for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first webProperty-AdWords link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of webProperty-AdWords links to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15885,8 +15832,8 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> where C: Borro
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15982,7 +15929,7 @@ impl<'a, C, A> ManagementAccountSummaryListCall<'a, C, A> where C: BorrowMut<hyp
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accountSummaries".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
@@ -16054,29 +16001,26 @@ impl<'a, C, A> ManagementAccountSummaryListCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementAccountSummaryListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of account summaries to include in this response, where the largest acceptable value is 1000.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementAccountSummaryListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountSummaryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16106,8 +16050,8 @@ impl<'a, C, A> ManagementAccountSummaryListCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16207,7 +16151,7 @@ impl<'a, C, A> ManagementCustomDimensionListCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -16303,49 +16247,46 @@ impl<'a, C, A> ManagementCustomDimensionListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// Account ID for the custom dimensions to retrieve.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the custom dimensions to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the custom dimensions to retrieve.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the custom dimensions to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementCustomDimensionListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of custom dimensions to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementCustomDimensionListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16375,8 +16316,8 @@ impl<'a, C, A> ManagementCustomDimensionListCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16478,7 +16419,7 @@ impl<'a, C, A> ManagementUploadListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources/{customDataSourceId}/uploads".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{customDataSourceId}", "customDataSourceId")].iter() {
@@ -16574,59 +16515,56 @@ impl<'a, C, A> ManagementUploadListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// Account Id for the uploads to retrieve.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account Id for the uploads to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property Id for the uploads to retrieve.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property Id for the uploads to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Custom data source Id for uploads to retrieve.
+    ///
     /// Sets the *custom data source id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Custom data source Id for uploads to retrieve.
     pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, A> {
         self._custom_data_source_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// A 1-based index of the first upload to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementUploadListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of uploads to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementUploadListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16656,8 +16594,8 @@ impl<'a, C, A> ManagementUploadListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16855,59 +16793,56 @@ impl<'a, C, A> ManagementProfileUserLinkListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// Account ID which the given view (profile) belongs to.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID which the given view (profile) belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web Property ID which the given view (profile) belongs to. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web Property ID which the given view (profile) belongs to. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to retrieve the profile-user links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to retrieve the profile-user links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first profile-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of profile-user links to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16937,8 +16872,8 @@ impl<'a, C, A> ManagementProfileUserLinkListCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUserReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17132,39 +17067,36 @@ impl<'a, C, A> ManagementAccountUserLinkListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// Account ID to retrieve the user links for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve the user links for.
     pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first account-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementAccountUserLinkListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of account-user links to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementAccountUserLinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17194,8 +17126,8 @@ impl<'a, C, A> ManagementAccountUserLinkListCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUserReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17299,7 +17231,7 @@ impl<'a, C, A> ManagementCustomMetricUpdateCall<'a, C, A> where C: BorrowMut<hyp
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics/{customMetricId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{customMetricId}", "customMetricId")].iter() {
@@ -17403,60 +17335,58 @@ impl<'a, C, A> ManagementCustomMetricUpdateCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CustomMetric) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID for the custom metric to update.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the custom metric to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the custom metric to update.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the custom metric to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Custom metric ID for the custom metric to update.
+    ///
     /// Sets the *custom metric id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Custom metric ID for the custom metric to update.
     pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._custom_metric_id = new_value.to_string();
         self
     }
-    /// Sets the *ignore custom data source links* query property to the given value.
-    ///
-    /// 
     /// Force the update and ignore any warnings related to the custom metric being linked to a custom data source / data set.
+    ///
+    /// Sets the *ignore custom data source links* query property to the given value.
     pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17486,8 +17416,8 @@ impl<'a, C, A> ManagementCustomMetricUpdateCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17679,52 +17609,51 @@ impl<'a, C, A> ManagementUploadDeleteUploadDataCall<'a, C, A> where C: BorrowMut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AnalyticsDataimportDeleteUploadDataRequest) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account Id for the uploads to be deleted.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account Id for the uploads to be deleted.
     pub fn account_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property Id for the uploads to be deleted.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property Id for the uploads to be deleted.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Custom data source Id for the uploads to be deleted.
+    ///
     /// Sets the *custom data source id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Custom data source Id for the uploads to be deleted.
     pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         self._custom_data_source_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17754,8 +17683,8 @@ impl<'a, C, A> ManagementUploadDeleteUploadDataCall<'a, C, A> where C: BorrowMut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17960,62 +17889,61 @@ impl<'a, C, A> ManagementExperimentUpdateCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Experiment) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID of the experiment to update.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID of the experiment to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID of the experiment to update.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID of the experiment to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID of the experiment to update.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID of the experiment to update.
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Experiment ID of the experiment to update.
+    ///
     /// Sets the *experiment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Experiment ID of the experiment to update.
     pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._experiment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18045,8 +17973,8 @@ impl<'a, C, A> ManagementExperimentUpdateCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18147,7 +18075,7 @@ impl<'a, C, A> ManagementGoalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals/{goalId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{goalId}", "goalId")].iter() {
@@ -18251,62 +18179,61 @@ impl<'a, C, A> ManagementGoalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Goal) -> ManagementGoalUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to update the goal.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to update the goal.
     pub fn account_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to update the goal.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to update the goal.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to update the goal.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to update the goal.
     pub fn profile_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Index of the goal to be updated.
+    ///
     /// Sets the *goal id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Index of the goal to be updated.
     pub fn goal_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, A> {
         self._goal_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18336,8 +18263,8 @@ impl<'a, C, A> ManagementGoalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18437,7 +18364,7 @@ impl<'a, C, A> ManagementCustomDataSourceListCall<'a, C, A> where C: BorrowMut<h
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDataSources".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -18533,49 +18460,46 @@ impl<'a, C, A> ManagementCustomDataSourceListCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    /// Account Id for the custom data sources to retrieve.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account Id for the custom data sources to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDataSourceListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property Id for the custom data sources to retrieve.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property Id for the custom data sources to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDataSourceListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// A 1-based index of the first custom data source to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementCustomDataSourceListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of custom data sources to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementCustomDataSourceListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDataSourceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18605,8 +18529,8 @@ impl<'a, C, A> ManagementCustomDataSourceListCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18706,7 +18630,7 @@ impl<'a, C, A> ManagementCustomMetricListCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -18802,49 +18726,46 @@ impl<'a, C, A> ManagementCustomMetricListCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// Account ID for the custom metrics to retrieve.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the custom metrics to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the custom metrics to retrieve.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the custom metrics to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementCustomMetricListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of custom metrics to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementCustomMetricListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18874,8 +18795,8 @@ impl<'a, C, A> ManagementCustomMetricListCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18977,7 +18898,7 @@ impl<'a, C, A> ManagementUnsampledReportListCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/unsampledReports".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -19073,59 +18994,56 @@ impl<'a, C, A> ManagementUnsampledReportListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// Account ID to retrieve unsampled reports for. Must be a specific account ID, ~all is not supported.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve unsampled reports for. Must be a specific account ID, ~all is not supported.
     pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve unsampled reports for. Must be a specific web property ID, ~all is not supported.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve unsampled reports for. Must be a specific web property ID, ~all is not supported.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to retrieve unsampled reports for. Must be a specific view (profile) ID, ~all is not supported.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to retrieve unsampled reports for. Must be a specific view (profile) ID, ~all is not supported.
     pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first unsampled report to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of unsampled reports to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19155,8 +19073,8 @@ impl<'a, C, A> ManagementUnsampledReportListCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19246,7 +19164,7 @@ impl<'a, C, A> ManagementWebpropertyGetCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -19342,33 +19260,32 @@ impl<'a, C, A> ManagementWebpropertyGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// Account ID to retrieve the web property for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve the web property for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// ID to retrieve the web property for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID to retrieve the web property for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19398,8 +19315,8 @@ impl<'a, C, A> ManagementWebpropertyGetCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19602,52 +19519,51 @@ impl<'a, C, A> ManagementExperimentInsertCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Experiment) -> ManagementExperimentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to create the experiment for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to create the experiment for.
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to create the experiment for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to create the experiment for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to create the experiment for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to create the experiment for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19677,8 +19593,8 @@ impl<'a, C, A> ManagementExperimentInsertCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19770,7 +19686,7 @@ impl<'a, C, A> ManagementCustomDimensionGetCall<'a, C, A> where C: BorrowMut<hyp
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions/{customDimensionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{customDimensionId}", "customDimensionId")].iter() {
@@ -19866,43 +19782,42 @@ impl<'a, C, A> ManagementCustomDimensionGetCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    /// Account ID for the custom dimension to retrieve.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the custom dimension to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the custom dimension to retrieve.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the custom dimension to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// The ID of the custom dimension to retrieve.
+    ///
     /// Sets the *custom dimension id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the custom dimension to retrieve.
     pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, A> {
         self._custom_dimension_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19932,8 +19847,8 @@ impl<'a, C, A> ManagementCustomDimensionGetCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20035,7 +19950,7 @@ impl<'a, C, A> ManagementProfileFilterLinkListCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -20131,59 +20046,56 @@ impl<'a, C, A> ManagementProfileFilterLinkListCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    /// Account ID to retrieve profile filter links for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve profile filter links for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property Id for profile filter links for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property Id for profile filter links for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Profile ID to retrieve filter links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Profile ID to retrieve filter links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of profile filter links to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20213,8 +20125,8 @@ impl<'a, C, A> ManagementProfileFilterLinkListCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20311,7 +20223,7 @@ impl<'a, C, A> ManagementWebpropertyPatchCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -20415,42 +20327,41 @@ impl<'a, C, A> ManagementWebpropertyPatchCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Webproperty) -> ManagementWebpropertyPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to which the web property belongs
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to which the web property belongs
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20480,8 +20391,8 @@ impl<'a, C, A> ManagementWebpropertyPatchCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20578,7 +20489,7 @@ impl<'a, C, A> ManagementCustomDimensionInsertCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customDimensions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -20682,42 +20593,41 @@ impl<'a, C, A> ManagementCustomDimensionInsertCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CustomDimension) -> ManagementCustomDimensionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID for the custom dimension to create.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the custom dimension to create.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the custom dimension to create.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the custom dimension to create.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20747,8 +20657,8 @@ impl<'a, C, A> ManagementCustomDimensionInsertCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20845,7 +20755,7 @@ impl<'a, C, A> ManagementCustomMetricInsertCall<'a, C, A> where C: BorrowMut<hyp
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/customMetrics".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -20949,42 +20859,41 @@ impl<'a, C, A> ManagementCustomMetricInsertCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CustomMetric) -> ManagementCustomMetricInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID for the custom metric to create.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID for the custom metric to create.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID for the custom dimension to create.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID for the custom dimension to create.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -21014,8 +20923,8 @@ impl<'a, C, A> ManagementCustomMetricInsertCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21114,7 +21023,7 @@ impl<'a, C, A> ManagementProfileUserLinkInsertCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/entityUserLinks".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -21218,52 +21127,51 @@ impl<'a, C, A> ManagementProfileUserLinkInsertCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EntityUserLink) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to create the user link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to create the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web Property ID to create the user link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web Property ID to create the user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to create the user link for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to create the user link for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -21293,8 +21201,8 @@ impl<'a, C, A> ManagementProfileUserLinkInsertCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21392,7 +21300,7 @@ impl<'a, C, A> ManagementWebpropertyListCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -21488,39 +21396,36 @@ impl<'a, C, A> ManagementWebpropertyListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// Account ID to retrieve web properties for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve web properties for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementWebpropertyListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of web properties to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementWebpropertyListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -21550,8 +21455,8 @@ impl<'a, C, A> ManagementWebpropertyListCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21648,7 +21553,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> where C: Bor
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -21752,42 +21657,41 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> where C: Bor
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EntityAdWordsLink) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// ID of the Google Analytics account to create the link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the Google Analytics account to create the link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to create the link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to create the link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -21817,8 +21721,8 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> where C: Bor
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21917,7 +21821,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> where C: Borr
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{webPropertyAdWordsLinkId}", "webPropertyAdWordsLinkId")].iter() {
@@ -22021,52 +21925,51 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> where C: Borr
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EntityAdWordsLink) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// ID of the account which the given web property belongs to.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the account which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve the AdWords link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve the AdWords link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Web property-AdWords link ID.
+    ///
     /// Sets the *web property ad words link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property-AdWords link ID.
     pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -22096,8 +21999,8 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> where C: Borr
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -22191,7 +22094,7 @@ impl<'a, C, A> ManagementGoalGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/goals/{goalId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{goalId}", "goalId")].iter() {
@@ -22287,53 +22190,52 @@ impl<'a, C, A> ManagementGoalGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Account ID to retrieve the goal for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve the goal for.
     pub fn account_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve the goal for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve the goal for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// View (Profile) ID to retrieve the goal for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// View (Profile) ID to retrieve the goal for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// Goal ID to retrieve the goal for.
+    ///
     /// Sets the *goal id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Goal ID to retrieve the goal for.
     pub fn goal_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, A> {
         self._goal_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -22363,8 +22265,8 @@ impl<'a, C, A> ManagementGoalGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -22455,7 +22357,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> where C: Bor
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{webPropertyAdWordsLinkId}", "webPropertyAdWordsLinkId")].iter() {
@@ -22541,43 +22443,42 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> where C: Bor
     }
 
 
+    /// ID of the account which the given web property belongs to.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the account which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to delete the AdWords link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to delete the AdWords link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Web property AdWords link ID.
+    ///
     /// Sets the *web property ad words link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property AdWords link ID.
     pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -22607,8 +22508,8 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> where C: Bor
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -22707,7 +22608,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> where C: Bor
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/entityAdWordsLinks/{webPropertyAdWordsLinkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{webPropertyAdWordsLinkId}", "webPropertyAdWordsLinkId")].iter() {
@@ -22811,52 +22712,51 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> where C: Bor
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EntityAdWordsLink) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// ID of the account which the given web property belongs to.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the account which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to retrieve the AdWords link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to retrieve the AdWords link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Web property-AdWords link ID.
+    ///
     /// Sets the *web property ad words link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property-AdWords link ID.
     pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -22886,8 +22786,8 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> where C: Bor
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -22984,7 +22884,7 @@ impl<'a, C, A> ManagementFilterPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters/{filterId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{filterId}", "filterId")].iter() {
@@ -23088,42 +22988,41 @@ impl<'a, C, A> ManagementFilterPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Filter) -> ManagementFilterPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to which the filter belongs.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to which the filter belongs.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// ID of the filter to be updated.
+    ///
     /// Sets the *filter id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the filter to be updated.
     pub fn filter_id(mut self, new_value: &str) -> ManagementFilterPatchCall<'a, C, A> {
         self._filter_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -23153,8 +23052,8 @@ impl<'a, C, A> ManagementFilterPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -23252,7 +23151,7 @@ impl<'a, C, A> ManagementFilterListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -23348,39 +23247,36 @@ impl<'a, C, A> ManagementFilterListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// Account ID to retrieve filters for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve filters for.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ManagementFilterListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of filters to include in this response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagementFilterListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -23410,8 +23306,8 @@ impl<'a, C, A> ManagementFilterListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -23501,7 +23397,7 @@ impl<'a, C, A> ManagementFilterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/filters/{filterId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{filterId}", "filterId")].iter() {
@@ -23597,33 +23493,32 @@ impl<'a, C, A> ManagementFilterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// Account ID to delete the filter for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to delete the filter for.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// ID of the filter to be deleted.
+    ///
     /// Sets the *filter id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the filter to be deleted.
     pub fn filter_id(mut self, new_value: &str) -> ManagementFilterDeleteCall<'a, C, A> {
         self._filter_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -23653,8 +23548,8 @@ impl<'a, C, A> ManagementFilterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -23751,7 +23646,7 @@ impl<'a, C, A> ManagementProfileInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId")].iter() {
@@ -23855,42 +23750,41 @@ impl<'a, C, A> ManagementProfileInsertCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Profile) -> ManagementProfileInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to create the view (profile) for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to create the view (profile) for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to create the view (profile) for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to create the view (profile) for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -23920,8 +23814,8 @@ impl<'a, C, A> ManagementProfileInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -24010,7 +23904,7 @@ impl<'a, C, A> ManagementAccountUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/entityUserLinks/{linkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{linkId}", "linkId")].iter() {
@@ -24096,33 +23990,32 @@ impl<'a, C, A> ManagementAccountUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    /// Account ID to delete the user link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to delete the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Link ID to delete the user link for.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Link ID to delete the user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -24152,8 +24045,8 @@ impl<'a, C, A> ManagementAccountUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -24252,7 +24145,7 @@ impl<'a, C, A> ManagementProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Edit.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId")].iter() {
@@ -24356,52 +24249,51 @@ impl<'a, C, A> ManagementProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Profile) -> ManagementProfileUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Account ID to which the view (profile) belongs
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to which the view (profile) belongs
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property ID to which the view (profile) belongs
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property ID to which the view (profile) belongs
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// ID of the view (profile) to be updated.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the view (profile) to be updated.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -24431,8 +24323,8 @@ impl<'a, C, A> ManagementProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Edit`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -24526,7 +24418,7 @@ impl<'a, C, A> ManagementProfileFilterLinkGetCall<'a, C, A> where C: BorrowMut<h
 
         let mut url = "https://www.googleapis.com/analytics/v3/management/accounts/{accountId}/webproperties/{webPropertyId}/profiles/{profileId}/profileFilterLinks/{linkId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{webPropertyId}", "webPropertyId"), ("{profileId}", "profileId"), ("{linkId}", "linkId")].iter() {
@@ -24622,53 +24514,52 @@ impl<'a, C, A> ManagementProfileFilterLinkGetCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    /// Account ID to retrieve profile filter link for.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account ID to retrieve profile filter link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Web property Id to retrieve profile filter link for.
+    ///
     /// Sets the *web property id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Web property Id to retrieve profile filter link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
+    /// Profile ID to retrieve filter link for.
+    ///
     /// Sets the *profile id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Profile ID to retrieve filter link for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
+    /// ID of the profile filter link.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the profile filter link.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -24698,8 +24589,8 @@ impl<'a, C, A> ManagementProfileFilterLinkGetCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -24823,7 +24714,7 @@ impl<'a, C, A> DataMcfGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/analytics/v3/data/mcf".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
@@ -24895,101 +24786,94 @@ impl<'a, C, A> DataMcfGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
+    ///
     /// Sets the *ids* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
     pub fn ids(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._ids = new_value.to_string();
         self
     }
+    /// Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
+    ///
     /// Sets the *start-date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
     pub fn start_date(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._start_date = new_value.to_string();
         self
     }
+    /// End date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
+    ///
     /// Sets the *end-date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// End date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
     pub fn end_date(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._end_date = new_value.to_string();
         self
     }
+    /// A comma-separated list of Multi-Channel Funnels metrics. E.g., 'mcf:totalConversions,mcf:totalConversionValue'. At least one metric must be specified.
+    ///
     /// Sets the *metrics* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A comma-separated list of Multi-Channel Funnels metrics. E.g., 'mcf:totalConversions,mcf:totalConversionValue'. At least one metric must be specified.
     pub fn metrics(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._metrics = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> DataMcfGetCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *sort* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of dimensions or metrics that determine the sort order for the Analytics data.
+    ///
+    /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
-    /// Sets the *sampling level* query property to the given value.
-    ///
-    /// 
     /// The desired sampling level.
+    ///
+    /// Sets the *sampling level* query property to the given value.
     pub fn sampling_level(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._sampling_level = Some(new_value.to_string());
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of entries to include in this feed.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> DataMcfGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filters* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of dimension or metric filters to be applied to the Analytics data.
+    ///
+    /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Sets the *dimensions* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of Multi-Channel Funnels dimensions. E.g., 'mcf:source,mcf:medium'.
+    ///
+    /// Sets the *dimensions* query property to the given value.
     pub fn dimensions(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._dimensions = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DataMcfGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -25019,8 +24903,8 @@ impl<'a, C, A> DataMcfGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -25154,7 +25038,7 @@ impl<'a, C, A> DataGaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/analytics/v3/data/ga".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
@@ -25226,117 +25110,108 @@ impl<'a, C, A> DataGaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
+    ///
     /// Sets the *ids* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
     pub fn ids(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._ids = new_value.to_string();
         self
     }
+    /// Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
+    ///
     /// Sets the *start-date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
     pub fn start_date(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._start_date = new_value.to_string();
         self
     }
+    /// End date for fetching Analytics data. Request can should specify an end date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is yesterday.
+    ///
     /// Sets the *end-date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// End date for fetching Analytics data. Request can should specify an end date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is yesterday.
     pub fn end_date(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._end_date = new_value.to_string();
         self
     }
+    /// A comma-separated list of Analytics metrics. E.g., 'ga:sessions,ga:pageviews'. At least one metric must be specified.
+    ///
     /// Sets the *metrics* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A comma-separated list of Analytics metrics. E.g., 'ga:sessions,ga:pageviews'. At least one metric must be specified.
     pub fn metrics(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._metrics = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> DataGaGetCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *sort* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of dimensions or metrics that determine the sort order for Analytics data.
+    ///
+    /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
-    /// Sets the *segment* query property to the given value.
-    ///
-    /// 
     /// An Analytics segment to be applied to data.
+    ///
+    /// Sets the *segment* query property to the given value.
     pub fn segment(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._segment = Some(new_value.to_string());
         self
     }
-    /// Sets the *sampling level* query property to the given value.
-    ///
-    /// 
     /// The desired sampling level.
+    ///
+    /// Sets the *sampling level* query property to the given value.
     pub fn sampling_level(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._sampling_level = Some(new_value.to_string());
         self
     }
-    /// Sets the *output* query property to the given value.
-    ///
-    /// 
     /// The selected format for the response. Default format is JSON.
+    ///
+    /// Sets the *output* query property to the given value.
     pub fn output(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._output = Some(new_value.to_string());
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of entries to include in this feed.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> DataGaGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filters* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of dimension or metric filters to be applied to Analytics data.
+    ///
+    /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Sets the *dimensions* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of Analytics dimensions. E.g., 'ga:browser,ga:city'.
+    ///
+    /// Sets the *dimensions* query property to the given value.
     pub fn dimensions(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._dimensions = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DataGaGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -25366,8 +25241,8 @@ impl<'a, C, A> DataGaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -25477,7 +25352,7 @@ impl<'a, C, A> DataRealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/analytics/v3/data/realtime".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
@@ -25549,65 +25424,60 @@ impl<'a, C, A> DataRealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Unique table ID for retrieving real time data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
+    ///
     /// Sets the *ids* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Unique table ID for retrieving real time data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
     pub fn ids(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, A> {
         self._ids = new_value.to_string();
         self
     }
+    /// A comma-separated list of real time metrics. E.g., 'rt:activeUsers'. At least one metric must be specified.
+    ///
     /// Sets the *metrics* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A comma-separated list of real time metrics. E.g., 'rt:activeUsers'. At least one metric must be specified.
     pub fn metrics(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, A> {
         self._metrics = new_value.to_string();
         self
     }
-    /// Sets the *sort* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of dimensions or metrics that determine the sort order for real time data.
+    ///
+    /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of entries to include in this feed.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> DataRealtimeGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filters* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of dimension or metric filters to be applied to real time data.
+    ///
+    /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Sets the *dimensions* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of real time dimensions. E.g., 'rt:medium,rt:city'.
+    ///
+    /// Sets the *dimensions* query property to the given value.
     pub fn dimensions(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, A> {
         self._dimensions = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DataRealtimeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -25637,8 +25507,8 @@ impl<'a, C, A> DataRealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -25731,7 +25601,7 @@ impl<'a, C, A> ProvisioningCreateAccountTicketCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/analytics/v3/provisioning/createAccountTicket".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Provision.as_ref().to_string(), ());
         }
 
         
@@ -25811,22 +25681,21 @@ impl<'a, C, A> ProvisioningCreateAccountTicketCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AccountTicket) -> ProvisioningCreateAccountTicketCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProvisioningCreateAccountTicketCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -25856,8 +25725,8 @@ impl<'a, C, A> ProvisioningCreateAccountTicketCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Provision`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -25945,7 +25814,7 @@ impl<'a, C, A> MetadataColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/analytics/v3/metadata/{reportType}/columns".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ManageUserReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{reportType}", "reportType")].iter() {
@@ -26041,23 +25910,22 @@ impl<'a, C, A> MetadataColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Report type. Allowed Values: 'ga'. Where 'ga' corresponds to the Core Reporting API
+    ///
     /// Sets the *report type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Report type. Allowed Values: 'ga'. Where 'ga' corresponds to the Core Reporting API
     pub fn report_type(mut self, new_value: &str) -> MetadataColumnListCall<'a, C, A> {
         self._report_type = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetadataColumnListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -26087,8 +25955,8 @@ impl<'a, C, A> MetadataColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

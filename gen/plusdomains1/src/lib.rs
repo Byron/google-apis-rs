@@ -121,16 +121,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -326,16 +328,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -439,7 +443,7 @@ impl Part for Videostream {}
 /// 
 /// * [list activities](struct.ActivityListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -485,7 +489,7 @@ impl Part for MediaExif {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonEmails {
     /// The type of address. Possible values include, but are not limited to, the following values:  
     /// - "account" - Google account email address. 
@@ -570,7 +574,7 @@ impl ResponseResult for Media {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonOrganizations {
     /// The date that the person joined this organization.
     #[serde(rename="startDate")]
@@ -690,7 +694,7 @@ impl Part for ActivityObjectActorImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonPlacesLived {
     /// If "true", this place of residence is this person's primary residence.
     pub primary: bool,
@@ -839,7 +843,7 @@ impl Part for CommentInReplyTo {}
 /// * [list by activity people](struct.PeopleListByActivityCall.html) (response)
 /// * [list people](struct.PeopleListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PeopleFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -888,7 +892,7 @@ impl Part for CommentActor {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonCoverCoverInfo {
     /// The difference between the left position of the cover image and the actual displayed cover image. Only valid for banner layout.
     #[serde(rename="leftImageOffset")]
@@ -906,7 +910,7 @@ impl Part for PersonCoverCoverInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonUrls {
     /// The type of URL. Possible values include, but are not limited to, the following values:  
     /// - "otherProfile" - URL for another profile. 
@@ -1005,7 +1009,7 @@ impl Part for CommentActorImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonImage {
     /// The URL of the person's profile photo. To resize the image and crop it to a square, append the query string ?sz=x, where x is the dimension in pixels of each side.
     pub url: String,
@@ -1042,7 +1046,7 @@ impl Part for CommentPlusoners {}
 /// 
 /// * [list audiences](struct.AudienceListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AudiencesFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1105,7 +1109,7 @@ impl Part for ActivityObjectAttachments {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonCoverCoverPhoto {
     /// The URL of the image.
     pub url: String,
@@ -1165,7 +1169,7 @@ impl Part for ActivityObjectAttachmentsFullImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonCover {
     /// Extra information about the cover photo.
     #[serde(rename="coverInfo")]
@@ -1211,7 +1215,7 @@ impl Part for Acl {}
 /// 
 /// * [get people](struct.PeopleGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Person {
     /// The "bragging rights" line of this person.
     #[serde(rename="braggingRights")]
@@ -1307,7 +1311,7 @@ impl ResponseResult for Person {}
 /// 
 /// * [list audiences](struct.AudienceListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Audience {
     /// The number of people in this circle. This only applies if entity_type is CIRCLE.
     #[serde(rename="memberCount")]
@@ -1476,7 +1480,7 @@ impl Part for ActivityObjectAttachmentsEmbed {}
 /// 
 /// * [list comments](struct.CommentListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1582,7 +1586,7 @@ impl ResponseResult for Comment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonName {
     /// The honorific prefixes (such as "Dr." or "Mrs.") for this person.
     #[serde(rename="honorificPrefix")]
@@ -1716,7 +1720,7 @@ impl Part for ActivityObject {}
 /// 
 /// * [list circles](struct.CircleListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CircleFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -2470,7 +2474,7 @@ impl<'a, C, A> CircleRemovePeopleCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}/people".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
@@ -2556,41 +2560,38 @@ impl<'a, C, A> CircleRemovePeopleCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The ID of the circle to remove the person from.
+    ///
     /// Sets the *circle id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the circle to remove the person from.
     pub fn circle_id(mut self, new_value: &str) -> CircleRemovePeopleCall<'a, C, A> {
         self._circle_id = new_value.to_string();
         self
     }
+    /// IDs of the people to remove from the circle. Optional, can be repeated.
+    ///
     /// Append the given value to the *user id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// IDs of the people to remove from the circle. Optional, can be repeated.
     pub fn add_user_id(mut self, new_value: &str) -> CircleRemovePeopleCall<'a, C, A> {
         self._user_id.push(new_value.to_string());
         self
     }
+    /// Email of the people to add to the circle. Optional, can be repeated.
+    ///
     /// Append the given value to the *email* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Email of the people to add to the circle. Optional, can be repeated.
     pub fn add_email(mut self, new_value: &str) -> CircleRemovePeopleCall<'a, C, A> {
         self._email.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleRemovePeopleCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2620,8 +2621,8 @@ impl<'a, C, A> CircleRemovePeopleCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2716,7 +2717,7 @@ impl<'a, C, A> CircleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}/circles".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId")].iter() {
@@ -2820,32 +2821,31 @@ impl<'a, C, A> CircleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Circle) -> CircleInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the user to create the circle on behalf of. The value "me" can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user to create the circle on behalf of. The value "me" can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> CircleInsertCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2875,8 +2875,8 @@ impl<'a, C, A> CircleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2982,7 +2982,7 @@ impl<'a, C, A> CircleAddPeopleCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}/people".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
@@ -3078,41 +3078,38 @@ impl<'a, C, A> CircleAddPeopleCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The ID of the circle to add the person to.
+    ///
     /// Sets the *circle id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the circle to add the person to.
     pub fn circle_id(mut self, new_value: &str) -> CircleAddPeopleCall<'a, C, A> {
         self._circle_id = new_value.to_string();
         self
     }
+    /// IDs of the people to add to the circle. Optional, can be repeated.
+    ///
     /// Append the given value to the *user id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// IDs of the people to add to the circle. Optional, can be repeated.
     pub fn add_user_id(mut self, new_value: &str) -> CircleAddPeopleCall<'a, C, A> {
         self._user_id.push(new_value.to_string());
         self
     }
+    /// Email of the people to add to the circle. Optional, can be repeated.
+    ///
     /// Append the given value to the *email* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Email of the people to add to the circle. Optional, can be repeated.
     pub fn add_email(mut self, new_value: &str) -> CircleAddPeopleCall<'a, C, A> {
         self._email.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleAddPeopleCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3142,8 +3139,8 @@ impl<'a, C, A> CircleAddPeopleCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3327,23 +3324,22 @@ impl<'a, C, A> CircleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The ID of the circle to get.
+    ///
     /// Sets the *circle id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the circle to get.
     pub fn circle_id(mut self, new_value: &str) -> CircleGetCall<'a, C, A> {
         self._circle_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3373,8 +3369,8 @@ impl<'a, C, A> CircleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleRead`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3568,39 +3564,36 @@ impl<'a, C, A> CircleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the user to get circles for. The special value "me" can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user to get circles for. The special value "me" can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> CircleListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CircleListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of circles to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> CircleListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3630,8 +3623,8 @@ impl<'a, C, A> CircleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleRead`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3726,7 +3719,7 @@ impl<'a, C, A> CircleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
@@ -3830,32 +3823,31 @@ impl<'a, C, A> CircleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Circle) -> CircleUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the circle to update.
+    ///
     /// Sets the *circle id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the circle to update.
     pub fn circle_id(mut self, new_value: &str) -> CircleUpdateCall<'a, C, A> {
         self._circle_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3885,8 +3877,8 @@ impl<'a, C, A> CircleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3981,7 +3973,7 @@ impl<'a, C, A> CirclePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
@@ -4085,32 +4077,31 @@ impl<'a, C, A> CirclePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Circle) -> CirclePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the circle to update.
+    ///
     /// Sets the *circle id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the circle to update.
     pub fn circle_id(mut self, new_value: &str) -> CirclePatchCall<'a, C, A> {
         self._circle_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CirclePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4140,8 +4131,8 @@ impl<'a, C, A> CirclePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4228,7 +4219,7 @@ impl<'a, C, A> CircleRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/circles/{circleId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
@@ -4314,23 +4305,22 @@ impl<'a, C, A> CircleRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The ID of the circle to delete.
+    ///
     /// Sets the *circle id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the circle to delete.
     pub fn circle_id(mut self, new_value: &str) -> CircleRemoveCall<'a, C, A> {
         self._circle_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleRemoveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4360,8 +4350,8 @@ impl<'a, C, A> CircleRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4461,7 +4451,7 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}/activities".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId")].iter() {
@@ -4565,40 +4555,38 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Activity) -> ActivityInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the user to create the activity on behalf of. Its value should be "me", to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user to create the activity on behalf of. Its value should be "me", to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> ActivityInsertCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *preview* query property to the given value.
-    ///
-    /// 
     /// If "true", extract the potential media attachments for a URL. The response will include all possible attachments for a URL, including video, photos, and articles based on the content of the page.
+    ///
+    /// Sets the *preview* query property to the given value.
     pub fn preview(mut self, new_value: bool) -> ActivityInsertCall<'a, C, A> {
         self._preview = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4628,8 +4616,8 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4717,7 +4705,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/activities/{activityId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{activityId}", "activityId")].iter() {
@@ -4813,23 +4801,22 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the activity to get.
+    ///
     /// Sets the *activity id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the activity to get.
     pub fn activity_id(mut self, new_value: &str) -> ActivityGetCall<'a, C, A> {
         self._activity_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4859,8 +4846,8 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4960,7 +4947,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}/activities/{collection}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId"), ("{collection}", "collection")].iter() {
@@ -5056,49 +5043,46 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The ID of the user to get activities for. The special value "me" can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user to get activities for. The special value "me" can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The collection of activities to list.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection of activities to list.
     pub fn collection(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of activities to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5128,8 +5112,8 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5323,39 +5307,36 @@ impl<'a, C, A> PeopleListByCircleCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The ID of the circle to get the members of.
+    ///
     /// Sets the *circle id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the circle to get the members of.
     pub fn circle_id(mut self, new_value: &str) -> PeopleListByCircleCall<'a, C, A> {
         self._circle_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PeopleListByCircleCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of people to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PeopleListByCircleCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleListByCircleCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5385,8 +5366,8 @@ impl<'a, C, A> PeopleListByCircleCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleRead`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5587,57 +5568,53 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Get the collection of people for the person identified. Use "me" to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Get the collection of people for the person identified. Use "me" to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> PeopleListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The collection of people to list.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection of people to list.
     pub fn collection(mut self, new_value: &str) -> PeopleListCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PeopleListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// The order to return people in.
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> PeopleListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of people to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PeopleListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5667,8 +5644,8 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleRead`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5756,7 +5733,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/people/{userId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId")].iter() {
@@ -5852,23 +5829,22 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The ID of the person to get the profile for. The special value "me" can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the person to get the profile for. The special value "me" can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> PeopleGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5898,8 +5874,8 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5999,7 +5975,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/activities/{activityId}/people/{collection}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{activityId}", "activityId"), ("{collection}", "collection")].iter() {
@@ -6095,49 +6071,46 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The ID of the activity to get the list of people for.
+    ///
     /// Sets the *activity id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the activity to get the list of people for.
     pub fn activity_id(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C, A> {
         self._activity_id = new_value.to_string();
         self
     }
+    /// The collection of people to list.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection of people to list.
     pub fn collection(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of people to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PeopleListByActivityCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PeopleListByActivityCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6167,8 +6140,8 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6274,7 +6247,7 @@ impl<'a, C, A> MediaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId"), ("{collection}", "collection")].iter() {
@@ -6480,41 +6453,40 @@ impl<'a, C, A> MediaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Media) -> MediaInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the user to create the activity on behalf of.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user to create the activity on behalf of.
     pub fn user_id(mut self, new_value: &str) -> MediaInsertCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn collection(mut self, new_value: &str) -> MediaInsertCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MediaInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6544,8 +6516,8 @@ impl<'a, C, A> MediaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6640,7 +6612,7 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/activities/{activityId}/comments".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{activityId}", "activityId")].iter() {
@@ -6744,32 +6716,31 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Comment) -> CommentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the activity to reply to.
+    ///
     /// Sets the *activity id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the activity to reply to.
     pub fn activity_id(mut self, new_value: &str) -> CommentInsertCall<'a, C, A> {
         self._activity_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6799,8 +6770,8 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6903,7 +6874,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/activities/{activityId}/comments".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{activityId}", "activityId")].iter() {
@@ -6999,47 +6970,43 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the activity to get comments for.
+    ///
     /// Sets the *activity id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the activity to get comments for.
     pub fn activity_id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._activity_id = new_value.to_string();
         self
     }
-    /// Sets the *sort order* query property to the given value.
-    ///
-    /// 
     /// The order in which to sort the list of comments.
+    ///
+    /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of comments to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7069,8 +7036,8 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7158,7 +7125,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/plusDomains/v1/comments/{commentId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{commentId}", "commentId")].iter() {
@@ -7254,23 +7221,22 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the comment to get.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment to get.
     pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7300,8 +7266,8 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluLogin`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7495,39 +7461,36 @@ impl<'a, C, A> AudienceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The ID of the user to get audiences for. The special value "me" can be used to indicate the authenticated user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user to get audiences for. The special value "me" can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> AudienceListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AudienceListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of circles to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> AudienceListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AudienceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7557,8 +7520,8 @@ impl<'a, C, A> AudienceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::PluCircleRead`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

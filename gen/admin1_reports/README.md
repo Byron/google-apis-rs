@@ -123,16 +123,18 @@ let result = hub.activities().watch(&req, "userKey", "applicationName")
 
 match result {
     Err(e) => match e {
-        Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-        Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-        Error::MissingToken => println!("OAuth2: Missing Token"),
-        Error::Cancelled => println!("Operation canceled by user"),
-        Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-        Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-        Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-        Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+        // The Error enum provides details about what exactly happened.
+        // You can also just use its `Debug`, `Display` or `Error` traits
+        Error::HttpError(_)
+        |Error::MissingAPIKey
+        |Error::MissingToken
+        |Error::Cancelled
+        |Error::UploadSizeLimitExceeded(_, _)
+        |Error::Failure(_)
+        |Error::FieldClash(_)
+        |Error::JsonDecodeError(_) => println!("{}", e),
     },
-    Ok(_) => println!("Success (value doesn't print)"),
+    Ok(res) => println!("Success: {:?}", res),
 }
 
 ```

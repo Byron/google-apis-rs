@@ -124,16 +124,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -309,16 +311,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -378,7 +382,7 @@ impl<'a, C, A> Reports<C, A>
 /// 
 /// * [list activities](struct.ActivityListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activities {
     /// Token for retrieving the next page
     #[serde(rename="nextPageToken")]
@@ -398,7 +402,7 @@ impl ResponseResult for Activities {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReportsWarningsData {
     /// Key associated with a key-value pair to give detailed information on the warning.
     pub key: String,
@@ -414,7 +418,7 @@ impl Part for UsageReportsWarningsData {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReport {
     /// The date to which the record belongs.
     pub date: String,
@@ -435,7 +439,7 @@ impl Part for UsageReport {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReportParameters {
     /// Nested message value of the parameter.
     #[serde(rename="msgValue")]
@@ -464,7 +468,7 @@ impl Part for UsageReportParameters {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityActor {
     /// Obfuscated user id of the user.
     #[serde(rename="profileId")]
@@ -486,7 +490,7 @@ impl Part for ActivityActor {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityId {
     /// Application name to which the event belongs.
     #[serde(rename="applicationName")]
@@ -509,7 +513,7 @@ impl Part for ActivityId {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReportsWarnings {
     /// Human readable message for the warning.
     pub message: String,
@@ -533,7 +537,7 @@ impl Part for UsageReportsWarnings {}
 /// * [get user usage report](struct.UserUsageReportGetCall.html) (response)
 /// * [get customer usage reports](struct.CustomerUsageReportGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReports {
     /// Token for retrieving the next page
     #[serde(rename="nextPageToken")]
@@ -556,7 +560,7 @@ impl ResponseResult for UsageReports {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activity {
     /// Kind of resource this is.
     pub kind: String,
@@ -583,7 +587,7 @@ impl Part for Activity {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityEventsParameters {
     /// Boolean value of the parameter.
     #[serde(rename="boolValue")]
@@ -611,7 +615,7 @@ impl Part for ActivityEventsParameters {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityEvents {
     /// Type of event.
     #[serde(rename="type")]
@@ -630,7 +634,7 @@ impl Part for ActivityEvents {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReportEntity {
     /// Obfuscated user id for the record.
     #[serde(rename="profileId")]
@@ -1130,22 +1134,21 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1175,8 +1178,8 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ReportAuditReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1417,106 +1420,97 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> ActivityWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
     pub fn user_key(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
+    /// Application name for which the events are to be retrieved.
+    ///
     /// Sets the *application name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Application name for which the events are to be retrieved.
     pub fn application_name(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._application_name = new_value.to_string();
         self
     }
-    /// Sets the *start time* query property to the given value.
-    ///
-    /// 
     /// Return events which occured at or after this time.
+    ///
+    /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Number of activity records to be shown in each page.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ActivityWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filters* query property to the given value.
-    ///
-    /// 
     /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...
+    ///
+    /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Sets the *event name* query property to the given value.
-    ///
-    /// 
     /// Name of the event being queried.
+    ///
+    /// Sets the *event name* query property to the given value.
     pub fn event_name(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._event_name = Some(new_value.to_string());
         self
     }
-    /// Sets the *end time* query property to the given value.
-    ///
-    /// 
     /// Return events which occured at or before this time.
+    ///
+    /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer id* query property to the given value.
-    ///
-    /// 
     /// Represents the customer for which the data is to be fetched.
+    ///
+    /// Sets the *customer id* query property to the given value.
     pub fn customer_id(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *actor ip address* query property to the given value.
-    ///
-    /// 
     /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
+    ///
+    /// Sets the *actor ip address* query property to the given value.
     pub fn actor_ip_address(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._actor_ip_address = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1546,8 +1540,8 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ReportAuditReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1773,97 +1767,88 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
     pub fn user_key(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
+    /// Application name for which the events are to be retrieved.
+    ///
     /// Sets the *application name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Application name for which the events are to be retrieved.
     pub fn application_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._application_name = new_value.to_string();
         self
     }
-    /// Sets the *start time* query property to the given value.
-    ///
-    /// 
     /// Return events which occured at or after this time.
+    ///
+    /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Number of activity records to be shown in each page.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ActivityListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filters* query property to the given value.
-    ///
-    /// 
     /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...
+    ///
+    /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Sets the *event name* query property to the given value.
-    ///
-    /// 
     /// Name of the event being queried.
+    ///
+    /// Sets the *event name* query property to the given value.
     pub fn event_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._event_name = Some(new_value.to_string());
         self
     }
-    /// Sets the *end time* query property to the given value.
-    ///
-    /// 
     /// Return events which occured at or before this time.
+    ///
+    /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer id* query property to the given value.
-    ///
-    /// 
     /// Represents the customer for which the data is to be fetched.
+    ///
+    /// Sets the *customer id* query property to the given value.
     pub fn customer_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *actor ip address* query property to the given value.
-    ///
-    /// 
     /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
+    ///
+    /// Sets the *actor ip address* query property to the given value.
     pub fn actor_ip_address(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._actor_ip_address = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1893,8 +1878,8 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ReportAuditReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1997,7 +1982,7 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/admin/reports/v1/usage/dates/{date}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ReportAuditReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ReportUsageReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{date}", "date")].iter() {
@@ -2093,47 +2078,43 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
+    ///
     /// Sets the *date* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
     pub fn date(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         self._date = new_value.to_string();
         self
     }
-    /// Sets the *parameters* query property to the given value.
-    ///
-    /// 
     /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.
+    ///
+    /// Sets the *parameters* query property to the given value.
     pub fn parameters(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         self._parameters = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer id* query property to the given value.
-    ///
-    /// 
     /// Represents the customer for which the data is to be fetched.
+    ///
+    /// Sets the *customer id* query property to the given value.
     pub fn customer_id(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerUsageReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2163,8 +2144,8 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ReportUsageReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2279,7 +2260,7 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/admin/reports/v1/usage/users/{userKey}/dates/{date}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ReportAuditReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ReportUsageReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{date}", "date")].iter() {
@@ -2375,73 +2356,67 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Represents the profile id or the user email for which the data should be filtered.
+    ///
     /// Sets the *user key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Represents the profile id or the user email for which the data should be filtered.
     pub fn user_key(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
+    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
+    ///
     /// Sets the *date* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
     pub fn date(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._date = new_value.to_string();
         self
     }
-    /// Sets the *parameters* query property to the given value.
-    ///
-    /// 
     /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.
+    ///
+    /// Sets the *parameters* query property to the given value.
     pub fn parameters(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._parameters = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Token to specify next page.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return. Maximum allowed is 1000
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> UserUsageReportGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filters* query property to the given value.
-    ///
-    /// 
     /// Represents the set of filters including parameter operator value.
+    ///
+    /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Sets the *customer id* query property to the given value.
-    ///
-    /// 
     /// Represents the customer for which the data is to be fetched.
+    ///
+    /// Sets the *customer id* query property to the given value.
     pub fn customer_id(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserUsageReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2471,8 +2446,8 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ReportUsageReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

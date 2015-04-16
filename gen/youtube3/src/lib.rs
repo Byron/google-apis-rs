@@ -162,16 +162,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -356,16 +358,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -467,7 +471,7 @@ impl<'a, C, A> YouTube<C, A>
 /// 
 /// * [list subscriptions](struct.SubscriptionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -563,7 +567,7 @@ impl Part for ChannelAuditDetails {}
 /// 
 /// * [set thumbnails](struct.ThumbnailSetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ThumbnailSetResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -657,7 +661,7 @@ impl Part for CdnSettings {}
 /// 
 /// * [get rating videos](struct.VideoGetRatingCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoGetRatingResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -694,7 +698,7 @@ impl Part for ActivityContentDetailsChannelItem {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct I18nLanguageSnippet {
     /// The human-readable name of the language in the language itself.
     pub name: String,
@@ -709,7 +713,7 @@ impl Part for I18nLanguageSnippet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoRating {
     /// no description provided
     pub rating: String,
@@ -730,7 +734,7 @@ impl Part for VideoRating {}
 /// 
 /// * [list i18n regions](struct.I18nRegionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct I18nRegionListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -758,7 +762,7 @@ impl ResponseResult for I18nRegionListResponse {}
 /// 
 /// * [list live streams](struct.LiveStreamListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStreamListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -798,7 +802,7 @@ impl ResponseResult for LiveStreamListResponse {}
 /// 
 /// * [list playlists](struct.PlaylistListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -1082,7 +1086,7 @@ impl Part for SubscriptionContentDetails {}
 /// 
 /// * [list channel sections](struct.ChannelSectionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -1196,7 +1200,7 @@ impl Part for CaptionSnippet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct I18nRegionSnippet {
     /// The region code as a 2-letter ISO country code.
     pub gl: String,
@@ -1245,7 +1249,7 @@ impl Part for ActivityContentDetailsComment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GuideCategorySnippet {
     /// no description provided
     #[serde(rename="channelId")]
@@ -1322,7 +1326,7 @@ impl Part for LiveStreamContentDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GuideCategory {
     /// The snippet object contains basic details about the category, such as its title.
     pub snippet: GuideCategorySnippet,
@@ -1346,7 +1350,7 @@ impl Part for GuideCategory {}
 /// 
 /// * [list i18n languages](struct.I18nLanguageListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct I18nLanguageListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -1534,7 +1538,7 @@ impl Part for ChannelLocalization {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchResult {
     /// The snippet object contains basic details about a search result, such as its title or description. For example, if the search result is a video, then the title will be the video's title and the description will be the video's description.
     pub snippet: SearchResultSnippet,
@@ -1558,7 +1562,7 @@ impl Part for SearchResult {}
 /// 
 /// * [list video categories](struct.VideoCategoryListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoCategoryListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -1621,7 +1625,7 @@ impl Part for VideoProcessingDetailsProcessingProgress {}
 /// 
 /// * [list videos](struct.VideoListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -1765,7 +1769,7 @@ impl Part for ChannelStatus {}
 /// 
 /// * [list channels](struct.ChannelListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -1855,7 +1859,7 @@ impl ToParts for ChannelSection {
 /// 
 /// * [list live broadcasts](struct.LiveBroadcastListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -1895,7 +1899,7 @@ impl ResponseResult for LiveBroadcastListResponse {}
 /// 
 /// * [list captions](struct.CaptionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CaptionListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -2327,7 +2331,7 @@ impl Part for IngestionInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoCategory {
     /// The snippet object contains basic details about the video category, including its title.
     pub snippet: VideoCategorySnippet,
@@ -2447,7 +2451,7 @@ impl Part for PlaylistContentDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageInfo {
     /// The number of results included in the API response.
     #[serde(rename="resultsPerPage")]
@@ -2548,7 +2552,7 @@ impl ToParts for Playlist {
 /// 
 /// * [list playlist items](struct.PlaylistItemListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -2870,7 +2874,7 @@ impl Part for PlaylistItemStatus {}
 /// 
 /// * [list guide categories](struct.GuideCategoryListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GuideCategoryListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -2950,7 +2954,7 @@ impl Part for ChannelContentDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TokenPagination;
 
 impl Part for TokenPagination {}
@@ -3035,7 +3039,7 @@ impl Part for ActivityContentDetails {}
 /// 
 /// * [list i18n regions](struct.I18nRegionListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct I18nRegion {
     /// The snippet object contains basic details about the i18n region, such as region code and human-readable name.
     pub snippet: Option<I18nRegionSnippet>,
@@ -3614,7 +3618,7 @@ impl Part for ActivityContentDetailsUpload {}
 /// 
 /// * [list activities](struct.ActivityListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -3917,7 +3921,7 @@ impl Part for VideoConversionPings {}
 /// 
 /// * [list i18n languages](struct.I18nLanguageListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct I18nLanguage {
     /// The snippet object contains basic details about the i18n language, such as language code and human-readable name.
     pub snippet: Option<I18nLanguageSnippet>,
@@ -4044,7 +4048,7 @@ impl Part for VideoConversionPing {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoCategorySnippet {
     /// no description provided
     pub assignable: bool,
@@ -4067,7 +4071,7 @@ impl Part for VideoCategorySnippet {}
 /// 
 /// * [list search](struct.SearchListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
@@ -4128,7 +4132,7 @@ impl Part for VideoSuggestions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchResultSnippet {
     /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.
     #[serde(rename="liveBroadcastContent")]
@@ -5984,6 +5988,8 @@ impl<'a, C, A> ActivityMethods<'a, C, A> {
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -6129,6 +6135,8 @@ impl<'a, C, A> I18nLanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -6138,27 +6146,23 @@ impl<'a, C, A> I18nLanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// 
     /// * *id*
     /// * *snippet*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     pub fn part(mut self, new_value: &str) -> I18nLanguageListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *hl* query property to the given value.
-    ///
-    /// 
     /// The hl parameter specifies the language that should be used for text values in the API response.
+    ///
+    /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> I18nLanguageListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> I18nLanguageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6188,8 +6192,8 @@ impl<'a, C, A> I18nLanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6486,32 +6490,30 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ChannelBannerResource) -> ChannelBannerInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelBannerInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelBannerInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6541,8 +6543,8 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6577,6 +6579,8 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -6742,6 +6746,10 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set part=snippet, the API response will also contain all of those nested properties.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -6752,63 +6760,53 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *id*
     /// * *snippet*
     /// * *contentDetails*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
-    /// 
-    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set part=snippet, the API response will also contain all of those nested properties.
     pub fn part(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *mine* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's channelSections.
+    ///
+    /// Sets the *mine* query property to the given value.
     pub fn mine(mut self, new_value: bool) -> ChannelSectionListCall<'a, C, A> {
         self._mine = Some(new_value);
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of the YouTube channelSection ID(s) for the resource(s) that are being retrieved. In a channelSection resource, the id property specifies the YouTube channelSection ID.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *hl* query property to the given value.
-    ///
-    /// 
     /// The hl parameter indicates that the snippet.localized property values in the returned channelSection resources should be in the specified language if localized values for that language are available. For example, if the API request specifies hl=de, the snippet.localized properties in the API response will contain German titles if German titles are available. Channel owners can provide localized channel section titles using either the channelSections.insert or channelSections.update method.
+    ///
+    /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Sets the *channel id* query property to the given value.
-    ///
-    /// 
     /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's channelSections.
+    ///
+    /// Sets the *channel id* query property to the given value.
     pub fn channel_id(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, A> {
         self._channel_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6838,8 +6836,8 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6872,6 +6870,8 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -7042,6 +7042,7 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -7051,11 +7052,14 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    /// 
     pub fn request(mut self, new_value: &ChannelSection) -> ChannelSectionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and contentDetails.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -7068,43 +7072,36 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are snippet and contentDetails.
     pub fn part(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7134,8 +7131,8 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7289,33 +7286,31 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID.
     pub fn id(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7345,8 +7340,8 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7379,6 +7374,8 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -7544,6 +7541,7 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -7553,11 +7551,14 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    /// 
     pub fn request(mut self, new_value: &ChannelSection) -> ChannelSectionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and contentDetails.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -7570,31 +7571,25 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are snippet and contentDetails.
     pub fn part(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7624,8 +7619,8 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7659,6 +7654,8 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -7814,6 +7811,10 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more guideCategory resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a guideCategory resource, the snippet property contains other properties, such as the category's title. If you set part=snippet, the API response will also contain all of those nested properties.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -7823,45 +7824,37 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// 
     /// * *id*
     /// * *snippet*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more guideCategory resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
-    /// 
-    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a guideCategory resource, the snippet property contains other properties, such as the category's title. If you set part=snippet, the API response will also contain all of those nested properties.
     pub fn part(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *region code* query property to the given value.
-    ///
-    /// 
     /// The regionCode parameter instructs the API to return the list of guide categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.
+    ///
+    /// Sets the *region code* query property to the given value.
     pub fn region_code(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, A> {
         self._region_code = Some(new_value.to_string());
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of the YouTube channel category ID(s) for the resource(s) that are being retrieved. In a guideCategory resource, the id property specifies the YouTube channel category ID.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *hl* query property to the given value.
-    ///
-    /// 
     /// The hl parameter specifies the language that will be used for text values in the API response.
+    ///
+    /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GuideCategoryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7891,8 +7884,8 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7925,6 +7918,8 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -8095,6 +8090,7 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -8104,11 +8100,14 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// 
     /// * *snippet*
     /// * *status*
-    /// 
     pub fn request(mut self, new_value: &Playlist) -> PlaylistInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and status.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -8121,43 +8120,36 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// 
     /// * *snippet*
     /// * *status*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are snippet and status.
     pub fn part(mut self, new_value: &str) -> PlaylistInsertCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8187,8 +8179,8 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8224,6 +8216,8 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -8404,6 +8398,10 @@ impl<'a, C, A> PlaylistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, status, and contentDetails.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -8415,91 +8413,78 @@ impl<'a, C, A> PlaylistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *snippet*
     /// * *status*
     /// * *contentDetails*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, status, and contentDetails.
-    /// 
-    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties.
     pub fn part(mut self, new_value: &str) -> PlaylistListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PlaylistListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistListCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *mine* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to true to instruct the API to only return playlists owned by the authenticated user.
+    ///
+    /// Sets the *mine* query property to the given value.
     pub fn mine(mut self, new_value: bool) -> PlaylistListCall<'a, C, A> {
         self._mine = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PlaylistListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of the YouTube playlist ID(s) for the resource(s) that are being retrieved. In a playlist resource, the id property specifies the playlist's YouTube playlist ID.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> PlaylistListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *hl* query property to the given value.
-    ///
-    /// 
     /// The hl parameter should be used for filter out the properties that are not in the given language. Used for the snippet part.
+    ///
+    /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> PlaylistListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Sets the *channel id* query property to the given value.
-    ///
-    /// 
     /// This value indicates that the API should only return the specified channel's playlists.
+    ///
+    /// Sets the *channel id* query property to the given value.
     pub fn channel_id(mut self, new_value: &str) -> PlaylistListCall<'a, C, A> {
         self._channel_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8529,8 +8514,8 @@ impl<'a, C, A> PlaylistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8684,33 +8669,31 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID.
     pub fn id(mut self, new_value: &str) -> PlaylistDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8740,8 +8723,8 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8774,6 +8757,8 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -8939,6 +8924,7 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -8948,11 +8934,16 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// 
     /// * *snippet*
     /// * *status*
-    /// 
     pub fn request(mut self, new_value: &Playlist) -> PlaylistUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and status.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist's privacy setting is contained in the status part. As such, if your request is updating a private playlist, and the request's part parameter value includes the status part, the playlist's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the playlist will revert to the default privacy setting.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -8965,33 +8956,25 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// 
     /// * *snippet*
     /// * *status*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are snippet and status.
-    /// 
-    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist's privacy setting is contained in the status part. As such, if your request is updating a private playlist, and the request's part parameter value includes the status part, the playlist's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the playlist will revert to the default privacy setting.
     pub fn part(mut self, new_value: &str) -> PlaylistUpdateCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistUpdateCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9021,8 +9004,8 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9297,31 +9280,29 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    /// The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided.
+    ///
     /// Sets the *video id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided.
     pub fn video_id(mut self, new_value: &str) -> ThumbnailSetCall<'a, C, A> {
         self._video_id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ThumbnailSetCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ThumbnailSetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9351,8 +9332,8 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9397,6 +9378,8 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -9587,6 +9570,10 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -9607,107 +9594,92 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *status*
     /// * *suggestions*
     /// * *topicDetails*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
-    /// 
-    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties.
     pub fn part(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *video category id* query property to the given value.
-    ///
-    /// 
     /// The videoCategoryId parameter identifies the video category for which the chart should be retrieved. This parameter can only be used in conjunction with the chart parameter. By default, charts are not restricted to a particular category.
+    ///
+    /// Sets the *video category id* query property to the given value.
     pub fn video_category_id(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._video_category_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *region code* query property to the given value.
-    ///
-    /// 
     /// The regionCode parameter instructs the API to select a video chart available in the specified region. This parameter can only be used in conjunction with the chart parameter. The parameter value is an ISO 3166-1 alpha-2 country code.
+    ///
+    /// Sets the *region code* query property to the given value.
     pub fn region_code(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._region_code = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     /// 
     /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *my rating* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to like or dislike to instruct the API to only return videos liked or disliked by the authenticated user.
+    ///
+    /// Sets the *my rating* query property to the given value.
     pub fn my_rating(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._my_rating = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     /// 
     /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> VideoListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// DEPRECATED
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) that are being retrieved. In a video resource, the id property specifies the video's ID.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *hl* query property to the given value.
-    ///
-    /// 
     /// The hl parameter instructs the API to return a localized version of the video details. If localized text is nor available for the requested language, the localizations object in the API response will contain the requested information in the default language instead. The parameter value is a BCP-47 language code. Your application can determine whether the requested localization was returned by checking the value of the snippet.localized.language property in the API response.
+    ///
+    /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Sets the *chart* query property to the given value.
-    ///
-    /// 
     /// The chart parameter identifies the chart that you want to retrieve.
+    ///
+    /// Sets the *chart* query property to the given value.
     pub fn chart(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._chart = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9737,8 +9709,8 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9894,43 +9866,41 @@ impl<'a, C, A> VideoRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed.
     pub fn id(mut self, new_value: &str) -> VideoRateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
+    /// Specifies the rating to record.
+    ///
     /// Sets the *rating* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Specifies the rating to record.
     pub fn rating(mut self, new_value: &str) -> VideoRateCall<'a, C, A> {
         self._rating = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoRateCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoRateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9960,8 +9930,8 @@ impl<'a, C, A> VideoRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10054,7 +10024,7 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/youtube/v3/videos/getRating".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -10126,33 +10096,31 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID.
     pub fn id(mut self, new_value: &str) -> VideoGetRatingCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoGetRatingCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoGetRatingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10182,8 +10150,8 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10337,33 +10305,31 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID.
     pub fn id(mut self, new_value: &str) -> VideoDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10393,8 +10359,8 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10437,6 +10403,8 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -10612,6 +10580,7 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -10631,11 +10600,18 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *status*
     /// * *suggestions*
     /// * *topicDetails*
-    /// 
     pub fn request(mut self, new_value: &Video) -> VideoUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a video's privacy setting is contained in the status part. As such, if your request is updating a private video, and the request's part parameter value includes the status part, the video's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the video will revert to the default privacy setting.
+    /// 
+    /// In addition, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -10658,35 +10634,25 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *status*
     /// * *suggestions*
     /// * *topicDetails*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
-    /// 
-    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a video's privacy setting is contained in the status part. As such, if your request is updating a private video, and the request's part parameter value includes the status part, the video's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the video will revert to the default privacy setting.
-    /// 
-    /// In addition, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
     pub fn part(mut self, new_value: &str) -> VideoUpdateCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoUpdateCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10716,8 +10682,8 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10761,6 +10727,8 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.upload*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -11071,6 +11039,7 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -11090,11 +11059,14 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *status*
     /// * *suggestions*
     /// * *topicDetails*
-    /// 
     pub fn request(mut self, new_value: &Video) -> VideoInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails. However, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -11117,67 +11089,57 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *status*
     /// * *suggestions*
     /// * *topicDetails*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails. However, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
     pub fn part(mut self, new_value: &str) -> VideoInsertCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *stabilize* query property to the given value.
-    ///
-    /// 
     /// The stabilize parameter indicates whether YouTube should adjust the video to remove shaky camera motions.
+    ///
+    /// Sets the *stabilize* query property to the given value.
     pub fn stabilize(mut self, new_value: bool) -> VideoInsertCall<'a, C, A> {
         self._stabilize = Some(new_value);
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> VideoInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *notify subscribers* query property to the given value.
-    ///
-    /// 
     /// The notifySubscribers parameter indicates whether YouTube should send notification to subscribers about the inserted video.
+    ///
+    /// Sets the *notify subscribers* query property to the given value.
     pub fn notify_subscribers(mut self, new_value: bool) -> VideoInsertCall<'a, C, A> {
         self._notify_subscribers = Some(new_value);
         self
     }
-    /// Sets the *auto levels* query property to the given value.
-    ///
-    /// 
     /// The autoLevels parameter indicates whether YouTube should automatically enhance the video's lighting and color.
+    ///
+    /// Sets the *auto levels* query property to the given value.
     pub fn auto_levels(mut self, new_value: bool) -> VideoInsertCall<'a, C, A> {
         self._auto_levels = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11207,8 +11169,8 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11241,6 +11203,8 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -11401,6 +11365,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -11410,11 +11375,14 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    /// 
     pub fn request(mut self, new_value: &Subscription) -> SubscriptionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and contentDetails.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -11427,21 +11395,16 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are snippet and contentDetails.
     pub fn part(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11471,8 +11434,8 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11507,6 +11470,8 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -11697,6 +11662,10 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -11707,107 +11676,92 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *id*
     /// * *snippet*
     /// * *contentDetails*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
-    /// 
-    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties.
     pub fn part(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order* query property to the given value.
-    ///
-    /// 
     /// The order parameter specifies the method that will be used to sort resources in the API response.
+    ///
+    /// Sets the *order* query property to the given value.
     pub fn order(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._order = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *my subscribers* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user.
+    ///
+    /// Sets the *my subscribers* query property to the given value.
     pub fn my_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a, C, A> {
         self._my_subscribers = Some(new_value);
         self
     }
-    /// Sets the *mine* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's subscriptions.
+    ///
+    /// Sets the *mine* query property to the given value.
     pub fn mine(mut self, new_value: bool) -> SubscriptionListCall<'a, C, A> {
         self._mine = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of the YouTube subscription ID(s) for the resource(s) that are being retrieved. In a subscription resource, the id property specifies the YouTube subscription ID.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *for channel id* query property to the given value.
-    ///
-    /// 
     /// The forChannelId parameter specifies a comma-separated list of channel IDs. The API response will then only contain subscriptions matching those channels.
+    ///
+    /// Sets the *for channel id* query property to the given value.
     pub fn for_channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._for_channel_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *channel id* query property to the given value.
-    ///
-    /// 
     /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's subscriptions.
+    ///
+    /// Sets the *channel id* query property to the given value.
     pub fn channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._channel_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11837,8 +11791,8 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11987,23 +11941,22 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID.
     pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12033,8 +11986,8 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12068,6 +12021,8 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -12358,6 +12313,10 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a search result, the snippet property contains other properties that identify the result's title, description, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -12367,265 +12326,230 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// 
     /// * *id*
     /// * *snippet*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
-    /// 
-    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a search result, the snippet property contains other properties that identify the result's title, description, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
     pub fn part(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *video type* query property to the given value.
-    ///
-    /// 
     /// The videoType parameter lets you restrict a search to a particular type of videos.
+    ///
+    /// Sets the *video type* query property to the given value.
     pub fn video_type(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._video_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *video syndicated* query property to the given value.
-    ///
-    /// 
     /// The videoSyndicated parameter lets you to restrict a search to only videos that can be played outside youtube.com.
+    ///
+    /// Sets the *video syndicated* query property to the given value.
     pub fn video_syndicated(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._video_syndicated = Some(new_value.to_string());
         self
     }
-    /// Sets the *video license* query property to the given value.
-    ///
-    /// 
     /// The videoLicense parameter filters search results to only include videos with a particular license. YouTube lets video uploaders choose to attach either the Creative Commons license or the standard YouTube license to each of their videos.
+    ///
+    /// Sets the *video license* query property to the given value.
     pub fn video_license(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._video_license = Some(new_value.to_string());
         self
     }
-    /// Sets the *video embeddable* query property to the given value.
-    ///
-    /// 
     /// The videoEmbeddable parameter lets you to restrict a search to only videos that can be embedded into a webpage.
+    ///
+    /// Sets the *video embeddable* query property to the given value.
     pub fn video_embeddable(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._video_embeddable = Some(new_value.to_string());
         self
     }
-    /// Sets the *video duration* query property to the given value.
-    ///
-    /// 
     /// The videoDuration parameter filters video search results based on their duration.
+    ///
+    /// Sets the *video duration* query property to the given value.
     pub fn video_duration(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._video_duration = Some(new_value.to_string());
         self
     }
-    /// Sets the *video dimension* query property to the given value.
-    ///
-    /// 
     /// The videoDimension parameter lets you restrict a search to only retrieve 2D or 3D videos.
+    ///
+    /// Sets the *video dimension* query property to the given value.
     pub fn video_dimension(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._video_dimension = Some(new_value.to_string());
         self
     }
-    /// Sets the *video definition* query property to the given value.
-    ///
-    /// 
     /// The videoDefinition parameter lets you restrict a search to only include either high definition (HD) or standard definition (SD) videos. HD videos are available for playback in at least 720p, though higher resolutions, like 1080p, might also be available.
+    ///
+    /// Sets the *video definition* query property to the given value.
     pub fn video_definition(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._video_definition = Some(new_value.to_string());
         self
     }
-    /// Sets the *video category id* query property to the given value.
-    ///
-    /// 
     /// The videoCategoryId parameter filters video search results based on their category.
+    ///
+    /// Sets the *video category id* query property to the given value.
     pub fn video_category_id(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._video_category_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *video caption* query property to the given value.
-    ///
-    /// 
     /// The videoCaption parameter indicates whether the API should filter video search results based on whether they have captions.
+    ///
+    /// Sets the *video caption* query property to the given value.
     pub fn video_caption(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._video_caption = Some(new_value.to_string());
         self
     }
-    /// Sets the *type* query property to the given value.
-    ///
-    /// 
     /// The type parameter restricts a search query to only retrieve a particular type of resource. The value is a comma-separated list of resource types.
+    ///
+    /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Sets the *topic id* query property to the given value.
-    ///
-    /// 
     /// The topicId parameter indicates that the API response should only contain resources associated with the specified topic. The value identifies a Freebase topic ID.
+    ///
+    /// Sets the *topic id* query property to the given value.
     pub fn topic_id(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._topic_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *safe search* query property to the given value.
-    ///
-    /// 
     /// The safeSearch parameter indicates whether the search results should include restricted content as well as standard content.
+    ///
+    /// Sets the *safe search* query property to the given value.
     pub fn safe_search(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._safe_search = Some(new_value.to_string());
         self
     }
-    /// Sets the *relevance language* query property to the given value.
-    ///
-    /// 
     /// The relevanceLanguage parameter instructs the API to return search results that are most relevant to the specified language. The parameter value is typically an ISO 639-1 two-letter language code. However, you should use the values zh-Hans for simplified Chinese and zh-Hant for traditional Chinese. Please note that results in other languages will still be returned if they are highly relevant to the search query term.
+    ///
+    /// Sets the *relevance language* query property to the given value.
     pub fn relevance_language(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._relevance_language = Some(new_value.to_string());
         self
     }
-    /// Sets the *related to video id* query property to the given value.
-    ///
-    /// 
     /// The relatedToVideoId parameter retrieves a list of videos that are related to the video that the parameter value identifies. The parameter value must be set to a YouTube video ID and, if you are using this parameter, the type parameter must be set to video.
+    ///
+    /// Sets the *related to video id* query property to the given value.
     pub fn related_to_video_id(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._related_to_video_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *region code* query property to the given value.
-    ///
-    /// 
     /// The regionCode parameter instructs the API to return search results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.
+    ///
+    /// Sets the *region code* query property to the given value.
     pub fn region_code(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._region_code = Some(new_value.to_string());
         self
     }
-    /// Sets the *q* query property to the given value.
-    ///
-    /// 
     /// The q parameter specifies the query term to search for.
+    ///
+    /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
-    /// Sets the *published before* query property to the given value.
-    ///
-    /// 
     /// The publishedBefore parameter indicates that the API response should only contain resources created before the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).
+    ///
+    /// Sets the *published before* query property to the given value.
     pub fn published_before(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._published_before = Some(new_value.to_string());
         self
     }
-    /// Sets the *published after* query property to the given value.
-    ///
-    /// 
     /// The publishedAfter parameter indicates that the API response should only contain resources created after the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).
+    ///
+    /// Sets the *published after* query property to the given value.
     pub fn published_after(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._published_after = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order* query property to the given value.
-    ///
-    /// 
     /// The order parameter specifies the method that will be used to order resources in the API response.
+    ///
+    /// Sets the *order* query property to the given value.
     pub fn order(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._order = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> SearchListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *location radius* query property to the given value.
-    ///
-    /// 
     /// The locationRadius, in conjunction with the location parameter, defines a geographic area. If the geographic coordinates associated with a video fall within that area, then the video may be included in search results. This parameter value must be a floating point number followed by a measurement unit. Valid measurement units are m, km, ft, and mi. For example, valid parameter values include 1500m, 5km, 10000ft, and 0.75mi. The API does not support locationRadius parameter values larger than 1000 kilometers.
+    ///
+    /// Sets the *location radius* query property to the given value.
     pub fn location_radius(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._location_radius = Some(new_value.to_string());
         self
     }
-    /// Sets the *location* query property to the given value.
-    ///
-    /// 
     /// The location parameter restricts a search to videos that have a geographical location specified in their metadata. The value is a string that specifies geographic latitude/longitude coordinates e.g. (37.42307,-122.08427)
+    ///
+    /// Sets the *location* query property to the given value.
     pub fn location(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._location = Some(new_value.to_string());
         self
     }
-    /// Sets the *for mine* query property to the given value.
-    ///
-    /// 
     /// The forMine parameter restricts the search to only retrieve videos owned by the authenticated user. If you set this parameter to true, then the type parameter's value must also be set to video.
+    ///
+    /// Sets the *for mine* query property to the given value.
     pub fn for_mine(mut self, new_value: bool) -> SearchListCall<'a, C, A> {
         self._for_mine = Some(new_value);
         self
     }
-    /// Sets the *for developer* query property to the given value.
-    ///
-    /// 
     /// The forDeveloper parameter restricts the search to only retrieve videos uploaded via the developer's application or website. The API server uses the request's authorization credentials to identify the developer. Therefore, a developer can restrict results to videos uploaded through the developer's own app or website but not to videos uploaded through other apps or sites.
+    ///
+    /// Sets the *for developer* query property to the given value.
     pub fn for_developer(mut self, new_value: bool) -> SearchListCall<'a, C, A> {
         self._for_developer = Some(new_value);
         self
     }
-    /// Sets the *for content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The forContentOwner parameter restricts the search to only retrieve resources owned by the content owner specified by the onBehalfOfContentOwner parameter. The user must be authenticated using a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.
+    ///
+    /// Sets the *for content owner* query property to the given value.
     pub fn for_content_owner(mut self, new_value: bool) -> SearchListCall<'a, C, A> {
         self._for_content_owner = Some(new_value);
         self
     }
-    /// Sets the *event type* query property to the given value.
-    ///
-    /// 
     /// The eventType parameter restricts a search to broadcast events.
+    ///
+    /// Sets the *event type* query property to the given value.
     pub fn event_type(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._event_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *channel type* query property to the given value.
-    ///
-    /// 
     /// The channelType parameter lets you restrict a search to a particular type of channel.
+    ///
+    /// Sets the *channel type* query property to the given value.
     pub fn channel_type(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._channel_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *channel id* query property to the given value.
-    ///
-    /// 
     /// The channelId parameter indicates that the API response should only contain resources created by the channel
+    ///
+    /// Sets the *channel id* query property to the given value.
     pub fn channel_id(mut self, new_value: &str) -> SearchListCall<'a, C, A> {
         self._channel_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SearchListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12655,8 +12579,8 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12690,6 +12614,8 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -12835,6 +12761,8 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -12844,27 +12772,23 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// 
     /// * *id*
     /// * *snippet*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     pub fn part(mut self, new_value: &str) -> I18nRegionListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *hl* query property to the given value.
-    ///
-    /// 
     /// The hl parameter specifies the language that should be used for text values in the API response.
+    ///
+    /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> I18nRegionListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> I18nRegionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12894,8 +12818,8 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12929,6 +12853,8 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -13101,6 +13027,7 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -13112,11 +13039,16 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    /// 
     pub fn request(mut self, new_value: &LiveStream) -> LiveStreamUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. If the request body does not specify a value for a mutable property, the existing value for that property will be removed.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -13131,45 +13063,36 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
-    /// 
-    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. If the request body does not specify a value for a mutable property, the existing value for that property will be removed.
     pub fn part(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13199,8 +13122,8 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13359,45 +13282,42 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The id parameter specifies the YouTube live stream ID for the resource that is being deleted.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube live stream ID for the resource that is being deleted.
     pub fn id(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13427,8 +13347,8 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13463,6 +13383,8 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -13633,6 +13555,8 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -13644,73 +13568,64 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.
     pub fn part(mut self, new_value: &str) -> LiveStreamListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LiveStreamListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamListCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *mine* query property to the given value.
-    ///
-    /// 
     /// The mine parameter can be used to instruct the API to only return streams owned by the authenticated user. Set the parameter value to true to only retrieve your own streams.
+    ///
+    /// Sets the *mine* query property to the given value.
     pub fn mine(mut self, new_value: bool) -> LiveStreamListCall<'a, C, A> {
         self._mine = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set. Acceptable values are 0 to 50, inclusive. The default value is 5.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LiveStreamListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of YouTube stream IDs that identify the streams being retrieved. In a liveStream resource, the id property specifies the stream's ID.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> LiveStreamListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13740,8 +13655,8 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13775,6 +13690,8 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -13947,6 +13864,7 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -13958,11 +13876,14 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    /// 
     pub fn request(mut self, new_value: &LiveStream) -> LiveStreamInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -13977,43 +13898,36 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
     pub fn part(mut self, new_value: &str) -> LiveStreamInsertCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14043,8 +13957,8 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14077,6 +13991,8 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -14242,6 +14158,7 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -14251,11 +14168,16 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// 
     /// * *id*
     /// * *invideoPromotion*
-    /// 
     pub fn request(mut self, new_value: &Channel) -> ChannelUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are id and invideoPromotion.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -14268,31 +14190,23 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// 
     /// * *id*
     /// * *invideoPromotion*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are id and invideoPromotion.
-    /// 
-    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies.
     pub fn part(mut self, new_value: &str) -> ChannelUpdateCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelUpdateCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14322,8 +14236,8 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14362,6 +14276,8 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 /// * *https://www.googleapis.com/auth/youtubepartner-channel-audit*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -14552,6 +14468,10 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, statistics, topicDetails, and invideoPromotion.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -14565,101 +14485,86 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *statistics*
     /// * *topicDetails*
     /// * *invideoPromotion*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, statistics, topicDetails, and invideoPromotion.
-    /// 
-    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties.
     pub fn part(mut self, new_value: &str) -> ChannelListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ChannelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *my subscribers* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to true to retrieve a list of channels that subscribed to the authenticated user's channel.
+    ///
+    /// Sets the *my subscribers* query property to the given value.
     pub fn my_subscribers(mut self, new_value: bool) -> ChannelListCall<'a, C, A> {
         self._my_subscribers = Some(new_value);
         self
     }
-    /// Sets the *mine* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to true to instruct the API to only return channels owned by the authenticated user.
+    ///
+    /// Sets the *mine* query property to the given value.
     pub fn mine(mut self, new_value: bool) -> ChannelListCall<'a, C, A> {
         self._mine = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ChannelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *managed by me* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to true to instruct the API to only return channels managed by the content owner that the onBehalfOfContentOwner parameter specifies. The user must be authenticated as a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.
+    ///
+    /// Sets the *managed by me* query property to the given value.
     pub fn managed_by_me(mut self, new_value: bool) -> ChannelListCall<'a, C, A> {
         self._managed_by_me = Some(new_value);
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of the YouTube channel ID(s) for the resource(s) that are being retrieved. In a channel resource, the id property specifies the channel's YouTube channel ID.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> ChannelListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *hl* query property to the given value.
-    ///
-    /// 
     /// The hl parameter should be used for filter out the properties that are not in the given language. Used for the brandingSettings part.
+    ///
+    /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> ChannelListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Sets the *for username* query property to the given value.
-    ///
-    /// 
     /// The forUsername parameter specifies a YouTube username, thereby requesting the channel associated with that username.
+    ///
+    /// Sets the *for username* query property to the given value.
     pub fn for_username(mut self, new_value: &str) -> ChannelListCall<'a, C, A> {
         self._for_username = Some(new_value.to_string());
         self
     }
-    /// Sets the *category id* query property to the given value.
-    ///
-    /// 
     /// The categoryId parameter specifies a YouTube guide category, thereby requesting YouTube channels associated with that category.
+    ///
+    /// Sets the *category id* query property to the given value.
     pub fn category_id(mut self, new_value: &str) -> ChannelListCall<'a, C, A> {
         self._category_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14689,8 +14594,8 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14724,6 +14629,8 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -14890,6 +14797,7 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -14900,11 +14808,14 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
     pub fn request(mut self, new_value: &PlaylistItem) -> PlaylistItemInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -14918,31 +14829,25 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
     pub fn part(mut self, new_value: &str) -> PlaylistItemInsertCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14972,8 +14877,8 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15122,23 +15027,22 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID.
     pub fn id(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15168,8 +15072,8 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15205,6 +15109,8 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -15375,6 +15281,10 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -15386,71 +15296,60 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
-    /// 
-    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties.
     pub fn part(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *video id* query property to the given value.
-    ///
-    /// 
     /// The videoId parameter specifies that the request should return only the playlist items that contain the specified video.
+    ///
+    /// Sets the *video id* query property to the given value.
     pub fn video_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, A> {
         self._video_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *playlist id* query property to the given value.
-    ///
-    /// 
     /// The playlistId parameter specifies the unique ID of the playlist for which you want to retrieve playlist items. Note that even though this is an optional parameter, every request to retrieve playlist items must specify a value for either the id parameter or the playlistId parameter.
+    ///
+    /// Sets the *playlist id* query property to the given value.
     pub fn playlist_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, A> {
         self._playlist_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PlaylistItemListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of one or more unique playlist item IDs.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15480,8 +15379,8 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15515,6 +15414,8 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -15676,6 +15577,7 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -15686,11 +15588,16 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
     pub fn request(mut self, new_value: &PlaylistItem) -> PlaylistItemUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist item can specify a start time and end time, which identify the times portion of the video that should play when users watch the video in the playlist. If your request is updating a playlist item that sets these values, and the request's part parameter value includes the contentDetails part, the playlist item's start and end times will be updated to whatever value the request body specifies. If the request body does not specify values, the existing start and end times will be removed and replaced with the default settings.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -15704,23 +15611,16 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
-    /// 
-    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist item can specify a start time and end time, which identify the times portion of the video that should play when users watch the video in the playlist. If your request is updating a playlist item that sets these values, and the request's part parameter value includes the contentDetails part, the playlist item's start and end times will be updated to whatever value the request body specifies. If the request body does not specify values, the existing start and end times will be removed and replaced with the default settings.
     pub fn part(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15750,8 +15650,8 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16035,40 +15935,38 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &InvideoBranding) -> WatermarkSetCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The channelId parameter specifies a YouTube channel ID for which the watermark is being provided.
+    ///
     /// Sets the *channel id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The channelId parameter specifies a YouTube channel ID for which the watermark is being provided.
     pub fn channel_id(mut self, new_value: &str) -> WatermarkSetCall<'a, C, A> {
         self._channel_id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkSetCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> WatermarkSetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16098,8 +15996,8 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16253,31 +16151,29 @@ impl<'a, C, A> WatermarkUnsetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The channelId parameter specifies a YouTube channel ID for which the watermark is being unset.
+    ///
     /// Sets the *channel id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The channelId parameter specifies a YouTube channel ID for which the watermark is being unset.
     pub fn channel_id(mut self, new_value: &str) -> WatermarkUnsetCall<'a, C, A> {
         self._channel_id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkUnsetCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> WatermarkUnsetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16307,8 +16203,8 @@ impl<'a, C, A> WatermarkUnsetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16342,6 +16238,8 @@ impl<'a, C, A> WatermarkUnsetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -16509,16 +16407,18 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated.
     pub fn id(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -16530,69 +16430,61 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn part(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *walltime* query property to the given value.
-    ///
-    /// 
     /// The walltime parameter specifies the wall clock time at which the specified slate change will occur. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.
+    ///
+    /// Sets the *walltime* query property to the given value.
     pub fn walltime(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, A> {
         self._walltime = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *offset time ms* query property to the given value.
-    ///
-    /// 
     /// The offsetTimeMs parameter specifies a positive time offset when the specified slate change will occur. The value is measured in milliseconds from the beginning of the broadcast's monitor stream, which is the time that the testing phase for the broadcast began. Even though it is specified in milliseconds, the value is actually an approximation, and YouTube completes the requested action as closely as possible to that time.
     /// 
     /// If you do not specify a value for this parameter, then YouTube performs the action as soon as possible. See the Getting started guide for more details.
     /// 
     /// Important: You should only specify a value for this parameter if your broadcast stream is delayed.
+    ///
+    /// Sets the *offset time ms* query property to the given value.
     pub fn offset_time_ms(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, A> {
         self._offset_time_ms = Some(new_value.to_string());
         self
     }
-    /// Sets the *display slate* query property to the given value.
-    ///
-    /// 
     /// The displaySlate parameter specifies whether the slate is being enabled or disabled.
+    ///
+    /// Sets the *display slate* query property to the given value.
     pub fn display_slate(mut self, new_value: bool) -> LiveBroadcastControlCall<'a, C, A> {
         self._display_slate = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastControlCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16622,8 +16514,8 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16657,6 +16549,8 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -16829,6 +16723,7 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -16840,11 +16735,16 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
     pub fn request(mut self, new_value: &LiveBroadcast) -> LiveBroadcastUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a broadcast's privacy status is defined in the status part. As such, if your request is updating a private or unlisted broadcast, and the request's part parameter value includes the status part, the broadcast's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the broadcast will revert to the default privacy setting.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -16859,45 +16759,36 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
-    /// 
-    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a broadcast's privacy status is defined in the status part. As such, if your request is updating a private or unlisted broadcast, and the request's part parameter value includes the status part, the broadcast's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the broadcast will revert to the default privacy setting.
     pub fn part(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16927,8 +16818,8 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16962,6 +16853,8 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -17134,6 +17027,7 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -17145,11 +17039,14 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
     pub fn request(mut self, new_value: &LiveBroadcast) -> LiveBroadcastInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -17164,43 +17061,36 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn part(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17230,8 +17120,8 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17265,6 +17155,8 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -17422,16 +17314,18 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.
     pub fn id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -17443,49 +17337,43 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn part(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *stream id* query property to the given value.
-    ///
-    /// 
     /// The streamId parameter specifies the unique ID of the video stream that is being bound to a broadcast. If this parameter is omitted, the API will remove any existing binding between the broadcast and a video stream.
+    ///
+    /// Sets the *stream id* query property to the given value.
     pub fn stream_id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
         self._stream_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastBindCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17515,8 +17403,8 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17551,6 +17439,8 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -17726,6 +17616,8 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -17737,81 +17629,71 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn part(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *mine* query property to the given value.
-    ///
-    /// 
     /// The mine parameter can be used to instruct the API to only return broadcasts owned by the authenticated user. Set the parameter value to true to only retrieve your own broadcasts.
+    ///
+    /// Sets the *mine* query property to the given value.
     pub fn mine(mut self, new_value: bool) -> LiveBroadcastListCall<'a, C, A> {
         self._mine = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LiveBroadcastListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of YouTube broadcast IDs that identify the broadcasts being retrieved. In a liveBroadcast resource, the id property specifies the broadcast's ID.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *broadcast status* query property to the given value.
-    ///
-    /// 
     /// The broadcastStatus parameter filters the API response to only include broadcasts with the specified status.
+    ///
+    /// Sets the *broadcast status* query property to the given value.
     pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, A> {
         self._broadcast_status = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17841,8 +17723,8 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18001,45 +17883,42 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted.
     pub fn id(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18069,8 +17948,8 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18104,6 +17983,8 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -18258,26 +18139,28 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to.
+    ///
     /// Sets the *broadcast status* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to.
     pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, A> {
         self._broadcast_status = new_value.to_string();
         self
     }
+    /// The id parameter specifies the unique ID of the broadcast that is transitioning to another status.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the unique ID of the broadcast that is transitioning to another status.
     pub fn id(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -18289,41 +18172,36 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn part(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    ///
-    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
     pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastTransitionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18353,8 +18231,8 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18451,7 +18329,7 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/youtube/v3/captions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
 
         
@@ -18513,39 +18391,36 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The id parameter identifies the caption track that is being deleted. The value is a caption track ID as identified by the id property in a caption resource.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter identifies the caption track that is being deleted. The value is a caption track ID as identified by the id property in a caption resource.
     pub fn id(mut self, new_value: &str) -> CaptionDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of* query property to the given value.
-    ///
-    /// 
     /// ID of the Google+ Page for the channel that the request is be on behalf of
+    ///
+    /// Sets the *on behalf of* query property to the given value.
     pub fn on_behalf_of(mut self, new_value: &str) -> CaptionDeleteCall<'a, C, A> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
-    /// Sets the *debug project id override* query property to the given value.
-    ///
-    /// 
     /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID
+    ///
+    /// Sets the *debug project id override* query property to the given value.
     pub fn debug_project_id_override(mut self, new_value: &str) -> CaptionDeleteCall<'a, C, A> {
         self._debug_project_id_override = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CaptionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18575,8 +18450,8 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18698,7 +18573,7 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
 
         
@@ -18884,15 +18759,17 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Caption) -> CaptionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter specifies the caption resource parts that the API response will include. Set the parameter value to snippet.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -18900,45 +18777,39 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    /// 
-    /// The part parameter specifies the caption resource parts that the API response will include. Set the parameter value to snippet.
     pub fn part(mut self, new_value: &str) -> CaptionInsertCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *sync* query property to the given value.
-    ///
-    /// 
     /// The sync parameter indicates whether YouTube should automatically synchronize the caption file with the audio track of the video. If you set the value to true, YouTube will disregard any time codes that are in the uploaded caption file and generate new time codes for the captions.
     /// 
     /// You should set the sync parameter to true if you are uploading a transcript, which has no time codes, or if you suspect the time codes in your file are incorrect and want YouTube to try to fix them.
+    ///
+    /// Sets the *sync* query property to the given value.
     pub fn sync(mut self, new_value: bool) -> CaptionInsertCall<'a, C, A> {
         self._sync = Some(new_value);
         self
     }
-    /// Sets the *on behalf of* query property to the given value.
-    ///
-    /// 
     /// ID of the Google+ Page for the channel that the request is be on behalf of
+    ///
+    /// Sets the *on behalf of* query property to the given value.
     pub fn on_behalf_of(mut self, new_value: &str) -> CaptionInsertCall<'a, C, A> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
-    /// Sets the *debug project id override* query property to the given value.
-    ///
-    /// 
     /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID.
+    ///
+    /// Sets the *debug project id override* query property to the given value.
     pub fn debug_project_id_override(mut self, new_value: &str) -> CaptionInsertCall<'a, C, A> {
         self._debug_project_id_override = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CaptionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18968,8 +18839,8 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19074,7 +18945,7 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/youtube/v3/captions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
 
         
@@ -19146,57 +19017,53 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The part parameter specifies the caption resource parts that the API response will include.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The part parameter specifies the caption resource parts that the API response will include.
     pub fn part(mut self, new_value: &str) -> CaptionListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
+    /// The videoId parameter specifies the YouTube video ID of the video for which the API should return caption tracks.
+    ///
     /// Sets the *video id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The videoId parameter specifies the YouTube video ID of the video for which the API should return caption tracks.
     pub fn video_id(mut self, new_value: &str) -> CaptionListCall<'a, C, A> {
         self._video_id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of* query property to the given value.
-    ///
-    /// 
     /// ID of the Google+ Page for the channel that the request is on behalf of.
+    ///
+    /// Sets the *on behalf of* query property to the given value.
     pub fn on_behalf_of(mut self, new_value: &str) -> CaptionListCall<'a, C, A> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of IDs that identify the caption resources that should be retrieved. Each ID must identify a caption track associated with the specified video.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> CaptionListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *debug project id override* query property to the given value.
-    ///
-    /// 
     /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID.
+    ///
+    /// Sets the *debug project id override* query property to the given value.
     pub fn debug_project_id_override(mut self, new_value: &str) -> CaptionListCall<'a, C, A> {
         self._debug_project_id_override = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CaptionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19226,8 +19093,8 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19337,7 +19204,7 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/youtube/v3/captions/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -19423,55 +19290,50 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The id parameter identifies the caption track that is being retrieved. The value is a caption track ID as identified by the id property in a caption resource.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter identifies the caption track that is being retrieved. The value is a caption track ID as identified by the id property in a caption resource.
     pub fn id(mut self, new_value: &str) -> CaptionDownloadCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *tlang* query property to the given value.
-    ///
-    /// 
     /// The tlang parameter specifies that the API response should return a translation of the specified caption track. The parameter value is an ISO 639-1 two-letter language code that identifies the desired caption language. The translation is generated by using machine translation, such as Google Translate.
+    ///
+    /// Sets the *tlang* query property to the given value.
     pub fn tlang(mut self, new_value: &str) -> CaptionDownloadCall<'a, C, A> {
         self._tlang = Some(new_value.to_string());
         self
     }
-    /// Sets the *tfmt* query property to the given value.
-    ///
-    /// 
     /// The tfmt parameter specifies that the caption track should be returned in a specific format. If the parameter is not included in the request, the track is returned in its original format.
+    ///
+    /// Sets the *tfmt* query property to the given value.
     pub fn tfmt(mut self, new_value: &str) -> CaptionDownloadCall<'a, C, A> {
         self._tfmt = Some(new_value.to_string());
         self
     }
-    /// Sets the *on behalf of* query property to the given value.
-    ///
-    /// 
     /// ID of the Google+ Page for the channel that the request is be on behalf of
+    ///
+    /// Sets the *on behalf of* query property to the given value.
     pub fn on_behalf_of(mut self, new_value: &str) -> CaptionDownloadCall<'a, C, A> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
-    /// Sets the *debug project id override* query property to the given value.
-    ///
-    /// 
     /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID
+    ///
+    /// Sets the *debug project id override* query property to the given value.
     pub fn debug_project_id_override(mut self, new_value: &str) -> CaptionDownloadCall<'a, C, A> {
         self._debug_project_id_override = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CaptionDownloadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19501,8 +19363,8 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19624,7 +19486,7 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
         }
 
         
@@ -19810,15 +19672,17 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Caption) -> CaptionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include. Set the property value to snippet if you are updating the track's draft status. Otherwise, set the property value to id.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -19826,45 +19690,39 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include. Set the property value to snippet if you are updating the track's draft status. Otherwise, set the property value to id.
     pub fn part(mut self, new_value: &str) -> CaptionUpdateCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *sync* query property to the given value.
-    ///
-    /// 
     /// Note: The API server only processes the parameter value if the request contains an updated caption file.
     /// 
     /// The sync parameter indicates whether YouTube should automatically synchronize the caption file with the audio track of the video. If you set the value to true, YouTube will automatically synchronize the caption track with the audio track.
+    ///
+    /// Sets the *sync* query property to the given value.
     pub fn sync(mut self, new_value: bool) -> CaptionUpdateCall<'a, C, A> {
         self._sync = Some(new_value);
         self
     }
-    /// Sets the *on behalf of* query property to the given value.
-    ///
-    /// 
     /// ID of the Google+ Page for the channel that the request is be on behalf of
+    ///
+    /// Sets the *on behalf of* query property to the given value.
     pub fn on_behalf_of(mut self, new_value: &str) -> CaptionUpdateCall<'a, C, A> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
-    /// Sets the *debug project id override* query property to the given value.
-    ///
-    /// 
     /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID.
+    ///
+    /// Sets the *debug project id override* query property to the given value.
     pub fn debug_project_id_override(mut self, new_value: &str) -> CaptionUpdateCall<'a, C, A> {
         self._debug_project_id_override = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CaptionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19894,8 +19752,8 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19929,6 +19787,8 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -20084,6 +19944,8 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -20093,43 +19955,37 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// 
     /// * *id*
     /// * *snippet*
-    /// 
-    /// The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.
     pub fn part(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *region code* query property to the given value.
-    ///
-    /// 
     /// The regionCode parameter instructs the API to return the list of video categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.
+    ///
+    /// Sets the *region code* query property to the given value.
     pub fn region_code(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, A> {
         self._region_code = Some(new_value.to_string());
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of video category IDs for the resources that you are retrieving.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *hl* query property to the given value.
-    ///
-    /// 
     /// The hl parameter specifies the language that should be used for text values in the API response.
+    ///
+    /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoCategoryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20159,8 +20015,8 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20194,6 +20050,8 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
+/// 
+/// The default scope will be `Scope::Readonly`.
 ///
 /// # Example
 ///
@@ -20374,6 +20232,10 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -20384,85 +20246,72 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *id*
     /// * *snippet*
     /// * *contentDetails*
-    /// 
-    /// The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
-    /// 
-    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
     pub fn part(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *region code* query property to the given value.
-    ///
-    /// 
     /// The regionCode parameter instructs the API to return results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code. YouTube uses this value when the authorized user's previous activity on YouTube does not provide enough information to generate the activity feed.
+    ///
+    /// Sets the *region code* query property to the given value.
     pub fn region_code(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._region_code = Some(new_value.to_string());
         self
     }
-    /// Sets the *published before* query property to the given value.
-    ///
-    /// 
     /// The publishedBefore parameter specifies the date and time before which an activity must have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be excluded from the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
+    ///
+    /// Sets the *published before* query property to the given value.
     pub fn published_before(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._published_before = Some(new_value.to_string());
         self
     }
-    /// Sets the *published after* query property to the given value.
-    ///
-    /// 
     /// The publishedAfter parameter specifies the earliest date and time that an activity could have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be included in the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
+    ///
+    /// Sets the *published after* query property to the given value.
     pub fn published_after(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._published_after = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *mine* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's activities.
+    ///
+    /// Sets the *mine* query property to the given value.
     pub fn mine(mut self, new_value: bool) -> ActivityListCall<'a, C, A> {
         self._mine = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *home* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to true to retrieve the activity feed that displays on the YouTube home page for the currently authenticated user.
+    ///
+    /// Sets the *home* query property to the given value.
     pub fn home(mut self, new_value: bool) -> ActivityListCall<'a, C, A> {
         self._home = Some(new_value);
         self
     }
-    /// Sets the *channel id* query property to the given value.
-    ///
-    /// 
     /// The channelId parameter specifies a unique YouTube channel ID. The API will then return a list of that channel's activities.
+    ///
+    /// Sets the *channel id* query property to the given value.
     pub fn channel_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._channel_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20492,8 +20341,8 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20527,6 +20376,8 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
 /// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// 
+/// The default scope will be `Scope::Full`.
 ///
 /// # Example
 ///
@@ -20687,6 +20538,7 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
@@ -20696,11 +20548,14 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    /// 
     pub fn request(mut self, new_value: &Activity) -> ActivityInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and contentDetails.
+    ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -20713,21 +20568,16 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    /// 
-    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
-    /// 
-    /// The part names that you can include in the parameter value are snippet and contentDetails.
     pub fn part(mut self, new_value: &str) -> ActivityInsertCall<'a, C, A> {
         self._part = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -20757,8 +20607,8 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

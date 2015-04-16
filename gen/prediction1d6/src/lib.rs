@@ -108,16 +108,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -293,16 +295,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -351,7 +355,7 @@ impl<'a, C, A> Prediction<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesCategoricalValues {
     /// Number of times this feature had this value.
     pub count: String,
@@ -405,7 +409,7 @@ impl RequestValue for Insert {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescription {
     /// Description of the output value or label.
     #[serde(rename="outputFeature")]
@@ -422,7 +426,7 @@ impl Part for AnalyzeDataDescription {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesNumeric {
     /// Number of numeric values for this feature in the data set.
     pub count: String,
@@ -445,7 +449,7 @@ impl Part for AnalyzeDataDescriptionFeaturesNumeric {}
 /// 
 /// * [list trainedmodels](struct.TrainedmodelListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct List {
     /// Pagination token to fetch the next page, if one exists.
     #[serde(rename="nextPageToken")]
@@ -481,7 +485,7 @@ impl Part for InputInput {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesText {
     /// Number of multiple-word text values for this feature.
     pub count: String,
@@ -495,7 +499,7 @@ impl Part for AnalyzeDataDescriptionFeaturesText {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionFeatures {
     /// The feature index.
     pub index: String,
@@ -540,7 +544,7 @@ impl RequestValue for Input {}
 /// * [predict hostedmodels](struct.HostedmodelPredictCall.html) (response)
 /// * [predict trainedmodels](struct.TrainedmodelPredictCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Output {
     /// What kind of resource this is.
     pub kind: String,
@@ -572,7 +576,7 @@ impl ResponseResult for Output {}
 /// 
 /// * [analyze trainedmodels](struct.TrainedmodelAnalyzeCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Analyze {
     /// What kind of resource this is.
     pub kind: String,
@@ -605,7 +609,7 @@ impl ResponseResult for Analyze {}
 /// * [get trainedmodels](struct.TrainedmodelGetCall.html) (response)
 /// * [update trainedmodels](struct.TrainedmodelUpdateCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Insert2 {
     /// What kind of resource this is.
     pub kind: String,
@@ -646,7 +650,7 @@ impl ResponseResult for Insert2 {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionOutputFeatureNumeric {
     /// Number of numeric output values in the data set.
     pub count: String,
@@ -664,7 +668,7 @@ impl Part for AnalyzeDataDescriptionOutputFeatureNumeric {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionOutputFeature {
     /// Description of the output labels in the data set.
     pub text: Vec<AnalyzeDataDescriptionOutputFeatureText>,
@@ -680,7 +684,7 @@ impl Part for AnalyzeDataDescriptionOutputFeature {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeModelDescription {
     /// An output confusion matrix. This shows an estimate for how this model will do in predictions. This is first indexed by the true class label. For each true class label, this provides a pair {predicted_label, count}, where count is the estimated number of times the model will predict the predicted label given the true label. Will not output if more then 100 classes (Categorical models only).
     #[serde(rename="confusionMatrix")]
@@ -700,7 +704,7 @@ impl Part for AnalyzeModelDescription {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Insert2ModelInfo {
     /// Number of valid data instances used in the trained model.
     #[serde(rename="numberInstances")]
@@ -730,7 +734,7 @@ impl Part for Insert2ModelInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionOutputFeatureText {
     /// Number of times the output label occurred in the data set.
     pub count: String,
@@ -746,7 +750,7 @@ impl Part for AnalyzeDataDescriptionOutputFeatureText {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesCategorical {
     /// Number of categorical values for this feature in the data.
     pub count: String,
@@ -800,7 +804,7 @@ impl Part for InsertTrainingInstances {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OutputOutputMulti {
     /// The probability of the class label.
     pub score: String,
@@ -1137,7 +1141,7 @@ impl<'a, C, A> TrainedmodelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/prediction/v1.6/projects/{project}/trainedmodels/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{id}", "id")].iter() {
@@ -1233,33 +1237,32 @@ impl<'a, C, A> TrainedmodelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The project associated with the model.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The unique name for the predictive model.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique name for the predictive model.
     pub fn id(mut self, new_value: &str) -> TrainedmodelGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1289,8 +1292,8 @@ impl<'a, C, A> TrainedmodelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1387,7 +1390,7 @@ impl<'a, C, A> TrainedmodelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/prediction/v1.6/projects/{project}/trainedmodels/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{id}", "id")].iter() {
@@ -1491,42 +1494,41 @@ impl<'a, C, A> TrainedmodelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Update) -> TrainedmodelUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The project associated with the model.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The unique name for the predictive model.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique name for the predictive model.
     pub fn id(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1556,8 +1558,8 @@ impl<'a, C, A> TrainedmodelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1655,7 +1657,7 @@ impl<'a, C, A> TrainedmodelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/prediction/v1.6/projects/{project}/trainedmodels/list".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project")].iter() {
@@ -1751,39 +1753,36 @@ impl<'a, C, A> TrainedmodelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The project associated with the model.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Pagination token.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TrainedmodelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> TrainedmodelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1813,8 +1812,8 @@ impl<'a, C, A> TrainedmodelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1903,7 +1902,7 @@ impl<'a, C, A> TrainedmodelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/prediction/v1.6/projects/{project}/trainedmodels/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{id}", "id")].iter() {
@@ -1989,33 +1988,32 @@ impl<'a, C, A> TrainedmodelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The project associated with the model.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The unique name for the predictive model.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique name for the predictive model.
     pub fn id(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2045,8 +2043,8 @@ impl<'a, C, A> TrainedmodelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2245,32 +2243,31 @@ impl<'a, C, A> TrainedmodelInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Insert) -> TrainedmodelInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The project associated with the model.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2300,8 +2297,8 @@ impl<'a, C, A> TrainedmodelInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2391,7 +2388,7 @@ impl<'a, C, A> TrainedmodelAnalyzeCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/prediction/v1.6/projects/{project}/trainedmodels/{id}/analyze".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{id}", "id")].iter() {
@@ -2487,33 +2484,32 @@ impl<'a, C, A> TrainedmodelAnalyzeCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// The project associated with the model.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The unique name for the predictive model.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique name for the predictive model.
     pub fn id(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelAnalyzeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2543,8 +2539,8 @@ impl<'a, C, A> TrainedmodelAnalyzeCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2641,7 +2637,7 @@ impl<'a, C, A> TrainedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/prediction/v1.6/projects/{project}/trainedmodels/{id}/predict".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{id}", "id")].iter() {
@@ -2745,42 +2741,41 @@ impl<'a, C, A> TrainedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Input) -> TrainedmodelPredictCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The project associated with the model.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelPredictCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The unique name for the predictive model.
+    ///
     /// Sets the *id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The unique name for the predictive model.
     pub fn id(mut self, new_value: &str) -> TrainedmodelPredictCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelPredictCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2810,8 +2805,8 @@ impl<'a, C, A> TrainedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2908,7 +2903,7 @@ impl<'a, C, A> HostedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/prediction/v1.6/projects/{project}/hostedmodels/{hostedModelName}/predict".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{hostedModelName}", "hostedModelName")].iter() {
@@ -3012,42 +3007,41 @@ impl<'a, C, A> HostedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Input) -> HostedmodelPredictCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The project associated with the model.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> HostedmodelPredictCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// The name of a hosted model.
+    ///
     /// Sets the *hosted model name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of a hosted model.
     pub fn hosted_model_name(mut self, new_value: &str) -> HostedmodelPredictCall<'a, C, A> {
         self._hosted_model_name = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> HostedmodelPredictCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3077,8 +3071,8 @@ impl<'a, C, A> HostedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

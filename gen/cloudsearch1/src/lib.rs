@@ -96,16 +96,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -271,16 +273,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -331,7 +335,7 @@ impl<'a, C, A> Cloudsearch<C, A>
 /// 
 /// * [indexes documents list projects](struct.ProjectIndexeDocumentListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListDocumentsResponse {
     /// If there are more results, retrieve them by invoking list documents call with the same arguments and this `nextPageToken`. If there are no more results, this field is not set.
     #[serde(rename="nextPageToken")]
@@ -347,7 +351,7 @@ impl ResponseResult for ListDocumentsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IndexInfo {
     /// The project associated with the index. It cannot be the empty string.
     #[serde(rename="projectId")]
@@ -367,7 +371,7 @@ impl Part for IndexInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchResult {
     /// If there are more results, retrieve them by invoking search call with the same arguments and this `nextPageToken`. If there are no more results, this field is not set.
     #[serde(rename="nextPageToken")]
@@ -386,7 +390,7 @@ impl Part for SearchResult {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FieldNames {
     /// The names of fields in which TEXT values are stored.
     #[serde(rename="textFields")]
@@ -433,7 +437,7 @@ impl Part for FieldValueList {}
 /// 
 /// * [indexes list projects](struct.ProjectIndexeListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListIndexesResponse {
     /// If there are more results, retrieve them by invoking list indexes call with the same arguments and this `nextPageToken`. If there are no more results, this field is not set.
     #[serde(rename="nextPageToken")]
@@ -454,7 +458,7 @@ impl ResponseResult for ListIndexesResponse {}
 /// 
 /// * [indexes search projects](struct.ProjectIndexeSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchResponse {
     /// The number of documents that match the query. It is greater than or equal to the number of documents actually returned. This is an approximation and not an exact count unless it is less than or equal to `matchedCountAccuracy` in search parameter.
     #[serde(rename="matchedCount")]
@@ -528,7 +532,7 @@ impl Part for FieldValue {}
 /// 
 /// * [indexes documents delete projects](struct.ProjectIndexeDocumentDeleteCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty;
 
 impl ResponseResult for Empty {}
@@ -914,63 +918,62 @@ impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The project from which to retrieve indexes. It cannot be the empty string.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project from which to retrieve indexes. It cannot be the empty string.
     pub fn project_id(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The prefix of the index name. It is used to list all indexes with names that have this prefix.
+    ///
     /// Sets the *index name prefix* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The prefix of the index name. It is used to list all indexes with names that have this prefix.
     pub fn index_name_prefix(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, A> {
         self._index_name_prefix = new_value.to_string();
         self
     }
+    /// The maximum number of indexes to return per page. If not specified, 100 indexes are returned per page.
+    ///
     /// Sets the *page size* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The maximum number of indexes to return per page. If not specified, 100 indexes are returned per page.
     pub fn page_size(mut self, new_value: i32) -> ProjectIndexeListCall<'a, C, A> {
         self._page_size = new_value;
         self
     }
+    /// A `nextPageToken` returned from previous list indexes call as the starting point for this call. If not specified, list indexes from the beginning.
+    ///
     /// Sets the *page token* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A `nextPageToken` returned from previous list indexes call as the starting point for this call. If not specified, list indexes from the beginning.
     pub fn page_token(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, A> {
         self._page_token = new_value.to_string();
         self
     }
+    /// Specifies which parts of the IndexInfo resource is returned in the response. If not specified, `ID_ONLY` is used.
+    ///
     /// Sets the *view* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Specifies which parts of the IndexInfo resource is returned in the response. If not specified, `ID_ONLY` is used.
     pub fn view(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, A> {
         self._view = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1004,8 +1007,8 @@ impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1193,43 +1196,42 @@ impl<'a, C, A> ProjectIndexeDocumentGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The project associated with the index for retrieving the document. It cannot be the empty string.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the index for retrieving the document. It cannot be the empty string.
     pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The index from which to retrieve the document. It cannot be the empty string.
+    ///
     /// Sets the *index id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The index from which to retrieve the document. It cannot be the empty string.
     pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentGetCall<'a, C, A> {
         self._index_id = new_value.to_string();
         self
     }
+    /// The identifier of the document to retrieve. It cannot be the empty string.
+    ///
     /// Sets the *doc id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The identifier of the document to retrieve. It cannot be the empty string.
     pub fn doc_id(mut self, new_value: &str) -> ProjectIndexeDocumentGetCall<'a, C, A> {
         self._doc_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1263,8 +1265,8 @@ impl<'a, C, A> ProjectIndexeDocumentGetCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1482,135 +1484,134 @@ impl<'a, C, A> ProjectIndexeSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// The project associated with the index for searching document. It cannot be the empty string.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the index for searching document. It cannot be the empty string.
     pub fn project_id(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The index to search. It cannot be the empty string.
+    ///
     /// Sets the *index id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The index to search. It cannot be the empty string.
     pub fn index_id(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._index_id = new_value.to_string();
         self
     }
+    /// The query string in search query syntax. If the query is missing or empty, all documents are returned.
+    ///
     /// Sets the *query* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The query string in search query syntax. If the query is missing or empty, all documents are returned.
     pub fn query(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._query = new_value.to_string();
         self
     }
+    /// Customized expressions used in `orderBy` or `returnFields`. The expression can contain fields in `Document`, the built-in fields ( `_rank`, the document rank, and `_score` if scoring is enabled) and fields defined in `fieldExpressions`. Each field expression is represented in a json object with the following fields: * `name`: the name of the field expression in string. * `expression`: the expression to be computed. It can be a combination of supported functions encoded in string. Expressions involving number fields can use the arithmetical operators (`+`, `-`, `*`, `/`) and the built-in numeric functions (`max`, `min`, `pow`, `count`, `log`, `abs`). Expressions involving geopoint fields can use the `geopoint` and `distance` functions. Expressions for text and html fields can use the `snippet` function. For example: ``` fieldExpressions={name: "TotalPrice", expression: "(Price+Tax)"} ``` ``` fieldExpressions={name: "snippet", expression: "snippet('good times', content)"} ``` The field expression names can be used in `orderBy` and `returnFields` after they are defined in `fieldExpressions`.
+    ///
     /// Append the given value to the *field expressions* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Customized expressions used in `orderBy` or `returnFields`. The expression can contain fields in `Document`, the built-in fields ( `_rank`, the document rank, and `_score` if scoring is enabled) and fields defined in `fieldExpressions`. Each field expression is represented in a json object with the following fields: * `name`: the name of the field expression in string. * `expression`: the expression to be computed. It can be a combination of supported functions encoded in string. Expressions involving number fields can use the arithmetical operators (`+`, `-`, `*`, `/`) and the built-in numeric functions (`max`, `min`, `pow`, `count`, `log`, `abs`). Expressions involving geopoint fields can use the `geopoint` and `distance` functions. Expressions for text and html fields can use the `snippet` function. For example: ``` fieldExpressions={name: "TotalPrice", expression: "(Price+Tax)"} ``` ``` fieldExpressions={name: "snippet", expression: "snippet('good times', content)"} ``` The field expression names can be used in `orderBy` and `returnFields` after they are defined in `fieldExpressions`.
     pub fn add_field_expressions(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._field_expressions.push(new_value.to_string());
         self
     }
+    /// The maximum number of search results to return per page. Searches perform best when the `pageSize` is kept as small as possible. If not specified, 10 results are returned per page.
+    ///
     /// Sets the *page size* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The maximum number of search results to return per page. Searches perform best when the `pageSize` is kept as small as possible. If not specified, 10 results are returned per page.
     pub fn page_size(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, A> {
         self._page_size = new_value;
         self
     }
+    /// A `nextPageToken` returned from previous Search call as the starting point for this call. Pagination tokens provide better performance and consistency than offsets, and they cannot be used in combination with offsets.
+    ///
     /// Sets the *page token* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A `nextPageToken` returned from previous Search call as the starting point for this call. Pagination tokens provide better performance and consistency than offsets, and they cannot be used in combination with offsets.
     pub fn page_token(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._page_token = new_value.to_string();
         self
     }
+    /// Offset is used to move to an arbitrary result, independent of the previous results. Offsets are inefficient when compared to `pageToken`. `pageToken` and `offset` cannot be both set. The default value of `offset` is 0.
+    ///
     /// Sets the *offset* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Offset is used to move to an arbitrary result, independent of the previous results. Offsets are inefficient when compared to `pageToken`. `pageToken` and `offset` cannot be both set. The default value of `offset` is 0.
     pub fn offset(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, A> {
         self._offset = new_value;
         self
     }
+    /// Minimum accuracy requirement for `matchedCount` in search response. If specified, `matchedCount` will be accurate up to at least that number. For example, when set to 100, any `matchedCount <= 100` is accurate. This option may add considerable latency/expense. By default (when it is not specified or set to 0), the accuracy is the same as `pageSize`.
+    ///
     /// Sets the *matched count accuracy* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Minimum accuracy requirement for `matchedCount` in search response. If specified, `matchedCount` will be accurate up to at least that number. For example, when set to 100, any `matchedCount <= 100` is accurate. This option may add considerable latency/expense. By default (when it is not specified or set to 0), the accuracy is the same as `pageSize`.
     pub fn matched_count_accuracy(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, A> {
         self._matched_count_accuracy = new_value;
         self
     }
+    /// Comma-separated list of fields for sorting on the search result, including fields from `Document`, the built-in fields (`_rank` and `_score`), and fields defined in `fieldExpressions`. For example: `orderBy="foo,bar"`. The default sorting order is ascending. To specify descending order for a field, a suffix `" desc"` should be appended to the field name. For example: `orderBy="foo desc,bar"`. The default value for text sort is the empty string, and the default value for numeric sort is 0. If not specified, the search results are automatically sorted by descending `_rank`. Sorting by ascending `_rank` is not allowed.
+    ///
     /// Sets the *order by* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Comma-separated list of fields for sorting on the search result, including fields from `Document`, the built-in fields (`_rank` and `_score`), and fields defined in `fieldExpressions`. For example: `orderBy="foo,bar"`. The default sorting order is ascending. To specify descending order for a field, a suffix `" desc"` should be appended to the field name. For example: `orderBy="foo desc,bar"`. The default value for text sort is the empty string, and the default value for numeric sort is 0. If not specified, the search results are automatically sorted by descending `_rank`. Sorting by ascending `_rank` is not allowed.
     pub fn order_by(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._order_by = new_value.to_string();
         self
     }
+    /// The scoring function to invoke on a search result for this query. If `scorer` is not set, scoring is disabled and `_score` is 0 for all documents in the search result. To enable document relevancy score based on term frequency, set `"scorer=generic"`.
+    ///
     /// Sets the *scorer* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The scoring function to invoke on a search result for this query. If `scorer` is not set, scoring is disabled and `_score` is 0 for all documents in the search result. To enable document relevancy score based on term frequency, set `"scorer=generic"`.
     pub fn scorer(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._scorer = new_value.to_string();
         self
     }
+    /// Maximum number of top retrieved results to score. It is valid only when `scorer` is set. If not specified, 100 retrieved results are scored.
+    ///
     /// Sets the *scorer size* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Maximum number of top retrieved results to score. It is valid only when `scorer` is set. If not specified, 100 retrieved results are scored.
     pub fn scorer_size(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, A> {
         self._scorer_size = new_value;
         self
     }
+    /// List of fields to return in `SearchResult` objects. It can be fields from `Document`, the built-in fields `_rank` and `_score`, and fields defined in `fieldExpressions`. Use `"*"` to return all fields from `Document`.
+    ///
     /// Append the given value to the *return fields* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// List of fields to return in `SearchResult` objects. It can be fields from `Document`, the built-in fields `_rank` and `_score`, and fields defined in `fieldExpressions`. Use `"*"` to return all fields from `Document`.
     pub fn add_return_fields(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._return_fields.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1644,8 +1645,8 @@ impl<'a, C, A> ProjectIndexeSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1837,63 +1838,62 @@ impl<'a, C, A> ProjectIndexeDocumentListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// The project associated with the index for listing documents. It cannot be the empty string.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the index for listing documents. It cannot be the empty string.
     pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The index from which to list the documents. It cannot be the empty string.
+    ///
     /// Sets the *index id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The index from which to list the documents. It cannot be the empty string.
     pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._index_id = new_value.to_string();
         self
     }
+    /// The maximum number of documents to return per page. If not specified, 100 documents are returned per page.
+    ///
     /// Sets the *page size* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The maximum number of documents to return per page. If not specified, 100 documents are returned per page.
     pub fn page_size(mut self, new_value: i32) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._page_size = new_value;
         self
     }
+    /// A `nextPageToken` returned from previous list documents call as the starting point for this call. If not specified, list documents from the beginning.
+    ///
     /// Sets the *page token* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A `nextPageToken` returned from previous list documents call as the starting point for this call. If not specified, list documents from the beginning.
     pub fn page_token(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._page_token = new_value.to_string();
         self
     }
+    /// Specifies which part of the document resource is returned in the response. If not specified, `ID_ONLY` is used.
+    ///
     /// Sets the *view* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Specifies which part of the document resource is returned in the response. If not specified, `ID_ONLY` is used.
     pub fn view(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._view = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1927,8 +1927,8 @@ impl<'a, C, A> ProjectIndexeDocumentListCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2129,42 +2129,41 @@ impl<'a, C, A> ProjectIndexeDocumentCreateCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Document) -> ProjectIndexeDocumentCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The project associated with the index for adding document. It cannot be the empty string.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the index for adding document. It cannot be the empty string.
     pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentCreateCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The index to add document to. It cannot be the empty string.
+    ///
     /// Sets the *index id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The index to add document to. It cannot be the empty string.
     pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentCreateCall<'a, C, A> {
         self._index_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2198,8 +2197,8 @@ impl<'a, C, A> ProjectIndexeDocumentCreateCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2387,43 +2386,42 @@ impl<'a, C, A> ProjectIndexeDocumentDeleteCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// The project associated with the index for deleting document. It cannot be the empty string.
+    ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The project associated with the index for deleting document. It cannot be the empty string.
     pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
+    /// The index from which to delete the document. It cannot be the empty string.
+    ///
     /// Sets the *index id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The index from which to delete the document. It cannot be the empty string.
     pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, A> {
         self._index_id = new_value.to_string();
         self
     }
+    /// The document to be deleted. It cannot be the empty string.
+    ///
     /// Sets the *doc id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The document to be deleted. It cannot be the empty string.
     pub fn doc_id(mut self, new_value: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, A> {
         self._doc_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2457,8 +2455,8 @@ impl<'a, C, A> ProjectIndexeDocumentDeleteCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

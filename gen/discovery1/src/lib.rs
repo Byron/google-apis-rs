@@ -98,16 +98,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -243,16 +245,18 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -298,7 +302,7 @@ impl<'a, C, A> Discovery<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestDescriptionAuthOauth2 {
     /// Available OAuth 2.0 scopes.
     pub scopes: HashMap<String, RestDescriptionAuthOauth2Scopes>,
@@ -312,7 +316,7 @@ impl Part for RestDescriptionAuthOauth2 {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethodResponse {
     /// Schema ID for the response schema.
     #[serde(rename="$ref")]
@@ -327,7 +331,7 @@ impl Part for RestMethodResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JsonSchemaVariant {
     /// The map of discriminant value to schema to use for parsing..
     pub map: Vec<JsonSchemaVariantMap>,
@@ -343,7 +347,7 @@ impl Part for JsonSchemaVariant {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethodMediaUploadProtocols {
     /// Supports uploading as a single HTTP request.
     pub simple: RestMethodMediaUploadProtocolsSimple,
@@ -359,7 +363,7 @@ impl Part for RestMethodMediaUploadProtocols {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethodMediaUploadProtocolsResumable {
     /// The URI path to be used for upload. Should be used in conjunction with the basePath property at the api-level.
     pub path: String,
@@ -375,7 +379,7 @@ impl Part for RestMethodMediaUploadProtocolsResumable {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JsonSchemaAnnotations {
     /// A list of methods for which this property is required on requests.
     pub required: Vec<String>,
@@ -389,7 +393,7 @@ impl Part for JsonSchemaAnnotations {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JsonSchemaVariantMap {
     /// no description provided
     pub type_value: String,
@@ -406,7 +410,7 @@ impl Part for JsonSchemaVariantMap {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestDescriptionIcons {
     /// The URL of the 32x32 icon.
     pub x32: String,
@@ -422,7 +426,7 @@ impl Part for RestDescriptionIcons {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethod {
     /// OAuth 2.0 scopes applicable to this method.
     pub scopes: Vec<String>,
@@ -476,7 +480,7 @@ impl Part for RestMethod {}
 /// 
 /// * [get rest apis](struct.ApiGetRestCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestDescription {
     /// The protocol described by this document.
     pub protocol: String,
@@ -554,7 +558,7 @@ impl ResponseResult for RestDescription {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethodMediaUpload {
     /// Maximum size of a media upload, such as "1MB", "2GB" or "3TB".
     #[serde(rename="maxSize")]
@@ -578,7 +582,7 @@ impl Part for RestMethodMediaUpload {}
 /// 
 /// * [list apis](struct.ApiListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectoryList {
     /// The individual directory entries. One entry per api/version pair.
     pub items: Vec<DirectoryListItems>,
@@ -596,7 +600,7 @@ impl ResponseResult for DirectoryList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JsonSchema {
     /// A description of this object.
     pub description: String,
@@ -653,7 +657,7 @@ impl Part for JsonSchema {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectoryListItems {
     /// The kind for this response.
     pub kind: String,
@@ -692,7 +696,7 @@ impl Part for DirectoryListItems {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestDescriptionAuth {
     /// OAuth 2.0 authentication information.
     pub oauth2: RestDescriptionAuthOauth2,
@@ -706,7 +710,7 @@ impl Part for RestDescriptionAuth {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestDescriptionAuthOauth2Scopes {
     /// Description of scope.
     pub description: String,
@@ -720,7 +724,7 @@ impl Part for RestDescriptionAuthOauth2Scopes {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectoryListItemsIcons {
     /// The URL of the 32x32 icon.
     pub x32: String,
@@ -736,7 +740,7 @@ impl Part for DirectoryListItemsIcons {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethodRequest {
     /// parameter name.
     #[serde(rename="parameterName")]
@@ -754,7 +758,7 @@ impl Part for RestMethodRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestResource {
     /// Methods on this resource.
     pub methods: HashMap<String, RestMethod>,
@@ -769,7 +773,7 @@ impl Part for RestResource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethodMediaUploadProtocolsSimple {
     /// The URI path to be used for upload. Should be used in conjunction with the basePath property at the api-level.
     pub path: String,
@@ -1031,33 +1035,32 @@ impl<'a, C, A> ApiGetRestCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The name of the API.
+    ///
     /// Sets the *api* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The name of the API.
     pub fn api(mut self, new_value: &str) -> ApiGetRestCall<'a, C, A> {
         self._api = new_value.to_string();
         self
     }
+    /// The version of the API.
+    ///
     /// Sets the *version* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The version of the API.
     pub fn version(mut self, new_value: &str) -> ApiGetRestCall<'a, C, A> {
         self._version = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApiGetRestCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1237,29 +1240,26 @@ impl<'a, C, A> ApiListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// Sets the *preferred* query property to the given value.
-    ///
-    /// 
     /// Return only the preferred version of an API.
+    ///
+    /// Sets the *preferred* query property to the given value.
     pub fn preferred(mut self, new_value: bool) -> ApiListCall<'a, C, A> {
         self._preferred = Some(new_value);
         self
     }
-    /// Sets the *name* query property to the given value.
-    ///
-    /// 
     /// Only include APIs with the given name.
+    ///
+    /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ApiListCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApiListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self

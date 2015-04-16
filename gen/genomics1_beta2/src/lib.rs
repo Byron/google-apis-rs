@@ -134,16 +134,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -319,16 +321,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -415,7 +419,7 @@ impl<'a, C, A> Genomics<C, A>
 /// 
 /// * [batch create annotations](struct.AnnotationBatchCreateCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchAnnotationsResponse {
     /// The resulting per-annotation entries, ordered consistently with the original request.
     pub entries: Vec<BatchAnnotationsResponseEntry>,
@@ -471,7 +475,7 @@ impl Part for Int32Value {}
 /// 
 /// * [search jobs](struct.JobSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchJobsResponse {
     /// The continuation token which is used to page through large result sets. Provide this value is a subsequent request to return the next page of results. This field will be empty if there are no more results.
     #[serde(rename="nextPageToken")]
@@ -591,7 +595,7 @@ impl Part for Metadata {}
 /// 
 /// * [coveragebuckets list readgroupsets](struct.ReadgroupsetCoveragebucketListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListCoverageBucketsResponse {
     /// The coverage buckets. The list of buckets is sparse; a bucket with 0 overlapping reads is not returned. A bucket never crosses more than one reference sequence. Each bucket has width bucketWidth, unless its end is the end of the reference sequence.
     #[serde(rename="coverageBuckets")]
@@ -642,7 +646,7 @@ impl Part for FastqMetadata {}
 /// 
 /// * [export variantsets](struct.VariantsetExportCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportVariantSetResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
@@ -661,7 +665,7 @@ impl ResponseResult for ExportVariantSetResponse {}
 /// 
 /// * [search annotations](struct.AnnotationSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchAnnotationsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -803,7 +807,7 @@ impl ResponseResult for Annotation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobRequest {
     /// The data source of the request, for example, a Google Cloud Storage object path or Readset ID.
     pub source: Vec<String>,
@@ -826,7 +830,7 @@ impl Part for JobRequest {}
 /// 
 /// * [search variants](struct.VariantSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchVariantsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -950,7 +954,7 @@ impl ResponseResult for CallSet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Position {
     /// The 0-based offset from the start of the forward strand for that reference.
     pub position: String,
@@ -974,7 +978,7 @@ impl Part for Position {}
 /// 
 /// * [import variants variantsets](struct.VariantsetImportVariantCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportVariantsResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
@@ -1043,7 +1047,7 @@ impl RequestValue for SearchCallSetsRequest {}
 /// 
 /// * [list datasets](struct.DatasetListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListDatasetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -1092,7 +1096,7 @@ impl RequestValue for ImportReadGroupSetsRequest {}
 /// 
 /// * [call readgroupsets](struct.ReadgroupsetCallCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CallReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
@@ -1113,7 +1117,7 @@ impl ResponseResult for CallReadGroupSetsResponse {}
 /// * [search references](struct.ReferenceSearchCall.html) (none)
 /// * [get references](struct.ReferenceGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Reference {
     /// The length of this reference's sequence.
     pub length: String,
@@ -1241,7 +1245,7 @@ impl Part for ReadGroup {}
 /// 
 /// * [search readgroupsets](struct.ReadgroupsetSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchReadGroupSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -1263,7 +1267,7 @@ impl ResponseResult for SearchReadGroupSetsResponse {}
 /// 
 /// * [import readgroupsets](struct.ReadgroupsetImportCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
@@ -1282,7 +1286,7 @@ impl ResponseResult for ImportReadGroupSetsResponse {}
 /// 
 /// * [export readgroupsets](struct.ReadgroupsetExportCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
@@ -1323,7 +1327,7 @@ impl RequestValue for SearchReadGroupSetsRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchAnnotationsResponseEntry {
     /// The resulting status for this annotation operation.
     pub status: BatchAnnotationsResponseEntryStatus,
@@ -1338,7 +1342,7 @@ impl Part for BatchAnnotationsResponseEntry {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchAnnotationsResponseEntryStatus {
     /// Error message for this status, if any.
     pub message: String,
@@ -1358,7 +1362,7 @@ impl Part for BatchAnnotationsResponseEntryStatus {}
 /// 
 /// * [bases list references](struct.ReferenceBaseListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListBasesResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -1424,7 +1428,7 @@ impl Part for Call {}
 /// 
 /// * [jobs create experimental](struct.ExperimentalJobCreateCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExperimentalCreateJobResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
@@ -1521,7 +1525,7 @@ impl ResponseResult for Dataset {}
 /// 
 /// * [search reads](struct.ReadSearchCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Read {
     /// The ID of the read group set this read belongs to. (Every read must belong to exactly one read group set.)
     #[serde(rename="readGroupSetId")]
@@ -1671,7 +1675,7 @@ impl ResponseResult for Variant {}
 /// 
 /// * [search annotation sets](struct.AnnotationSetSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchAnnotationSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -1695,7 +1699,7 @@ impl ResponseResult for SearchAnnotationSetsResponse {}
 /// * [search jobs](struct.JobSearchCall.html) (none)
 /// * [get jobs](struct.JobGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Job {
     /// A more detailed description of this job's current status.
     #[serde(rename="detailedStatus")]
@@ -1822,7 +1826,7 @@ impl RequestValue for ExportReadGroupSetsRequest {}
 /// 
 /// * [search referencesets](struct.ReferencesetSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchReferenceSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -1844,7 +1848,7 @@ impl ResponseResult for SearchReferenceSetsResponse {}
 /// 
 /// * [get referencesets](struct.ReferencesetGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReferenceSet {
     /// Free text description of this reference set.
     pub description: String,
@@ -1912,7 +1916,7 @@ impl ResponseResult for VariantSet {}
 /// 
 /// * [align readgroupsets](struct.ReadgroupsetAlignCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AlignReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
@@ -2007,7 +2011,7 @@ impl RequestValue for SearchReadsRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Range {
     /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.
     pub start: String,
@@ -2062,7 +2066,7 @@ impl RequestValue for SearchAnnotationSetsRequest {}
 /// 
 /// * [search reads](struct.ReadSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchReadsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -2099,7 +2103,7 @@ impl Part for InterleavedFastqSource {}
 /// 
 /// * [search references](struct.ReferenceSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchReferencesResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -2205,7 +2209,7 @@ impl Part for QueryRange {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LinearAlignment {
     /// The position of this alignment.
     pub position: Position,
@@ -2264,7 +2268,7 @@ impl ResponseResult for AnnotationSet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CigarUnit {
     /// referenceSequence is only used at mismatches (SEQUENCE_MISMATCH) and deletions (DELETE). Filling this field replaces SAM's MD tag. If the relevant information is not available, this field is unset.
     #[serde(rename="referenceSequence")]
@@ -2322,7 +2326,7 @@ impl Part for TranscriptExon {}
 /// 
 /// * [search variantsets](struct.VariantsetSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchVariantSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -2339,7 +2343,7 @@ impl ResponseResult for SearchVariantSetsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CoverageBucket {
     /// The average number of reads which are aligned to each individual reference base in this bucket.
     #[serde(rename="meanCoverage")]
@@ -2360,7 +2364,7 @@ impl Part for CoverageBucket {}
 /// 
 /// * [search callsets](struct.CallsetSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchCallSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
@@ -4120,7 +4124,7 @@ impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/datasets".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -4200,22 +4204,21 @@ impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Dataset) -> DatasetCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4245,8 +4248,8 @@ impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4341,7 +4344,7 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/datasets/{datasetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{datasetId}", "datasetId")].iter() {
@@ -4445,32 +4448,31 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Dataset) -> DatasetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the dataset to be updated.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the dataset to be updated.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetUpdateCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4500,8 +4502,8 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4588,7 +4590,7 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/datasets/{datasetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{datasetId}", "datasetId")].iter() {
@@ -4674,23 +4676,22 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the dataset to be deleted.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the dataset to be deleted.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetDeleteCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4720,8 +4721,8 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4809,7 +4810,7 @@ impl<'a, C, A> DatasetUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/datasets/{datasetId}/undelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{datasetId}", "datasetId")].iter() {
@@ -4905,23 +4906,22 @@ impl<'a, C, A> DatasetUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The ID of the dataset to be undeleted.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the dataset to be undeleted.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetUndeleteCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetUndeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4951,8 +4951,8 @@ impl<'a, C, A> DatasetUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5136,23 +5136,22 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the dataset.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5182,8 +5181,8 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5278,7 +5277,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/datasets/{datasetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{datasetId}", "datasetId")].iter() {
@@ -5382,32 +5381,31 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Dataset) -> DatasetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the dataset to be updated.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the dataset to be updated.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetPatchCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5437,8 +5435,8 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5611,37 +5609,33 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Sets the *project number* query property to the given value.
-    ///
-    /// 
     /// The project to list datasets for.
+    ///
+    /// Sets the *project number* query property to the given value.
     pub fn project_number(mut self, new_value: &str) -> DatasetListCall<'a, C, A> {
         self._project_number = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> DatasetListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *page size* query property to the given value.
-    ///
-    /// 
     /// The maximum number of results returned by this request. If unspecified, defaults to 50.
+    ///
+    /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> DatasetListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5671,8 +5665,8 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5759,7 +5753,7 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/jobs/{jobId}/cancel".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{jobId}", "jobId")].iter() {
@@ -5845,23 +5839,22 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Required. The ID of the job.
+    ///
     /// Sets the *job id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Required. The ID of the job.
     pub fn job_id(mut self, new_value: &str) -> JobCancelCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobCancelCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5891,8 +5884,8 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6076,23 +6069,22 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
 
+    /// Required. The ID of the job.
+    ///
     /// Sets the *job id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Required. The ID of the job.
     pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6122,8 +6114,8 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6216,7 +6208,7 @@ impl<'a, C, A> JobSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/jobs/search".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -6296,22 +6288,21 @@ impl<'a, C, A> JobSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SearchJobsRequest) -> JobSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6341,8 +6332,8 @@ impl<'a, C, A> JobSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6437,7 +6428,7 @@ impl<'a, C, A> ReferencesetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/referencesets/search".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -6517,22 +6508,21 @@ impl<'a, C, A> ReferencesetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SearchReferenceSetsRequest) -> ReferencesetSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferencesetSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6562,8 +6552,8 @@ impl<'a, C, A> ReferencesetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6749,23 +6739,22 @@ impl<'a, C, A> ReferencesetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The ID of the reference set.
+    ///
     /// Sets the *reference set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the reference set.
     pub fn reference_set_id(mut self, new_value: &str) -> ReferencesetGetCall<'a, C, A> {
         self._reference_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferencesetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6795,8 +6784,8 @@ impl<'a, C, A> ReferencesetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6855,7 +6844,6 @@ pub struct StreamingVariantStoreStreamvariantCall<'a, C, A>
     _request: StreamVariantsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for StreamingVariantStoreStreamvariantCall<'a, C, A> {}
@@ -6888,8 +6876,17 @@ impl<'a, C, A> StreamingVariantStoreStreamvariantCall<'a, C, A> where C: BorrowM
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/streamingVariantStore/streamvariants".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
         }
 
         
@@ -6905,22 +6902,11 @@ impl<'a, C, A> StreamingVariantStoreStreamvariantCall<'a, C, A> where C: BorrowM
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -6969,22 +6955,21 @@ impl<'a, C, A> StreamingVariantStoreStreamvariantCall<'a, C, A> where C: BorrowM
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &StreamVariantsRequest) -> StreamingVariantStoreStreamvariantCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> StreamingVariantStoreStreamvariantCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7012,22 +6997,6 @@ impl<'a, C, A> StreamingVariantStoreStreamvariantCall<'a, C, A> where C: BorrowM
         self
     }
 
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StreamingVariantStoreStreamvariantCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
 }
 
 
@@ -7102,7 +7071,7 @@ impl<'a, C, A> CallsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/callsets/{callSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{callSetId}", "callSetId")].iter() {
@@ -7188,23 +7157,22 @@ impl<'a, C, A> CallsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the call set to be deleted.
+    ///
     /// Sets the *call set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the call set to be deleted.
     pub fn call_set_id(mut self, new_value: &str) -> CallsetDeleteCall<'a, C, A> {
         self._call_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7234,8 +7202,8 @@ impl<'a, C, A> CallsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7330,7 +7298,7 @@ impl<'a, C, A> CallsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/callsets/search".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -7410,22 +7378,21 @@ impl<'a, C, A> CallsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SearchCallSetsRequest) -> CallsetSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7455,8 +7422,8 @@ impl<'a, C, A> CallsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7551,7 +7518,7 @@ impl<'a, C, A> CallsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/callsets/{callSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{callSetId}", "callSetId")].iter() {
@@ -7655,32 +7622,31 @@ impl<'a, C, A> CallsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CallSet) -> CallsetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the call set to be updated.
+    ///
     /// Sets the *call set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the call set to be updated.
     pub fn call_set_id(mut self, new_value: &str) -> CallsetPatchCall<'a, C, A> {
         self._call_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7710,8 +7676,8 @@ impl<'a, C, A> CallsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7804,7 +7770,7 @@ impl<'a, C, A> CallsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/callsets".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -7884,22 +7850,21 @@ impl<'a, C, A> CallsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CallSet) -> CallsetCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7929,8 +7894,8 @@ impl<'a, C, A> CallsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8114,23 +8079,22 @@ impl<'a, C, A> CallsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the call set.
+    ///
     /// Sets the *call set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the call set.
     pub fn call_set_id(mut self, new_value: &str) -> CallsetGetCall<'a, C, A> {
         self._call_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8160,8 +8124,8 @@ impl<'a, C, A> CallsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8256,7 +8220,7 @@ impl<'a, C, A> CallsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/callsets/{callSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{callSetId}", "callSetId")].iter() {
@@ -8360,32 +8324,31 @@ impl<'a, C, A> CallsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CallSet) -> CallsetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the call set to be updated.
+    ///
     /// Sets the *call set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the call set to be updated.
     pub fn call_set_id(mut self, new_value: &str) -> CallsetUpdateCall<'a, C, A> {
         self._call_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8415,8 +8378,8 @@ impl<'a, C, A> CallsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8515,7 +8478,7 @@ impl<'a, C, A> ReadSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/reads/search".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -8595,22 +8558,21 @@ impl<'a, C, A> ReadSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SearchReadsRequest) -> ReadSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8640,8 +8602,8 @@ impl<'a, C, A> ReadSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8736,7 +8698,7 @@ impl<'a, C, A> ReadgroupsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/{readGroupSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{readGroupSetId}", "readGroupSetId")].iter() {
@@ -8840,32 +8802,31 @@ impl<'a, C, A> ReadgroupsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ReadGroupSet) -> ReadgroupsetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
+    ///
     /// Sets the *read group set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
     pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetUpdateCall<'a, C, A> {
         self._read_group_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8895,8 +8856,8 @@ impl<'a, C, A> ReadgroupsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8991,7 +8952,7 @@ impl<'a, C, A> ReadgroupsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/export".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageReadWrite.as_ref().to_string(), ());
         }
 
         
@@ -9071,22 +9032,21 @@ impl<'a, C, A> ReadgroupsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ExportReadGroupSetsRequest) -> ReadgroupsetExportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetExportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9116,8 +9076,8 @@ impl<'a, C, A> ReadgroupsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageReadWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9212,7 +9172,7 @@ impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/import".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageReadWrite.as_ref().to_string(), ());
         }
 
         
@@ -9292,22 +9252,21 @@ impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ImportReadGroupSetsRequest) -> ReadgroupsetImportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9337,8 +9296,8 @@ impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageReadWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9433,7 +9392,7 @@ impl<'a, C, A> ReadgroupsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/{readGroupSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{readGroupSetId}", "readGroupSetId")].iter() {
@@ -9537,32 +9496,31 @@ impl<'a, C, A> ReadgroupsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ReadGroupSet) -> ReadgroupsetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
+    ///
     /// Sets the *read group set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
     pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetPatchCall<'a, C, A> {
         self._read_group_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9592,8 +9550,8 @@ impl<'a, C, A> ReadgroupsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9686,7 +9644,7 @@ impl<'a, C, A> ReadgroupsetCallCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/call".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageReadWrite.as_ref().to_string(), ());
         }
 
         
@@ -9766,22 +9724,21 @@ impl<'a, C, A> ReadgroupsetCallCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CallReadGroupSetsRequest) -> ReadgroupsetCallCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetCallCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9811,8 +9768,8 @@ impl<'a, C, A> ReadgroupsetCallCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageReadWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9905,7 +9862,7 @@ impl<'a, C, A> ReadgroupsetAlignCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/align".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageReadWrite.as_ref().to_string(), ());
         }
 
         
@@ -9985,22 +9942,21 @@ impl<'a, C, A> ReadgroupsetAlignCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AlignReadGroupSetsRequest) -> ReadgroupsetAlignCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetAlignCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10030,8 +9986,8 @@ impl<'a, C, A> ReadgroupsetAlignCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageReadWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10247,71 +10203,64 @@ impl<'a, C, A> ReadgroupsetCoveragebucketListCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    /// Required. The ID of the read group set over which coverage is requested.
+    ///
     /// Sets the *read group set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Required. The ID of the read group set over which coverage is requested.
     pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._read_group_set_id = new_value.to_string();
         self
     }
-    /// Sets the *target bucket width* query property to the given value.
-    ///
-    /// 
     /// The desired width of each reported coverage bucket in base pairs. This will be rounded down to the nearest precomputed bucket width; the value of which is returned as bucketWidth in the response. Defaults to infinity (each bucket spans an entire reference sequence) or the length of the target range, if specified. The smallest precomputed bucketWidth is currently 2048 base pairs; this is subject to change.
+    ///
+    /// Sets the *target bucket width* query property to the given value.
     pub fn target_bucket_width(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._target_bucket_width = Some(new_value.to_string());
         self
     }
-    /// Sets the *range.start* query property to the given value.
-    ///
-    /// 
     /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.
+    ///
+    /// Sets the *range.start* query property to the given value.
     pub fn range_start(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._range_start = Some(new_value.to_string());
         self
     }
-    /// Sets the *range.reference name* query property to the given value.
-    ///
-    /// 
     /// The reference sequence name, for example chr1, 1, or chrX.
+    ///
+    /// Sets the *range.reference name* query property to the given value.
     pub fn range_reference_name(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._range_reference_name = Some(new_value.to_string());
         self
     }
-    /// Sets the *range.end* query property to the given value.
-    ///
-    /// 
     /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.
+    ///
+    /// Sets the *range.end* query property to the given value.
     pub fn range_end(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._range_end = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *page size* query property to the given value.
-    ///
-    /// 
     /// The maximum number of results to return in a single page. If unspecified, defaults to 1024. The maximum value is 2048.
+    ///
+    /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10341,8 +10290,8 @@ impl<'a, C, A> ReadgroupsetCoveragebucketListCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10429,7 +10378,7 @@ impl<'a, C, A> ReadgroupsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/{readGroupSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{readGroupSetId}", "readGroupSetId")].iter() {
@@ -10515,23 +10464,22 @@ impl<'a, C, A> ReadgroupsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The ID of the read group set to be deleted. The caller must have WRITE permissions to the dataset associated with this read group set.
+    ///
     /// Sets the *read group set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the read group set to be deleted. The caller must have WRITE permissions to the dataset associated with this read group set.
     pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetDeleteCall<'a, C, A> {
         self._read_group_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10561,8 +10509,8 @@ impl<'a, C, A> ReadgroupsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10657,7 +10605,7 @@ impl<'a, C, A> ReadgroupsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/search".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -10737,22 +10685,21 @@ impl<'a, C, A> ReadgroupsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SearchReadGroupSetsRequest) -> ReadgroupsetSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10782,8 +10729,8 @@ impl<'a, C, A> ReadgroupsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10967,23 +10914,22 @@ impl<'a, C, A> ReadgroupsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The ID of the read group set.
+    ///
     /// Sets the *read group set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the read group set.
     pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetGetCall<'a, C, A> {
         self._read_group_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11013,8 +10959,8 @@ impl<'a, C, A> ReadgroupsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11220,55 +11166,50 @@ impl<'a, C, A> ReferenceBaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The ID of the reference.
+    ///
     /// Sets the *reference id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the reference.
     pub fn reference_id(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, A> {
         self._reference_id = new_value.to_string();
         self
     }
-    /// Sets the *start* query property to the given value.
-    ///
-    /// 
     /// The start position (0-based) of this query. Defaults to 0.
+    ///
+    /// Sets the *start* query property to the given value.
     pub fn start(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, A> {
         self._start = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *page size* query property to the given value.
-    ///
-    /// 
     /// Specifies the maximum number of bases to return in a single page.
+    ///
+    /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ReferenceBaseListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// Sets the *end* query property to the given value.
-    ///
-    /// 
     /// The end position (0-based, exclusive) of this query. Defaults to the length of this reference.
+    ///
+    /// Sets the *end* query property to the given value.
     pub fn end(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, A> {
         self._end = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferenceBaseListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11298,8 +11239,8 @@ impl<'a, C, A> ReferenceBaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11394,7 +11335,7 @@ impl<'a, C, A> ReferenceSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/references/search".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -11474,22 +11415,21 @@ impl<'a, C, A> ReferenceSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SearchReferencesRequest) -> ReferenceSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferenceSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11519,8 +11459,8 @@ impl<'a, C, A> ReferenceSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11706,23 +11646,22 @@ impl<'a, C, A> ReferenceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The ID of the reference.
+    ///
     /// Sets the *reference id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the reference.
     pub fn reference_id(mut self, new_value: &str) -> ReferenceGetCall<'a, C, A> {
         self._reference_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferenceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11752,8 +11691,8 @@ impl<'a, C, A> ReferenceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11937,23 +11876,22 @@ impl<'a, C, A> AnnotationSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The ID of the annotation set to be retrieved.
+    ///
     /// Sets the *annotation set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the annotation set to be retrieved.
     pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetGetCall<'a, C, A> {
         self._annotation_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11983,8 +11921,8 @@ impl<'a, C, A> AnnotationSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12079,7 +12017,7 @@ impl<'a, C, A> AnnotationSetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotationSets/{annotationSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{annotationSetId}", "annotationSetId")].iter() {
@@ -12183,32 +12121,31 @@ impl<'a, C, A> AnnotationSetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AnnotationSet) -> AnnotationSetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the annotation set to be updated.
+    ///
     /// Sets the *annotation set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the annotation set to be updated.
     pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetUpdateCall<'a, C, A> {
         self._annotation_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12238,8 +12175,8 @@ impl<'a, C, A> AnnotationSetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12332,7 +12269,7 @@ impl<'a, C, A> AnnotationSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotationSets".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -12412,22 +12349,21 @@ impl<'a, C, A> AnnotationSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AnnotationSet) -> AnnotationSetCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12457,8 +12393,8 @@ impl<'a, C, A> AnnotationSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12551,7 +12487,7 @@ impl<'a, C, A> AnnotationSetSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotationSets/search".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -12631,22 +12567,21 @@ impl<'a, C, A> AnnotationSetSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SearchAnnotationSetsRequest) -> AnnotationSetSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12676,8 +12611,8 @@ impl<'a, C, A> AnnotationSetSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12772,7 +12707,7 @@ impl<'a, C, A> AnnotationSetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotationSets/{annotationSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{annotationSetId}", "annotationSetId")].iter() {
@@ -12876,32 +12811,31 @@ impl<'a, C, A> AnnotationSetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AnnotationSet) -> AnnotationSetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the annotation set to be updated.
+    ///
     /// Sets the *annotation set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the annotation set to be updated.
     pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetPatchCall<'a, C, A> {
         self._annotation_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12931,8 +12865,8 @@ impl<'a, C, A> AnnotationSetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13019,7 +12953,7 @@ impl<'a, C, A> AnnotationSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotationSets/{annotationSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{annotationSetId}", "annotationSetId")].iter() {
@@ -13105,23 +13039,22 @@ impl<'a, C, A> AnnotationSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// The ID of the annotation set to be deleted.
+    ///
     /// Sets the *annotation set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the annotation set to be deleted.
     pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetDeleteCall<'a, C, A> {
         self._annotation_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13151,8 +13084,8 @@ impl<'a, C, A> AnnotationSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13247,7 +13180,7 @@ impl<'a, C, A> VariantSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/variants/search".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -13327,22 +13260,21 @@ impl<'a, C, A> VariantSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SearchVariantsRequest) -> VariantSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13372,8 +13304,8 @@ impl<'a, C, A> VariantSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13460,7 +13392,7 @@ impl<'a, C, A> VariantDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/variants/{variantId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{variantId}", "variantId")].iter() {
@@ -13546,23 +13478,22 @@ impl<'a, C, A> VariantDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the variant to be deleted.
+    ///
     /// Sets the *variant id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the variant to be deleted.
     pub fn variant_id(mut self, new_value: &str) -> VariantDeleteCall<'a, C, A> {
         self._variant_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13592,8 +13523,8 @@ impl<'a, C, A> VariantDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13777,23 +13708,22 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the variant.
+    ///
     /// Sets the *variant id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the variant.
     pub fn variant_id(mut self, new_value: &str) -> VariantGetCall<'a, C, A> {
         self._variant_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13823,8 +13753,8 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13917,7 +13847,7 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/variants".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -13997,22 +13927,21 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Variant) -> VariantCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14042,8 +13971,8 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14138,7 +14067,7 @@ impl<'a, C, A> VariantUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/variants/{variantId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{variantId}", "variantId")].iter() {
@@ -14242,32 +14171,31 @@ impl<'a, C, A> VariantUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Variant) -> VariantUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the variant to be updated.
+    ///
     /// Sets the *variant id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the variant to be updated.
     pub fn variant_id(mut self, new_value: &str) -> VariantUpdateCall<'a, C, A> {
         self._variant_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14297,8 +14225,8 @@ impl<'a, C, A> VariantUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14393,7 +14321,7 @@ impl<'a, C, A> AnnotationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotations/{annotationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{annotationId}", "annotationId")].iter() {
@@ -14497,32 +14425,31 @@ impl<'a, C, A> AnnotationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Annotation) -> AnnotationPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the annotation set to be updated.
+    ///
     /// Sets the *annotation id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the annotation set to be updated.
     pub fn annotation_id(mut self, new_value: &str) -> AnnotationPatchCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14552,8 +14479,8 @@ impl<'a, C, A> AnnotationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14648,7 +14575,7 @@ impl<'a, C, A> AnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotations/{annotationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{annotationId}", "annotationId")].iter() {
@@ -14752,32 +14679,31 @@ impl<'a, C, A> AnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Annotation) -> AnnotationUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the annotation set to be updated.
+    ///
     /// Sets the *annotation id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the annotation set to be updated.
     pub fn annotation_id(mut self, new_value: &str) -> AnnotationUpdateCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14807,8 +14733,8 @@ impl<'a, C, A> AnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14901,7 +14827,7 @@ impl<'a, C, A> AnnotationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotations/search".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -14981,22 +14907,21 @@ impl<'a, C, A> AnnotationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SearchAnnotationsRequest) -> AnnotationSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15026,8 +14951,8 @@ impl<'a, C, A> AnnotationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15114,7 +15039,7 @@ impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotations/{annotationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{annotationId}", "annotationId")].iter() {
@@ -15200,23 +15125,22 @@ impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The ID of the annotation set to be deleted.
+    ///
     /// Sets the *annotation id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the annotation set to be deleted.
     pub fn annotation_id(mut self, new_value: &str) -> AnnotationDeleteCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15246,8 +15170,8 @@ impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15431,23 +15355,22 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the annotation set to be retrieved.
+    ///
     /// Sets the *annotation id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the annotation set to be retrieved.
     pub fn annotation_id(mut self, new_value: &str) -> AnnotationGetCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15477,8 +15400,8 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15571,7 +15494,7 @@ impl<'a, C, A> AnnotationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -15651,22 +15574,21 @@ impl<'a, C, A> AnnotationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Annotation) -> AnnotationCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15696,8 +15618,8 @@ impl<'a, C, A> AnnotationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15793,7 +15715,7 @@ impl<'a, C, A> AnnotationBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotations:batchCreate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -15873,22 +15795,21 @@ impl<'a, C, A> AnnotationBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &BatchCreateAnnotationsRequest) -> AnnotationBatchCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationBatchCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15918,8 +15839,8 @@ impl<'a, C, A> AnnotationBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16012,7 +15933,7 @@ impl<'a, C, A> ExperimentalJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/experimental/jobs/create".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageReadWrite.as_ref().to_string(), ());
         }
 
         
@@ -16092,22 +16013,21 @@ impl<'a, C, A> ExperimentalJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ExperimentalCreateJobRequest) -> ExperimentalJobCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ExperimentalJobCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16137,8 +16057,8 @@ impl<'a, C, A> ExperimentalJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageReadWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16233,7 +16153,7 @@ impl<'a, C, A> VariantsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/variantsets/{variantSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{variantSetId}", "variantSetId")].iter() {
@@ -16337,32 +16257,31 @@ impl<'a, C, A> VariantsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &VariantSet) -> VariantsetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the variant to be updated.
+    ///
     /// Sets the *variant set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the variant to be updated.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetUpdateCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16392,8 +16311,8 @@ impl<'a, C, A> VariantsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16592,32 +16511,31 @@ impl<'a, C, A> VariantsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ExportVariantSetRequest) -> VariantsetExportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Required. The ID of the variant set that contains variant data which should be exported. The caller must have READ access to this variant set.
+    ///
     /// Sets the *variant set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Required. The ID of the variant set that contains variant data which should be exported. The caller must have READ access to this variant set.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetExportCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetExportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16647,8 +16565,8 @@ impl<'a, C, A> VariantsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Bigquery`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16743,7 +16661,7 @@ impl<'a, C, A> VariantsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/variantsets/{variantSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{variantSetId}", "variantSetId")].iter() {
@@ -16847,32 +16765,31 @@ impl<'a, C, A> VariantsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &VariantSet) -> VariantsetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the variant to be updated.
+    ///
     /// Sets the *variant set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the variant to be updated.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetPatchCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16902,8 +16819,8 @@ impl<'a, C, A> VariantsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16998,7 +16915,7 @@ impl<'a, C, A> VariantsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/variantsets/search".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -17078,22 +16995,21 @@ impl<'a, C, A> VariantsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &SearchVariantSetsRequest) -> VariantsetSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17123,8 +17039,8 @@ impl<'a, C, A> VariantsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17308,23 +17224,22 @@ impl<'a, C, A> VariantsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Required. The ID of the variant set.
+    ///
     /// Sets the *variant set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Required. The ID of the variant set.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetGetCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17354,8 +17269,8 @@ impl<'a, C, A> VariantsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17451,7 +17366,7 @@ impl<'a, C, A> VariantsetMergeVariantCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/variantsets/{variantSetId}/mergeVariants".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{variantSetId}", "variantSetId")].iter() {
@@ -17545,32 +17460,31 @@ impl<'a, C, A> VariantsetMergeVariantCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &MergeVariantsRequest) -> VariantsetMergeVariantCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The destination variant set.
+    ///
     /// Sets the *variant set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The destination variant set.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetMergeVariantCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetMergeVariantCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17600,8 +17514,8 @@ impl<'a, C, A> VariantsetMergeVariantCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17688,7 +17602,7 @@ impl<'a, C, A> VariantsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/variantsets/{variantSetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{variantSetId}", "variantSetId")].iter() {
@@ -17774,23 +17688,22 @@ impl<'a, C, A> VariantsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The ID of the variant set to be deleted.
+    ///
     /// Sets the *variant set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the variant set to be deleted.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetDeleteCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17820,8 +17733,8 @@ impl<'a, C, A> VariantsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17918,7 +17831,7 @@ impl<'a, C, A> VariantsetImportVariantCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/variantsets/{variantSetId}/importVariants".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageReadWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{variantSetId}", "variantSetId")].iter() {
@@ -18022,32 +17935,31 @@ impl<'a, C, A> VariantsetImportVariantCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ImportVariantsRequest) -> VariantsetImportVariantCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Required. The variant set to which variant data should be imported.
+    ///
     /// Sets the *variant set id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Required. The variant set to which variant data should be imported.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetImportVariantCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetImportVariantCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18077,8 +17989,8 @@ impl<'a, C, A> VariantsetImportVariantCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageReadWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

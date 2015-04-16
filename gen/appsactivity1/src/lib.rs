@@ -105,16 +105,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -291,16 +293,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -346,7 +350,7 @@ impl<'a, C, A> Appsactivity<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Rename {
     /// The new title.
     #[serde(rename="newTitle")]
@@ -363,7 +367,7 @@ impl Part for Rename {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PermissionChange {
     /// Lists all Permission objects removed.
     #[serde(rename="removedPermissions")]
@@ -380,7 +384,7 @@ impl Part for PermissionChange {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Target {
     /// The MIME type of the target.
     #[serde(rename="mimeType")]
@@ -398,7 +402,7 @@ impl Part for Target {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Parent {
     /// The parent's ID.
     pub id: String,
@@ -416,7 +420,7 @@ impl Part for Parent {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Permission {
     /// Whether the permission requires a link to the file.
     #[serde(rename="withLink")]
@@ -442,7 +446,7 @@ impl Part for Permission {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Photo {
     /// The URL of the photo.
     pub url: String,
@@ -455,7 +459,7 @@ impl Part for Photo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Move {
     /// The removed parent(s).
     #[serde(rename="removedParents")]
@@ -477,7 +481,7 @@ impl Part for Move {}
 /// 
 /// * [list activities](struct.ActivityListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListActivitiesResponse {
     /// Token for the next page of results.
     #[serde(rename="nextPageToken")]
@@ -493,7 +497,7 @@ impl ResponseResult for ListActivitiesResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     /// The profile photo of the user.
     pub photo: Photo,
@@ -508,7 +512,7 @@ impl Part for User {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activity {
     /// The fields common to all of the singleEvents that make up the Activity.
     #[serde(rename="combinedEvent")]
@@ -525,7 +529,7 @@ impl Part for Activity {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
     /// Extra information for rename type events, such as the old and new names.
     pub rename: Rename,
@@ -804,70 +808,62 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Sets the *user id* query property to the given value.
-    ///
-    /// 
     /// Indicates the user to return activity for. Use the special value me to indicate the currently authenticated user.
+    ///
+    /// Sets the *user id* query property to the given value.
     pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._user_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *source* query property to the given value.
-    ///
-    /// 
     /// The Google service from which to return activities. Possible values of source are: 
     /// - drive.google.com
+    ///
+    /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A token to retrieve a specific page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *page size* query property to the given value.
-    ///
-    /// 
     /// The maximum number of events to return on a page. The response includes a continuation token if there are more events.
+    ///
+    /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ActivityListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// Sets the *grouping strategy* query property to the given value.
-    ///
-    /// 
     /// Indicates the strategy to use when grouping singleEvents items in the associated combinedEvent object.
+    ///
+    /// Sets the *grouping strategy* query property to the given value.
     pub fn grouping_strategy(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._grouping_strategy = Some(new_value.to_string());
         self
     }
-    /// Sets the *drive.file id* query property to the given value.
-    ///
-    /// 
     /// Identifies the Drive item to return activities for.
+    ///
+    /// Sets the *drive.file id* query property to the given value.
     pub fn drive_file_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._drive_file_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *drive.ancestor id* query property to the given value.
-    ///
-    /// 
     /// Identifies the Drive folder containing the items for which to return activities.
+    ///
+    /// Sets the *drive.ancestor id* query property to the given value.
     pub fn drive_ancestor_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._drive_ancestor_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -897,8 +893,8 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DriveMetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

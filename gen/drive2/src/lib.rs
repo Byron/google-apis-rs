@@ -171,16 +171,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -380,16 +382,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -569,7 +573,7 @@ impl ResponseResult for Comment {}
 /// 
 /// * [get about](struct.AboutGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct About {
     /// The user's language or locale code, as defined by BCP 47, with some extensions from Unicode's LDML format (http://www.unicode.org/reports/tr35/).
     #[serde(rename="languageCode")]
@@ -834,7 +838,7 @@ impl ResponseResult for File {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutAdditionalRoleInfo {
     /// The supported additional roles per primary role.
     #[serde(rename="roleSets")]
@@ -857,7 +861,7 @@ impl Part for AboutAdditionalRoleInfo {}
 /// 
 /// * [list changes](struct.ChangeListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChangeList {
     /// The page token for the next page of changes.
     #[serde(rename="nextPageToken")]
@@ -891,7 +895,7 @@ impl ResponseResult for ChangeList {}
 /// 
 /// * [list properties](struct.PropertyListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PropertyList {
     /// The list of properties.
     pub items: Vec<Property>,
@@ -916,7 +920,7 @@ impl ResponseResult for PropertyList {}
 /// 
 /// * [get id for email permissions](struct.PermissionGetIdForEmailCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PermissionId {
     /// This is always drive#permissionId.
     pub kind: String,
@@ -945,7 +949,7 @@ impl Part for FileIndexableText {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutAdditionalRoleInfoRoleSets {
     /// A primary permission role.
     #[serde(rename="primaryRole")]
@@ -968,7 +972,7 @@ impl Part for AboutAdditionalRoleInfoRoleSets {}
 /// 
 /// * [list replies](struct.ReplyListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentReplyList {
     /// The token to use to request the next page of results.
     #[serde(rename="nextPageToken")]
@@ -992,7 +996,7 @@ impl ResponseResult for CommentReplyList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutImportFormats {
     /// The imported file's content type to convert from.
     pub source: String,
@@ -1013,7 +1017,7 @@ impl Part for AboutImportFormats {}
 /// 
 /// * [list revisions](struct.RevisionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionList {
     /// The actual list of revisions.
     pub items: Vec<Revision>,
@@ -1033,7 +1037,7 @@ impl ResponseResult for RevisionList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutMaxUploadSizes {
     /// The file type.
     #[serde(rename="type")]
@@ -1229,7 +1233,7 @@ impl ResponseResult for Revision {}
 /// 
 /// * [list comments](struct.CommentListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentList {
     /// The token to use to request the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1258,7 +1262,7 @@ impl ResponseResult for CommentList {}
 /// 
 /// * [list parents](struct.ParentListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ParentList {
     /// The actual list of parents.
     pub items: Vec<ParentReference>,
@@ -1283,7 +1287,7 @@ impl ResponseResult for ParentList {}
 /// 
 /// * [list permissions](struct.PermissionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PermissionList {
     /// The actual list of permissions.
     pub items: Vec<Permission>,
@@ -1303,7 +1307,7 @@ impl ResponseResult for PermissionList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutQuotaBytesByService {
     /// The service's name, e.g. DRIVE, GMAIL, or PHOTOS.
     #[serde(rename="serviceName")]
@@ -1460,7 +1464,7 @@ impl Part for FileImageMediaMetadata {}
 /// * [get apps](struct.AppGetCall.html) (response)
 /// * [list apps](struct.AppListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct App {
     /// The list of secondary mime types.
     #[serde(rename="secondaryMimeTypes")]
@@ -1561,7 +1565,7 @@ impl Part for FileImageMediaMetadataLocation {}
 /// 
 /// * [list files](struct.FileListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileList {
     /// The page token for the next page of files.
     #[serde(rename="nextPageToken")]
@@ -1592,7 +1596,7 @@ impl ResponseResult for FileList {}
 /// 
 /// * [list children](struct.ChildrenListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChildList {
     /// The page token for the next page of children.
     #[serde(rename="nextPageToken")]
@@ -1676,7 +1680,7 @@ impl Part for UserPicture {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutFeatures {
     /// The name of the feature.
     #[serde(rename="featureName")]
@@ -1726,7 +1730,7 @@ impl Part for User {}
 /// 
 /// * [list apps](struct.AppListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppList {
     /// The actual list of apps.
     pub items: Vec<App>,
@@ -1749,7 +1753,7 @@ impl ResponseResult for AppList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppIcons {
     /// Category of the icon. Allowed values are:  
     /// - application - icon for the application 
@@ -1835,7 +1839,7 @@ impl Part for FileVideoMediaMetadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutExportFormats {
     /// The content type to convert from.
     pub source: String,
@@ -1858,7 +1862,7 @@ impl Part for AboutExportFormats {}
 /// * [watch changes](struct.ChangeWatchCall.html) (none)
 /// * [get changes](struct.ChangeGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Change {
     /// The time of this modification.
     #[serde(rename="modificationDate")]
@@ -3600,7 +3604,7 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
 /// Subscribe to changes on a file
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
-/// `.param("alt", "media")`.
+/// `.alt("media")`.
 /// Please note that due to missing multi-part support on the server side, you will only receive the media,
 /// but not the `Channel` structure that you would usually get. The latter will be a default value.
 ///
@@ -3826,72 +3830,66 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> FileWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID for the file in question.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the file in question.
     pub fn file_id(mut self, new_value: &str) -> FileWatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *update viewed date* query property to the given value.
-    ///
-    /// 
     /// Whether to update the view date after successfully retrieving the file.
+    ///
+    /// Sets the *update viewed date* query property to the given value.
     pub fn update_viewed_date(mut self, new_value: bool) -> FileWatchCall<'a, C, A> {
         self._update_viewed_date = Some(new_value);
         self
     }
-    /// Sets the *revision id* query property to the given value.
-    ///
-    /// 
     /// Specifies the Revision ID that should be downloaded. Ignored unless alt=media is specified.
+    ///
+    /// Sets the *revision id* query property to the given value.
     pub fn revision_id(mut self, new_value: &str) -> FileWatchCall<'a, C, A> {
         self._revision_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// This parameter is deprecated and has no function.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> FileWatchCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *alt* query property to the given value.
-    ///
-    /// 
     /// Specifies the type of resource representation to return. The default is 'json' to return file metadata. Specifying 'media' will cause the file content to be returned.
+    ///
+    /// Sets the *alt* query property to the given value.
     pub fn alt(mut self, new_value: &str) -> FileWatchCall<'a, C, A> {
         self._alt = Some(new_value.to_string());
         self
     }
-    /// Sets the *acknowledge abuse* query property to the given value.
-    ///
-    /// 
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. Ignored unless alt=media is specified.
+    ///
+    /// Sets the *acknowledge abuse* query property to the given value.
     pub fn acknowledge_abuse(mut self, new_value: bool) -> FileWatchCall<'a, C, A> {
         self._acknowledge_abuse = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3912,7 +3910,6 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> FileWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3921,8 +3918,8 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4250,86 +4247,77 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &File) -> FileInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *visibility* query property to the given value.
-    ///
-    /// 
     /// The visibility of the new file. This parameter is only relevant when convert=false.
+    ///
+    /// Sets the *visibility* query property to the given value.
     pub fn visibility(mut self, new_value: &str) -> FileInsertCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
-    /// Sets the *use content as indexable text* query property to the given value.
-    ///
-    /// 
     /// Whether to use the content as indexable text.
+    ///
+    /// Sets the *use content as indexable text* query property to the given value.
     pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
         self._use_content_as_indexable_text = Some(new_value);
         self
     }
-    /// Sets the *timed text track name* query property to the given value.
-    ///
-    /// 
     /// The timed text track name.
+    ///
+    /// Sets the *timed text track name* query property to the given value.
     pub fn timed_text_track_name(mut self, new_value: &str) -> FileInsertCall<'a, C, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
     }
-    /// Sets the *timed text language* query property to the given value.
-    ///
-    /// 
     /// The language of the timed text.
+    ///
+    /// Sets the *timed text language* query property to the given value.
     pub fn timed_text_language(mut self, new_value: &str) -> FileInsertCall<'a, C, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
     }
-    /// Sets the *pinned* query property to the given value.
-    ///
-    /// 
     /// Whether to pin the head revision of the uploaded file. A file can have a maximum of 200 pinned revisions.
+    ///
+    /// Sets the *pinned* query property to the given value.
     pub fn pinned(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
         self._pinned = Some(new_value);
         self
     }
-    /// Sets the *ocr language* query property to the given value.
-    ///
-    /// 
     /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
+    ///
+    /// Sets the *ocr language* query property to the given value.
     pub fn ocr_language(mut self, new_value: &str) -> FileInsertCall<'a, C, A> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
-    /// Sets the *ocr* query property to the given value.
-    ///
-    /// 
     /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
+    ///
+    /// Sets the *ocr* query property to the given value.
     pub fn ocr(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
         self._ocr = Some(new_value);
         self
     }
-    /// Sets the *convert* query property to the given value.
-    ///
-    /// 
     /// Whether to convert this file to the corresponding Google Docs format.
+    ///
+    /// Sets the *convert* query property to the given value.
     pub fn convert(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
         self._convert = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4359,8 +4347,8 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4544,23 +4532,22 @@ impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the file to untrash.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file to untrash.
     pub fn file_id(mut self, new_value: &str) -> FileUntrashCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileUntrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4590,8 +4577,8 @@ impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4825,88 +4812,80 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &File) -> FileCopyCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file to copy.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file to copy.
     pub fn file_id(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *visibility* query property to the given value.
-    ///
-    /// 
     /// The visibility of the new file. This parameter is only relevant when the source is not a native Google Doc and convert=false.
+    ///
+    /// Sets the *visibility* query property to the given value.
     pub fn visibility(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
-    /// Sets the *timed text track name* query property to the given value.
-    ///
-    /// 
     /// The timed text track name.
+    ///
+    /// Sets the *timed text track name* query property to the given value.
     pub fn timed_text_track_name(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
     }
-    /// Sets the *timed text language* query property to the given value.
-    ///
-    /// 
     /// The language of the timed text.
+    ///
+    /// Sets the *timed text language* query property to the given value.
     pub fn timed_text_language(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
     }
-    /// Sets the *pinned* query property to the given value.
-    ///
-    /// 
     /// Whether to pin the head revision of the new copy. A file can have a maximum of 200 pinned revisions.
+    ///
+    /// Sets the *pinned* query property to the given value.
     pub fn pinned(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
         self._pinned = Some(new_value);
         self
     }
-    /// Sets the *ocr language* query property to the given value.
-    ///
-    /// 
     /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
+    ///
+    /// Sets the *ocr language* query property to the given value.
     pub fn ocr_language(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
-    /// Sets the *ocr* query property to the given value.
-    ///
-    /// 
     /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
+    ///
+    /// Sets the *ocr* query property to the given value.
     pub fn ocr(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
         self._ocr = Some(new_value);
         self
     }
-    /// Sets the *convert* query property to the given value.
-    ///
-    /// 
     /// Whether to convert this file to the corresponding Google Docs format.
+    ///
+    /// Sets the *convert* query property to the given value.
     pub fn convert(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
         self._convert = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileCopyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4936,8 +4915,8 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5121,23 +5100,22 @@ impl<'a, C, A> FileTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The ID of the file to trash.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file to trash.
     pub fn file_id(mut self, new_value: &str) -> FileTrashCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileTrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5167,8 +5145,8 @@ impl<'a, C, A> FileTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5315,13 +5293,12 @@ impl<'a, C, A> FileEmptyTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileEmptyTrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5351,8 +5328,8 @@ impl<'a, C, A> FileEmptyTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5535,53 +5512,47 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Sets the *q* query property to the given value.
-    ///
-    /// 
     /// Query string for searching files.
+    ///
+    /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// This parameter is deprecated and has no function.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token for files.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of files to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> FileListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *corpus* query property to the given value.
-    ///
-    /// 
     /// The body of items (files/documents) to which the query applies.
+    ///
+    /// Sets the *corpus* query property to the given value.
     pub fn corpus(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._corpus = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5611,8 +5582,8 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5796,23 +5767,22 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The ID of the file to update.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file to update.
     pub fn file_id(mut self, new_value: &str) -> FileTouchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileTouchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5842,8 +5812,8 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6217,128 +6187,115 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &File) -> FileUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file to update.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file to update.
     pub fn file_id(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *use content as indexable text* query property to the given value.
-    ///
-    /// 
     /// Whether to use the content as indexable text.
+    ///
+    /// Sets the *use content as indexable text* query property to the given value.
     pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._use_content_as_indexable_text = Some(new_value);
         self
     }
-    /// Sets the *update viewed date* query property to the given value.
-    ///
-    /// 
     /// Whether to update the view date after successfully updating the file.
+    ///
+    /// Sets the *update viewed date* query property to the given value.
     pub fn update_viewed_date(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._update_viewed_date = Some(new_value);
         self
     }
-    /// Sets the *timed text track name* query property to the given value.
-    ///
-    /// 
     /// The timed text track name.
+    ///
+    /// Sets the *timed text track name* query property to the given value.
     pub fn timed_text_track_name(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
     }
-    /// Sets the *timed text language* query property to the given value.
-    ///
-    /// 
     /// The language of the timed text.
+    ///
+    /// Sets the *timed text language* query property to the given value.
     pub fn timed_text_language(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
     }
-    /// Sets the *set modified date* query property to the given value.
-    ///
-    /// 
     /// Whether to set the modified date with the supplied modified date.
+    ///
+    /// Sets the *set modified date* query property to the given value.
     pub fn set_modified_date(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._set_modified_date = Some(new_value);
         self
     }
-    /// Sets the *remove parents* query property to the given value.
-    ///
-    /// 
     /// Comma-separated list of parent IDs to remove.
+    ///
+    /// Sets the *remove parents* query property to the given value.
     pub fn remove_parents(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._remove_parents = Some(new_value.to_string());
         self
     }
-    /// Sets the *pinned* query property to the given value.
-    ///
-    /// 
     /// Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.
+    ///
+    /// Sets the *pinned* query property to the given value.
     pub fn pinned(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._pinned = Some(new_value);
         self
     }
-    /// Sets the *ocr language* query property to the given value.
-    ///
-    /// 
     /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
+    ///
+    /// Sets the *ocr language* query property to the given value.
     pub fn ocr_language(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
-    /// Sets the *ocr* query property to the given value.
-    ///
-    /// 
     /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
+    ///
+    /// Sets the *ocr* query property to the given value.
     pub fn ocr(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._ocr = Some(new_value);
         self
     }
-    /// Sets the *new revision* query property to the given value.
-    ///
-    /// 
     /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous revisions are preserved (causing increased use of the user's data storage quota).
+    ///
+    /// Sets the *new revision* query property to the given value.
     pub fn new_revision(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._new_revision = Some(new_value);
         self
     }
-    /// Sets the *convert* query property to the given value.
-    ///
-    /// 
     /// Whether to convert this file to the corresponding Google Docs format.
+    ///
+    /// Sets the *convert* query property to the given value.
     pub fn convert(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._convert = Some(new_value);
         self
     }
-    /// Sets the *add parents* query property to the given value.
-    ///
-    /// 
     /// Comma-separated list of parent IDs to add.
+    ///
+    /// Sets the *add parents* query property to the given value.
     pub fn add_parents(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._add_parents = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6368,8 +6325,8 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6542,23 +6499,22 @@ impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the file to delete.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file to delete.
     pub fn file_id(mut self, new_value: &str) -> FileDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6588,8 +6544,8 @@ impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6848,128 +6804,115 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &File) -> FilePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file to update.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file to update.
     pub fn file_id(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *use content as indexable text* query property to the given value.
-    ///
-    /// 
     /// Whether to use the content as indexable text.
+    ///
+    /// Sets the *use content as indexable text* query property to the given value.
     pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._use_content_as_indexable_text = Some(new_value);
         self
     }
-    /// Sets the *update viewed date* query property to the given value.
-    ///
-    /// 
     /// Whether to update the view date after successfully updating the file.
+    ///
+    /// Sets the *update viewed date* query property to the given value.
     pub fn update_viewed_date(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._update_viewed_date = Some(new_value);
         self
     }
-    /// Sets the *timed text track name* query property to the given value.
-    ///
-    /// 
     /// The timed text track name.
+    ///
+    /// Sets the *timed text track name* query property to the given value.
     pub fn timed_text_track_name(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
     }
-    /// Sets the *timed text language* query property to the given value.
-    ///
-    /// 
     /// The language of the timed text.
+    ///
+    /// Sets the *timed text language* query property to the given value.
     pub fn timed_text_language(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
     }
-    /// Sets the *set modified date* query property to the given value.
-    ///
-    /// 
     /// Whether to set the modified date with the supplied modified date.
+    ///
+    /// Sets the *set modified date* query property to the given value.
     pub fn set_modified_date(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._set_modified_date = Some(new_value);
         self
     }
-    /// Sets the *remove parents* query property to the given value.
-    ///
-    /// 
     /// Comma-separated list of parent IDs to remove.
+    ///
+    /// Sets the *remove parents* query property to the given value.
     pub fn remove_parents(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._remove_parents = Some(new_value.to_string());
         self
     }
-    /// Sets the *pinned* query property to the given value.
-    ///
-    /// 
     /// Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.
+    ///
+    /// Sets the *pinned* query property to the given value.
     pub fn pinned(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._pinned = Some(new_value);
         self
     }
-    /// Sets the *ocr language* query property to the given value.
-    ///
-    /// 
     /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
+    ///
+    /// Sets the *ocr language* query property to the given value.
     pub fn ocr_language(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
-    /// Sets the *ocr* query property to the given value.
-    ///
-    /// 
     /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
+    ///
+    /// Sets the *ocr* query property to the given value.
     pub fn ocr(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._ocr = Some(new_value);
         self
     }
-    /// Sets the *new revision* query property to the given value.
-    ///
-    /// 
     /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous revisions are preserved (causing increased use of the user's data storage quota).
+    ///
+    /// Sets the *new revision* query property to the given value.
     pub fn new_revision(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._new_revision = Some(new_value);
         self
     }
-    /// Sets the *convert* query property to the given value.
-    ///
-    /// 
     /// Whether to convert this file to the corresponding Google Docs format.
+    ///
+    /// Sets the *convert* query property to the given value.
     pub fn convert(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._convert = Some(new_value);
         self
     }
-    /// Sets the *add parents* query property to the given value.
-    ///
-    /// 
     /// Comma-separated list of parent IDs to add.
+    ///
+    /// Sets the *add parents* query property to the given value.
     pub fn add_parents(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._add_parents = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FilePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6999,8 +6942,8 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7019,7 +6962,7 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// Gets a file's metadata by ID.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
-/// `.param("alt", "media")`.
+/// `.alt("media")`.
 /// Please note that due to missing multi-part support on the server side, you will only receive the media,
 /// but not the `File` structure that you would usually get. The latter will be a default value.
 ///
@@ -7230,63 +7173,57 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// The ID for the file in question.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the file in question.
     pub fn file_id(mut self, new_value: &str) -> FileGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *update viewed date* query property to the given value.
-    ///
-    /// 
     /// Whether to update the view date after successfully retrieving the file.
+    ///
+    /// Sets the *update viewed date* query property to the given value.
     pub fn update_viewed_date(mut self, new_value: bool) -> FileGetCall<'a, C, A> {
         self._update_viewed_date = Some(new_value);
         self
     }
-    /// Sets the *revision id* query property to the given value.
-    ///
-    /// 
     /// Specifies the Revision ID that should be downloaded. Ignored unless alt=media is specified.
+    ///
+    /// Sets the *revision id* query property to the given value.
     pub fn revision_id(mut self, new_value: &str) -> FileGetCall<'a, C, A> {
         self._revision_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// This parameter is deprecated and has no function.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> FileGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *alt* query property to the given value.
-    ///
-    /// 
     /// Specifies the type of resource representation to return. The default is 'json' to return file metadata. Specifying 'media' will cause the file content to be returned.
+    ///
+    /// Sets the *alt* query property to the given value.
     pub fn alt(mut self, new_value: &str) -> FileGetCall<'a, C, A> {
         self._alt = Some(new_value.to_string());
         self
     }
-    /// Sets the *acknowledge abuse* query property to the given value.
-    ///
-    /// 
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. Ignored unless alt=media is specified.
+    ///
+    /// Sets the *acknowledge abuse* query property to the given value.
     pub fn acknowledge_abuse(mut self, new_value: bool) -> FileGetCall<'a, C, A> {
         self._acknowledge_abuse = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7307,7 +7244,6 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> FileGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7316,8 +7252,8 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7418,7 +7354,7 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/drive/v2/about".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         
@@ -7490,37 +7426,33 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Sets the *start change id* query property to the given value.
-    ///
-    /// 
     /// Change ID to start counting from when calculating number of remaining change IDs
+    ///
+    /// Sets the *start change id* query property to the given value.
     pub fn start_change_id(mut self, new_value: &str) -> AboutGetCall<'a, C, A> {
         self._start_change_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *max change id count* query property to the given value.
-    ///
-    /// 
     /// Maximum number of remaining change IDs to count
+    ///
+    /// Sets the *max change id count* query property to the given value.
     pub fn max_change_id_count(mut self, new_value: i64) -> AboutGetCall<'a, C, A> {
         self._max_change_id_count = Some(new_value);
         self
     }
-    /// Sets the *include subscribed* query property to the given value.
-    ///
-    /// 
     /// When calculating the number of remaining change IDs, whether to include public files the user has opened and shared files. When set to false, this counts only change IDs for owned files and any shared or public files that the user has explicitly added to a folder they own.
+    ///
+    /// Sets the *include subscribed* query property to the given value.
     pub fn include_subscribed(mut self, new_value: bool) -> AboutGetCall<'a, C, A> {
         self._include_subscribed = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AboutGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7550,8 +7482,8 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7839,31 +7771,29 @@ impl<'a, C, A> RealtimeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    /// The ID of the file that the Realtime API data model is associated with.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file that the Realtime API data model is associated with.
     pub fn file_id(mut self, new_value: &str) -> RealtimeUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *base revision* query property to the given value.
-    ///
-    /// 
     /// The revision of the model to diff the uploaded model against. If set, the uploaded model is diffed against the provided revision and those differences are merged with any changes made to the model after the provided revision. If not set, the uploaded model replaces the current model on the server.
+    ///
+    /// Sets the *base revision* query property to the given value.
     pub fn base_revision(mut self, new_value: &str) -> RealtimeUpdateCall<'a, C, A> {
         self._base_revision = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RealtimeUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7893,8 +7823,8 @@ impl<'a, C, A> RealtimeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7989,7 +7919,7 @@ impl<'a, C, A> RealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/realtime".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -8075,31 +8005,29 @@ impl<'a, C, A> RealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the file that the Realtime API data model is associated with.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file that the Realtime API data model is associated with.
     pub fn file_id(mut self, new_value: &str) -> RealtimeGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *revision* query property to the given value.
-    ///
-    /// 
     /// The revision of the Realtime API data model to export. Revisions start at 1 (the initial empty data model) and are incremented with each change. If this parameter is excluded, the most recent data model will be returned.
+    ///
+    /// Sets the *revision* query property to the given value.
     pub fn revision(mut self, new_value: i32) -> RealtimeGetCall<'a, C, A> {
         self._revision = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RealtimeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8129,8 +8057,8 @@ impl<'a, C, A> RealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8314,23 +8242,22 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
 
+    /// The ID of the app.
+    ///
     /// Sets the *app id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the app.
     pub fn app_id(mut self, new_value: &str) -> AppGetCall<'a, C, A> {
         self._app_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8360,8 +8287,8 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8534,37 +8461,33 @@ impl<'a, C, A> AppListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// Sets the *language code* query property to the given value.
-    ///
-    /// 
     /// A language or locale code, as defined by BCP 47, with some extensions from Unicode's LDML format (http://www.unicode.org/reports/tr35/).
+    ///
+    /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> AppListCall<'a, C, A> {
         self._language_code = Some(new_value.to_string());
         self
     }
-    /// Sets the *app filter mime types* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of MIME types for open with filtering. All apps within the given app query scope which can open any of the given MIME types will be included in the response. If appFilterExtensions are provided as well, the result is a union of the two resulting app lists.
+    ///
+    /// Sets the *app filter mime types* query property to the given value.
     pub fn app_filter_mime_types(mut self, new_value: &str) -> AppListCall<'a, C, A> {
         self._app_filter_mime_types = Some(new_value.to_string());
         self
     }
-    /// Sets the *app filter extensions* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of file extensions for open with filtering. All apps within the given app query scope which can open any of the given file extensions will be included in the response. If appFilterMimeTypes are provided as well, the result is a union of the two resulting app lists.
+    ///
+    /// Sets the *app filter extensions* query property to the given value.
     pub fn app_filter_extensions(mut self, new_value: &str) -> AppListCall<'a, C, A> {
         self._app_filter_extensions = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8594,8 +8517,8 @@ impl<'a, C, A> AppListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8770,33 +8693,32 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the comment.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8826,8 +8748,8 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8922,7 +8844,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/comments/{commentId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
@@ -9018,41 +8940,39 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the comment.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *include deleted* query property to the given value.
-    ///
-    /// 
     /// If set, this will succeed when retrieving a deleted comment, and will include any deleted replies.
+    ///
+    /// Sets the *include deleted* query property to the given value.
     pub fn include_deleted(mut self, new_value: bool) -> CommentGetCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9082,8 +9002,8 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9282,32 +9202,31 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Comment) -> CommentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentInsertCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9337,8 +9256,8 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9539,42 +9458,41 @@ impl<'a, C, A> CommentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Comment) -> CommentPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentPatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the comment.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> CommentPatchCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9604,8 +9522,8 @@ impl<'a, C, A> CommentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9806,42 +9724,41 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Comment) -> CommentUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the comment.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> CommentUpdateCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9871,8 +9788,8 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9980,7 +9897,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/comments".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -10076,55 +9993,50 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *updated min* query property to the given value.
-    ///
-    /// 
     /// Only discussions that were updated after this timestamp will be returned. Formatted as an RFC 3339 timestamp.
+    ///
+    /// Sets the *updated min* query property to the given value.
     pub fn updated_min(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of discussions to include in the response, used for paging.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> CommentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *include deleted* query property to the given value.
-    ///
-    /// 
     /// If set, all comments and replies, including deleted comments and replies (with content stripped) will be returned.
+    ///
+    /// Sets the *include deleted* query property to the given value.
     pub fn include_deleted(mut self, new_value: bool) -> CommentListCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10154,8 +10066,8 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10258,7 +10170,7 @@ impl<'a, C, A> ChildrenListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{folderId}/children".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{folderId}", "folderId")].iter() {
@@ -10354,47 +10266,43 @@ impl<'a, C, A> ChildrenListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The ID of the folder.
+    ///
     /// Sets the *folder id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the folder.
     pub fn folder_id(mut self, new_value: &str) -> ChildrenListCall<'a, C, A> {
         self._folder_id = new_value.to_string();
         self
     }
-    /// Sets the *q* query property to the given value.
-    ///
-    /// 
     /// Query string for searching children.
+    ///
+    /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> ChildrenListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token for children.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ChildrenListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of children to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ChildrenListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10424,8 +10332,8 @@ impl<'a, C, A> ChildrenListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10515,7 +10423,7 @@ impl<'a, C, A> ChildrenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{folderId}/children/{childId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{folderId}", "folderId"), ("{childId}", "childId")].iter() {
@@ -10611,33 +10519,32 @@ impl<'a, C, A> ChildrenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the folder.
+    ///
     /// Sets the *folder id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the folder.
     pub fn folder_id(mut self, new_value: &str) -> ChildrenGetCall<'a, C, A> {
         self._folder_id = new_value.to_string();
         self
     }
+    /// The ID of the child.
+    ///
     /// Sets the *child id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the child.
     pub fn child_id(mut self, new_value: &str) -> ChildrenGetCall<'a, C, A> {
         self._child_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10667,8 +10574,8 @@ impl<'a, C, A> ChildrenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10843,33 +10750,32 @@ impl<'a, C, A> ChildrenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID of the folder.
+    ///
     /// Sets the *folder id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the folder.
     pub fn folder_id(mut self, new_value: &str) -> ChildrenDeleteCall<'a, C, A> {
         self._folder_id = new_value.to_string();
         self
     }
+    /// The ID of the child.
+    ///
     /// Sets the *child id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the child.
     pub fn child_id(mut self, new_value: &str) -> ChildrenDeleteCall<'a, C, A> {
         self._child_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10899,8 +10805,8 @@ impl<'a, C, A> ChildrenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11099,32 +11005,31 @@ impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ChildReference) -> ChildrenInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the folder.
+    ///
     /// Sets the *folder id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the folder.
     pub fn folder_id(mut self, new_value: &str) -> ChildrenInsertCall<'a, C, A> {
         self._folder_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11154,8 +11059,8 @@ impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11317,22 +11222,21 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11362,8 +11266,8 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11451,7 +11355,7 @@ impl<'a, C, A> ParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/parents".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -11547,23 +11451,22 @@ impl<'a, C, A> ParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ParentListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11593,8 +11496,8 @@ impl<'a, C, A> ParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11769,33 +11672,32 @@ impl<'a, C, A> ParentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ParentDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the parent.
+    ///
     /// Sets the *parent id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the parent.
     pub fn parent_id(mut self, new_value: &str) -> ParentDeleteCall<'a, C, A> {
         self._parent_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11825,8 +11727,8 @@ impl<'a, C, A> ParentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12025,32 +11927,31 @@ impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ParentReference) -> ParentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ParentInsertCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12080,8 +11981,8 @@ impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12171,7 +12072,7 @@ impl<'a, C, A> ParentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/parents/{parentId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{parentId}", "parentId")].iter() {
@@ -12267,33 +12168,32 @@ impl<'a, C, A> ParentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ParentGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the parent.
+    ///
     /// Sets the *parent id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the parent.
     pub fn parent_id(mut self, new_value: &str) -> ParentGetCall<'a, C, A> {
         self._parent_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12323,8 +12223,8 @@ impl<'a, C, A> ParentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12527,52 +12427,51 @@ impl<'a, C, A> ReplyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CommentReply) -> ReplyPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the comment.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
+    /// The ID of the reply.
+    ///
     /// Sets the *reply id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the reply.
     pub fn reply_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, A> {
         self._reply_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12602,8 +12501,8 @@ impl<'a, C, A> ReplyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12708,7 +12607,7 @@ impl<'a, C, A> ReplyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/comments/{commentId}/replies".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
@@ -12804,57 +12703,53 @@ impl<'a, C, A> ReplyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the comment.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyListCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ReplyListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of replies to include in the response, used for paging.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ReplyListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *include deleted* query property to the given value.
-    ///
-    /// 
     /// If set, all replies, including deleted replies (with content stripped) will be returned.
+    ///
+    /// Sets the *include deleted* query property to the given value.
     pub fn include_deleted(mut self, new_value: bool) -> ReplyListCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12884,8 +12779,8 @@ impl<'a, C, A> ReplyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12982,7 +12877,7 @@ impl<'a, C, A> ReplyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/comments/{commentId}/replies/{replyId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId"), ("{replyId}", "replyId")].iter() {
@@ -13078,51 +12973,49 @@ impl<'a, C, A> ReplyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the comment.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
+    /// The ID of the reply.
+    ///
     /// Sets the *reply id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the reply.
     pub fn reply_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, A> {
         self._reply_id = new_value.to_string();
         self
     }
-    /// Sets the *include deleted* query property to the given value.
-    ///
-    /// 
     /// If set, this will succeed when retrieving a deleted reply.
+    ///
+    /// Sets the *include deleted* query property to the given value.
     pub fn include_deleted(mut self, new_value: bool) -> ReplyGetCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13152,8 +13045,8 @@ impl<'a, C, A> ReplyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13354,42 +13247,41 @@ impl<'a, C, A> ReplyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CommentReply) -> ReplyInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the comment.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13419,8 +13311,8 @@ impl<'a, C, A> ReplyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13597,43 +13489,42 @@ impl<'a, C, A> ReplyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the comment.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
+    /// The ID of the reply.
+    ///
     /// Sets the *reply id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the reply.
     pub fn reply_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, A> {
         self._reply_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13663,8 +13554,8 @@ impl<'a, C, A> ReplyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13867,52 +13758,51 @@ impl<'a, C, A> ReplyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CommentReply) -> ReplyUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the comment.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
+    /// The ID of the reply.
+    ///
     /// Sets the *reply id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the reply.
     pub fn reply_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, A> {
         self._reply_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13942,8 +13832,8 @@ impl<'a, C, A> ReplyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14118,33 +14008,32 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The ID for the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID for the permission.
+    ///
     /// Sets the *permission id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the permission.
     pub fn permission_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14174,8 +14063,8 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14384,48 +14273,45 @@ impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Permission) -> PermissionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID for the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *send notification emails* query property to the given value.
-    ///
-    /// 
     /// Whether to send notification emails when sharing to users or groups. This parameter is ignored and an email is sent if the role is owner.
+    ///
+    /// Sets the *send notification emails* query property to the given value.
     pub fn send_notification_emails(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
         self._send_notification_emails = Some(new_value);
         self
     }
-    /// Sets the *email message* query property to the given value.
-    ///
-    /// 
     /// A custom message to include in notification emails.
+    ///
+    /// Sets the *email message* query property to the given value.
     pub fn email_message(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
         self._email_message = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14455,8 +14341,8 @@ impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14662,50 +14548,48 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Permission) -> PermissionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID for the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID for the permission.
+    ///
     /// Sets the *permission id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the permission.
     pub fn permission_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
-    /// Sets the *transfer ownership* query property to the given value.
-    ///
-    /// 
     /// Whether changing a role to 'owner' downgrades the current owners to writers. Does nothing if the specified role is not 'owner'.
+    ///
+    /// Sets the *transfer ownership* query property to the given value.
     pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
         self._transfer_ownership = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14735,8 +14619,8 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14942,50 +14826,48 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Permission) -> PermissionPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID for the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionPatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID for the permission.
+    ///
     /// Sets the *permission id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the permission.
     pub fn permission_id(mut self, new_value: &str) -> PermissionPatchCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
-    /// Sets the *transfer ownership* query property to the given value.
-    ///
-    /// 
     /// Whether changing a role to 'owner' downgrades the current owners to writers. Does nothing if the specified role is not 'owner'.
+    ///
+    /// Sets the *transfer ownership* query property to the given value.
     pub fn transfer_ownership(mut self, new_value: bool) -> PermissionPatchCall<'a, C, A> {
         self._transfer_ownership = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15015,8 +14897,8 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15104,7 +14986,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -15200,23 +15082,22 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID for the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15246,8 +15127,8 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15337,7 +15218,7 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/permissions/{permissionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{permissionId}", "permissionId")].iter() {
@@ -15433,33 +15314,32 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID for the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID for the permission.
+    ///
     /// Sets the *permission id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the permission.
     pub fn permission_id(mut self, new_value: &str) -> PermissionGetCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15489,8 +15369,8 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15674,23 +15554,22 @@ impl<'a, C, A> PermissionGetIdForEmailCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// The email address for which to return a permission ID
+    ///
     /// Sets the *email* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The email address for which to return a permission ID
     pub fn email(mut self, new_value: &str) -> PermissionGetIdForEmailCall<'a, C, A> {
         self._email = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionGetIdForEmailCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15720,8 +15599,8 @@ impl<'a, C, A> PermissionGetIdForEmailCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15919,62 +15798,56 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> ChangeWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *start change id* query property to the given value.
-    ///
-    /// 
     /// Change ID to start listing changes from.
+    ///
+    /// Sets the *start change id* query property to the given value.
     pub fn start_change_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
         self._start_change_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token for changes.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of changes to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ChangeWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *include subscribed* query property to the given value.
-    ///
-    /// 
     /// Whether to include public files the user has opened and shared files. When set to false, the list only includes owned files plus any shared or public files the user has explicitly added to a folder they own.
+    ///
+    /// Sets the *include subscribed* query property to the given value.
     pub fn include_subscribed(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
         self._include_subscribed = Some(new_value);
         self
     }
-    /// Sets the *include deleted* query property to the given value.
-    ///
-    /// 
     /// Whether to include deleted items.
+    ///
+    /// Sets the *include deleted* query property to the given value.
     pub fn include_deleted(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16004,8 +15877,8 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16188,53 +16061,47 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Sets the *start change id* query property to the given value.
-    ///
-    /// 
     /// Change ID to start listing changes from.
+    ///
+    /// Sets the *start change id* query property to the given value.
     pub fn start_change_id(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._start_change_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Page token for changes.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of changes to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *include subscribed* query property to the given value.
-    ///
-    /// 
     /// Whether to include public files the user has opened and shared files. When set to false, the list only includes owned files plus any shared or public files the user has explicitly added to a folder they own.
+    ///
+    /// Sets the *include subscribed* query property to the given value.
     pub fn include_subscribed(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
         self._include_subscribed = Some(new_value);
         self
     }
-    /// Sets the *include deleted* query property to the given value.
-    ///
-    /// 
     /// Whether to include deleted items.
+    ///
+    /// Sets the *include deleted* query property to the given value.
     pub fn include_deleted(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16264,8 +16131,8 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16449,23 +16316,22 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The ID of the change.
+    ///
     /// Sets the *change id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the change.
     pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
         self._change_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16495,8 +16361,8 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16702,50 +16568,48 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Property) -> PropertyPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The key of the property.
+    ///
     /// Sets the *property key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The key of the property.
     pub fn property_key(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
         self._property_key = new_value.to_string();
         self
     }
-    /// Sets the *visibility* query property to the given value.
-    ///
-    /// 
     /// The visibility of the property.
+    ///
+    /// Sets the *visibility* query property to the given value.
     pub fn visibility(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16775,8 +16639,8 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16956,41 +16820,39 @@ impl<'a, C, A> PropertyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The key of the property.
+    ///
     /// Sets the *property key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The key of the property.
     pub fn property_key(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
         self._property_key = new_value.to_string();
         self
     }
-    /// Sets the *visibility* query property to the given value.
-    ///
-    /// 
     /// The visibility of the property.
+    ///
+    /// Sets the *visibility* query property to the given value.
     pub fn visibility(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17020,8 +16882,8 @@ impl<'a, C, A> PropertyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17220,32 +17082,31 @@ impl<'a, C, A> PropertyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Property) -> PropertyInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyInsertCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17275,8 +17136,8 @@ impl<'a, C, A> PropertyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17364,7 +17225,7 @@ impl<'a, C, A> PropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/properties".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -17460,23 +17321,22 @@ impl<'a, C, A> PropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17506,8 +17366,8 @@ impl<'a, C, A> PropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17713,50 +17573,48 @@ impl<'a, C, A> PropertyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Property) -> PropertyUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The key of the property.
+    ///
     /// Sets the *property key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The key of the property.
     pub fn property_key(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, A> {
         self._property_key = new_value.to_string();
         self
     }
-    /// Sets the *visibility* query property to the given value.
-    ///
-    /// 
     /// The visibility of the property.
+    ///
+    /// Sets the *visibility* query property to the given value.
     pub fn visibility(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17786,8 +17644,8 @@ impl<'a, C, A> PropertyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17882,7 +17740,7 @@ impl<'a, C, A> PropertyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/properties/{propertyKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{propertyKey}", "propertyKey")].iter() {
@@ -17978,41 +17836,39 @@ impl<'a, C, A> PropertyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The key of the property.
+    ///
     /// Sets the *property key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The key of the property.
     pub fn property_key(mut self, new_value: &str) -> PropertyGetCall<'a, C, A> {
         self._property_key = new_value.to_string();
         self
     }
-    /// Sets the *visibility* query property to the given value.
-    ///
-    /// 
     /// The visibility of the property.
+    ///
+    /// Sets the *visibility* query property to the given value.
     pub fn visibility(mut self, new_value: &str) -> PropertyGetCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18042,8 +17898,8 @@ impl<'a, C, A> PropertyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18133,7 +17989,7 @@ impl<'a, C, A> RevisionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/revisions/{revisionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
@@ -18229,33 +18085,32 @@ impl<'a, C, A> RevisionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the revision.
+    ///
     /// Sets the *revision id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the revision.
     pub fn revision_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, A> {
         self._revision_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18285,8 +18140,8 @@ impl<'a, C, A> RevisionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18461,33 +18316,32 @@ impl<'a, C, A> RevisionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID of the revision.
+    ///
     /// Sets the *revision id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the revision.
     pub fn revision_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, C, A> {
         self._revision_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18517,8 +18371,8 @@ impl<'a, C, A> RevisionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18719,42 +18573,41 @@ impl<'a, C, A> RevisionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Revision) -> RevisionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID for the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID for the revision.
+    ///
     /// Sets the *revision id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the revision.
     pub fn revision_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, C, A> {
         self._revision_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -18784,8 +18637,8 @@ impl<'a, C, A> RevisionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18873,7 +18726,7 @@ impl<'a, C, A> RevisionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         let mut url = "https://www.googleapis.com/drive/v2/files/{fileId}/revisions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
@@ -18969,23 +18822,22 @@ impl<'a, C, A> RevisionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The ID of the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> RevisionListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19015,8 +18867,8 @@ impl<'a, C, A> RevisionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19217,42 +19069,41 @@ impl<'a, C, A> RevisionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Revision) -> RevisionPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID for the file.
+    ///
     /// Sets the *file id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
+    /// The ID for the revision.
+    ///
     /// Sets the *revision id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID for the revision.
     pub fn revision_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, A> {
         self._revision_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -19282,8 +19133,8 @@ impl<'a, C, A> RevisionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

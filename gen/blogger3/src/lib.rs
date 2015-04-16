@@ -131,16 +131,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -312,16 +314,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -402,7 +406,7 @@ impl Part for PostBlog {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BlogPerUserInfo {
     /// True if the user has Admin level access to the blog.
     #[serde(rename="hasAdminAccess")]
@@ -429,7 +433,7 @@ impl Part for BlogPerUserInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostPerUserInfo {
     /// The kind of this entity. Always blogger#postPerUserInfo
     pub kind: String,
@@ -461,7 +465,7 @@ impl Part for PostPerUserInfo {}
 /// * [get blogs](struct.BlogGetCall.html) (response)
 /// * [get by url blogs](struct.BlogGetByUrlCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Blog {
     /// The status of the blog.
     pub status: String,
@@ -506,7 +510,7 @@ impl ResponseResult for Blog {}
 /// 
 /// * [list post user infos](struct.PostUserInfoListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostUserInfosList {
     /// Pagination token to fetch the next page, if one exists.
     #[serde(rename="nextPageToken")]
@@ -529,7 +533,7 @@ impl ResponseResult for PostUserInfosList {}
 /// 
 /// * [get blog user infos](struct.BlogUserInfoGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BlogUserInfo {
     /// The Blog resource.
     pub blog: Blog,
@@ -610,7 +614,7 @@ impl Part for CommentPost {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserBlogs {
     /// The URL of the Blogs for this user.
     #[serde(rename="selfLink")]
@@ -645,7 +649,7 @@ impl Part for PostReplies {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageviewsCounts {
     /// Count of page views for the given time range
     pub count: String,
@@ -667,7 +671,7 @@ impl Part for PageviewsCounts {}
 /// 
 /// * [list by user blogs](struct.BlogListByUserCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BlogList {
     /// The list of Blogs this user has Authorship or Admin rights over.
     pub items: Vec<Blog>,
@@ -690,7 +694,7 @@ impl ResponseResult for BlogList {}
 /// 
 /// * [get users](struct.UserGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     /// Profile summary information.
     pub about: String,
@@ -852,7 +856,7 @@ impl Part for PostAuthor {}
 /// * [list by blog comments](struct.CommentListByBlogCall.html) (response)
 /// * [list comments](struct.CommentListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentList {
     /// Pagination token to fetch the next page, if one exists.
     #[serde(rename="nextPageToken")]
@@ -893,7 +897,7 @@ impl Part for PostImages {}
 /// * [list posts](struct.PostListCall.html) (response)
 /// * [search posts](struct.PostSearchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostList {
     /// Pagination token to fetch the next page, if one exists.
     #[serde(rename="nextPageToken")]
@@ -925,7 +929,7 @@ impl Part for CommentAuthorImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BlogPages {
     /// The count of pages in this blog.
     #[serde(rename="totalItems")]
@@ -943,7 +947,7 @@ impl Part for BlogPages {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BlogPosts {
     /// The count of posts in this blog.
     #[serde(rename="totalItems")]
@@ -1066,7 +1070,7 @@ impl ResponseResult for Comment {}
 /// * [list post user infos](struct.PostUserInfoListCall.html) (none)
 /// * [get post user infos](struct.PostUserInfoGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostUserInfo {
     /// The kind of this entity. Always blogger#postUserInfo
     pub kind: String,
@@ -1089,7 +1093,7 @@ impl ResponseResult for PostUserInfo {}
 /// 
 /// * [get page views](struct.PageViewGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Pageviews {
     /// The container of posts in this blog.
     pub counts: Vec<PageviewsCounts>,
@@ -1133,7 +1137,7 @@ impl Part for PageAuthor {}
 /// 
 /// * [list pages](struct.PageListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageList {
     /// Pagination token to fetch the next page, if one exists.
     #[serde(rename="nextPageToken")]
@@ -1151,7 +1155,7 @@ impl ResponseResult for PageList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserLocale {
     /// The user's country setting.
     pub country: String,
@@ -1197,7 +1201,7 @@ impl Part for PageBlog {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BlogLocale {
     /// The country this blog's locale is set to.
     pub country: String,
@@ -2338,7 +2342,7 @@ impl<'a, C, A> PageViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/blogger/v3/blogs/{blogId}/pageviews".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{blogId}", "blogId")].iter() {
@@ -2434,31 +2438,29 @@ impl<'a, C, A> PageViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the blog to get.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the blog to get.
     pub fn blog_id(mut self, new_value: &str) -> PageViewGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    ///
     /// Append the given value to the *range* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
     pub fn add_range(mut self, new_value: &str) -> PageViewGetCall<'a, C, A> {
         self._range.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageViewGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2488,8 +2490,8 @@ impl<'a, C, A> PageViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2673,23 +2675,22 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// The ID of the user to get.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user to get.
     pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2719,8 +2720,8 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2932,57 +2933,52 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     pub fn user_id(mut self, new_value: &str) -> BlogListByUserCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
-    ///
-    /// 
     /// Access level with which to view the blogs. Note that some fields require elevated access.
+    ///
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> BlogListByUserCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
+    /// Blog statuses to include in the result (default: Live blogs only). Note that ADMIN access is required to view deleted blogs.
+    ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Blog statuses to include in the result (default: Live blogs only). Note that ADMIN access is required to view deleted blogs.
     pub fn add_status(mut self, new_value: &str) -> BlogListByUserCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
+    /// User access types for blogs to include in the results, e.g. AUTHOR will return blogs where the user has author level access. If no roles are specified, defaults to ADMIN and AUTHOR roles.
+    ///
     /// Append the given value to the *role* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// User access types for blogs to include in the results, e.g. AUTHOR will return blogs where the user has author level access. If no roles are specified, defaults to ADMIN and AUTHOR roles.
     pub fn add_role(mut self, new_value: &str) -> BlogListByUserCall<'a, C, A> {
         self._role.push(new_value.to_string());
         self
     }
-    /// Sets the *fetch user info* query property to the given value.
-    ///
-    /// 
     /// Whether the response is a list of blogs with per-user information instead of just blogs.
+    ///
+    /// Sets the *fetch user info* query property to the given value.
     pub fn fetch_user_info(mut self, new_value: bool) -> BlogListByUserCall<'a, C, A> {
         self._fetch_user_info = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogListByUserCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3012,8 +3008,8 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3207,39 +3203,36 @@ impl<'a, C, A> BlogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// The ID of the blog to get.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the blog to get.
     pub fn blog_id(mut self, new_value: &str) -> BlogGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
-    ///
-    /// 
     /// Access level with which to view the blog. Note that some fields require elevated access.
+    ///
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> BlogGetCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Sets the *max posts* query property to the given value.
-    ///
-    /// 
     /// Maximum number of posts to pull back with the blog.
+    ///
+    /// Sets the *max posts* query property to the given value.
     pub fn max_posts(mut self, new_value: u32) -> BlogGetCall<'a, C, A> {
         self._max_posts = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3269,8 +3262,8 @@ impl<'a, C, A> BlogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3435,31 +3428,29 @@ impl<'a, C, A> BlogGetByUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The URL of the blog to retrieve.
+    ///
     /// Sets the *url* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The URL of the blog to retrieve.
     pub fn url(mut self, new_value: &str) -> BlogGetByUrlCall<'a, C, A> {
         self._url = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
-    ///
-    /// 
     /// Access level with which to view the blog. Note that some fields require elevated access.
+    ///
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> BlogGetByUrlCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogGetByUrlCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3489,8 +3480,8 @@ impl<'a, C, A> BlogGetByUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3716,82 +3707,76 @@ impl<'a, C, A> PostUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Post) -> PostUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PostUpdateCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Post.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> PostUpdateCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
-    /// Sets the *revert* query property to the given value.
-    ///
-    /// 
     /// Whether a revert action should be performed when the post is updated (default: false).
+    ///
+    /// Sets the *revert* query property to the given value.
     pub fn revert(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
-    /// Sets the *publish* query property to the given value.
-    ///
-    /// 
     /// Whether a publish action should be performed when the post is updated (default: false).
+    ///
+    /// Sets the *publish* query property to the given value.
     pub fn publish(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._publish = Some(new_value);
         self
     }
-    /// Sets the *max comments* query property to the given value.
-    ///
-    /// 
     /// Maximum number of comments to retrieve with the returned post.
+    ///
+    /// Sets the *max comments* query property to the given value.
     pub fn max_comments(mut self, new_value: u32) -> PostUpdateCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
-    /// Sets the *fetch images* query property to the given value.
-    ///
-    /// 
     /// Whether image URL metadata for each post is included in the returned result (default: false).
+    ///
+    /// Sets the *fetch images* query property to the given value.
     pub fn fetch_images(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
-    /// Sets the *fetch body* query property to the given value.
-    ///
-    /// 
     /// Whether the body content of the post is included with the result (default: true).
+    ///
+    /// Sets the *fetch body* query property to the given value.
     pub fn fetch_body(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._fetch_body = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3821,8 +3806,8 @@ impl<'a, C, A> PostUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4018,49 +4003,46 @@ impl<'a, C, A> PostGetByPathCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// ID of the blog to fetch the post from.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to fetch the post from.
     pub fn blog_id(mut self, new_value: &str) -> PostGetByPathCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// Path of the Post to retrieve.
+    ///
     /// Sets the *path* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Path of the Post to retrieve.
     pub fn path(mut self, new_value: &str) -> PostGetByPathCall<'a, C, A> {
         self._path = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
-    ///
-    /// 
     /// Access level with which to view the returned result. Note that some fields require elevated access.
+    ///
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PostGetByPathCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Sets the *max comments* query property to the given value.
-    ///
-    /// 
     /// Maximum number of comments to pull back on a post.
+    ///
+    /// Sets the *max comments* query property to the given value.
     pub fn max_comments(mut self, new_value: u32) -> PostGetByPathCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostGetByPathCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4090,8 +4072,8 @@ impl<'a, C, A> PostGetByPathCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4297,65 +4279,60 @@ impl<'a, C, A> PostGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// ID of the blog to fetch the post from.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to fetch the post from.
     pub fn blog_id(mut self, new_value: &str) -> PostGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the post
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the post
     pub fn post_id(mut self, new_value: &str) -> PostGetCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
-    ///
-    /// 
     /// Access level with which to view the returned result. Note that some fields require elevated access.
+    ///
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PostGetCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Sets the *max comments* query property to the given value.
-    ///
-    /// 
     /// Maximum number of comments to pull back on a post.
+    ///
+    /// Sets the *max comments* query property to the given value.
     pub fn max_comments(mut self, new_value: u32) -> PostGetCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
-    /// Sets the *fetch images* query property to the given value.
-    ///
-    /// 
     /// Whether image URL metadata for each post is included (default: false).
+    ///
+    /// Sets the *fetch images* query property to the given value.
     pub fn fetch_images(mut self, new_value: bool) -> PostGetCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
-    /// Sets the *fetch body* query property to the given value.
-    ///
-    /// 
     /// Whether the body content of the post is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
+    ///
+    /// Sets the *fetch body* query property to the given value.
     pub fn fetch_body(mut self, new_value: bool) -> PostGetCall<'a, C, A> {
         self._fetch_body = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4385,8 +4362,8 @@ impl<'a, C, A> PostGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4600,56 +4577,52 @@ impl<'a, C, A> PostInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Post) -> PostInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// ID of the blog to add the post to.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to add the post to.
     pub fn blog_id(mut self, new_value: &str) -> PostInsertCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
-    /// Sets the *is draft* query property to the given value.
-    ///
-    /// 
     /// Whether to create the post as a draft (default: false).
+    ///
+    /// Sets the *is draft* query property to the given value.
     pub fn is_draft(mut self, new_value: bool) -> PostInsertCall<'a, C, A> {
         self._is_draft = Some(new_value);
         self
     }
-    /// Sets the *fetch images* query property to the given value.
-    ///
-    /// 
     /// Whether image URL metadata for each post is included in the returned result (default: false).
+    ///
+    /// Sets the *fetch images* query property to the given value.
     pub fn fetch_images(mut self, new_value: bool) -> PostInsertCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
-    /// Sets the *fetch body* query property to the given value.
-    ///
-    /// 
     /// Whether the body content of the post is included with the result (default: true).
+    ///
+    /// Sets the *fetch body* query property to the given value.
     pub fn fetch_body(mut self, new_value: bool) -> PostInsertCall<'a, C, A> {
         self._fetch_body = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4679,8 +4652,8 @@ impl<'a, C, A> PostInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4871,41 +4844,39 @@ impl<'a, C, A> PostPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PostPublishCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Post.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> PostPublishCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
-    /// Sets the *publish date* query property to the given value.
-    ///
-    /// 
     /// Optional date and time to schedule the publishing of the Blog. If no publishDate parameter is given, the post is either published at the a previously saved schedule date (if present), or the current time. If a future date is given, the post will be scheduled to be published.
+    ///
+    /// Sets the *publish date* query property to the given value.
     pub fn publish_date(mut self, new_value: &str) -> PostPublishCall<'a, C, A> {
         self._publish_date = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostPublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4935,8 +4906,8 @@ impl<'a, C, A> PostPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5111,33 +5082,32 @@ impl<'a, C, A> PostDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PostDeleteCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Post.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> PostDeleteCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5167,8 +5137,8 @@ impl<'a, C, A> PostDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5354,33 +5324,32 @@ impl<'a, C, A> PostRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PostRevertCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Post.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> PostRevertCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5410,8 +5379,8 @@ impl<'a, C, A> PostRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5607,49 +5576,46 @@ impl<'a, C, A> PostSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// ID of the blog to fetch the post from.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to fetch the post from.
     pub fn blog_id(mut self, new_value: &str) -> PostSearchCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// Query terms to search this blog for matching posts.
+    ///
     /// Sets the *q* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Query terms to search this blog for matching posts.
     pub fn q(mut self, new_value: &str) -> PostSearchCall<'a, C, A> {
         self._q = new_value.to_string();
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// Sort search results
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> PostSearchCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *fetch bodies* query property to the given value.
-    ///
-    /// 
     /// Whether the body content of posts is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
+    ///
+    /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> PostSearchCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5679,8 +5645,8 @@ impl<'a, C, A> PostSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5906,82 +5872,76 @@ impl<'a, C, A> PostPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Post) -> PostPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PostPatchCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Post.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> PostPatchCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
-    /// Sets the *revert* query property to the given value.
-    ///
-    /// 
     /// Whether a revert action should be performed when the post is updated (default: false).
+    ///
+    /// Sets the *revert* query property to the given value.
     pub fn revert(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
-    /// Sets the *publish* query property to the given value.
-    ///
-    /// 
     /// Whether a publish action should be performed when the post is updated (default: false).
+    ///
+    /// Sets the *publish* query property to the given value.
     pub fn publish(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._publish = Some(new_value);
         self
     }
-    /// Sets the *max comments* query property to the given value.
-    ///
-    /// 
     /// Maximum number of comments to retrieve with the returned post.
+    ///
+    /// Sets the *max comments* query property to the given value.
     pub fn max_comments(mut self, new_value: u32) -> PostPatchCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
-    /// Sets the *fetch images* query property to the given value.
-    ///
-    /// 
     /// Whether image URL metadata for each post is included in the returned result (default: false).
+    ///
+    /// Sets the *fetch images* query property to the given value.
     pub fn fetch_images(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
-    /// Sets the *fetch body* query property to the given value.
-    ///
-    /// 
     /// Whether the body content of the post is included with the result (default: true).
+    ///
+    /// Sets the *fetch body* query property to the given value.
     pub fn fetch_body(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._fetch_body = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6011,8 +5971,8 @@ impl<'a, C, A> PostPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6250,104 +6210,93 @@ impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// ID of the blog to fetch posts from.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to fetch posts from.
     pub fn blog_id(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
-    ///
-    /// 
     /// Access level with which to view the returned result. Note that some fields require escalated access.
+    ///
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
+    /// Statuses to include in the results.
+    ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Statuses to include in the results.
     pub fn add_status(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
-    /// Sets the *start date* query property to the given value.
-    ///
-    /// 
     /// Earliest post date to fetch, a date-time with RFC 3339 formatting.
+    ///
+    /// Sets the *start date* query property to the given value.
     pub fn start_date(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Continuation token if the request is paged.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// Sort search results
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of posts to fetch.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PostListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *labels* query property to the given value.
-    ///
-    /// 
     /// Comma-separated list of labels to search for.
+    ///
+    /// Sets the *labels* query property to the given value.
     pub fn labels(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._labels = Some(new_value.to_string());
         self
     }
-    /// Sets the *fetch images* query property to the given value.
-    ///
-    /// 
     /// Whether image URL metadata for each post is included.
+    ///
+    /// Sets the *fetch images* query property to the given value.
     pub fn fetch_images(mut self, new_value: bool) -> PostListCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
-    /// Sets the *fetch bodies* query property to the given value.
-    ///
-    /// 
     /// Whether the body content of posts is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
+    ///
+    /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> PostListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
-    /// Sets the *end date* query property to the given value.
-    ///
-    /// 
     /// Latest post date to fetch, a date-time with RFC 3339 formatting.
+    ///
+    /// Sets the *end date* query property to the given value.
     pub fn end_date(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._end_date = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6377,8 +6326,8 @@ impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6571,51 +6520,49 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// ID of the blog to containing the comment.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to containing the comment.
     pub fn blog_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// ID of the post to fetch posts from.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the post to fetch posts from.
     pub fn post_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
+    /// The ID of the comment to get.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment to get.
     pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
-    ///
-    /// 
     /// Access level for the requested comment (default: READER). Note that some comments will require elevated permissions, for example comments where the parent posts which is in a draft state, or comments that are pending moderation.
+    ///
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6645,8 +6592,8 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6834,43 +6781,42 @@ impl<'a, C, A> CommentRemoveContentCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Post.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
+    /// The ID of the comment to delete content from.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment to delete content from.
     pub fn comment_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentRemoveContentCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6900,8 +6846,8 @@ impl<'a, C, A> CommentRemoveContentCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7119,71 +7065,64 @@ impl<'a, C, A> CommentListByBlogCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// ID of the blog to fetch comments from.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to fetch comments from.
     pub fn blog_id(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
     pub fn add_status(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
-    /// Sets the *start date* query property to the given value.
-    ///
-    /// 
     /// Earliest date of comment to fetch, a date-time with RFC 3339 formatting.
+    ///
+    /// Sets the *start date* query property to the given value.
     pub fn start_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Continuation token if request is paged.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of comments to include in the result.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> CommentListByBlogCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *fetch bodies* query property to the given value.
-    ///
-    /// 
     /// Whether the body content of the comments is included.
+    ///
+    /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> CommentListByBlogCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
-    /// Sets the *end date* query property to the given value.
-    ///
-    /// 
     /// Latest date of comment to fetch, a date-time with RFC 3339 formatting.
+    ///
+    /// Sets the *end date* query property to the given value.
     pub fn end_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._end_date = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListByBlogCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7213,8 +7152,8 @@ impl<'a, C, A> CommentListByBlogCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7402,43 +7341,42 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Post.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
+    /// The ID of the comment to mark as spam.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment to mark as spam.
     pub fn comment_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentMarkAsSpamCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7468,8 +7406,8 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7694,89 +7632,81 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// ID of the blog to fetch comments from.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to fetch comments from.
     pub fn blog_id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// ID of the post to fetch posts from.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the post to fetch posts from.
     pub fn post_id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
-    ///
-    /// 
     /// Access level with which to view the returned result. Note that some fields require elevated access.
+    ///
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
+    ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
     pub fn add_status(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
-    /// Sets the *start date* query property to the given value.
-    ///
-    /// 
     /// Earliest date of comment to fetch, a date-time with RFC 3339 formatting.
+    ///
+    /// Sets the *start date* query property to the given value.
     pub fn start_date(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Continuation token if request is paged.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of comments to include in the result.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *fetch bodies* query property to the given value.
-    ///
-    /// 
     /// Whether the body content of the comments is included.
+    ///
+    /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> CommentListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
-    /// Sets the *end date* query property to the given value.
-    ///
-    /// 
     /// Latest date of comment to fetch, a date-time with RFC 3339 formatting.
+    ///
+    /// Sets the *end date* query property to the given value.
     pub fn end_date(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._end_date = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7806,8 +7736,8 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7995,43 +7925,42 @@ impl<'a, C, A> CommentApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Post.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
+    /// The ID of the comment to mark as not spam.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment to mark as not spam.
     pub fn comment_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentApproveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8061,8 +7990,8 @@ impl<'a, C, A> CommentApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8239,43 +8168,42 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Post.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
+    /// The ID of the comment to delete.
+    ///
     /// Sets the *comment id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the comment to delete.
     pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8305,8 +8233,8 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8499,51 +8427,49 @@ impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     pub fn user_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the blog.
     pub fn blog_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the post to get.
+    ///
     /// Sets the *post id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the post to get.
     pub fn post_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
-    /// Sets the *max comments* query property to the given value.
-    ///
-    /// 
     /// Maximum number of comments to pull back on a post.
+    ///
+    /// Sets the *max comments* query property to the given value.
     pub fn max_comments(mut self, new_value: u32) -> PostUserInfoGetCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostUserInfoGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8573,8 +8499,8 @@ impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8809,105 +8735,95 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     pub fn user_id(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// ID of the blog to fetch posts from.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to fetch posts from.
     pub fn blog_id(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
-    ///
-    /// 
     /// Access level with which to view the returned result. Note that some fields require elevated access.
+    ///
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
+    ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
     pub fn add_status(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
-    /// Sets the *start date* query property to the given value.
-    ///
-    /// 
     /// Earliest post date to fetch, a date-time with RFC 3339 formatting.
+    ///
+    /// Sets the *start date* query property to the given value.
     pub fn start_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Continuation token if the request is paged.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order by* query property to the given value.
-    ///
-    /// 
     /// Sort order applied to search results. Default is published.
+    ///
+    /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of posts to fetch.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PostUserInfoListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *labels* query property to the given value.
-    ///
-    /// 
     /// Comma-separated list of labels to search for.
+    ///
+    /// Sets the *labels* query property to the given value.
     pub fn labels(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._labels = Some(new_value.to_string());
         self
     }
-    /// Sets the *fetch bodies* query property to the given value.
-    ///
-    /// 
     /// Whether the body content of posts is included. Default is false.
+    ///
+    /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> PostUserInfoListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
-    /// Sets the *end date* query property to the given value.
-    ///
-    /// 
     /// Latest post date to fetch, a date-time with RFC 3339 formatting.
+    ///
+    /// Sets the *end date* query property to the given value.
     pub fn end_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._end_date = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostUserInfoListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8937,8 +8853,8 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9129,41 +9045,39 @@ impl<'a, C, A> BlogUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     pub fn user_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the blog to get.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the blog to get.
     pub fn blog_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
-    /// Sets the *max posts* query property to the given value.
-    ///
-    /// 
     /// Maximum number of posts to pull back with the blog.
+    ///
+    /// Sets the *max posts* query property to the given value.
     pub fn max_posts(mut self, new_value: u32) -> BlogUserInfoGetCall<'a, C, A> {
         self._max_posts = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogUserInfoGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9193,8 +9107,8 @@ impl<'a, C, A> BlogUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9385,40 +9299,38 @@ impl<'a, C, A> PageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// ID of the blog containing the page.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog containing the page.
     pub fn blog_id(mut self, new_value: &str) -> PageGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the page to get.
+    ///
     /// Sets the *page id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the page to get.
     pub fn page_id(mut self, new_value: &str) -> PageGetCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
     ///
-    /// 
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PageGetCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9448,8 +9360,8 @@ impl<'a, C, A> PageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9662,63 +9574,57 @@ impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// ID of the blog to fetch Pages from.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to fetch Pages from.
     pub fn blog_id(mut self, new_value: &str) -> PageListCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
-    /// Sets the *view* query property to the given value.
-    ///
-    /// 
     /// Access level with which to view the returned result. Note that some fields require elevated access.
+    ///
+    /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PageListCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
+    ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
     pub fn add_status(mut self, new_value: &str) -> PageListCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// Continuation token if the request is paged.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PageListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of Pages to fetch.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PageListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *fetch bodies* query property to the given value.
-    ///
-    /// 
     /// Whether to retrieve the Page bodies.
+    ///
+    /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> PageListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9748,8 +9654,8 @@ impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9935,33 +9841,32 @@ impl<'a, C, A> PageRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the blog.
     pub fn blog_id(mut self, new_value: &str) -> PageRevertCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the page.
+    ///
     /// Sets the *page id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the page.
     pub fn page_id(mut self, new_value: &str) -> PageRevertCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9991,8 +9896,8 @@ impl<'a, C, A> PageRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10196,40 +10101,38 @@ impl<'a, C, A> PageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Page) -> PageInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// ID of the blog to add the page to.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// ID of the blog to add the page to.
     pub fn blog_id(mut self, new_value: &str) -> PageInsertCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
-    /// Sets the *is draft* query property to the given value.
-    ///
-    /// 
     /// Whether to create the page as a draft (default: false).
+    ///
+    /// Sets the *is draft* query property to the given value.
     pub fn is_draft(mut self, new_value: bool) -> PageInsertCall<'a, C, A> {
         self._is_draft = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10259,8 +10162,8 @@ impl<'a, C, A> PageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10471,58 +10374,55 @@ impl<'a, C, A> PagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Page) -> PagePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PagePatchCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Page.
+    ///
     /// Sets the *page id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Page.
     pub fn page_id(mut self, new_value: &str) -> PagePatchCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
-    /// Sets the *revert* query property to the given value.
-    ///
-    /// 
     /// Whether a revert action should be performed when the page is updated (default: false).
+    ///
+    /// Sets the *revert* query property to the given value.
     pub fn revert(mut self, new_value: bool) -> PagePatchCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
-    /// Sets the *publish* query property to the given value.
-    ///
-    /// 
     /// Whether a publish action should be performed when the page is updated (default: false).
+    ///
+    /// Sets the *publish* query property to the given value.
     pub fn publish(mut self, new_value: bool) -> PagePatchCall<'a, C, A> {
         self._publish = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PagePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10552,8 +10452,8 @@ impl<'a, C, A> PagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10739,33 +10639,32 @@ impl<'a, C, A> PagePublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the blog.
     pub fn blog_id(mut self, new_value: &str) -> PagePublishCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the page.
+    ///
     /// Sets the *page id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the page.
     pub fn page_id(mut self, new_value: &str) -> PagePublishCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PagePublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10795,8 +10694,8 @@ impl<'a, C, A> PagePublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11007,58 +10906,55 @@ impl<'a, C, A> PageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Page) -> PageUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PageUpdateCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Page.
+    ///
     /// Sets the *page id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Page.
     pub fn page_id(mut self, new_value: &str) -> PageUpdateCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
-    /// Sets the *revert* query property to the given value.
-    ///
-    /// 
     /// Whether a revert action should be performed when the page is updated (default: false).
+    ///
+    /// Sets the *revert* query property to the given value.
     pub fn revert(mut self, new_value: bool) -> PageUpdateCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
-    /// Sets the *publish* query property to the given value.
-    ///
-    /// 
     /// Whether a publish action should be performed when the page is updated (default: false).
+    ///
+    /// Sets the *publish* query property to the given value.
     pub fn publish(mut self, new_value: bool) -> PageUpdateCall<'a, C, A> {
         self._publish = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11088,8 +10984,8 @@ impl<'a, C, A> PageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11264,33 +11160,32 @@ impl<'a, C, A> PageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the Blog.
+    ///
     /// Sets the *blog id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PageDeleteCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
+    /// The ID of the Page.
+    ///
     /// Sets the *page id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the Page.
     pub fn page_id(mut self, new_value: &str) -> PageDeleteCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11320,8 +11215,8 @@ impl<'a, C, A> PageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

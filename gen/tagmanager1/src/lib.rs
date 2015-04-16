@@ -150,16 +150,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -348,16 +350,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -408,7 +412,7 @@ impl<'a, C, A> TagManager<C, A>
 /// 
 /// * [containers macros list accounts](struct.AccountContainerMacroListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListMacrosResponse {
     /// All GTM Macros of a GTM Container.
     pub macros: Vec<Macro>,
@@ -550,7 +554,7 @@ impl ResponseResult for Container {}
 /// 
 /// * [containers list accounts](struct.AccountContainerListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListContainersResponse {
     /// All Containers of a GTM Account.
     pub containers: Vec<Container>,
@@ -619,7 +623,7 @@ impl ResponseResult for Macro {}
 /// 
 /// * [containers variables list accounts](struct.AccountContainerVariableListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListVariablesResponse {
     /// All GTM Variables of a GTM Container.
     pub variables: Vec<Variable>,
@@ -746,7 +750,7 @@ impl ResponseResult for Rule {}
 /// 
 /// * [list accounts](struct.AccountListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAccountsResponse {
     /// List of GTM Accounts that a user has access to.
     pub accounts: Vec<Account>,
@@ -764,7 +768,7 @@ impl ResponseResult for ListAccountsResponse {}
 /// 
 /// * [containers versions publish accounts](struct.AccountContainerVersionPublishCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PublishContainerVersionResponse {
     /// The container version created.
     #[serde(rename="containerVersion")]
@@ -854,7 +858,7 @@ impl ResponseResult for Trigger {}
 /// 
 /// * [containers versions create accounts](struct.AccountContainerVersionCreateCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateContainerVersionResponse {
     /// The container version created.
     #[serde(rename="containerVersion")]
@@ -876,7 +880,7 @@ impl ResponseResult for CreateContainerVersionResponse {}
 /// 
 /// * [containers rules list accounts](struct.AccountContainerRuleListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListRulesResponse {
     /// All GTM Rules of a GTM Container.
     pub rules: Vec<Rule>,
@@ -971,7 +975,7 @@ impl Part for Parameter {}
 /// 
 /// * [containers tags list accounts](struct.AccountContainerTagListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTagsResponse {
     /// All GTM Tags of a GTM Container.
     pub tags: Vec<Tag>,
@@ -989,7 +993,7 @@ impl ResponseResult for ListTagsResponse {}
 /// 
 /// * [permissions list accounts](struct.AccountPermissionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAccountUsersResponse {
     /// All GTM AccountUsers of a GTM Account.
     #[serde(rename="userAccess")]
@@ -1031,7 +1035,7 @@ impl RequestValue for CreateContainerVersionRequestVersionOptions {}
 /// 
 /// * [containers triggers list accounts](struct.AccountContainerTriggerListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTriggersResponse {
     /// All GTM Triggers of a GTM Container.
     pub triggers: Vec<Trigger>,
@@ -1044,7 +1048,7 @@ impl ResponseResult for ListTriggersResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContainerVersionHeader {
     /// Container version display name.
     pub name: String,
@@ -1138,7 +1142,7 @@ impl ResponseResult for ContainerVersion {}
 /// 
 /// * [containers versions list accounts](struct.AccountContainerVersionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListContainerVersionsResponse {
     /// All container version headers of a GTM Container.
     #[serde(rename="containerVersionHeader")]
@@ -2383,23 +2387,22 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2429,8 +2432,8 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2518,7 +2521,7 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -2614,23 +2617,22 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// The GTM Account ID. @required tagmanager.accounts.permissions.list
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID. @required tagmanager.accounts.permissions.list
     pub fn account_id(mut self, new_value: &str) -> AccountPermissionListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2660,8 +2662,8 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2753,7 +2755,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/undelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -2849,43 +2851,42 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Container Version ID.
+    ///
     /// Sets the *container version id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container Version ID.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2915,8 +2916,8 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainerversion`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3011,7 +3012,7 @@ impl<'a, C, A> AccountPermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -3115,32 +3116,31 @@ impl<'a, C, A> AccountPermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UserAccess) -> AccountPermissionCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountPermissionCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3170,8 +3170,8 @@ impl<'a, C, A> AccountPermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3260,7 +3260,7 @@ impl<'a, C, A> AccountPermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions/{permissionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{permissionId}", "permissionId")].iter() {
@@ -3346,33 +3346,32 @@ impl<'a, C, A> AccountPermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM User ID.
+    ///
     /// Sets the *permission id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM User ID.
     pub fn permission_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3402,8 +3401,8 @@ impl<'a, C, A> AccountPermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3589,33 +3588,32 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3645,8 +3643,8 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3837,41 +3835,39 @@ impl<'a, C, A> AccountContainerVersionListCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *headers* query property to the given value.
-    ///
-    /// 
     /// Retrieve headers only when true.
+    ///
+    /// Sets the *headers* query property to the given value.
     pub fn headers(mut self, new_value: bool) -> AccountContainerVersionListCall<'a, C, A> {
         self._headers = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3901,8 +3897,8 @@ impl<'a, C, A> AccountContainerVersionListCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4006,7 +4002,7 @@ impl<'a, C, A> AccountContainerTriggerUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{triggerId}", "triggerId")].iter() {
@@ -4110,60 +4106,58 @@ impl<'a, C, A> AccountContainerTriggerUpdateCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Trigger) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Trigger ID.
+    ///
     /// Sets the *trigger id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Trigger ID.
     pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._trigger_id = new_value.to_string();
         self
     }
-    /// Sets the *fingerprint* query property to the given value.
-    ///
-    /// 
     /// When provided, this fingerprint must match the fingerprint of the trigger in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4193,8 +4187,8 @@ impl<'a, C, A> AccountContainerTriggerUpdateCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4382,43 +4376,42 @@ impl<'a, C, A> AccountContainerTriggerGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Trigger ID.
+    ///
     /// Sets the *trigger id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Trigger ID.
     pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, A> {
         self._trigger_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4448,8 +4441,8 @@ impl<'a, C, A> AccountContainerTriggerGetCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4624,33 +4617,32 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4680,8 +4672,8 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DeleteContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4776,7 +4768,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -4880,32 +4872,31 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Container) -> AccountContainerCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4935,8 +4926,8 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5027,7 +5018,7 @@ impl<'a, C, A> AccountContainerTagDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{tagId}", "tagId")].iter() {
@@ -5113,43 +5104,42 @@ impl<'a, C, A> AccountContainerTagDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Tag ID.
+    ///
     /// Sets the *tag id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Tag ID.
     pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, A> {
         self._tag_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5179,8 +5169,8 @@ impl<'a, C, A> AccountContainerTagDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5284,7 +5274,7 @@ impl<'a, C, A> AccountContainerRuleUpdateCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/rules/{ruleId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{ruleId}", "ruleId")].iter() {
@@ -5388,60 +5378,58 @@ impl<'a, C, A> AccountContainerRuleUpdateCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Rule) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Rule ID.
+    ///
     /// Sets the *rule id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Rule ID.
     pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
-    /// Sets the *fingerprint* query property to the given value.
-    ///
-    /// 
     /// When provided, this fingerprint must match the fingerprint of the rule in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5471,8 +5459,8 @@ impl<'a, C, A> AccountContainerRuleUpdateCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5563,7 +5551,7 @@ impl<'a, C, A> AccountContainerRuleDeleteCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/rules/{ruleId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{ruleId}", "ruleId")].iter() {
@@ -5649,43 +5637,42 @@ impl<'a, C, A> AccountContainerRuleDeleteCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Rule ID.
+    ///
     /// Sets the *rule id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Rule ID.
     pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5715,8 +5702,8 @@ impl<'a, C, A> AccountContainerRuleDeleteCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5902,33 +5889,32 @@ impl<'a, C, A> AccountContainerTagListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5958,8 +5944,8 @@ impl<'a, C, A> AccountContainerTagListCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6056,7 +6042,7 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/publish".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Publish.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -6152,51 +6138,49 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Container Version ID.
+    ///
     /// Sets the *container version id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container Version ID.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
-    /// Sets the *fingerprint* query property to the given value.
-    ///
-    /// 
     /// When provided, this fingerprint must match the fingerprint of the container version in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6226,8 +6210,8 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Publish`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6324,7 +6308,7 @@ impl<'a, C, A> AccountContainerTagCreateCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -6428,42 +6412,41 @@ impl<'a, C, A> AccountContainerTagCreateCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Tag) -> AccountContainerTagCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6493,8 +6476,8 @@ impl<'a, C, A> AccountContainerTagCreateCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6680,33 +6663,32 @@ impl<'a, C, A> AccountContainerTriggerListCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6736,8 +6718,8 @@ impl<'a, C, A> AccountContainerTriggerListCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6828,7 +6810,7 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -6914,43 +6896,42 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Container Version ID.
+    ///
     /// Sets the *container version id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container Version ID.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6980,8 +6961,8 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainerversion`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7081,7 +7062,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageAccount.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -7185,40 +7166,38 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Account) -> AccountUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *fingerprint* query property to the given value.
-    ///
-    /// 
     /// When provided, this fingerprint must match the fingerprint of the account in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7248,8 +7227,8 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageAccount`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7340,7 +7319,7 @@ impl<'a, C, A> AccountContainerMacroDeleteCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/macros/{macroId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{macroId}", "macroId")].iter() {
@@ -7426,43 +7405,42 @@ impl<'a, C, A> AccountContainerMacroDeleteCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Macro ID.
+    ///
     /// Sets the *macro id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Macro ID.
     pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, A> {
         self._macro_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7492,8 +7470,8 @@ impl<'a, C, A> AccountContainerMacroDeleteCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7590,7 +7568,7 @@ impl<'a, C, A> AccountContainerVersionCreateCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -7694,42 +7672,41 @@ impl<'a, C, A> AccountContainerVersionCreateCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &CreateContainerVersionRequestVersionOptions) -> AccountContainerVersionCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7759,8 +7736,8 @@ impl<'a, C, A> AccountContainerVersionCreateCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainerversion`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7850,7 +7827,7 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions/{permissionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{permissionId}", "permissionId")].iter() {
@@ -7946,33 +7923,32 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM User ID.
+    ///
     /// Sets the *permission id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM User ID.
     pub fn permission_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8002,8 +7978,8 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8100,7 +8076,7 @@ impl<'a, C, A> AccountContainerRuleCreateCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/rules".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -8204,42 +8180,41 @@ impl<'a, C, A> AccountContainerRuleCreateCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Rule) -> AccountContainerRuleCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8269,8 +8244,8 @@ impl<'a, C, A> AccountContainerRuleCreateCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8362,7 +8337,7 @@ impl<'a, C, A> AccountContainerVersionRestoreCall<'a, C, A> where C: BorrowMut<h
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/restore".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -8458,43 +8433,42 @@ impl<'a, C, A> AccountContainerVersionRestoreCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Container Version ID.
+    ///
     /// Sets the *container version id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container Version ID.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionRestoreCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8524,8 +8498,8 @@ impl<'a, C, A> AccountContainerVersionRestoreCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8713,43 +8687,42 @@ impl<'a, C, A> AccountContainerRuleGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Rule ID.
+    ///
     /// Sets the *rule id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Rule ID.
     pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8779,8 +8752,8 @@ impl<'a, C, A> AccountContainerRuleGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8877,7 +8850,7 @@ impl<'a, C, A> AccountContainerVariableCreateCall<'a, C, A> where C: BorrowMut<h
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -8981,42 +8954,41 @@ impl<'a, C, A> AccountContainerVariableCreateCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Variable) -> AccountContainerVariableCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9046,8 +9018,8 @@ impl<'a, C, A> AccountContainerVariableCreateCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9233,33 +9205,32 @@ impl<'a, C, A> AccountContainerVariableListCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9289,8 +9260,8 @@ impl<'a, C, A> AccountContainerVariableListCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9387,7 +9358,7 @@ impl<'a, C, A> AccountContainerMacroCreateCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/macros".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -9491,42 +9462,41 @@ impl<'a, C, A> AccountContainerMacroCreateCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Macro) -> AccountContainerMacroCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9556,8 +9526,8 @@ impl<'a, C, A> AccountContainerMacroCreateCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9745,43 +9715,42 @@ impl<'a, C, A> AccountContainerTagGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Tag ID.
+    ///
     /// Sets the *tag id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Tag ID.
     pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, A> {
         self._tag_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9811,8 +9780,8 @@ impl<'a, C, A> AccountContainerTagGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10000,43 +9969,42 @@ impl<'a, C, A> AccountContainerVariableGetCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Variable ID.
+    ///
     /// Sets the *variable id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Variable ID.
     pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, A> {
         self._variable_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10066,8 +10034,8 @@ impl<'a, C, A> AccountContainerVariableGetCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10158,7 +10126,7 @@ impl<'a, C, A> AccountContainerTriggerDeleteCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{triggerId}", "triggerId")].iter() {
@@ -10244,43 +10212,42 @@ impl<'a, C, A> AccountContainerTriggerDeleteCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Trigger ID.
+    ///
     /// Sets the *trigger id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Trigger ID.
     pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, A> {
         self._trigger_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10310,8 +10277,8 @@ impl<'a, C, A> AccountContainerTriggerDeleteCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10497,33 +10464,32 @@ impl<'a, C, A> AccountContainerMacroListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10553,8 +10519,8 @@ impl<'a, C, A> AccountContainerMacroListCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10651,7 +10617,7 @@ impl<'a, C, A> AccountContainerTriggerCreateCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -10755,42 +10721,41 @@ impl<'a, C, A> AccountContainerTriggerCreateCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Trigger) -> AccountContainerTriggerCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10820,8 +10785,8 @@ impl<'a, C, A> AccountContainerTriggerCreateCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10925,7 +10890,7 @@ impl<'a, C, A> AccountContainerMacroUpdateCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/macros/{macroId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{macroId}", "macroId")].iter() {
@@ -11029,60 +10994,58 @@ impl<'a, C, A> AccountContainerMacroUpdateCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Macro) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Macro ID.
+    ///
     /// Sets the *macro id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Macro ID.
     pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._macro_id = new_value.to_string();
         self
     }
-    /// Sets the *fingerprint* query property to the given value.
-    ///
-    /// 
     /// When provided, this fingerprint must match the fingerprint of the macro in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11112,8 +11075,8 @@ impl<'a, C, A> AccountContainerMacroUpdateCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11271,13 +11234,12 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11307,8 +11269,8 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11405,7 +11367,7 @@ impl<'a, C, A> AccountPermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions/{permissionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{permissionId}", "permissionId")].iter() {
@@ -11509,42 +11471,41 @@ impl<'a, C, A> AccountPermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &UserAccess) -> AccountPermissionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM User ID.
+    ///
     /// Sets the *permission id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM User ID.
     pub fn permission_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11574,8 +11535,8 @@ impl<'a, C, A> AccountPermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ManageUser`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11666,7 +11627,7 @@ impl<'a, C, A> AccountContainerVariableDeleteCall<'a, C, A> where C: BorrowMut<h
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{variableId}", "variableId")].iter() {
@@ -11752,43 +11713,42 @@ impl<'a, C, A> AccountContainerVariableDeleteCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Variable ID.
+    ///
     /// Sets the *variable id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Variable ID.
     pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, A> {
         self._variable_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11818,8 +11778,8 @@ impl<'a, C, A> AccountContainerVariableDeleteCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12003,23 +11963,22 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12049,8 +12008,8 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12152,7 +12111,7 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -12256,50 +12215,48 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Container) -> AccountContainerUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *fingerprint* query property to the given value.
-    ///
-    /// 
     /// When provided, this fingerprint must match the fingerprint of the container in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12329,8 +12286,8 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12516,33 +12473,32 @@ impl<'a, C, A> AccountContainerRuleListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12572,8 +12528,8 @@ impl<'a, C, A> AccountContainerRuleListCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12677,7 +12633,7 @@ impl<'a, C, A> AccountContainerTagUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{tagId}", "tagId")].iter() {
@@ -12781,60 +12737,58 @@ impl<'a, C, A> AccountContainerTagUpdateCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Tag) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Tag ID.
+    ///
     /// Sets the *tag id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Tag ID.
     pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._tag_id = new_value.to_string();
         self
     }
-    /// Sets the *fingerprint* query property to the given value.
-    ///
-    /// 
     /// When provided, this fingerprint must match the fingerprint of the tag in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12864,8 +12818,8 @@ impl<'a, C, A> AccountContainerTagUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13053,43 +13007,42 @@ impl<'a, C, A> AccountContainerMacroGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Macro ID.
+    ///
     /// Sets the *macro id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Macro ID.
     pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, A> {
         self._macro_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13119,8 +13072,8 @@ impl<'a, C, A> AccountContainerMacroGetCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13224,7 +13177,7 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -13328,60 +13281,58 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ContainerVersion) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Container Version ID.
+    ///
     /// Sets the *container version id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container Version ID.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
-    /// Sets the *fingerprint* query property to the given value.
-    ///
-    /// 
     /// When provided, this fingerprint must match the fingerprint of the container version in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13411,8 +13362,8 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainerversion`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13516,7 +13467,7 @@ impl<'a, C, A> AccountContainerVariableUpdateCall<'a, C, A> where C: BorrowMut<h
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{variableId}", "variableId")].iter() {
@@ -13620,60 +13571,58 @@ impl<'a, C, A> AccountContainerVariableUpdateCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Variable) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Variable ID.
+    ///
     /// Sets the *variable id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Variable ID.
     pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._variable_id = new_value.to_string();
         self
     }
-    /// Sets the *fingerprint* query property to the given value.
-    ///
-    /// 
     /// When provided, this fingerprint must match the fingerprint of the variable in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13703,8 +13652,8 @@ impl<'a, C, A> AccountContainerVariableUpdateCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13892,43 +13841,42 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// The GTM Account ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The GTM Container ID.
+    ///
     /// Sets the *container id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
+    /// The GTM Container Version ID. Specify published to retrieve the currently published version.
+    ///
     /// Sets the *container version id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The GTM Container Version ID. Specify published to retrieve the currently published version.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13958,8 +13906,8 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

@@ -110,16 +110,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -284,16 +286,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -345,7 +349,7 @@ impl<'a, C, A> AutoscalerHub<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeprecationStatus {
     /// no description provided
     pub deleted: String,
@@ -366,7 +370,7 @@ impl Part for DeprecationStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarningsData {
     /// no description provided
     pub key: String,
@@ -387,7 +391,7 @@ impl Part for OperationWarningsData {}
 /// 
 /// * [list zones](struct.ZoneListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Zone {
     /// no description provided
     pub status: Option<String>,
@@ -421,7 +425,7 @@ impl Resource for Zone {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarnings {
     /// no description provided
     pub message: String,
@@ -444,7 +448,7 @@ impl Part for OperationWarnings {}
 /// 
 /// * [list zone operations](struct.ZoneOperationListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationList {
     /// no description provided
     #[serde(rename="nextPageToken")]
@@ -467,7 +471,7 @@ impl ResponseResult for OperationList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ZoneMaintenanceWindows {
     /// no description provided
     #[serde(rename="endTime")]
@@ -508,7 +512,7 @@ impl Part for AutoscalingPolicyCustomMetricUtilization {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationErrorErrors {
     /// no description provided
     pub message: String,
@@ -555,7 +559,7 @@ impl Part for AutoscalingPolicy {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationError {
     /// no description provided
     pub errors: Vec<OperationErrorErrors>,
@@ -602,7 +606,7 @@ impl Part for AutoscalingPolicyLoadBalancingUtilization {}
 /// 
 /// * [list autoscalers](struct.AutoscalerListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalerListResponse {
     /// [Output only] A token used to continue a truncated list request.
     #[serde(rename="nextPageToken")]
@@ -629,7 +633,7 @@ impl ResponseResult for AutoscalerListResponse {}
 /// * [get zone operations](struct.ZoneOperationGetCall.html) (response)
 /// * [patch autoscalers](struct.AutoscalerPatchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// no description provided
     pub status: String,
@@ -701,7 +705,7 @@ impl ResponseResult for Operation {}
 /// 
 /// * [list zones](struct.ZoneListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ZoneList {
     /// no description provided
     #[serde(rename="nextPageToken")]
@@ -1294,43 +1298,39 @@ impl<'a, C, A> ZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn project(mut self, new_value: &str) -> ZoneListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
     ///
-    /// 
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ZoneListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
     ///
-    /// 
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ZoneListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filter* query property to the given value.
     ///
-    /// 
+    /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ZoneListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1360,8 +1360,8 @@ impl<'a, C, A> ZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ComputeReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1562,52 +1562,48 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
     ///
-    /// 
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
     ///
-    /// 
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filter* query property to the given value.
     ///
-    /// 
+    /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1637,8 +1633,8 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ComputeReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1815,40 +1811,39 @@ impl<'a, C, A> ZoneOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn project(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn zone(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    ///
     /// Sets the *operation* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn operation(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1878,8 +1873,8 @@ impl<'a, C, A> ZoneOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Compute`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2067,40 +2062,39 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    ///
     /// Sets the *operation* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2130,8 +2124,8 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ComputeReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2332,54 +2326,50 @@ impl<'a, C, A> AutoscalerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// Project ID of Autoscaler resource.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Zone name of Autoscaler resource.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
     ///
-    /// 
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AutoscalerListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
     ///
-    /// 
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> AutoscalerListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filter* query property to the given value.
     ///
-    /// 
+    /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> AutoscalerListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2409,8 +2399,8 @@ impl<'a, C, A> AutoscalerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ComputeReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2613,52 +2603,51 @@ impl<'a, C, A> AutoscalerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Autoscaler) -> AutoscalerUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of Autoscaler resource.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Zone name of Autoscaler resource.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// Name of the Autoscaler resource.
+    ///
     /// Sets the *autoscaler* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the Autoscaler resource.
     pub fn autoscaler(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, A> {
         self._autoscaler = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2688,8 +2677,8 @@ impl<'a, C, A> AutoscalerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Compute`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2892,52 +2881,51 @@ impl<'a, C, A> AutoscalerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Autoscaler) -> AutoscalerPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of Autoscaler resource.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Zone name of Autoscaler resource.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// Name of the Autoscaler resource.
+    ///
     /// Sets the *autoscaler* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the Autoscaler resource.
     pub fn autoscaler(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, A> {
         self._autoscaler = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2967,8 +2955,8 @@ impl<'a, C, A> AutoscalerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Compute`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3156,43 +3144,42 @@ impl<'a, C, A> AutoscalerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// Project ID of Autoscaler resource.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Zone name of Autoscaler resource.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// Name of the Autoscaler resource.
+    ///
     /// Sets the *autoscaler* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the Autoscaler resource.
     pub fn autoscaler(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, A> {
         self._autoscaler = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3222,8 +3209,8 @@ impl<'a, C, A> AutoscalerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Compute`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3424,42 +3411,41 @@ impl<'a, C, A> AutoscalerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Autoscaler) -> AutoscalerInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Project ID of Autoscaler resource.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Zone name of Autoscaler resource.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerInsertCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3489,8 +3475,8 @@ impl<'a, C, A> AutoscalerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Compute`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3678,43 +3664,42 @@ impl<'a, C, A> AutoscalerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Project ID of Autoscaler resource.
+    ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
+    /// Zone name of Autoscaler resource.
+    ///
     /// Sets the *zone* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
+    /// Name of the Autoscaler resource.
+    ///
     /// Sets the *autoscaler* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the Autoscaler resource.
     pub fn autoscaler(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, A> {
         self._autoscaler = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3744,8 +3729,8 @@ impl<'a, C, A> AutoscalerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ComputeReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

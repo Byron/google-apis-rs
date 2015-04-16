@@ -135,16 +135,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -312,16 +314,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -409,7 +413,7 @@ impl<'a, C, A> Games<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Category {
     /// The category name.
     pub category: String,
@@ -432,7 +436,7 @@ impl Part for Category {}
 /// 
 /// * [list players](struct.PlayerListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
@@ -450,7 +454,7 @@ impl ResponseResult for PlayerListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerScore {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScore.
     pub kind: String,
@@ -478,7 +482,7 @@ impl Part for PlayerScore {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instance.
     pub kind: String,
@@ -523,7 +527,7 @@ impl Part for Instance {}
 /// 
 /// * [list achievement definitions](struct.AchievementDefinitionListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementDefinition {
     /// The total steps for an incremental achievement.
     #[serde(rename="totalSteps")]
@@ -581,7 +585,7 @@ impl Resource for AchievementDefinition {}
 /// 
 /// * [unlock achievements](struct.AchievementUnlockCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementUnlockResponse {
     /// Whether this achievement was newly unlocked (that is, whether the unlock request for the achievement was the first for the player).
     #[serde(rename="newlyUnlocked")]
@@ -643,7 +647,7 @@ impl Part for EventUpdateRequest {}
 /// 
 /// * [list turn based matches](struct.TurnBasedMatcheListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedMatchList {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
@@ -666,7 +670,7 @@ impl ResponseResult for TurnBasedMatchList {}
 /// 
 /// * [update multiple achievements](struct.AchievementUpdateMultipleCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementUpdateMultipleResponse {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateListResponse.
     pub kind: String,
@@ -682,7 +686,7 @@ impl ResponseResult for AchievementUpdateMultipleResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventChild {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventChild.
     pub kind: String,
@@ -698,7 +702,7 @@ impl Part for EventChild {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventRecordFailure {
     /// The ID of the event that was not updated.
     #[serde(rename="eventId")]
@@ -720,7 +724,7 @@ impl Part for EventRecordFailure {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementUpdateResponse {
     /// The current steps recorded for this achievement if it is incremental.
     #[serde(rename="currentSteps")]
@@ -752,7 +756,7 @@ impl Part for AchievementUpdateResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomModification {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomModification.
     pub kind: String,
@@ -776,7 +780,7 @@ impl Part for RoomModification {}
 /// 
 /// * [list definitions events](struct.EventListDefinitionCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventDefinitionListResponse {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
@@ -799,7 +803,7 @@ impl ResponseResult for EventDefinitionListResponse {}
 /// 
 /// * [submit scores](struct.ScoreSubmitCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerScoreResponse {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScoreResponse.
     pub kind: String,
@@ -831,7 +835,7 @@ impl ResponseResult for PlayerScoreResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImageAsset {
     /// The URL of the asset.
     pub url: String,
@@ -877,7 +881,7 @@ impl RequestValue for RoomP2PStatuses {}
 /// 
 /// * [increment achievements](struct.AchievementIncrementCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementIncrementResponse {
     /// The current steps recorded for this incremental achievement.
     #[serde(rename="currentSteps")]
@@ -901,7 +905,7 @@ impl ResponseResult for AchievementIncrementResponse {}
 /// 
 /// * [sync turn based matches](struct.TurnBasedMatcheSyncCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedMatchSync {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
@@ -957,7 +961,7 @@ impl RequestValue for TurnBasedMatchCreateRequest {}
 /// * [accept quests](struct.QuestAcceptCall.html) (response)
 /// * [list quests](struct.QuestListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Quest {
     /// The description of the quest.
     pub description: String,
@@ -1045,7 +1049,7 @@ impl Part for AggregateStats {}
 /// 
 /// * [set steps at least achievements](struct.AchievementSetStepsAtLeastCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementSetStepsAtLeastResponse {
     /// The current steps recorded for this incremental achievement.
     #[serde(rename="currentSteps")]
@@ -1069,7 +1073,7 @@ impl ResponseResult for AchievementSetStepsAtLeastResponse {}
 /// 
 /// * [get metagame config metagame](struct.MetagameGetMetagameConfigCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetagameConfig {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#metagameConfig.
     pub kind: String,
@@ -1093,7 +1097,7 @@ impl ResponseResult for MetagameConfig {}
 /// 
 /// * [list achievement definitions](struct.AchievementDefinitionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementDefinitionsListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1248,7 +1252,7 @@ impl RequestValue for PushTokenId {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventBatchRecordFailure {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventBatchRecordFailure.
     pub kind: String,
@@ -1289,7 +1293,7 @@ impl Part for RoomClientAddress {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerExperienceInfo {
     /// The current number of experience points for the player.
     #[serde(rename="currentExperiencePoints")]
@@ -1320,7 +1324,7 @@ impl Part for PlayerExperienceInfo {}
 /// * [list window scores](struct.ScoreListWindowCall.html) (response)
 /// * [list scores](struct.ScoreListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardScores {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1347,7 +1351,7 @@ impl ResponseResult for LeaderboardScores {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomParticipant {
     /// True if this participant was auto-matched with the requesting player.
     #[serde(rename="autoMatched")]
@@ -1401,7 +1405,7 @@ impl Part for RoomParticipant {}
 /// * [list snapshots](struct.SnapshotListCall.html) (none)
 /// * [get snapshots](struct.SnapshotGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Snapshot {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#snapshot.
     pub kind: String,
@@ -1486,7 +1490,7 @@ impl RequestValue for RoomLeaveRequest {}
 /// 
 /// * [submit multiple scores](struct.ScoreSubmitMultipleCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerScoreListResponse {
     /// The score submissions statuses.
     #[serde(rename="submittedScores")]
@@ -1541,7 +1545,7 @@ impl Part for RoomLeaveDiagnostics {}
 /// 
 /// * [claim quest milestones](struct.QuestMilestoneClaimCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QuestMilestone {
     /// The current state of the milestone.
     /// Possible values are:  
@@ -1573,7 +1577,7 @@ impl Resource for QuestMilestone {}
 /// 
 /// * [rematch turn based matches](struct.TurnBasedMatcheRematchCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedMatchRematch {
     /// The newly created match; a rematch of the old match with the same participants.
     pub rematch: TurnBasedMatch,
@@ -1596,7 +1600,7 @@ impl ResponseResult for TurnBasedMatchRematch {}
 /// 
 /// * [get scores](struct.ScoreGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerLeaderboardScoreListResponse {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1622,7 +1626,7 @@ impl ResponseResult for PlayerLeaderboardScoreListResponse {}
 /// * [get applications](struct.ApplicationGetCall.html) (response)
 /// * [played applications](struct.ApplicationPlayedCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Application {
     /// The category of the application.
     pub category: ApplicationCategory,
@@ -1665,7 +1669,7 @@ impl ResponseResult for Application {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Played {
     /// True if the player was auto-matched with the currently authenticated user.
     #[serde(rename="autoMatched")]
@@ -1684,7 +1688,7 @@ impl Part for Played {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QuestContribution {
     /// The formatted value of the contribution as a string. Format depends on the configuration for the associated event definition in the Play Games Developer Console.
     #[serde(rename="formattedValue")]
@@ -1702,7 +1706,7 @@ impl Part for QuestContribution {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QuestCriterion {
     /// The ID of the event the criterion corresponds to.
     #[serde(rename="eventId")]
@@ -1734,7 +1738,7 @@ impl Part for QuestCriterion {}
 /// 
 /// * [list rooms](struct.RoomListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomList {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1752,7 +1756,7 @@ impl ResponseResult for RoomList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerLevel {
     /// The maximum experience points for this level.
     #[serde(rename="maxExperiencePoints")]
@@ -1773,7 +1777,7 @@ impl Part for PlayerLevel {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomAutoMatchStatus {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomAutoMatchStatus.
     pub kind: String,
@@ -1789,7 +1793,7 @@ impl Part for RoomAutoMatchStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedMatchData {
     /// The byte representation of the data (limited to 128 kB), as a Base64-encoded string with the URL_SAFE encoding option.
     pub data: String,
@@ -1807,7 +1811,7 @@ impl Part for TurnBasedMatchData {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventDefinition {
     /// Indicates whether the icon image being returned is a default image, or is game-provided.
     #[serde(rename="isDefaultImageUrl")]
@@ -1841,7 +1845,7 @@ impl Part for EventDefinition {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceIosDetails {
     /// Indicates that this instance is the default for new installations on iPhone devices.
     #[serde(rename="preferredForIphone")]
@@ -1872,7 +1876,7 @@ impl Part for InstanceIosDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceAndroidDetails {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceAndroidDetails.
     pub kind: String,
@@ -1898,7 +1902,7 @@ impl Part for InstanceAndroidDetails {}
 /// 
 /// * [reveal achievements](struct.AchievementRevealCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementRevealResponse {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementRevealResponse.
     pub kind: String,
@@ -1929,7 +1933,7 @@ impl ResponseResult for AchievementRevealResponse {}
 /// * [join rooms](struct.RoomJoinCall.html) (response)
 /// * [report status rooms](struct.RoomReportStatuCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Room {
     /// The status of the room.
     /// Possible values are:  
@@ -1981,7 +1985,7 @@ impl ResponseResult for Room {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardEntry {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardEntry.
     pub kind: String,
@@ -2085,7 +2089,7 @@ impl RequestValue for RoomCreateRequest {}
 /// 
 /// * [list quests](struct.QuestListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QuestListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
@@ -2108,7 +2112,7 @@ impl ResponseResult for QuestListResponse {}
 /// 
 /// * [list by player events](struct.EventListByPlayerCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerEventListResponse {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
@@ -2144,7 +2148,7 @@ impl Part for GamesAchievementIncrement {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedMatchModification {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchModification.
     pub kind: String,
@@ -2168,7 +2172,7 @@ impl Part for TurnBasedMatchModification {}
 /// 
 /// * [list achievements](struct.AchievementListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerAchievementListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
@@ -2213,7 +2217,7 @@ impl Resource for PushToken {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerLeaderboardScore {
     /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.
     #[serde(rename="writeTimestamp")]
@@ -2273,7 +2277,7 @@ impl RequestValue for PlayerScoreSubmissionList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SnapshotImage {
     /// The URL of the image. This URL may be invalidated at any time and should not be cached.
     pub url: String,
@@ -2294,7 +2298,7 @@ impl Part for SnapshotImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnonymousPlayer {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#anonymousPlayer.
     pub kind: String,
@@ -2378,7 +2382,7 @@ impl RequestValue for RoomJoinRequest {}
 /// 
 /// * [report status rooms](struct.RoomReportStatuCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomStatus {
     /// The status of the room.
     /// Possible values are:  
@@ -2432,7 +2436,7 @@ impl Part for PushTokenIdIos {}
 /// * [list leaderboards](struct.LeaderboardListCall.html) (none)
 /// * [get leaderboards](struct.LeaderboardGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Leaderboard {
     /// The icon for the leaderboard.
     #[serde(rename="iconUrl")]
@@ -2461,7 +2465,7 @@ impl ResponseResult for Leaderboard {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedMatchParticipant {
     /// True if this participant was auto-matched with the requesting player.
     #[serde(rename="autoMatched")]
@@ -2494,7 +2498,7 @@ impl Part for TurnBasedMatchParticipant {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardScoreRank {
     /// The number of scores in the leaderboard.
     #[serde(rename="numScores")]
@@ -2518,7 +2522,7 @@ impl Part for LeaderboardScoreRank {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerName {
     /// The given name of this player. In some places, this is known as the first name.
     #[serde(rename="givenName")]
@@ -2536,7 +2540,7 @@ impl Part for PlayerName {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerAchievement {
     /// The state of the achievement.
     /// Possible values are:  
@@ -2648,7 +2652,7 @@ impl RequestValue for AchievementUpdateMultipleRequest {}
 /// 
 /// * [list snapshots](struct.SnapshotListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SnapshotListResponse {
     /// Token corresponding to the next page of results. If there are no more results, the token is omitted.
     #[serde(rename="nextPageToken")]
@@ -2666,7 +2670,7 @@ impl ResponseResult for SnapshotListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApplicationCategory {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#applicationCategory.
     pub kind: String,
@@ -2771,7 +2775,7 @@ impl RequestValue for TurnBasedMatchTurn {}
 /// * [leave turn turn based matches](struct.TurnBasedMatcheLeaveTurnCall.html) (response)
 /// * [get turn based matches](struct.TurnBasedMatcheGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedMatch {
     /// The status of the match.
     /// Possible values are:  
@@ -2874,7 +2878,7 @@ impl RequestValue for EventRecordRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceWebDetails {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceWebDetails.
     pub kind: String,
@@ -2897,7 +2901,7 @@ impl Part for InstanceWebDetails {}
 /// 
 /// * [list categories by player metagame](struct.MetagameListCategoriesByPlayerCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CategoryListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
@@ -2915,7 +2919,7 @@ impl ResponseResult for CategoryListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerEvent {
     /// The ID of the event definition.
     #[serde(rename="definitionId")]
@@ -2946,7 +2950,7 @@ impl Part for PlayerEvent {}
 /// * [list players](struct.PlayerListCall.html) (none)
 /// * [get players](struct.PlayerGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Player {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#player.
     pub kind: String,
@@ -2984,7 +2988,7 @@ impl ResponseResult for Player {}
 /// 
 /// * [record events](struct.EventRecordCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventUpdateResponse {
     /// The current status of any updated events
     #[serde(rename="playerEvents")]
@@ -3011,7 +3015,7 @@ impl ResponseResult for EventUpdateResponse {}
 /// 
 /// * [check revisions](struct.RevisionCheckCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionCheckResponse {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#revisionCheckResponse.
     pub kind: String,
@@ -3069,7 +3073,7 @@ impl Part for AchievementUpdateRequest {}
 /// 
 /// * [list leaderboards](struct.LeaderboardListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
@@ -4779,7 +4783,7 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/games/v1/players/{playerId}/achievements".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{playerId}", "playerId")].iter() {
@@ -4875,55 +4879,50 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
+    ///
     /// Sets the *player id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> AchievementListCall<'a, C, A> {
         self._player_id = new_value.to_string();
         self
     }
-    /// Sets the *state* query property to the given value.
-    ///
-    /// 
     /// Tells the server to return only achievements with the specified state. If this parameter isn't specified, all achievements are returned.
+    ///
+    /// Sets the *state* query property to the given value.
     pub fn state(mut self, new_value: &str) -> AchievementListCall<'a, C, A> {
         self._state = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AchievementListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of achievement resources to return in the response, used for paging. For any response, the actual number of achievement resources returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AchievementListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> AchievementListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4953,8 +4952,8 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5049,7 +5048,7 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/games/v1/achievements/{achievementId}/increment".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{achievementId}", "achievementId")].iter() {
@@ -5145,41 +5144,39 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The ID of the achievement used by this method.
+    ///
     /// Sets the *achievement id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementIncrementCall<'a, C, A> {
         self._achievement_id = new_value.to_string();
         self
     }
+    /// The number of steps to increment.
+    ///
     /// Sets the *steps to increment* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The number of steps to increment.
     pub fn steps_to_increment(mut self, new_value: i32) -> AchievementIncrementCall<'a, C, A> {
         self._steps_to_increment = new_value;
         self
     }
-    /// Sets the *request id* query property to the given value.
-    ///
-    /// 
     /// A randomly generated numeric ID for each request specified by the caller. This number is used at the server to ensure that the request is handled correctly across retries.
+    ///
+    /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> AchievementIncrementCall<'a, C, A> {
         self._request_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementIncrementCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5209,8 +5206,8 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5300,7 +5297,7 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/games/v1/achievements/{achievementId}/setStepsAtLeast".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{achievementId}", "achievementId")].iter() {
@@ -5396,33 +5393,32 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// The ID of the achievement used by this method.
+    ///
     /// Sets the *achievement id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementSetStepsAtLeastCall<'a, C, A> {
         self._achievement_id = new_value.to_string();
         self
     }
+    /// The minimum value to set the steps to.
+    ///
     /// Sets the *steps* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The minimum value to set the steps to.
     pub fn steps(mut self, new_value: i32) -> AchievementSetStepsAtLeastCall<'a, C, A> {
         self._steps = new_value;
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementSetStepsAtLeastCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5452,8 +5448,8 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5546,7 +5542,7 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/games/v1/achievements/updateMultiple".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -5626,22 +5622,21 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &AchievementUpdateMultipleRequest) -> AchievementUpdateMultipleCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementUpdateMultipleCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5671,8 +5666,8 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5760,7 +5755,7 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/games/v1/achievements/{achievementId}/reveal".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{achievementId}", "achievementId")].iter() {
@@ -5856,23 +5851,22 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The ID of the achievement used by this method.
+    ///
     /// Sets the *achievement id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementRevealCall<'a, C, A> {
         self._achievement_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementRevealCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5902,8 +5896,8 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5991,7 +5985,7 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/games/v1/achievements/{achievementId}/unlock".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{achievementId}", "achievementId")].iter() {
@@ -6087,23 +6081,22 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The ID of the achievement used by this method.
+    ///
     /// Sets the *achievement id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementUnlockCall<'a, C, A> {
         self._achievement_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementUnlockCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6133,8 +6126,8 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6227,7 +6220,7 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/games/v1/leaderboards/{leaderboardId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId")].iter() {
@@ -6323,31 +6316,29 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID of the leaderboard.
+    ///
     /// Sets the *leaderboard id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardGetCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> LeaderboardGetCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6377,8 +6368,8 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6479,7 +6470,7 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/games/v1/leaderboards".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -6551,37 +6542,33 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LeaderboardListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of leaderboards to return in the response. For any response, the actual number of leaderboards returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> LeaderboardListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> LeaderboardListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6611,8 +6598,8 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6717,7 +6704,7 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
 
         let mut url = "https://www.googleapis.com/games/v1/players/{playerId}/categories/{collection}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{playerId}", "playerId"), ("{collection}", "collection")].iter() {
@@ -6813,57 +6800,53 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
+    ///
     /// Sets the *player id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C, A> {
         self._player_id = new_value.to_string();
         self
     }
+    /// The collection of categories for which data will be returned.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection of categories for which data will be returned.
     pub fn collection(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of category resources to return in the response, used for paging. For any response, the actual number of category resources returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> MetagameListCategoriesByPlayerCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetagameListCategoriesByPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6893,8 +6876,8 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6980,7 +6963,7 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/games/v1/metagameConfig".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -7052,13 +7035,12 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetagameGetMetagameConfigCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7088,8 +7070,8 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7192,7 +7174,7 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/games/v1/players/me/players/{collection}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{collection}", "collection")].iter() {
@@ -7288,47 +7270,43 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Collection of players being retrieved
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Collection of players being retrieved
     pub fn collection(mut self, new_value: &str) -> PlayerListCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PlayerListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of player resources to return in the response, used for paging. For any response, the actual number of player resources returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> PlayerListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> PlayerListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlayerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7358,8 +7336,8 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7452,7 +7430,7 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/games/v1/players/{playerId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{playerId}", "playerId")].iter() {
@@ -7548,31 +7526,29 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
+    ///
     /// Sets the *player id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> PlayerGetCall<'a, C, A> {
         self._player_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> PlayerGetCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlayerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7602,8 +7578,8 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7696,7 +7672,7 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/games/v1/quests/{questId}/accept".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{questId}", "questId")].iter() {
@@ -7792,31 +7768,29 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the quest.
+    ///
     /// Sets the *quest id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the quest.
     pub fn quest_id(mut self, new_value: &str) -> QuestAcceptCall<'a, C, A> {
         self._quest_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> QuestAcceptCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestAcceptCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7846,8 +7820,8 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7950,7 +7924,7 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/games/v1/players/{playerId}/quests".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{playerId}", "playerId")].iter() {
@@ -8046,47 +8020,43 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
+    ///
     /// Sets the *player id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> QuestListCall<'a, C, A> {
         self._player_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> QuestListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of quest resources to return in the response, used for paging. For any response, the actual number of quest resources returned may be less than the specified maxResults. Acceptable values are 1 to 50, inclusive. (Default: 50).
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> QuestListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> QuestListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8116,8 +8086,8 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8306,31 +8276,29 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the snapshot.
+    ///
     /// Sets the *snapshot id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the snapshot.
     pub fn snapshot_id(mut self, new_value: &str) -> SnapshotGetCall<'a, C, A> {
         self._snapshot_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> SnapshotGetCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SnapshotGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8360,8 +8328,8 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DriveAppdata`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8560,47 +8528,43 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
+    ///
     /// Sets the *player id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> SnapshotListCall<'a, C, A> {
         self._player_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> SnapshotListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of snapshot resources to return in the response, used for paging. For any response, the actual number of snapshot resources returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> SnapshotListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> SnapshotListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SnapshotListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8630,8 +8594,8 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DriveAppdata`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8718,7 +8682,7 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/dismiss".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
@@ -8804,23 +8768,22 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// The ID of the match.
+    ///
     /// Sets the *match id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheDismisCall<'a, C, A> {
         self._match_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheDismisCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8850,8 +8813,8 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8962,7 +8925,7 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/sync".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -9034,53 +8997,47 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TurnBasedMatcheSyncCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of matches to return in the response, used for paging. For any response, the actual number of matches to return may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> TurnBasedMatcheSyncCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *max completed matches* query property to the given value.
-    ///
-    /// 
     /// The maximum number of completed or canceled matches to return in the response. If not set, all matches returned could be completed or canceled.
+    ///
+    /// Sets the *max completed matches* query property to the given value.
     pub fn max_completed_matches(mut self, new_value: i32) -> TurnBasedMatcheSyncCall<'a, C, A> {
         self._max_completed_matches = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheSyncCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *include match data* query property to the given value.
-    ///
-    /// 
     /// True if match data should be returned in the response. Note that not all data will necessarily be returned if include_match_data is true; the server may decide to only return data for some of the matches to limit download size for the client. The remainder of the data for these matches will be retrievable on request.
+    ///
+    /// Sets the *include match data* query property to the given value.
     pub fn include_match_data(mut self, new_value: bool) -> TurnBasedMatcheSyncCall<'a, C, A> {
         self._include_match_data = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheSyncCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9110,8 +9067,8 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9204,7 +9161,7 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/decline".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
@@ -9300,31 +9257,29 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The ID of the match.
+    ///
     /// Sets the *match id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheDeclineCall<'a, C, A> {
         self._match_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheDeclineCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheDeclineCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9354,8 +9309,8 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9453,7 +9408,7 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
@@ -9549,39 +9504,36 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The ID of the match.
+    ///
     /// Sets the *match id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheGetCall<'a, C, A> {
         self._match_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheGetCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *include match data* query property to the given value.
-    ///
-    /// 
     /// Get match data along with metadata.
+    ///
+    /// Sets the *include match data* query property to the given value.
     pub fn include_match_data(mut self, new_value: bool) -> TurnBasedMatcheGetCall<'a, C, A> {
         self._include_match_data = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9611,8 +9563,8 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9710,7 +9662,7 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/create".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -9790,30 +9742,28 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &TurnBasedMatchCreateRequest) -> TurnBasedMatcheCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheCreateCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9843,8 +9793,8 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9937,7 +9887,7 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/join".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
@@ -10033,31 +9983,29 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// The ID of the match.
+    ///
     /// Sets the *match id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheJoinCall<'a, C, A> {
         self._match_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheJoinCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheJoinCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10087,8 +10035,8 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10188,7 +10136,7 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/leaveTurn".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
@@ -10284,49 +10232,46 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The ID of the match.
+    ///
     /// Sets the *match id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheLeaveTurnCall<'a, C, A> {
         self._match_id = new_value.to_string();
         self
     }
+    /// The version of the match being updated.
+    ///
     /// Sets the *match version* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The version of the match being updated.
     pub fn match_version(mut self, new_value: i32) -> TurnBasedMatcheLeaveTurnCall<'a, C, A> {
         self._match_version = new_value;
         self
     }
-    /// Sets the *pending participant id* query property to the given value.
-    ///
-    /// 
     /// The ID of another participant who should take their turn next. If not set, the match will wait for other player(s) to join via automatching; this is only valid if automatch criteria is set on the match with remaining slots for automatched players.
+    ///
+    /// Sets the *pending participant id* query property to the given value.
     pub fn pending_participant_id(mut self, new_value: &str) -> TurnBasedMatcheLeaveTurnCall<'a, C, A> {
         self._pending_participant_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheLeaveTurnCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheLeaveTurnCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10356,8 +10301,8 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10444,7 +10389,7 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/cancel".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
@@ -10530,23 +10475,22 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// The ID of the match.
+    ///
     /// Sets the *match id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheCancelCall<'a, C, A> {
         self._match_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheCancelCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10576,8 +10520,8 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10677,7 +10621,7 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/finish".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
@@ -10781,40 +10725,38 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &TurnBasedMatchResults) -> TurnBasedMatcheFinishCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the match.
+    ///
     /// Sets the *match id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheFinishCall<'a, C, A> {
         self._match_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheFinishCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheFinishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10844,8 +10786,8 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10938,7 +10880,7 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/leave".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
@@ -11034,31 +10976,29 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The ID of the match.
+    ///
     /// Sets the *match id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheLeaveCall<'a, C, A> {
         self._match_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheLeaveCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheLeaveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11088,8 +11028,8 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11200,7 +11140,7 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -11272,53 +11212,47 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> TurnBasedMatcheListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of matches to return in the response, used for paging. For any response, the actual number of matches to return may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> TurnBasedMatcheListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *max completed matches* query property to the given value.
-    ///
-    /// 
     /// The maximum number of completed or canceled matches to return in the response. If not set, all matches returned could be completed or canceled.
+    ///
+    /// Sets the *max completed matches* query property to the given value.
     pub fn max_completed_matches(mut self, new_value: i32) -> TurnBasedMatcheListCall<'a, C, A> {
         self._max_completed_matches = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *include match data* query property to the given value.
-    ///
-    /// 
     /// True if match data should be returned in the response. Note that not all data will necessarily be returned if include_match_data is true; the server may decide to only return data for some of the matches to limit download size for the client. The remainder of the data for these matches will be retrievable on request.
+    ///
+    /// Sets the *include match data* query property to the given value.
     pub fn include_match_data(mut self, new_value: bool) -> TurnBasedMatcheListCall<'a, C, A> {
         self._include_match_data = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11348,8 +11282,8 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11449,7 +11383,7 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/turn".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
@@ -11553,40 +11487,38 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &TurnBasedMatchTurn) -> TurnBasedMatcheTakeTurnCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the match.
+    ///
     /// Sets the *match id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheTakeTurnCall<'a, C, A> {
         self._match_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheTakeTurnCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheTakeTurnCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11616,8 +11548,8 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11715,7 +11647,7 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/games/v1/turnbasedmatches/{matchId}/rematch".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
@@ -11811,39 +11743,36 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The ID of the match.
+    ///
     /// Sets the *match id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheRematchCall<'a, C, A> {
         self._match_id = new_value.to_string();
         self
     }
-    /// Sets the *request id* query property to the given value.
-    ///
-    /// 
     /// A randomly generated numeric ID for each request specified by the caller. This number is used at the server to ensure that the request is handled correctly across retries.
+    ///
+    /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> TurnBasedMatcheRematchCall<'a, C, A> {
         self._request_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheRematchCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheRematchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11873,8 +11802,8 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11972,7 +11901,7 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         let mut url = "https://www.googleapis.com/games/v1/applications/{applicationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{applicationId}", "applicationId")].iter() {
@@ -12068,39 +11997,36 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The application ID from the Google Play developer console.
+    ///
     /// Sets the *application id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The application ID from the Google Play developer console.
     pub fn application_id(mut self, new_value: &str) -> ApplicationGetCall<'a, C, A> {
         self._application_id = new_value.to_string();
         self
     }
-    /// Sets the *platform type* query property to the given value.
-    ///
-    /// 
     /// Restrict application details returned to the specific platform.
+    ///
+    /// Sets the *platform type* query property to the given value.
     pub fn platform_type(mut self, new_value: &str) -> ApplicationGetCall<'a, C, A> {
         self._platform_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> ApplicationGetCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApplicationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12130,8 +12056,8 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12216,7 +12142,7 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/games/v1/applications/played".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -12278,13 +12204,12 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApplicationPlayedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12314,8 +12239,8 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12408,7 +12333,7 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{roomId}", "roomId")].iter() {
@@ -12504,31 +12429,29 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// The ID of the room.
+    ///
     /// Sets the *room id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomGetCall<'a, C, A> {
         self._room_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> RoomGetCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12558,8 +12481,8 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12659,7 +12582,7 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}/leave".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{roomId}", "roomId")].iter() {
@@ -12763,40 +12686,38 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &RoomLeaveRequest) -> RoomLeaveCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the room.
+    ///
     /// Sets the *room id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomLeaveCall<'a, C, A> {
         self._room_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> RoomLeaveCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomLeaveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12826,8 +12747,8 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12928,7 +12849,7 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/games/v1/rooms".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -13000,37 +12921,33 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> RoomListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of rooms to return in the response, used for paging. For any response, the actual number of rooms to return may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> RoomListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> RoomListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13060,8 +12977,8 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13161,7 +13078,7 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}/reportstatus".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{roomId}", "roomId")].iter() {
@@ -13265,40 +13182,38 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &RoomP2PStatuses) -> RoomReportStatuCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the room.
+    ///
     /// Sets the *room id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomReportStatuCall<'a, C, A> {
         self._room_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> RoomReportStatuCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomReportStatuCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13328,8 +13243,8 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13427,7 +13342,7 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/games/v1/rooms/create".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -13507,30 +13422,28 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &RoomCreateRequest) -> RoomCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> RoomCreateCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13560,8 +13473,8 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13654,7 +13567,7 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}/decline".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{roomId}", "roomId")].iter() {
@@ -13750,31 +13663,29 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the room.
+    ///
     /// Sets the *room id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomDeclineCall<'a, C, A> {
         self._room_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> RoomDeclineCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomDeclineCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13804,8 +13715,8 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13892,7 +13803,7 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}/dismiss".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{roomId}", "roomId")].iter() {
@@ -13978,23 +13889,22 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the room.
+    ///
     /// Sets the *room id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomDismisCall<'a, C, A> {
         self._room_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomDismisCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14024,8 +13934,8 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14125,7 +14035,7 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/games/v1/rooms/{roomId}/join".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{roomId}", "roomId")].iter() {
@@ -14229,40 +14139,38 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &RoomJoinRequest) -> RoomJoinCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the room.
+    ///
     /// Sets the *room id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomJoinCall<'a, C, A> {
         self._room_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> RoomJoinCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomJoinCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14292,8 +14200,8 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14393,7 +14301,7 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/games/v1/leaderboards/{leaderboardId}/scores".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId")].iter() {
@@ -14489,49 +14397,46 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the leaderboard.
+    ///
     /// Sets the *leaderboard id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
+    /// The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units.
+    ///
     /// Sets the *score* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units.
     pub fn score(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
         self._score = new_value.to_string();
         self
     }
-    /// Sets the *score tag* query property to the given value.
-    ///
-    /// 
     /// Additional information about the score you're submitting. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
+    ///
+    /// Sets the *score tag* query property to the given value.
     pub fn score_tag(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
         self._score_tag = Some(new_value.to_string());
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreSubmitCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14561,8 +14466,8 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14669,7 +14574,7 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = "https://www.googleapis.com/games/v1/leaderboards/{leaderboardId}/scores/{collection}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId"), ("{collection}", "collection")].iter() {
@@ -14765,67 +14670,63 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The ID of the leaderboard.
+    ///
     /// Sets the *leaderboard id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
+    /// The collection of scores you're requesting.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection of scores you're requesting.
     pub fn collection(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
+    /// The time span for the scores and ranks you're requesting.
+    ///
     /// Sets the *time span* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The time span for the scores and ranks you're requesting.
     pub fn time_span(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
         self._time_span = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ScoreListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -14855,8 +14756,8 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14969,7 +14870,7 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = "https://www.googleapis.com/games/v1/players/{playerId}/leaderboards/{leaderboardId}/scores/{timeSpan}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{playerId}", "playerId"), ("{leaderboardId}", "leaderboardId"), ("{timeSpan}", "timeSpan")].iter() {
@@ -15065,75 +14966,70 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
+    ///
     /// Sets the *player id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
         self._player_id = new_value.to_string();
         self
     }
+    /// The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.
+    ///
     /// Sets the *leaderboard id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.
     pub fn leaderboard_id(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
+    /// The time span for the scores and ranks you're requesting.
+    ///
     /// Sets the *time span* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The time span for the scores and ranks you're requesting.
     pub fn time_span(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
         self._time_span = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ScoreGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *include rank type* query property to the given value.
-    ///
-    /// 
     /// The types of ranks to return. If the parameter is omitted, no ranks will be returned.
+    ///
+    /// Sets the *include rank type* query property to the given value.
     pub fn include_rank_type(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
         self._include_rank_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15163,8 +15059,8 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15262,7 +15158,7 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/games/v1/leaderboards/scores".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -15342,30 +15238,28 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &PlayerScoreSubmissionList) -> ScoreSubmitMultipleCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> ScoreSubmitMultipleCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreSubmitMultipleCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15395,8 +15289,8 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15513,7 +15407,7 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/games/v1/leaderboards/{leaderboardId}/window/{collection}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId"), ("{collection}", "collection")].iter() {
@@ -15609,83 +15503,77 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The ID of the leaderboard.
+    ///
     /// Sets the *leaderboard id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
+    /// The collection of scores you're requesting.
+    ///
     /// Sets the *collection* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The collection of scores you're requesting.
     pub fn collection(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
         self._collection = new_value.to_string();
         self
     }
+    /// The time span for the scores and ranks you're requesting.
+    ///
     /// Sets the *time span* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The time span for the scores and ranks you're requesting.
     pub fn time_span(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
         self._time_span = new_value.to_string();
         self
     }
-    /// Sets the *return top if absent* query property to the given value.
-    ///
-    /// 
     /// True if the top scores should be returned when the player is not in the leaderboard. Defaults to true.
+    ///
+    /// Sets the *return top if absent* query property to the given value.
     pub fn return_top_if_absent(mut self, new_value: bool) -> ScoreListWindowCall<'a, C, A> {
         self._return_top_if_absent = Some(new_value);
         self
     }
-    /// Sets the *results above* query property to the given value.
-    ///
-    /// 
     /// The preferred number of scores to return above the player's score. More scores may be returned if the player is at the bottom of the leaderboard; fewer may be returned if the player is at the top. Must be less than or equal to maxResults.
+    ///
+    /// Sets the *results above* query property to the given value.
     pub fn results_above(mut self, new_value: i32) -> ScoreListWindowCall<'a, C, A> {
         self._results_above = Some(new_value);
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ScoreListWindowCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreListWindowCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15715,8 +15603,8 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15808,7 +15696,7 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/games/v1/pushtokens/remove".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -15878,22 +15766,21 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &PushTokenId) -> PushtokenRemoveCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PushtokenRemoveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -15923,8 +15810,8 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16016,7 +15903,7 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/games/v1/pushtokens".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -16086,22 +15973,21 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &PushToken) -> PushtokenUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PushtokenUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16131,8 +16017,8 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16220,7 +16106,7 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/games/v1/revisions/check".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -16292,28 +16178,27 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Sets the *client revision* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    /// 
     /// The revision of the client SDK used by your application. Format:
     /// [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:
     ///  
     /// - "ANDROID" - Client is running the Android SDK. 
     /// - "IOS" - Client is running the iOS SDK. 
     /// - "WEB_APP" - Client is running as a Web App.
+    ///
+    /// Sets the *client revision* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
     pub fn client_revision(mut self, new_value: &str) -> RevisionCheckCall<'a, C, A> {
         self._client_revision = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionCheckCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16343,8 +16228,8 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16445,7 +16330,7 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/games/v1/eventDefinitions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -16517,37 +16402,33 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> EventListDefinitionCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of event definitions to return in the response, used for paging. For any response, the actual number of event definitions to return may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> EventListDefinitionCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> EventListDefinitionCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventListDefinitionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16577,8 +16458,8 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16676,7 +16557,7 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/games/v1/events".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -16756,30 +16637,28 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EventRecordRequest) -> EventRecordCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> EventRecordCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventRecordCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -16809,8 +16688,8 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16911,7 +16790,7 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/games/v1/events".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -16983,37 +16862,33 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> EventListByPlayerCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of events to return in the response, used for paging. For any response, the actual number of events to return may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> EventListByPlayerCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> EventListByPlayerCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventListByPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17043,8 +16918,8 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17135,7 +17010,7 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/games/v1/quests/{questId}/milestones/{milestoneId}/claim".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{questId}", "questId"), ("{milestoneId}", "milestoneId")].iter() {
@@ -17221,43 +17096,42 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// The ID of the quest.
+    ///
     /// Sets the *quest id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the quest.
     pub fn quest_id(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, A> {
         self._quest_id = new_value.to_string();
         self
     }
+    /// The ID of the milestone.
+    ///
     /// Sets the *milestone id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the milestone.
     pub fn milestone_id(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, A> {
         self._milestone_id = new_value.to_string();
         self
     }
+    /// A numeric ID to ensure that the request is handled correctly across retries. Your client application must generate this ID randomly.
+    ///
     /// Sets the *request id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A numeric ID to ensure that the request is handled correctly across retries. Your client application must generate this ID randomly.
     pub fn request_id(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, A> {
         self._request_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestMilestoneClaimCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17287,8 +17161,8 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17389,7 +17263,7 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/games/v1/achievements".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DriveAppdata.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
@@ -17461,37 +17335,33 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of achievement resources to return in the response, used for paging. For any response, the actual number of achievement resources returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AchievementDefinitionListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementDefinitionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -17521,8 +17391,8 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

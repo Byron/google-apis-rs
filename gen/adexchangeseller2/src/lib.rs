@@ -122,16 +122,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -300,16 +302,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -360,7 +364,7 @@ impl<'a, C, A> AdExchangeSeller<C, A>
 /// 
 /// * [urlchannels list accounts](struct.AccountUrlchannelListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlChannels {
     /// Continuation token used to page through URL channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
@@ -398,7 +402,7 @@ impl ResponseResult for UrlChannels {}
 /// * [preferreddeals list accounts](struct.AccountPreferreddealListCall.html) (none)
 /// * [get accounts](struct.AccountGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
     /// Kind of resource this is, in this case adexchangeseller#account.
     pub kind: String,
@@ -421,7 +425,7 @@ impl ResponseResult for Account {}
 /// 
 /// * [customchannels list accounts](struct.AccountCustomchannelListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomChannels {
     /// Continuation token used to page through custom channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
@@ -446,7 +450,7 @@ impl ResponseResult for CustomChannels {}
 /// 
 /// * [alerts list accounts](struct.AccountAlertListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Alerts {
     /// The alerts returned in this list response.
     pub items: Vec<Alert>,
@@ -461,7 +465,7 @@ impl ResponseResult for Alerts {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SavedReport {
     /// Kind of resource this is, in this case adexchangeseller#savedReport.
     pub kind: String,
@@ -478,7 +482,7 @@ impl Part for SavedReport {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdClient {
     /// This ad client's product code, which corresponds to the PRODUCT_CODE report dimension.
     #[serde(rename="productCode")]
@@ -507,7 +511,7 @@ impl Part for AdClient {}
 /// 
 /// * [preferreddeals list accounts](struct.AccountPreferreddealListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PreferredDeals {
     /// The preferred deals returned in this list response.
     pub items: Vec<PreferredDeal>,
@@ -522,7 +526,7 @@ impl ResponseResult for PreferredDeals {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportingMetadataEntry {
     /// The names of the metrics which the dimension or metric this reporting metadata entry describes requires to also be present in order for the report to be valid. Omitting these will not cause an error or warning, but may result in data which cannot be correctly interpreted.
     #[serde(rename="requiredMetrics")]
@@ -552,7 +556,7 @@ impl Part for ReportingMetadataEntry {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomChannelTargetingInfo {
     /// The external description of the channel.
     pub description: String,
@@ -580,7 +584,7 @@ impl Part for CustomChannelTargetingInfo {}
 /// * [metadata dimensions list accounts](struct.AccountMetadataDimensionListCall.html) (response)
 /// * [metadata metrics list accounts](struct.AccountMetadataMetricListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
     /// no description provided
     pub items: Vec<ReportingMetadataEntry>,
@@ -595,7 +599,7 @@ impl ResponseResult for Metadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlChannel {
     /// Kind of resource this is, in this case adexchangeseller#urlChannel.
     pub kind: String,
@@ -618,7 +622,7 @@ impl Part for UrlChannel {}
 /// 
 /// * [adclients list accounts](struct.AccountAdclientListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdClients {
     /// Continuation token used to page through ad clients. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
@@ -643,7 +647,7 @@ impl ResponseResult for AdClients {}
 /// 
 /// * [preferreddeals get accounts](struct.AccountPreferreddealGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PreferredDeal {
     /// Kind of resource this is, in this case adexchangeseller#preferredDeal.
     pub kind: String,
@@ -681,7 +685,7 @@ impl ResponseResult for PreferredDeal {}
 /// 
 /// * [reports saved list accounts](struct.AccountReportSavedListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SavedReports {
     /// Continuation token used to page through saved reports. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
@@ -701,7 +705,7 @@ impl ResponseResult for SavedReports {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportHeaders {
     /// The currency of this column. Only present if the header type is METRIC_CURRENCY.
     pub currency: String,
@@ -720,7 +724,7 @@ impl Part for ReportHeaders {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Alert {
     /// Unique identifier of this alert. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: String,
@@ -747,7 +751,7 @@ impl Part for Alert {}
 /// 
 /// * [list accounts](struct.AccountListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Accounts {
     /// Continuation token used to page through accounts. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
@@ -773,7 +777,7 @@ impl ResponseResult for Accounts {}
 /// * [reports saved generate accounts](struct.AccountReportSavedGenerateCall.html) (response)
 /// * [reports generate accounts](struct.AccountReportGenerateCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Report {
     /// The header information of the columns requested in the report. This is a list of headers; one for each dimension in the request, followed by one for each metric in the request.
     pub headers: Vec<ReportHeaders>,
@@ -804,7 +808,7 @@ impl ResponseResult for Report {}
 /// 
 /// * [customchannels get accounts](struct.AccountCustomchannelGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomChannel {
     /// Kind of resource this is, in this case adexchangeseller#customChannel.
     pub kind: String,
@@ -1329,57 +1333,53 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    /// Account owning the saved report.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account owning the saved report.
     pub fn account_id(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// The saved report to retrieve.
+    ///
     /// Sets the *saved report id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The saved report to retrieve.
     pub fn saved_report_id(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._saved_report_id = new_value.to_string();
         self
     }
-    /// Sets the *start index* query property to the given value.
-    ///
-    /// 
     /// Index of the first row of report data to return.
+    ///
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of rows of report data to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1409,8 +1409,8 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1594,23 +1594,22 @@ impl<'a, C, A> AccountMetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// Account with visibility to the metrics.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account with visibility to the metrics.
     pub fn account_id(mut self, new_value: &str) -> AccountMetadataMetricListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountMetadataMetricListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1640,8 +1639,8 @@ impl<'a, C, A> AccountMetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1901,103 +1900,95 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// Account which owns the generated report.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account which owns the generated report.
     pub fn account_id(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
+    ///
     /// Sets the *start date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn start_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._start_date = new_value.to_string();
         self
     }
+    /// End of the date range to report on in "YYYY-MM-DD" format, inclusive.
+    ///
     /// Sets the *end date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// End of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn end_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._end_date = new_value.to_string();
         self
     }
-    /// Sets the *start index* query property to the given value.
-    ///
-    /// 
     /// Index of the first row of report data to return.
+    ///
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> AccountReportGenerateCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
+    /// The name of a dimension or metric to sort the resulting report on, optionally prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.
+    ///
     /// Append the given value to the *sort* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The name of a dimension or metric to sort the resulting report on, optionally prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.
     pub fn add_sort(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._sort.push(new_value.to_string());
         self
     }
+    /// Numeric columns to include in the report.
+    ///
     /// Append the given value to the *metric* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Numeric columns to include in the report.
     pub fn add_metric(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._metric.push(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of rows of report data to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> AccountReportGenerateCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
+    /// Filters to be run on the report.
+    ///
     /// Append the given value to the *filter* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Filters to be run on the report.
     pub fn add_filter(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._filter.push(new_value.to_string());
         self
     }
+    /// Dimensions to base the report on.
+    ///
     /// Append the given value to the *dimension* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Dimensions to base the report on.
     pub fn add_dimension(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._dimension.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountReportGenerateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2027,8 +2018,8 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2224,49 +2215,46 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// Account to which the ad client belongs.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account to which the ad client belongs.
     pub fn account_id(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Ad client for which to list URL channels.
+    ///
     /// Sets the *ad client id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Ad client for which to list URL channels.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A continuation token, used to page through URL channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of URL channels to include in the response, used for paging.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> AccountUrlchannelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUrlchannelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2296,8 +2284,8 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2491,39 +2479,36 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// Account owning the saved reports.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account owning the saved reports.
     pub fn account_id(mut self, new_value: &str) -> AccountReportSavedListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A continuation token, used to page through saved reports. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AccountReportSavedListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of saved reports to include in the response, used for paging.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AccountReportSavedListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountReportSavedListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2553,8 +2538,8 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2740,33 +2725,32 @@ impl<'a, C, A> AccountPreferreddealGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// Account owning the deal.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account owning the deal.
     pub fn account_id(mut self, new_value: &str) -> AccountPreferreddealGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Preferred deal to get information about.
+    ///
     /// Sets the *deal id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Preferred deal to get information about.
     pub fn deal_id(mut self, new_value: &str) -> AccountPreferreddealGetCall<'a, C, A> {
         self._deal_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPreferreddealGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2796,8 +2780,8 @@ impl<'a, C, A> AccountPreferreddealGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2991,39 +2975,36 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// Account to which the ad client belongs.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account to which the ad client belongs.
     pub fn account_id(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of ad clients to include in the response, used for paging.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> AccountAdclientListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdclientListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3053,8 +3034,8 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3238,23 +3219,22 @@ impl<'a, C, A> AccountMetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
+    /// Account with visibility to the dimensions.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account with visibility to the dimensions.
     pub fn account_id(mut self, new_value: &str) -> AccountMetadataDimensionListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountMetadataDimensionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3284,8 +3264,8 @@ impl<'a, C, A> AccountMetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyp
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3473,43 +3453,42 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// Account to which the ad client belongs.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account to which the ad client belongs.
     pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Ad client which contains the custom channel.
+    ///
     /// Sets the *ad client id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Ad client which contains the custom channel.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
+    /// Custom channel to retrieve.
+    ///
     /// Sets the *custom channel id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Custom channel to retrieve.
     pub fn custom_channel_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, A> {
         self._custom_channel_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCustomchannelGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3539,8 +3518,8 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3736,49 +3715,46 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// Account to which the ad client belongs.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account to which the ad client belongs.
     pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
+    /// Ad client for which to list custom channels.
+    ///
     /// Sets the *ad client id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Ad client for which to list custom channels.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A continuation token, used to page through custom channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of custom channels to include in the response, used for paging.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> AccountCustomchannelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCustomchannelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3808,8 +3784,8 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3977,29 +3953,26 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A continuation token, used to page through accounts. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of accounts to include in the response, used for paging.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AccountListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4029,8 +4002,8 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4219,31 +4192,29 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// Account owning the alerts.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account owning the alerts.
     pub fn account_id(mut self, new_value: &str) -> AccountAlertListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// The locale to use for translating alert messages. The account locale will be used if this is not supplied. The AdSense default (English) will be used if the supplied locale is invalid or unsupported.
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> AccountAlertListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAlertListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4273,8 +4244,8 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4458,23 +4429,22 @@ impl<'a, C, A> AccountPreferreddealListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// Account owning the deals.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account owning the deals.
     pub fn account_id(mut self, new_value: &str) -> AccountPreferreddealListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPreferreddealListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4504,8 +4474,8 @@ impl<'a, C, A> AccountPreferreddealListCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4689,23 +4659,22 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Account to get information about. Tip: 'myaccount' is a valid ID.
+    ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Account to get information about. Tip: 'myaccount' is a valid ID.
     pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4735,8 +4704,8 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeSellerReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

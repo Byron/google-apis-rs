@@ -112,16 +112,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -298,16 +300,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -370,7 +374,7 @@ impl<'a, C, A> YouTubeAnalytics<C, A>
 /// 
 /// * [list batch report definitions](struct.BatchReportDefinitionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchReportDefinitionList {
     /// A list of batchReportDefinition resources that match the request criteria.
     pub items: Vec<BatchReportDefinition>,
@@ -440,7 +444,7 @@ impl Part for GroupContentDetails {}
 /// 
 /// * [list groups](struct.GroupListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupListResponse {
     /// no description provided
     pub items: Vec<Group>,
@@ -457,7 +461,7 @@ impl ResponseResult for GroupListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultTableColumnHeaders {
     /// The type of the data in the column (STRING, INTEGER, FLOAT, etc.).
     #[serde(rename="dataType")]
@@ -482,7 +486,7 @@ impl Part for ResultTableColumnHeaders {}
 /// 
 /// * [list group items](struct.GroupItemListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupItemListResponse {
     /// no description provided
     pub items: Vec<GroupItem>,
@@ -499,7 +503,7 @@ impl ResponseResult for GroupItemListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchReportOutputs {
     /// Cloud storage URL to download this report. This URL is valid for 30 minutes.
     #[serde(rename="downloadUrl")]
@@ -588,7 +592,7 @@ impl Part for GroupItemResource {}
 /// 
 /// * [list batch report definitions](struct.BatchReportDefinitionListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchReportDefinition {
     /// Status of the report definition.
     pub status: Option<String>,
@@ -615,7 +619,7 @@ impl Resource for BatchReportDefinition {}
 /// 
 /// * [query reports](struct.ReportQueryCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultTable {
     /// This value specifies the type of data included in the API response. For the query method, the kind property value will be youtubeAnalytics#resultTable.
     pub kind: String,
@@ -638,7 +642,7 @@ impl ResponseResult for ResultTable {}
 /// 
 /// * [list batch reports](struct.BatchReportListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchReport {
     /// This value specifies the type of data of this item. For batch report the kind property value is youtubeAnalytics#batchReport.
     pub kind: Option<String>,
@@ -664,7 +668,7 @@ impl Resource for BatchReport {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchReportTimeSpan {
     /// End of the period included in the report. Inclusive. For reports containing all entities endTime is not set.
     #[serde(rename="endTime")]
@@ -687,7 +691,7 @@ impl Part for BatchReportTimeSpan {}
 /// 
 /// * [list batch reports](struct.BatchReportListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchReportList {
     /// A list of batchReport resources that match the request criteria.
     pub items: Vec<BatchReport>,
@@ -1212,7 +1216,7 @@ impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/reports".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::YoutubeReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
 
         
@@ -1284,103 +1288,96 @@ impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// Identifies the YouTube channel or content owner for which you are retrieving YouTube Analytics data.
+    /// - To request data for a YouTube user, set the ids parameter value to channel==CHANNEL_ID, where CHANNEL_ID specifies the unique YouTube channel ID.
+    /// - To request data for a YouTube CMS content owner, set the ids parameter value to contentOwner==OWNER_NAME, where OWNER_NAME is the CMS name of the content owner.
+    ///
     /// Sets the *ids* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Identifies the YouTube channel or content owner for which you are retrieving YouTube Analytics data.
-    /// - To request data for a YouTube user, set the ids parameter value to channel==CHANNEL_ID, where CHANNEL_ID specifies the unique YouTube channel ID.
-    /// - To request data for a YouTube CMS content owner, set the ids parameter value to contentOwner==OWNER_NAME, where OWNER_NAME is the CMS name of the content owner.
     pub fn ids(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._ids = new_value.to_string();
         self
     }
+    /// The start date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
+    ///
     /// Sets the *start-date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The start date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
     pub fn start_date(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._start_date = new_value.to_string();
         self
     }
+    /// The end date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
+    ///
     /// Sets the *end-date* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The end date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
     pub fn end_date(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._end_date = new_value.to_string();
         self
     }
+    /// A comma-separated list of YouTube Analytics metrics, such as views or likes,dislikes. See the Available Reports document for a list of the reports that you can retrieve and the metrics available in each report, and see the Metrics document for definitions of those metrics.
+    ///
     /// Sets the *metrics* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A comma-separated list of YouTube Analytics metrics, such as views or likes,dislikes. See the Available Reports document for a list of the reports that you can retrieve and the metrics available in each report, and see the Metrics document for definitions of those metrics.
     pub fn metrics(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._metrics = new_value.to_string();
         self
     }
-    /// Sets the *start-index* query property to the given value.
-    ///
-    /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter (one-based, inclusive).
+    ///
+    /// Sets the *start-index* query property to the given value.
     pub fn start_index(mut self, new_value: i32) -> ReportQueryCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *sort* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of dimensions or metrics that determine the sort order for YouTube Analytics data. By default the sort order is ascending. The '-' prefix causes descending sort order.
+    ///
+    /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
-    /// Sets the *max-results* query property to the given value.
-    ///
-    /// 
     /// The maximum number of rows to include in the response.
+    ///
+    /// Sets the *max-results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ReportQueryCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *filters* query property to the given value.
-    ///
-    /// 
     /// A list of filters that should be applied when retrieving YouTube Analytics data. The Available Reports document identifies the dimensions that can be used to filter each report, and the Dimensions document defines those dimensions. If a request uses multiple filters, join them together with a semicolon (;), and the returned result table will satisfy both filters. For example, a filters parameter value of video==dMH0bHeiRNg;country==IT restricts the result set to include data for the given video in Italy.
+    ///
+    /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Sets the *dimensions* query property to the given value.
-    ///
-    /// 
     /// A comma-separated list of YouTube Analytics dimensions, such as views or ageGroup,gender. See the Available Reports document for a list of the reports that you can retrieve and the dimensions used for those reports. Also see the Dimensions document for definitions of those dimensions.
+    ///
+    /// Sets the *dimensions* query property to the given value.
     pub fn dimensions(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._dimensions = Some(new_value.to_string());
         self
     }
-    /// Sets the *currency* query property to the given value.
-    ///
-    /// 
     /// The currency to which financial metrics should be converted. The default is US Dollar (USD). If the result contains no financial metrics, this flag will be ignored. Responds with an error if the specified currency is not recognized.
+    ///
+    /// Sets the *currency* query property to the given value.
     pub fn currency(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._currency = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1410,8 +1407,8 @@ impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::YtAnalyticMonetaryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1499,7 +1496,7 @@ impl<'a, C, A> BatchReportDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/batchReportDefinitions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::YoutubeReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
 
         
@@ -1571,23 +1568,22 @@ impl<'a, C, A> BatchReportDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
+    ///
     /// Sets the *on behalf of content owner* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> BatchReportDefinitionListCall<'a, C, A> {
         self._on_behalf_of_content_owner = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BatchReportDefinitionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1617,8 +1613,8 @@ impl<'a, C, A> BatchReportDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::YtAnalyticMonetaryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1796,32 +1792,30 @@ impl<'a, C, A> GroupItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &GroupItem) -> GroupItemInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupItemInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupItemInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1851,8 +1845,8 @@ impl<'a, C, A> GroupItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Youtube`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2017,33 +2011,31 @@ impl<'a, C, A> GroupItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The id parameter specifies the unique ID of the group for which you want to retrieve group items.
+    ///
     /// Sets the *group id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the unique ID of the group for which you want to retrieve group items.
     pub fn group_id(mut self, new_value: &str) -> GroupItemListCall<'a, C, A> {
         self._group_id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupItemListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupItemListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2073,8 +2065,8 @@ impl<'a, C, A> GroupItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::YoutubeReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2228,33 +2220,31 @@ impl<'a, C, A> GroupItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The id parameter specifies the YouTube group item ID for the group that is being deleted.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube group item ID for the group that is being deleted.
     pub fn id(mut self, new_value: &str) -> GroupItemDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupItemDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupItemDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2284,8 +2274,8 @@ impl<'a, C, A> GroupItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Youtube`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2439,33 +2429,31 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The id parameter specifies the YouTube group ID for the group that is being deleted.
+    ///
     /// Sets the *id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The id parameter specifies the YouTube group ID for the group that is being deleted.
     pub fn id(mut self, new_value: &str) -> GroupDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2495,8 +2483,8 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Youtube`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2674,32 +2662,30 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Group) -> GroupInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2729,8 +2715,8 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Youtube`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2903,39 +2889,35 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *mine* query property to the given value.
-    ///
-    /// 
     /// Set this parameter's value to true to instruct the API to only return groups owned by the authenticated user.
+    ///
+    /// Sets the *mine* query property to the given value.
     pub fn mine(mut self, new_value: bool) -> GroupListCall<'a, C, A> {
         self._mine = Some(new_value);
         self
     }
-    /// Sets the *id* query property to the given value.
-    ///
-    /// 
     /// The id parameter specifies a comma-separated list of the YouTube group ID(s) for the resource(s) that are being retrieved. In a group resource, the id property specifies the group's YouTube group ID.
+    ///
+    /// Sets the *id* query property to the given value.
     pub fn id(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2965,8 +2947,8 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::YoutubeReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3144,32 +3126,30 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Group) -> GroupUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *on behalf of content owner* query property to the given value.
-    ///
-    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupUpdateCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3199,8 +3179,8 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Youtube`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3290,7 +3270,7 @@ impl<'a, C, A> BatchReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/batchReports".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::YoutubeReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::YtAnalyticMonetaryReadonly.as_ref().to_string(), ());
         }
 
         
@@ -3362,33 +3342,32 @@ impl<'a, C, A> BatchReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The batchReportDefinitionId parameter specifies the ID of the batch reportort definition for which you are retrieving reports.
+    ///
     /// Sets the *batch report definition id* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The batchReportDefinitionId parameter specifies the ID of the batch reportort definition for which you are retrieving reports.
     pub fn batch_report_definition_id(mut self, new_value: &str) -> BatchReportListCall<'a, C, A> {
         self._batch_report_definition_id = new_value.to_string();
         self
     }
+    /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
+    ///
     /// Sets the *on behalf of content owner* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> BatchReportListCall<'a, C, A> {
         self._on_behalf_of_content_owner = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BatchReportListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3418,8 +3397,8 @@ impl<'a, C, A> BatchReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::YtAnalyticMonetaryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

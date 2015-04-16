@@ -129,16 +129,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -305,16 +307,18 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -360,7 +364,7 @@ impl<'a, C, A> Customsearch<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultImage {
     /// no description provided
     pub width: i32,
@@ -396,7 +400,7 @@ impl Part for ResultImage {}
 /// 
 /// * [list cse](struct.CseListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Search {
     /// no description provided
     pub promotions: Vec<Promotion>,
@@ -424,7 +428,7 @@ impl ResponseResult for Search {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotionImage {
     /// no description provided
     pub source: String,
@@ -442,7 +446,7 @@ impl Part for PromotionImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchUrl {
     /// no description provided
     #[serde(rename="type")]
@@ -459,7 +463,7 @@ impl Part for SearchUrl {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchSpelling {
     /// no description provided
     #[serde(rename="correctedQuery")]
@@ -477,7 +481,7 @@ impl Part for SearchSpelling {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotionBodyLines {
     /// no description provided
     pub url: String,
@@ -498,7 +502,7 @@ impl Part for PromotionBodyLines {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultType {
     /// no description provided
     pub kind: String,
@@ -546,7 +550,7 @@ impl Part for ResultType {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Context {
     /// no description provided
     pub facets: Vec<Vec<ContextFacets>>,
@@ -561,7 +565,7 @@ impl Part for Context {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContextFacets {
     /// no description provided
     pub label_with_op: String,
@@ -579,7 +583,7 @@ impl Part for ContextFacets {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Query {
     /// no description provided
     #[serde(rename="dateRestrict")]
@@ -688,7 +692,7 @@ impl Part for Query {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Promotion {
     /// no description provided
     #[serde(rename="bodyLines")]
@@ -714,7 +718,7 @@ impl Part for Promotion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchSearchInformation {
     /// no description provided
     #[serde(rename="formattedSearchTime")]
@@ -738,7 +742,7 @@ impl Part for SearchSearchInformation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultLabels {
     /// no description provided
     #[serde(rename="displayName")]
@@ -1148,271 +1152,239 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// Query
+    ///
     /// Sets the *q* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Query
     pub fn q(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._q = new_value.to_string();
         self
     }
-    /// Sets the *start* query property to the given value.
-    ///
-    /// 
     /// The index of the first result to return
+    ///
+    /// Sets the *start* query property to the given value.
     pub fn start(mut self, new_value: u32) -> CseListCall<'a, C, A> {
         self._start = Some(new_value);
         self
     }
-    /// Sets the *sort* query property to the given value.
-    ///
-    /// 
     /// The sort expression to apply to the results
+    ///
+    /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
-    /// Sets the *site search filter* query property to the given value.
-    ///
-    /// 
     /// Controls whether to include or exclude results from the site named in the as_sitesearch parameter
+    ///
+    /// Sets the *site search filter* query property to the given value.
     pub fn site_search_filter(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._site_search_filter = Some(new_value.to_string());
         self
     }
-    /// Sets the *site search* query property to the given value.
-    ///
-    /// 
     /// Specifies all search results should be pages from a given site
+    ///
+    /// Sets the *site search* query property to the given value.
     pub fn site_search(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._site_search = Some(new_value.to_string());
         self
     }
-    /// Sets the *search type* query property to the given value.
-    ///
-    /// 
     /// Specifies the search type: image.
+    ///
+    /// Sets the *search type* query property to the given value.
     pub fn search_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._search_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *safe* query property to the given value.
-    ///
-    /// 
     /// Search safety level
+    ///
+    /// Sets the *safe* query property to the given value.
     pub fn safe(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._safe = Some(new_value.to_string());
         self
     }
-    /// Sets the *rights* query property to the given value.
-    ///
-    /// 
     /// Filters based on licensing. Supported values include: cc_publicdomain, cc_attribute, cc_sharealike, cc_noncommercial, cc_nonderived and combinations of these.
+    ///
+    /// Sets the *rights* query property to the given value.
     pub fn rights(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._rights = Some(new_value.to_string());
         self
     }
-    /// Sets the *related site* query property to the given value.
-    ///
-    /// 
     /// Specifies that all search results should be pages that are related to the specified URL
+    ///
+    /// Sets the *related site* query property to the given value.
     pub fn related_site(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._related_site = Some(new_value.to_string());
         self
     }
-    /// Sets the *or terms* query property to the given value.
-    ///
-    /// 
     /// Provides additional search terms to check for in a document, where each document in the search results must contain at least one of the additional search terms
+    ///
+    /// Sets the *or terms* query property to the given value.
     pub fn or_terms(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._or_terms = Some(new_value.to_string());
         self
     }
-    /// Sets the *num* query property to the given value.
-    ///
-    /// 
     /// Number of search results to return
+    ///
+    /// Sets the *num* query property to the given value.
     pub fn num(mut self, new_value: u32) -> CseListCall<'a, C, A> {
         self._num = Some(new_value);
         self
     }
-    /// Sets the *lr* query property to the given value.
-    ///
-    /// 
     /// The language restriction for the search results
+    ///
+    /// Sets the *lr* query property to the given value.
     pub fn lr(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._lr = Some(new_value.to_string());
         self
     }
-    /// Sets the *low range* query property to the given value.
-    ///
-    /// 
     /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query
+    ///
+    /// Sets the *low range* query property to the given value.
     pub fn low_range(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._low_range = Some(new_value.to_string());
         self
     }
-    /// Sets the *link site* query property to the given value.
-    ///
-    /// 
     /// Specifies that all search results should contain a link to a particular URL
+    ///
+    /// Sets the *link site* query property to the given value.
     pub fn link_site(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._link_site = Some(new_value.to_string());
         self
     }
-    /// Sets the *img type* query property to the given value.
-    ///
-    /// 
     /// Returns images of a type, which can be one of: clipart, face, lineart, news, and photo.
+    ///
+    /// Sets the *img type* query property to the given value.
     pub fn img_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *img size* query property to the given value.
-    ///
-    /// 
     /// Returns images of a specified size, where size can be one of: icon, small, medium, large, xlarge, xxlarge, and huge.
+    ///
+    /// Sets the *img size* query property to the given value.
     pub fn img_size(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_size = Some(new_value.to_string());
         self
     }
-    /// Sets the *img dominant color* query property to the given value.
-    ///
-    /// 
     /// Returns images of a specific dominant color: yellow, green, teal, blue, purple, pink, white, gray, black and brown.
+    ///
+    /// Sets the *img dominant color* query property to the given value.
     pub fn img_dominant_color(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_dominant_color = Some(new_value.to_string());
         self
     }
-    /// Sets the *img color type* query property to the given value.
-    ///
-    /// 
     /// Returns black and white, grayscale, or color images: mono, gray, and color.
+    ///
+    /// Sets the *img color type* query property to the given value.
     pub fn img_color_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_color_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *hq* query property to the given value.
-    ///
-    /// 
     /// Appends the extra query terms to the query.
+    ///
+    /// Sets the *hq* query property to the given value.
     pub fn hq(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._hq = Some(new_value.to_string());
         self
     }
-    /// Sets the *hl* query property to the given value.
-    ///
-    /// 
     /// Sets the user interface language.
+    ///
+    /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Sets the *high range* query property to the given value.
-    ///
-    /// 
     /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query
+    ///
+    /// Sets the *high range* query property to the given value.
     pub fn high_range(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._high_range = Some(new_value.to_string());
         self
     }
-    /// Sets the *googlehost* query property to the given value.
-    ///
-    /// 
     /// The local Google domain to use to perform the search.
+    ///
+    /// Sets the *googlehost* query property to the given value.
     pub fn googlehost(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._googlehost = Some(new_value.to_string());
         self
     }
-    /// Sets the *gl* query property to the given value.
-    ///
-    /// 
     /// Geolocation of end user.
+    ///
+    /// Sets the *gl* query property to the given value.
     pub fn gl(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._gl = Some(new_value.to_string());
         self
     }
-    /// Sets the *filter* query property to the given value.
-    ///
-    /// 
     /// Controls turning on or off the duplicate content filter.
+    ///
+    /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Sets the *file type* query property to the given value.
-    ///
-    /// 
     /// Returns images of a specified type. Some of the allowed values are: bmp, gif, png, jpg, svg, pdf, ...
+    ///
+    /// Sets the *file type* query property to the given value.
     pub fn file_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._file_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *exclude terms* query property to the given value.
-    ///
-    /// 
     /// Identifies a word or phrase that should not appear in any documents in the search results
+    ///
+    /// Sets the *exclude terms* query property to the given value.
     pub fn exclude_terms(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._exclude_terms = Some(new_value.to_string());
         self
     }
-    /// Sets the *exact terms* query property to the given value.
-    ///
-    /// 
     /// Identifies a phrase that all documents in the search results must contain
+    ///
+    /// Sets the *exact terms* query property to the given value.
     pub fn exact_terms(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._exact_terms = Some(new_value.to_string());
         self
     }
-    /// Sets the *date restrict* query property to the given value.
-    ///
-    /// 
     /// Specifies all search results are from a time period
+    ///
+    /// Sets the *date restrict* query property to the given value.
     pub fn date_restrict(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._date_restrict = Some(new_value.to_string());
         self
     }
-    /// Sets the *cx* query property to the given value.
-    ///
-    /// 
     /// The custom search engine ID to scope this search query
+    ///
+    /// Sets the *cx* query property to the given value.
     pub fn cx(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._cx = Some(new_value.to_string());
         self
     }
-    /// Sets the *cref* query property to the given value.
-    ///
-    /// 
     /// The URL of a linked custom search engine
+    ///
+    /// Sets the *cref* query property to the given value.
     pub fn cref(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._cref = Some(new_value.to_string());
         self
     }
-    /// Sets the *cr* query property to the given value.
-    ///
-    /// 
     /// Country restrict(s).
+    ///
+    /// Sets the *cr* query property to the given value.
     pub fn cr(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._cr = Some(new_value.to_string());
         self
     }
-    /// Sets the *c2coff* query property to the given value.
-    ///
-    /// 
     /// Turns off the translation between zh-CN and zh-TW.
+    ///
+    /// Sets the *c2coff* query property to the given value.
     pub fn c2coff(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._c2coff = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CseListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self

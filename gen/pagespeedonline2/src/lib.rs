@@ -103,16 +103,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -253,16 +255,18 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -308,7 +312,7 @@ impl<'a, C, A> Pagespeedonline<C, A>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiFormatStringV2ArgsSecondaryRects {
     /// The width of the rect.
     pub width: i32,
@@ -328,7 +332,7 @@ impl Part for PagespeedApiFormatStringV2ArgsSecondaryRects {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiFormatStringV2ArgsRects {
     /// The width of the rect.
     pub width: i32,
@@ -348,7 +352,7 @@ impl Part for PagespeedApiFormatStringV2ArgsRects {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiFormatStringV2 {
     /// List of arguments for the format string.
     pub args: Vec<PagespeedApiFormatStringV2Args>,
@@ -363,7 +367,7 @@ impl Part for PagespeedApiFormatStringV2 {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultFormattedResultsRuleResultsUrlBlocksUrls {
     /// List of entries that provide additional details about a single URL. Optional.
     pub details: Vec<PagespeedApiFormatStringV2>,
@@ -379,7 +383,7 @@ impl Part for ResultFormattedResultsRuleResultsUrlBlocksUrls {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultPageStats {
     /// Number of response bytes for flash resources on the page.
     #[serde(rename="flashResponseBytes")]
@@ -430,7 +434,7 @@ impl Part for ResultPageStats {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultFormattedResultsRuleResults {
     /// Localized name of the rule, intended for presentation to a user.
     #[serde(rename="localizedRuleName")]
@@ -455,7 +459,7 @@ impl Part for ResultFormattedResultsRuleResults {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultVersion {
     /// The major version number of PageSpeed used to generate these results.
     pub major: i32,
@@ -471,7 +475,7 @@ impl Part for ResultVersion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiFormatStringV2Args {
     /// The screen rectangles being referred to, with dimensions measured in CSS pixels. This is only ever used for SNAPSHOT_RECT arguments. If this is absent for a SNAPSHOT_RECT argument, it means that that argument refers to the entire snapshot.
     pub rects: Vec<PagespeedApiFormatStringV2ArgsRects>,
@@ -494,7 +498,7 @@ impl Part for PagespeedApiFormatStringV2Args {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultFormattedResultsRuleResultsUrlBlocks {
     /// Heading to be displayed with the list of URLs.
     pub header: PagespeedApiFormatStringV2,
@@ -510,7 +514,7 @@ impl Part for ResultFormattedResultsRuleResultsUrlBlocks {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiImageV2 {
     /// Width of screenshot in pixels.
     pub width: i32,
@@ -538,7 +542,7 @@ impl Part for PagespeedApiImageV2 {}
 /// 
 /// * [runpagespeed pagespeedapi](struct.PagespeedapiRunpagespeedCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultType {
     /// Kind of result.
     pub kind: String,
@@ -574,7 +578,7 @@ impl ResponseResult for ResultType {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PagespeedApiImageV2PageRect {
     /// The width of the rect.
     pub width: i32,
@@ -594,7 +598,7 @@ impl Part for PagespeedApiImageV2PageRect {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultFormattedResults {
     /// The locale of the formattedResults, e.g. "en_US".
     pub locale: String,
@@ -611,7 +615,7 @@ impl Part for ResultFormattedResults {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultRuleGroups {
     /// The score (0-100) for this rule group, which indicates how much better a page could be in that category (e.g. how much faster, or how much more usable). A high score indicates little room for improvement, while a lower score indicates more room for improvement.
     pub score: i32,
@@ -864,64 +868,58 @@ impl<'a, C, A> PagespeedapiRunpagespeedCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The URL to fetch and analyze
+    ///
     /// Sets the *url* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The URL to fetch and analyze
     pub fn url(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._url = new_value.to_string();
         self
     }
-    /// Sets the *strategy* query property to the given value.
-    ///
-    /// 
     /// The analysis strategy to use
+    ///
+    /// Sets the *strategy* query property to the given value.
     pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._strategy = Some(new_value.to_string());
         self
     }
-    /// Sets the *screenshot* query property to the given value.
-    ///
-    /// 
     /// Indicates if binary data containing a screenshot should be included
+    ///
+    /// Sets the *screenshot* query property to the given value.
     pub fn screenshot(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._screenshot = Some(new_value);
         self
     }
+    /// A PageSpeed rule to run; if none are given, all rules are run
+    ///
     /// Append the given value to the *rule* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// A PageSpeed rule to run; if none are given, all rules are run
     pub fn add_rule(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._rule.push(new_value.to_string());
         self
     }
-    /// Sets the *locale* query property to the given value.
-    ///
-    /// 
     /// The locale used to localize formatted results
+    ///
+    /// Sets the *locale* query property to the given value.
     pub fn locale(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
-    /// Sets the *filter_third_party_resources* query property to the given value.
-    ///
-    /// 
     /// Indicates if third party resources should be filtered out before PageSpeed analysis.
+    ///
+    /// Sets the *filter_third_party_resources* query property to the given value.
     pub fn filter_third_party_resources(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._filter_third_party_resources = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self

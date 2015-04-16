@@ -106,16 +106,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -279,16 +281,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -369,7 +373,7 @@ impl Part for LogError {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Log {
     /// Type URL describing the expected payload type for the log.
     #[serde(rename="payloadType")]
@@ -393,7 +397,7 @@ impl Part for Log {}
 /// 
 /// * [logs list projects](struct.ProjectLogListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLogsResponse {
     /// If there are more results, then `nextPageToken` is returned in the response. To get the next batch of logs, use the value of `nextPageToken` as `pageToken` in the next call of `ListLogs`. If `nextPageToken` is empty, then there are no more results.
     #[serde(rename="nextPageToken")]
@@ -409,7 +413,7 @@ impl ResponseResult for ListLogsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LogService {
     /// Label keys used when labeling log entries for this service. The order of the keys is significant, with higher priority keys coming earlier in the list.
     #[serde(rename="indexKeys")]
@@ -430,7 +434,7 @@ impl Part for LogService {}
 /// 
 /// * [logs entries write projects](struct.ProjectLogEntryWriteCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WriteLogEntriesResponse;
 
 impl ResponseResult for WriteLogEntriesResponse {}
@@ -445,7 +449,7 @@ impl ResponseResult for WriteLogEntriesResponse {}
 /// 
 /// * [logs sinks list projects](struct.ProjectLogSinkListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLogSinksResponse {
     /// The requested log sinks. If any of the returned `LogSink` objects have an empty `destination` field, then call `logServices.sinks.get` to retrieve the complete `LogSink` object.
     pub sinks: Vec<LogSink>,
@@ -484,7 +488,7 @@ impl RequestValue for WriteLogEntriesRequest {}
 /// 
 /// * [log services list projects](struct.ProjectLogServiceListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLogServicesResponse {
     /// If there are more results, then `nextPageToken` is returned in the response. To get the next batch of services, use the value of `nextPageToken` as `pageToken` in the next call of `ListLogServices`. If `nextPageToken` is empty, then there are no more results.
     #[serde(rename="nextPageToken")]
@@ -563,7 +567,7 @@ impl Part for LogEntryMetadata {}
 /// 
 /// * [log services indexes list projects](struct.ProjectLogServiceIndexeListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLogServiceIndexesResponse {
     /// If there are more results, then `nextPageToken` is returned in the response. To get the next batch of indexes, use the value of `nextPageToken` as `pageToken` in the next call of `ListLogServiceIndexess`. If `nextPageToken` is empty, then there are no more results.
     #[serde(rename="nextPageToken")]
@@ -615,7 +619,7 @@ impl ResponseResult for LogSink {}
 /// * [log services sinks delete projects](struct.ProjectLogServiceSinkDeleteCall.html) (response)
 /// * [logs delete projects](struct.ProjectLogDeleteCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty;
 
 impl ResponseResult for Empty {}
@@ -630,7 +634,7 @@ impl ResponseResult for Empty {}
 /// 
 /// * [log services sinks list projects](struct.ProjectLogServiceSinkListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLogServiceSinksResponse {
     /// The requested log service sinks. If any of the returned `LogSink` objects have an empty `destination` field, then call `logServices.sinks.get` to retrieve the complete `LogSink` object.
     pub sinks: Vec<LogSink>,
@@ -1189,47 +1193,43 @@ impl<'a, C, A> ProjectLogServiceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    /// Part of `projectName`. The project resource whose services are to be listed.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `projectName`. The project resource whose services are to be listed.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceListCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// An opaque token, returned as `nextPageToken` by a prior `ListLogServices` operation. If `pageToken` is supplied, then the other fields of this request are ignored, and instead the previous `ListLogServices` operation is continued.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectLogServiceListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *page size* query property to the given value.
-    ///
-    /// 
     /// The maximum number of `LogService` objects to return in one operation.
+    ///
+    /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLogServiceListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// Sets the *log* query property to the given value.
-    ///
-    /// 
     /// The name of the log resource whose services are to be listed. log for which to list services. When empty, all services are listed.
+    ///
+    /// Sets the *log* query property to the given value.
     pub fn log(mut self, new_value: &str) -> ProjectLogServiceListCall<'a, C, A> {
         self._log = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1263,8 +1263,8 @@ impl<'a, C, A> ProjectLogServiceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1468,55 +1468,50 @@ impl<'a, C, A> ProjectLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// Part of `projectName`. The project name for which to list the log resources.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `projectName`. The project name for which to list the log resources.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogListCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
-    /// Sets the *service name* query property to the given value.
-    ///
-    /// 
     /// A service name for which to list logs. Only logs containing entries whose metadata includes this service name are returned. If `serviceName` and `serviceIndexPrefix` are both empty, then all log names are returned. To list all log names, regardless of service, leave both the `serviceName` and `serviceIndexPrefix` empty. To list log names containing entries with a particular service name (or explicitly empty service name) set `serviceName` to the desired value and `serviceIndexPrefix` to `"/"`.
+    ///
+    /// Sets the *service name* query property to the given value.
     pub fn service_name(mut self, new_value: &str) -> ProjectLogListCall<'a, C, A> {
         self._service_name = Some(new_value.to_string());
         self
     }
-    /// Sets the *service index prefix* query property to the given value.
-    ///
-    /// 
     /// A log service index prefix for which to list logs. Only logs containing entries whose metadata that includes these label values (associated with index keys) are returned. The prefix is a slash separated list of values, and need not specify all index labels. An empty index (or a single slash) matches all log service indexes.
+    ///
+    /// Sets the *service index prefix* query property to the given value.
     pub fn service_index_prefix(mut self, new_value: &str) -> ProjectLogListCall<'a, C, A> {
         self._service_index_prefix = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// An opaque token, returned as `nextPageToken` by a prior `ListLogs` operation. If `pageToken` is supplied, then the other fields of this request are ignored, and instead the previous `ListLogs` operation is continued.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectLogListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *page size* query property to the given value.
-    ///
-    /// 
     /// The maximum number of results to return.
+    ///
+    /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLogListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1550,8 +1545,8 @@ impl<'a, C, A> ProjectLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1739,43 +1734,42 @@ impl<'a, C, A> ProjectLogSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Part of `sinkName`. The name of the sink resource to return.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. The name of the sink resource to return.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkGetCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *logs id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkGetCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *sinks id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn sinks_id(mut self, new_value: &str) -> ProjectLogSinkGetCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1809,8 +1803,8 @@ impl<'a, C, A> ProjectLogSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2013,52 +2007,51 @@ impl<'a, C, A> ProjectLogServiceSinkUpdateCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LogSink) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Part of `sinkName`. The name of the sink to update.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. The name of the sink to update.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *log services id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *sinks id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn sinks_id(mut self, new_value: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2092,8 +2085,8 @@ impl<'a, C, A> ProjectLogServiceSinkUpdateCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2294,42 +2287,41 @@ impl<'a, C, A> ProjectLogEntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &WriteLogEntriesRequest) -> ProjectLogEntryWriteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Part of `logName`. The name of the log resource into which to insert the log entries.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `logName`. The name of the log resource into which to insert the log entries.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogEntryWriteCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `logName`. See documentation of `projectsId`.
+    ///
     /// Sets the *logs id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `logName`. See documentation of `projectsId`.
     pub fn logs_id(mut self, new_value: &str) -> ProjectLogEntryWriteCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogEntryWriteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2363,8 +2355,8 @@ impl<'a, C, A> ProjectLogEntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2552,43 +2544,42 @@ impl<'a, C, A> ProjectLogServiceSinkDeleteCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// Part of `sinkName`. The name of the sink to delete.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. The name of the sink to delete.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *log services id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *sinks id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn sinks_id(mut self, new_value: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2622,8 +2613,8 @@ impl<'a, C, A> ProjectLogServiceSinkDeleteCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2834,73 +2825,67 @@ impl<'a, C, A> ProjectLogServiceIndexeListCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// Part of `serviceName`. A log service resource of the form `/projects/*/logServices/*`. The service indexes of the log service are returned. Example: `"/projects/myProj/logServices/appengine.googleapis.com"`.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `serviceName`. A log service resource of the form `/projects/*/logServices/*`. The service indexes of the log service are returned. Example: `"/projects/myProj/logServices/appengine.googleapis.com"`.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `serviceName`. See documentation of `projectsId`.
+    ///
     /// Sets the *log services id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `serviceName`. See documentation of `projectsId`.
     pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// An opaque token, returned as `nextPageToken` by a prior `ListLogServiceIndexes` operation. If `pageToken` is supplied, then the other fields of this request are ignored, and instead the previous `ListLogServiceIndexes` operation is continued.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *page size* query property to the given value.
-    ///
-    /// 
     /// The maximum number of log service index resources to return in one operation.
+    ///
+    /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// Sets the *log* query property to the given value.
-    ///
-    /// 
     /// A log resource like `/projects/project_id/logs/log_name`, identifying the log for which to list service indexes.
+    ///
+    /// Sets the *log* query property to the given value.
     pub fn log(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._log = Some(new_value.to_string());
         self
     }
-    /// Sets the *index prefix* query property to the given value.
-    ///
-    /// 
     /// Restricts the indexes returned to be those with a specified prefix. The prefix has the form `"/label_value/label_value/..."`, in order corresponding to the [`LogService indexKeys`][google.logging.v1.LogService.index_keys]. Non-empty prefixes must begin with `/` . Example prefixes: + `"/myModule/"` retrieves App Engine versions associated with `myModule`. The trailing slash terminates the value. + `"/myModule"` retrieves App Engine modules with names beginning with `myModule`. + `""` retrieves all indexes.
+    ///
+    /// Sets the *index prefix* query property to the given value.
     pub fn index_prefix(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._index_prefix = Some(new_value.to_string());
         self
     }
-    /// Sets the *depth* query property to the given value.
-    ///
-    /// 
     /// A limit to the number of levels of the index hierarchy that are expanded. If `depth` is 0, it defaults to the level specified by the prefix field (the number of slash separators). The default empty prefix implies a `depth` of 1. It is an error for `depth` to be any non-zero value less than the number of components in `indexPrefix`.
+    ///
+    /// Sets the *depth* query property to the given value.
     pub fn depth(mut self, new_value: i32) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._depth = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2934,8 +2919,8 @@ impl<'a, C, A> ProjectLogServiceIndexeListCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3121,33 +3106,32 @@ impl<'a, C, A> ProjectLogSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// Part of `logName`. The log for which to list sinks.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `logName`. The log for which to list sinks.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkListCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `logName`. See documentation of `projectsId`.
+    ///
     /// Sets the *logs id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `logName`. See documentation of `projectsId`.
     pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkListCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3181,8 +3165,8 @@ impl<'a, C, A> ProjectLogSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3385,52 +3369,51 @@ impl<'a, C, A> ProjectLogSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LogSink) -> ProjectLogSinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Part of `sinkName`. The name of the sink to update.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. The name of the sink to update.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkUpdateCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *logs id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkUpdateCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *sinks id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn sinks_id(mut self, new_value: &str) -> ProjectLogSinkUpdateCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3464,8 +3447,8 @@ impl<'a, C, A> ProjectLogSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3666,42 +3649,41 @@ impl<'a, C, A> ProjectLogServiceSinkCreateCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LogSink) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Part of `serviceName`. The name of the service in which to create a sink.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `serviceName`. The name of the service in which to create a sink.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `serviceName`. See documentation of `projectsId`.
+    ///
     /// Sets the *log services id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `serviceName`. See documentation of `projectsId`.
     pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3735,8 +3717,8 @@ impl<'a, C, A> ProjectLogServiceSinkCreateCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3924,43 +3906,42 @@ impl<'a, C, A> ProjectLogSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// Part of `sinkName`. The name of the sink to delete.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. The name of the sink to delete.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkDeleteCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *logs id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkDeleteCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *sinks id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn sinks_id(mut self, new_value: &str) -> ProjectLogSinkDeleteCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3994,8 +3975,8 @@ impl<'a, C, A> ProjectLogSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4196,42 +4177,41 @@ impl<'a, C, A> ProjectLogSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &LogSink) -> ProjectLogSinkCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Part of `logName`. The log in which to create a sink resource.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `logName`. The log in which to create a sink resource.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkCreateCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `logName`. See documentation of `projectsId`.
+    ///
     /// Sets the *logs id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `logName`. See documentation of `projectsId`.
     pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkCreateCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4265,8 +4245,8 @@ impl<'a, C, A> ProjectLogSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4454,43 +4434,42 @@ impl<'a, C, A> ProjectLogServiceSinkGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// Part of `sinkName`. The name of the sink to return.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. The name of the sink to return.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkGetCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *log services id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkGetCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
+    /// Part of `sinkName`. See documentation of `projectsId`.
+    ///
     /// Sets the *sinks id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `sinkName`. See documentation of `projectsId`.
     pub fn sinks_id(mut self, new_value: &str) -> ProjectLogServiceSinkGetCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4524,8 +4503,8 @@ impl<'a, C, A> ProjectLogServiceSinkGetCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4711,33 +4690,32 @@ impl<'a, C, A> ProjectLogServiceSinkListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// Part of `serviceName`. The name of the service for which to list sinks.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `serviceName`. The name of the service for which to list sinks.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkListCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `serviceName`. See documentation of `projectsId`.
+    ///
     /// Sets the *log services id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `serviceName`. See documentation of `projectsId`.
     pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkListCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4771,8 +4749,8 @@ impl<'a, C, A> ProjectLogServiceSinkListCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4958,33 +4936,32 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// Part of `logName`. The log resource to delete.
+    ///
     /// Sets the *projects id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `logName`. The log resource to delete.
     pub fn projects_id(mut self, new_value: &str) -> ProjectLogDeleteCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
+    /// Part of `logName`. See documentation of `projectsId`.
+    ///
     /// Sets the *logs id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Part of `logName`. See documentation of `projectsId`.
     pub fn logs_id(mut self, new_value: &str) -> ProjectLogDeleteCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5018,8 +4995,8 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

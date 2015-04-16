@@ -141,16 +141,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -327,16 +329,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -402,7 +406,7 @@ impl<'a, C, A> Storage<C, A>
 /// 
 /// * [list bucket access controls](struct.BucketAccessControlListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketAccessControls {
     /// The list of items.
     pub items: Vec<BucketAccessControl>,
@@ -669,7 +673,7 @@ impl ResponseResult for Object {}
 /// 
 /// * [list objects](struct.ObjectListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Objects {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -717,7 +721,7 @@ impl Part for BucketCors {}
 /// * [list object access controls](struct.ObjectAccessControlListCall.html) (response)
 /// * [list default object access controls](struct.DefaultObjectAccessControlListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectAccessControls {
     /// The list of items.
     pub items: Vec<String>,
@@ -1050,7 +1054,7 @@ impl RequestValue for ComposeRequest {}
 /// 
 /// * [list buckets](struct.BucketListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Buckets {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -2173,7 +2177,7 @@ impl<'a, C, A> DefaultObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -2277,32 +2281,31 @@ impl<'a, C, A> DefaultObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ObjectAccessControl) -> DefaultObjectAccessControlInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2332,8 +2335,8 @@ impl<'a, C, A> DefaultObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2430,7 +2433,7 @@ impl<'a, C, A> DefaultObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -2534,42 +2537,41 @@ impl<'a, C, A> DefaultObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ObjectAccessControl) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2599,8 +2601,8 @@ impl<'a, C, A> DefaultObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2698,7 +2700,7 @@ impl<'a, C, A> DefaultObjectAccessControlListCall<'a, C, A> where C: BorrowMut<h
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -2794,39 +2796,36 @@ impl<'a, C, A> DefaultObjectAccessControlListCall<'a, C, A> where C: BorrowMut<h
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// If present, only return default ACL listing if the bucket's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// If present, only return default ACL listing if the bucket's current metageneration matches this value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2856,8 +2855,8 @@ impl<'a, C, A> DefaultObjectAccessControlListCall<'a, C, A> where C: BorrowMut<h
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2954,7 +2953,7 @@ impl<'a, C, A> DefaultObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -3058,42 +3057,41 @@ impl<'a, C, A> DefaultObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ObjectAccessControl) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3123,8 +3121,8 @@ impl<'a, C, A> DefaultObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3213,7 +3211,7 @@ impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -3299,33 +3297,32 @@ impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3355,8 +3352,8 @@ impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3446,7 +3443,7 @@ impl<'a, C, A> DefaultObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -3542,33 +3539,32 @@ impl<'a, C, A> DefaultObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3598,8 +3594,8 @@ impl<'a, C, A> DefaultObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hy
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3696,7 +3692,7 @@ impl<'a, C, A> BucketAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -3800,42 +3796,41 @@ impl<'a, C, A> BucketAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &BucketAccessControl) -> BucketAccessControlPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3865,8 +3860,8 @@ impl<'a, C, A> BucketAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3955,7 +3950,7 @@ impl<'a, C, A> BucketAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -4041,33 +4036,32 @@ impl<'a, C, A> BucketAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4097,8 +4091,8 @@ impl<'a, C, A> BucketAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4193,7 +4187,7 @@ impl<'a, C, A> BucketAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -4297,32 +4291,31 @@ impl<'a, C, A> BucketAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &BucketAccessControl) -> BucketAccessControlInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4352,8 +4345,8 @@ impl<'a, C, A> BucketAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4443,7 +4436,7 @@ impl<'a, C, A> BucketAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -4539,33 +4532,32 @@ impl<'a, C, A> BucketAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4595,8 +4587,8 @@ impl<'a, C, A> BucketAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4693,7 +4685,7 @@ impl<'a, C, A> BucketAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -4797,42 +4789,41 @@ impl<'a, C, A> BucketAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &BucketAccessControl) -> BucketAccessControlUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4862,8 +4853,8 @@ impl<'a, C, A> BucketAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4951,7 +4942,7 @@ impl<'a, C, A> BucketAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -5047,23 +5038,22 @@ impl<'a, C, A> BucketAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlListCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5093,8 +5083,8 @@ impl<'a, C, A> BucketAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5256,22 +5246,21 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5301,8 +5290,8 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5554,105 +5543,95 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Name of the bucket in which the object resides.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the bucket in which the object resides.
     pub fn bucket(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// Name of the object.
+    ///
     /// Sets the *object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to noAcl.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's generation does not match the given value.
+    ///
+    /// Sets the *if generation not match* query property to the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's generation matches the given value.
+    ///
+    /// Sets the *if generation match* query property to the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
     pub fn generation(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key hash* query property to the given value.
-    ///
-    /// 
     /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key hash* query property to the given value.
     pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key* query property to the given value.
-    ///
-    /// 
     /// Provides a base64-encoded 256-bit key to decrypt the object. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key* query property to the given value.
     pub fn encryption_key(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption algorithm* query property to the given value.
-    ///
-    /// 
     /// Specifies the encryption algorithm that would be used to decrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption algorithm* query property to the given value.
     pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5682,8 +5661,8 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5912,80 +5891,73 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Channel) -> ObjectWatchAllCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of the bucket in which to look for objects.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the bucket in which to look for objects.
     pub fn bucket(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *versions* query property to the given value.
-    ///
-    /// 
     /// If true, lists all versions of a file as distinct results.
+    ///
+    /// Sets the *versions* query property to the given value.
     pub fn versions(mut self, new_value: bool) -> ObjectWatchAllCall<'a, C, A> {
         self._versions = Some(new_value);
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to noAcl.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *prefix* query property to the given value.
-    ///
-    /// 
     /// Filter results to objects whose names begin with this prefix.
+    ///
+    /// Sets the *prefix* query property to the given value.
     pub fn prefix(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
         self._prefix = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A previously-returned page token representing part of the larger set of results to view.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ObjectWatchAllCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delimiter* query property to the given value.
-    ///
-    /// 
     /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
+    ///
+    /// Sets the *delimiter* query property to the given value.
     pub fn delimiter(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
         self._delimiter = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectWatchAllCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6015,8 +5987,8 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6288,122 +6260,111 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Object) -> ObjectUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of the bucket in which the object resides.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the bucket in which the object resides.
     pub fn bucket(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// Name of the object.
+    ///
     /// Sets the *object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to full.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *predefined acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of access controls to this object.
+    ///
+    /// Sets the *predefined acl* query property to the given value.
     pub fn predefined_acl(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current generation does not match the given value.
+    ///
+    /// Sets the *if generation not match* query property to the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current generation matches the given value.
+    ///
+    /// Sets the *if generation match* query property to the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
     pub fn generation(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key hash* query property to the given value.
-    ///
-    /// 
     /// For downloading encrypted objects, provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key hash* query property to the given value.
     pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key* query property to the given value.
-    ///
-    /// 
     /// For downloading encrypted objects, provides a base64-encoded 256-bit key to decrypt the object. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key* query property to the given value.
     pub fn encryption_key(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption algorithm* query property to the given value.
-    ///
-    /// 
     /// For downloading encrypted objects, specifies the encryption algorithm that would be used to decrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption algorithm* query property to the given value.
     pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6433,8 +6394,8 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6820,120 +6781,108 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Object) -> ObjectInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
     pub fn bucket(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *predefined acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of access controls to this object.
+    ///
+    /// Sets the *predefined acl* query property to the given value.
     pub fn predefined_acl(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *name* query property to the given value.
-    ///
-    /// 
     /// Name of the object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
+    ///
+    /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current generation does not match the given value.
+    ///
+    /// Sets the *if generation not match* query property to the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current generation matches the given value.
+    ///
+    /// Sets the *if generation match* query property to the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key hash* query property to the given value.
-    ///
-    /// 
     /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key hash* query property to the given value.
     pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key* query property to the given value.
-    ///
-    /// 
     /// Provides a base64-encoded 256-bit key to encrypt the object. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key* query property to the given value.
     pub fn encryption_key(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption algorithm* query property to the given value.
-    ///
-    /// 
     /// Specifies the encryption algorithm that would be used to encrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption algorithm* query property to the given value.
     pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
-    /// Sets the *content encoding* query property to the given value.
-    ///
-    /// 
     /// If set, sets the contentEncoding property of the final object to this value. Setting this parameter is equivalent to setting the contentEncoding metadata property. This can be useful when uploading an object with uploadType=media to indicate the encoding of the content being uploaded.
+    ///
+    /// Sets the *content encoding* query property to the given value.
     pub fn content_encoding(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._content_encoding = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6963,8 +6912,8 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7216,90 +7165,83 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ComposeRequest) -> ObjectComposeCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of the bucket in which to store the new object.
+    ///
     /// Sets the *destination bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the bucket in which to store the new object.
     pub fn destination_bucket(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._destination_bucket = new_value.to_string();
         self
     }
+    /// Name of the new object.
+    ///
     /// Sets the *destination object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the new object.
     pub fn destination_object(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._destination_object = new_value.to_string();
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current generation matches the given value.
+    ///
+    /// Sets the *if generation match* query property to the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key hash* query property to the given value.
-    ///
-    /// 
     /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key hash* query property to the given value.
     pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key* query property to the given value.
-    ///
-    /// 
     /// Provides a base64-encoded 256-bit key that was used to encrypt the object, if any. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key* query property to the given value.
     pub fn encryption_key(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption algorithm* query property to the given value.
-    ///
-    /// 
     /// Specifies the encryption algorithm that was used to encrypt the object, if any. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption algorithm* query property to the given value.
     pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
-    /// Sets the *destination predefined acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of access controls to the destination object.
+    ///
+    /// Sets the *destination predefined acl* query property to the given value.
     pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._destination_predefined_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectComposeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7329,8 +7271,8 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7530,73 +7472,67 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Name of the bucket in which the object resides.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the bucket in which the object resides.
     pub fn bucket(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// Name of the object.
+    ///
     /// Sets the *object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current generation does not match the given value.
+    ///
+    /// Sets the *if generation not match* query property to the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current generation matches the given value.
+    ///
+    /// Sets the *if generation match* query property to the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// 
     /// If present, permanently deletes a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
     pub fn generation(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7626,8 +7562,8 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7841,71 +7777,64 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// Name of the bucket in which to look for objects.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the bucket in which to look for objects.
     pub fn bucket(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *versions* query property to the given value.
-    ///
-    /// 
     /// If true, lists all versions of a file as distinct results.
+    ///
+    /// Sets the *versions* query property to the given value.
     pub fn versions(mut self, new_value: bool) -> ObjectListCall<'a, C, A> {
         self._versions = Some(new_value);
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to noAcl.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *prefix* query property to the given value.
-    ///
-    /// 
     /// Filter results to objects whose names begin with this prefix.
+    ///
+    /// Sets the *prefix* query property to the given value.
     pub fn prefix(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
         self._prefix = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A previously-returned page token representing part of the larger set of results to view.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ObjectListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delimiter* query property to the given value.
-    ///
-    /// 
     /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
+    ///
+    /// Sets the *delimiter* query property to the given value.
     pub fn delimiter(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
         self._delimiter = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7935,8 +7864,8 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8232,174 +8161,159 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Object) -> ObjectCopyCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of the bucket in which to find the source object.
+    ///
     /// Sets the *source bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the bucket in which to find the source object.
     pub fn source_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._source_bucket = new_value.to_string();
         self
     }
+    /// Name of the source object.
+    ///
     /// Sets the *source object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the source object.
     pub fn source_object(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._source_object = new_value.to_string();
         self
     }
+    /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
+    ///
     /// Sets the *destination bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
     pub fn destination_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._destination_bucket = new_value.to_string();
         self
     }
+    /// Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
+    ///
     /// Sets the *destination object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
     pub fn destination_object(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._destination_object = new_value.to_string();
         self
     }
-    /// Sets the *source generation* query property to the given value.
-    ///
-    /// 
     /// If present, selects a specific revision of the source object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *source generation* query property to the given value.
     pub fn source_generation(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._source_generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *if source metageneration not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the source object's current metageneration does not match the given value.
+    ///
+    /// Sets the *if source metageneration not match* query property to the given value.
     pub fn if_source_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_source_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if source metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the source object's current metageneration matches the given value.
+    ///
+    /// Sets the *if source metageneration match* query property to the given value.
     pub fn if_source_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_source_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if source generation not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the source object's generation does not match the given value.
+    ///
+    /// Sets the *if source generation not match* query property to the given value.
     pub fn if_source_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_source_generation_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if source generation match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the source object's generation matches the given value.
+    ///
+    /// Sets the *if source generation match* query property to the given value.
     pub fn if_source_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_source_generation_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the destination object's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the destination object's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the destination object's current generation does not match the given value.
+    ///
+    /// Sets the *if generation not match* query property to the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the destination object's current generation matches the given value.
+    ///
+    /// Sets the *if generation match* query property to the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key hash* query property to the given value.
-    ///
-    /// 
     /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key hash* query property to the given value.
     pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key* query property to the given value.
-    ///
-    /// 
     /// Provides a base64-encoded 256-bit key that was used to encrypt the object, if any. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key* query property to the given value.
     pub fn encryption_key(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption algorithm* query property to the given value.
-    ///
-    /// 
     /// Specifies the encryption algorithm that was used to encrypt the object, if any. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption algorithm* query property to the given value.
     pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
-    /// Sets the *destination predefined acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of access controls to the destination object.
+    ///
+    /// Sets the *destination predefined acl* query property to the given value.
     pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._destination_predefined_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectCopyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8429,8 +8343,8 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8681,122 +8595,111 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Object) -> ObjectPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of the bucket in which the object resides.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the bucket in which the object resides.
     pub fn bucket(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// Name of the object.
+    ///
     /// Sets the *object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to full.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *predefined acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of access controls to this object.
+    ///
+    /// Sets the *predefined acl* query property to the given value.
     pub fn predefined_acl(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation not match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current generation does not match the given value.
+    ///
+    /// Sets the *if generation not match* query property to the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if generation match* query property to the given value.
-    ///
-    /// 
     /// Makes the operation conditional on whether the object's current generation matches the given value.
+    ///
+    /// Sets the *if generation match* query property to the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
     pub fn generation(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key hash* query property to the given value.
-    ///
-    /// 
     /// For downloading encrypted objects, provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key hash* query property to the given value.
     pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption key* query property to the given value.
-    ///
-    /// 
     /// For downloading encrypted objects, provides a base64-encoded 256-bit key to decrypt the object. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption key* query property to the given value.
     pub fn encryption_key(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
-    /// Sets the *encryption algorithm* query property to the given value.
-    ///
-    /// 
     /// For downloading encrypted objects, specifies the encryption algorithm that would be used to decrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    ///
+    /// Sets the *encryption algorithm* query property to the given value.
     pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8826,8 +8729,8 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8924,7 +8827,7 @@ impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object"), ("{entity}", "entity")].iter() {
@@ -9020,51 +8923,49 @@ impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// Name of the object.
+    ///
     /// Sets the *object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9094,8 +8995,8 @@ impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9197,7 +9098,7 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
@@ -9301,50 +9202,48 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ObjectAccessControl) -> ObjectAccessControlInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// Name of the object.
+    ///
     /// Sets the *object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9374,8 +9273,8 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9479,7 +9378,7 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object"), ("{entity}", "entity")].iter() {
@@ -9583,60 +9482,58 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ObjectAccessControl) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// Name of the object.
+    ///
     /// Sets the *object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9666,8 +9563,8 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9762,7 +9659,7 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
@@ -9858,41 +9755,39 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// Name of the object.
+    ///
     /// Sets the *object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9922,8 +9817,8 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10019,7 +9914,7 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object"), ("{entity}", "entity")].iter() {
@@ -10105,51 +10000,49 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// Name of the object.
+    ///
     /// Sets the *object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10179,8 +10072,8 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10284,7 +10177,7 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DevstorageFullControl.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object"), ("{entity}", "entity")].iter() {
@@ -10388,60 +10281,58 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ObjectAccessControl) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
+    /// Name of the object.
+    ///
     /// Sets the *object* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
+    ///
     /// Sets the *entity* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
+    ///
+    /// Sets the *generation* query property to the given value.
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10471,8 +10362,8 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageFullControl`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10696,72 +10587,66 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Bucket) -> BucketUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to full.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *predefined default object acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of default object access controls to this bucket.
+    ///
+    /// Sets the *predefined default object acl* query property to the given value.
     pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *predefined acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of access controls to this bucket.
+    ///
+    /// Sets the *predefined acl* query property to the given value.
     pub fn predefined_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10791,8 +10676,8 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10991,47 +10876,43 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to noAcl.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> BucketGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketGetCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> BucketGetCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11061,8 +10942,8 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11245,39 +11126,36 @@ impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketDeleteCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// If set, only deletes the bucket if its metageneration does not match this value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketDeleteCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// If set, only deletes the bucket if its metageneration matches this value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> BucketDeleteCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11307,8 +11185,8 @@ impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11498,56 +11376,52 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Bucket) -> BucketInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// A valid API project identifier.
+    ///
     /// Sets the *project* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A valid API project identifier.
     pub fn project(mut self, new_value: &str) -> BucketInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to noAcl, unless the bucket resource specifies acl or defaultObjectAcl properties, when it defaults to full.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> BucketInsertCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *predefined default object acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of default object access controls to this bucket.
+    ///
+    /// Sets the *predefined default object acl* query property to the given value.
     pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketInsertCall<'a, C, A> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *predefined acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of access controls to this bucket.
+    ///
+    /// Sets the *predefined acl* query property to the given value.
     pub fn predefined_acl(mut self, new_value: &str) -> BucketInsertCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11577,8 +11451,8 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11802,72 +11676,66 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Bucket) -> BucketPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Name of a bucket.
+    ///
     /// Sets the *bucket* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to full.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *predefined default object acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of default object access controls to this bucket.
+    ///
+    /// Sets the *predefined default object acl* query property to the given value.
     pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *predefined acl* query property to the given value.
-    ///
-    /// 
     /// Apply a predefined set of access controls to this bucket.
+    ///
+    /// Sets the *predefined acl* query property to the given value.
     pub fn predefined_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration not match* query property to the given value.
-    ///
-    /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *if metageneration match* query property to the given value.
-    ///
-    /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11897,8 +11765,8 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12078,55 +11946,50 @@ impl<'a, C, A> BucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// A valid API project identifier.
+    ///
     /// Sets the *project* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// A valid API project identifier.
     pub fn project(mut self, new_value: &str) -> BucketListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// Set of properties to return. Defaults to noAcl.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> BucketListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
-    /// Sets the *prefix* query property to the given value.
-    ///
-    /// 
     /// Filter results to buckets whose names begin with this prefix.
+    ///
+    /// Sets the *prefix* query property to the given value.
     pub fn prefix(mut self, new_value: &str) -> BucketListCall<'a, C, A> {
         self._prefix = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// A previously-returned page token representing part of the larger set of results to view.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> BucketListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Maximum number of buckets to return.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> BucketListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12156,8 +12019,8 @@ impl<'a, C, A> BucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

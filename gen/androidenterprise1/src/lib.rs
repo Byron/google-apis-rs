@@ -127,16 +127,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -300,16 +302,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -390,7 +394,7 @@ impl<'a, C, A> AndroidEnterprise<C, A>
 /// 
 /// * [get app restrictions schema products](struct.ProductGetAppRestrictionsSchemaCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppRestrictionsSchema {
     /// The set of restrictions that make up this schema.
     pub restrictions: Vec<AppRestrictionsSchemaRestriction>,
@@ -403,7 +407,7 @@ impl ResponseResult for AppRestrictionsSchema {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppRestrictionsSchemaRestriction {
     /// The type of the restriction.
     #[serde(rename="restrictionType")]
@@ -431,7 +435,7 @@ impl Part for AppRestrictionsSchemaRestriction {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppRestrictionsSchemaRestrictionRestrictionValue {
     /// The boolean value - this will only be present if type is bool.
     #[serde(rename="valueBool")]
@@ -462,7 +466,7 @@ impl Part for AppRestrictionsSchemaRestrictionRestrictionValue {}
 /// 
 /// * [list enterprises](struct.EnterpriseListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnterprisesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprisesListResponse".
     pub kind: String,
@@ -519,7 +523,7 @@ impl ResponseResult for Entitlement {}
 /// 
 /// * [list installs](struct.InstallListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstallsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#installsListResponse".
     pub kind: String,
@@ -539,7 +543,7 @@ impl ResponseResult for InstallsListResponse {}
 /// 
 /// * [list collectionviewers](struct.CollectionviewerListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CollectionViewersListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collectionViewersListResponse".
     pub kind: String,
@@ -559,7 +563,7 @@ impl ResponseResult for CollectionViewersListResponse {}
 /// 
 /// * [list devices](struct.DeviceListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DevicesListResponse {
     /// A managed device.
     pub device: Vec<Device>,
@@ -663,7 +667,7 @@ impl ResponseResult for Enterprise {}
 /// 
 /// * [generate token users](struct.UserGenerateTokenCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserToken {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#userToken".
     pub kind: String,
@@ -757,7 +761,7 @@ impl Part for ProductPermission {}
 /// * [get app restrictions schema products](struct.ProductGetAppRestrictionsSchemaCall.html) (none)
 /// * [get permissions products](struct.ProductGetPermissionCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Product {
     /// A link to an image that can be used as an icon for the product.
     #[serde(rename="iconUrl")]
@@ -796,7 +800,7 @@ impl ResponseResult for Product {}
 /// 
 /// * [get permissions](struct.PermissionGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Permission {
     /// An opaque string uniquely identifying the permission.
     #[serde(rename="permissionId")]
@@ -822,7 +826,7 @@ impl ResponseResult for Permission {}
 /// 
 /// * [list entitlements](struct.EntitlementListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntitlementsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#entitlementsListResponse".
     pub kind: String,
@@ -842,7 +846,7 @@ impl ResponseResult for EntitlementsListResponse {}
 /// 
 /// * [list users](struct.UserListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#usersListResponse".
     pub kind: String,
@@ -899,7 +903,7 @@ impl ResponseResult for Collection {}
 /// 
 /// * [list collections](struct.CollectionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CollectionsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collectionsListResponse".
     pub kind: String,
@@ -954,7 +958,7 @@ impl ResponseResult for User {}
 /// 
 /// * [list grouplicenseusers](struct.GrouplicenseuserListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupLicenseUsersListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicenseUsersListResponse".
     pub kind: String,
@@ -1001,7 +1005,7 @@ impl ResponseResult for EnterpriseAccount {}
 /// * [list devices](struct.DeviceListCall.html) (none)
 /// * [set state devices](struct.DeviceSetStateCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Device {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#device".
     pub kind: String,
@@ -1027,7 +1031,7 @@ impl ResponseResult for Device {}
 /// 
 /// * [get grouplicenses](struct.GrouplicenseGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupLicense {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicense".
     pub kind: String,
@@ -1060,7 +1064,7 @@ impl ResponseResult for GroupLicense {}
 /// 
 /// * [list grouplicenses](struct.GrouplicenseListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupLicensesListResponse {
     /// A group license for a product approved for use in the enterprise.
     #[serde(rename="groupLicense")]
@@ -2582,43 +2586,42 @@ impl<'a, C, A> CollectionviewerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionviewerDeleteCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the collection.
+    ///
     /// Sets the *collection id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionviewerDeleteCall<'a, C, A> {
         self._collection_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> CollectionviewerDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionviewerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2648,8 +2651,8 @@ impl<'a, C, A> CollectionviewerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2852,52 +2855,51 @@ impl<'a, C, A> CollectionviewerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &User) -> CollectionviewerPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionviewerPatchCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the collection.
+    ///
     /// Sets the *collection id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionviewerPatchCall<'a, C, A> {
         self._collection_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> CollectionviewerPatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionviewerPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2927,8 +2929,8 @@ impl<'a, C, A> CollectionviewerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3116,43 +3118,42 @@ impl<'a, C, A> CollectionviewerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionviewerGetCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the collection.
+    ///
     /// Sets the *collection id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionviewerGetCall<'a, C, A> {
         self._collection_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> CollectionviewerGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionviewerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3182,8 +3183,8 @@ impl<'a, C, A> CollectionviewerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3369,33 +3370,32 @@ impl<'a, C, A> CollectionviewerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionviewerListCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the collection.
+    ///
     /// Sets the *collection id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionviewerListCall<'a, C, A> {
         self._collection_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionviewerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3425,8 +3425,8 @@ impl<'a, C, A> CollectionviewerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3629,52 +3629,51 @@ impl<'a, C, A> CollectionviewerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &User) -> CollectionviewerUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionviewerUpdateCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the collection.
+    ///
     /// Sets the *collection id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionviewerUpdateCall<'a, C, A> {
         self._collection_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> CollectionviewerUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionviewerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3704,8 +3703,8 @@ impl<'a, C, A> CollectionviewerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3880,33 +3879,32 @@ impl<'a, C, A> UserRevokeTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> UserRevokeTokenCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> UserRevokeTokenCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserRevokeTokenCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3936,8 +3934,8 @@ impl<'a, C, A> UserRevokeTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4123,33 +4121,32 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> UserGetCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4179,8 +4176,8 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4366,33 +4363,32 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The exact primary email address of the user to look up.
+    ///
     /// Sets the *email* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The exact primary email address of the user to look up.
     pub fn email(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._email = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4422,8 +4418,8 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4609,33 +4605,32 @@ impl<'a, C, A> UserGenerateTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> UserGenerateTokenCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> UserGenerateTokenCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserGenerateTokenCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4665,8 +4660,8 @@ impl<'a, C, A> UserGenerateTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4871,62 +4866,61 @@ impl<'a, C, A> InstallPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Install) -> InstallPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> InstallPatchCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> InstallPatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The Android ID of the device.
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Android ID of the device.
     pub fn device_id(mut self, new_value: &str) -> InstallPatchCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
+    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *install id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn install_id(mut self, new_value: &str) -> InstallPatchCall<'a, C, A> {
         self._install_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstallPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4956,8 +4950,8 @@ impl<'a, C, A> InstallPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5147,53 +5141,52 @@ impl<'a, C, A> InstallGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> InstallGetCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> InstallGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The Android ID of the device.
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Android ID of the device.
     pub fn device_id(mut self, new_value: &str) -> InstallGetCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
+    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *install id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn install_id(mut self, new_value: &str) -> InstallGetCall<'a, C, A> {
         self._install_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstallGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5223,8 +5216,8 @@ impl<'a, C, A> InstallGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5412,43 +5405,42 @@ impl<'a, C, A> InstallListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> InstallListCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> InstallListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The Android ID of the device.
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Android ID of the device.
     pub fn device_id(mut self, new_value: &str) -> InstallListCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstallListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5478,8 +5470,8 @@ impl<'a, C, A> InstallListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5658,53 +5650,52 @@ impl<'a, C, A> InstallDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> InstallDeleteCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> InstallDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The Android ID of the device.
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Android ID of the device.
     pub fn device_id(mut self, new_value: &str) -> InstallDeleteCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
+    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *install id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn install_id(mut self, new_value: &str) -> InstallDeleteCall<'a, C, A> {
         self._install_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstallDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -5734,8 +5725,8 @@ impl<'a, C, A> InstallDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5940,62 +5931,61 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Install) -> InstallUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> InstallUpdateCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> InstallUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The Android ID of the device.
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The Android ID of the device.
     pub fn device_id(mut self, new_value: &str) -> InstallUpdateCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
+    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *install id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn install_id(mut self, new_value: &str) -> InstallUpdateCall<'a, C, A> {
         self._install_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstallUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6025,8 +6015,8 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6229,52 +6219,51 @@ impl<'a, C, A> DeviceSetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &DeviceState) -> DeviceSetStateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> DeviceSetStateCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> DeviceSetStateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the device.
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the device.
     pub fn device_id(mut self, new_value: &str) -> DeviceSetStateCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeviceSetStateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6304,8 +6293,8 @@ impl<'a, C, A> DeviceSetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6493,43 +6482,42 @@ impl<'a, C, A> DeviceGetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> DeviceGetStateCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> DeviceGetStateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the device.
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the device.
     pub fn device_id(mut self, new_value: &str) -> DeviceGetStateCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeviceGetStateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6559,8 +6547,8 @@ impl<'a, C, A> DeviceGetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6746,33 +6734,32 @@ impl<'a, C, A> DeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> DeviceListCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> DeviceListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeviceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -6802,8 +6789,8 @@ impl<'a, C, A> DeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6991,43 +6978,42 @@ impl<'a, C, A> DeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> DeviceGetCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> DeviceGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the device.
+    ///
     /// Sets the *device id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the device.
     pub fn device_id(mut self, new_value: &str) -> DeviceGetCall<'a, C, A> {
         self._device_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeviceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7057,8 +7043,8 @@ impl<'a, C, A> DeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7231,23 +7217,22 @@ impl<'a, C, A> EnterpriseUnenrollCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseUnenrollCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EnterpriseUnenrollCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7277,8 +7262,8 @@ impl<'a, C, A> EnterpriseUnenrollCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7453,32 +7438,31 @@ impl<'a, C, A> EnterpriseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Enterprise) -> EnterpriseInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The token provided by the enterprise to register the MDM.
+    ///
     /// Sets the *token* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The token provided by the enterprise to register the MDM.
     pub fn token(mut self, new_value: &str) -> EnterpriseInsertCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EnterpriseInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7508,8 +7492,8 @@ impl<'a, C, A> EnterpriseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7669,23 +7653,22 @@ impl<'a, C, A> EnterpriseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The exact primary domain name of the enterprise to look up.
+    ///
     /// Sets the *domain* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The exact primary domain name of the enterprise to look up.
     pub fn domain(mut self, new_value: &str) -> EnterpriseListCall<'a, C, A> {
         self._domain = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EnterpriseListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7715,8 +7698,8 @@ impl<'a, C, A> EnterpriseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7900,23 +7883,22 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseGetCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EnterpriseGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -7946,8 +7928,8 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8122,32 +8104,31 @@ impl<'a, C, A> EnterpriseEnrollCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Enterprise) -> EnterpriseEnrollCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The token provided by the enterprise to register the MDM.
+    ///
     /// Sets the *token* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The token provided by the enterprise to register the MDM.
     pub fn token(mut self, new_value: &str) -> EnterpriseEnrollCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EnterpriseEnrollCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8177,8 +8158,8 @@ impl<'a, C, A> EnterpriseEnrollCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8377,32 +8358,31 @@ impl<'a, C, A> EnterpriseSetAccountCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &EnterpriseAccount) -> EnterpriseSetAccountCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseSetAccountCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EnterpriseSetAccountCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8432,8 +8412,8 @@ impl<'a, C, A> EnterpriseSetAccountCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8606,23 +8586,22 @@ impl<'a, C, A> EnterpriseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseDeleteCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EnterpriseDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8652,8 +8631,8 @@ impl<'a, C, A> EnterpriseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8852,32 +8831,31 @@ impl<'a, C, A> CollectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Collection) -> CollectionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionInsertCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -8907,8 +8885,8 @@ impl<'a, C, A> CollectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9109,42 +9087,41 @@ impl<'a, C, A> CollectionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Collection) -> CollectionPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionPatchCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the collection.
+    ///
     /// Sets the *collection id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionPatchCall<'a, C, A> {
         self._collection_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9174,8 +9151,8 @@ impl<'a, C, A> CollectionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9376,42 +9353,41 @@ impl<'a, C, A> CollectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Collection) -> CollectionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionUpdateCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the collection.
+    ///
     /// Sets the *collection id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionUpdateCall<'a, C, A> {
         self._collection_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9441,8 +9417,8 @@ impl<'a, C, A> CollectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9626,23 +9602,22 @@ impl<'a, C, A> CollectionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionListCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9672,8 +9647,8 @@ impl<'a, C, A> CollectionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9859,33 +9834,32 @@ impl<'a, C, A> CollectionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionGetCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the collection.
+    ///
     /// Sets the *collection id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionGetCall<'a, C, A> {
         self._collection_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -9915,8 +9889,8 @@ impl<'a, C, A> CollectionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10091,33 +10065,32 @@ impl<'a, C, A> CollectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionDeleteCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the collection.
+    ///
     /// Sets the *collection id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionDeleteCall<'a, C, A> {
         self._collection_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10147,8 +10120,8 @@ impl<'a, C, A> CollectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10334,33 +10307,32 @@ impl<'a, C, A> GrouplicenseuserListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> GrouplicenseuserListCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *group license id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".
     pub fn group_license_id(mut self, new_value: &str) -> GrouplicenseuserListCall<'a, C, A> {
         self._group_license_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GrouplicenseuserListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10390,8 +10362,8 @@ impl<'a, C, A> GrouplicenseuserListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10599,60 +10571,58 @@ impl<'a, C, A> EntitlementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Entitlement) -> EntitlementUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EntitlementUpdateCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> EntitlementUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *entitlement id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn entitlement_id(mut self, new_value: &str) -> EntitlementUpdateCall<'a, C, A> {
         self._entitlement_id = new_value.to_string();
         self
     }
-    /// Sets the *install* query property to the given value.
-    ///
-    /// 
     /// Set to true to also install the product on all the user's devices where possible. Failure to install on one or more devices will not prevent this operation from returning successfully, as long as the entitlement was successfully assigned to the user.
+    ///
+    /// Sets the *install* query property to the given value.
     pub fn install(mut self, new_value: bool) -> EntitlementUpdateCall<'a, C, A> {
         self._install = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntitlementUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10682,8 +10652,8 @@ impl<'a, C, A> EntitlementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10869,33 +10839,32 @@ impl<'a, C, A> EntitlementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EntitlementListCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> EntitlementListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntitlementListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -10925,8 +10894,8 @@ impl<'a, C, A> EntitlementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11114,43 +11083,42 @@ impl<'a, C, A> EntitlementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EntitlementGetCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> EntitlementGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *entitlement id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn entitlement_id(mut self, new_value: &str) -> EntitlementGetCall<'a, C, A> {
         self._entitlement_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntitlementGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11180,8 +11148,8 @@ impl<'a, C, A> EntitlementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11389,60 +11357,58 @@ impl<'a, C, A> EntitlementPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Entitlement) -> EntitlementPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EntitlementPatchCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> EntitlementPatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *entitlement id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn entitlement_id(mut self, new_value: &str) -> EntitlementPatchCall<'a, C, A> {
         self._entitlement_id = new_value.to_string();
         self
     }
-    /// Sets the *install* query property to the given value.
-    ///
-    /// 
     /// Set to true to also install the product on all the user's devices where possible. Failure to install on one or more devices will not prevent this operation from returning successfully, as long as the entitlement was successfully assigned to the user.
+    ///
+    /// Sets the *install* query property to the given value.
     pub fn install(mut self, new_value: bool) -> EntitlementPatchCall<'a, C, A> {
         self._install = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntitlementPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11472,8 +11438,8 @@ impl<'a, C, A> EntitlementPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11650,43 +11616,42 @@ impl<'a, C, A> EntitlementDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the user.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *entitlement id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn entitlement_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, A> {
         self._entitlement_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntitlementDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11716,8 +11681,8 @@ impl<'a, C, A> EntitlementDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11903,33 +11868,32 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> ProductGetPermissionCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the product.
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the product.
     pub fn product_id(mut self, new_value: &str) -> ProductGetPermissionCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProductGetPermissionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -11959,8 +11923,8 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12151,41 +12115,39 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the product, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the product, e.g. "app:com.google.android.gm".
     pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProductGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12215,8 +12177,8 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12407,41 +12369,39 @@ impl<'a, C, A> ProductGetAppRestrictionsSchemaCall<'a, C, A> where C: BorrowMut<
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> ProductGetAppRestrictionsSchemaCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the product.
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the product.
     pub fn product_id(mut self, new_value: &str) -> ProductGetAppRestrictionsSchemaCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> ProductGetAppRestrictionsSchemaCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProductGetAppRestrictionsSchemaCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12471,8 +12431,8 @@ impl<'a, C, A> ProductGetAppRestrictionsSchemaCall<'a, C, A> where C: BorrowMut<
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12673,42 +12633,41 @@ impl<'a, C, A> ProductUpdatePermissionCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &ProductPermissions) -> ProductUpdatePermissionCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> ProductUpdatePermissionCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the product.
+    ///
     /// Sets the *product id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the product.
     pub fn product_id(mut self, new_value: &str) -> ProductUpdatePermissionCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProductUpdatePermissionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12738,8 +12697,8 @@ impl<'a, C, A> ProductUpdatePermissionCall<'a, C, A> where C: BorrowMut<hyper::C
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12925,33 +12884,32 @@ impl<'a, C, A> GrouplicenseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> GrouplicenseGetCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
+    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".
+    ///
     /// Sets the *group license id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".
     pub fn group_license_id(mut self, new_value: &str) -> GrouplicenseGetCall<'a, C, A> {
         self._group_license_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GrouplicenseGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -12981,8 +12939,8 @@ impl<'a, C, A> GrouplicenseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13166,23 +13124,22 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
+    /// The ID of the enterprise.
+    ///
     /// Sets the *enterprise id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> GrouplicenseListCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> GrouplicenseListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13212,8 +13169,8 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13402,31 +13359,29 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The ID of the permission.
+    ///
     /// Sets the *permission id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the permission.
     pub fn permission_id(mut self, new_value: &str) -> PermissionGetCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
-    /// Sets the *language* query property to the given value.
-    ///
-    /// 
     /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de")
+    ///
+    /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> PermissionGetCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -13456,8 +13411,8 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

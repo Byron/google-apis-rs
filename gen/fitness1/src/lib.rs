@@ -107,16 +107,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -300,16 +302,18 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -426,7 +430,7 @@ impl ResponseResult for Dataset {}
 /// 
 /// * [data sources list users](struct.UserDataSourceListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListDataSourcesResponse {
     /// A previously created data source.
     #[serde(rename="dataSource")]
@@ -503,7 +507,7 @@ impl ResponseResult for Session {}
 /// 
 /// * [sessions list users](struct.UserSessionListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListSessionsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
@@ -1130,59 +1134,56 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The data stream ID of the data source that created the dataset.
+    ///
     /// Sets the *data source id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The data stream ID of the data source that created the dataset.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
+    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
     pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large datasets. To get the next page of a dataset, set this parameter to the value of nextPageToken from the previous response. Each subsequent call will yield a partial dataset with data point end timestamps that are strictly smaller than those in the previous partial response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *limit* query property to the given value.
-    ///
-    /// 
     /// If specified, no more than this many data points will be included in the dataset. If the there are more data points in the dataset, nextPageToken will be set in the dataset response.
+    ///
+    /// Sets the *limit* query property to the given value.
     pub fn limit(mut self, new_value: i32) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._limit = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1212,8 +1213,8 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityRead`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1308,7 +1309,7 @@ impl<'a, C, A> UserDataSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/fitness/v1/users/{userId}/dataSources".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId")].iter() {
@@ -1412,32 +1413,31 @@ impl<'a, C, A> UserDataSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &DataSource) -> UserDataSourceCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceCreateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1467,8 +1467,8 @@ impl<'a, C, A> UserDataSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1569,7 +1569,7 @@ impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = "https://www.googleapis.com/fitness/v1/users/{userId}/dataSources/{dataSourceId}/datasets/{datasetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId"), ("{dataSourceId}", "dataSourceId"), ("{datasetId}", "datasetId")].iter() {
@@ -1655,59 +1655,56 @@ impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
+    /// Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The data stream ID of the data source that created the dataset.
+    ///
     /// Sets the *data source id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The data stream ID of the data source that created the dataset.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
+    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
     pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *modified time millis* query property to the given value.
-    ///
-    /// 
     /// When the operation was performed on the client.
+    ///
+    /// Sets the *modified time millis* query property to the given value.
     pub fn modified_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._modified_time_millis = Some(new_value.to_string());
         self
     }
-    /// Sets the *current time millis* query property to the given value.
-    ///
-    /// 
     /// The client's current time in milliseconds since epoch.
+    ///
+    /// Sets the *current time millis* query property to the given value.
     pub fn current_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -1737,8 +1734,8 @@ impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hype
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1842,7 +1839,7 @@ impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = "https://www.googleapis.com/fitness/v1/users/{userId}/dataSources/{dataSourceId}/datasets/{datasetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId"), ("{dataSourceId}", "dataSourceId"), ("{datasetId}", "datasetId")].iter() {
@@ -1946,60 +1943,58 @@ impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Dataset) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The data stream ID of the data source that created the dataset.
+    ///
     /// Sets the *data source id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The data stream ID of the data source that created the dataset.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
+    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
+    ///
     /// Sets the *dataset id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
     pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Sets the *current time millis* query property to the given value.
-    ///
-    /// 
     /// The client's current time in milliseconds since epoch. Note that the minStartTimeNs and maxEndTimeNs properties in the request body are in nanoseconds instead of milliseconds.
+    ///
+    /// Sets the *current time millis* query property to the given value.
     pub fn current_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2029,8 +2024,8 @@ impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2124,7 +2119,7 @@ impl<'a, C, A> UserSessionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/fitness/v1/users/{userId}/sessions/{sessionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId"), ("{sessionId}", "sessionId")].iter() {
@@ -2210,41 +2205,39 @@ impl<'a, C, A> UserSessionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the session to be deleted.
+    ///
     /// Sets the *session id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the session to be deleted.
     pub fn session_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, A> {
         self._session_id = new_value.to_string();
         self
     }
-    /// Sets the *current time millis* query property to the given value.
-    ///
-    /// 
     /// The client's current time in milliseconds since epoch.
+    ///
+    /// Sets the *current time millis* query property to the given value.
     pub fn current_time_millis(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSessionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2274,8 +2267,8 @@ impl<'a, C, A> UserSessionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2461,33 +2454,32 @@ impl<'a, C, A> UserDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    /// Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The data stream ID of the data source to retrieve.
+    ///
     /// Sets the *data source id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The data stream ID of the data source to retrieve.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2517,8 +2509,8 @@ impl<'a, C, A> UserDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityRead`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2617,7 +2609,7 @@ impl<'a, C, A> UserDataSourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = "https://www.googleapis.com/fitness/v1/users/{userId}/dataSources/{dataSourceId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId"), ("{dataSourceId}", "dataSourceId")].iter() {
@@ -2721,42 +2713,41 @@ impl<'a, C, A> UserDataSourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &DataSource) -> UserDataSourceUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The data stream ID of the data source to update.
+    ///
     /// Sets the *data source id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The data stream ID of the data source to update.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2786,8 +2777,8 @@ impl<'a, C, A> UserDataSourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2991,55 +2982,50 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
-    /// Sets the *start time* query property to the given value.
-    ///
-    /// 
     /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.
+    ///
+    /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *include deleted* query property to the given value.
-    ///
-    /// 
     /// If true, deleted sessions will be returned. When set to true, sessions returned in this response will only have an ID and will not have any other fields.
+    ///
+    /// Sets the *include deleted* query property to the given value.
     pub fn include_deleted(mut self, new_value: bool) -> UserSessionListCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
-    /// Sets the *end time* query property to the given value.
-    ///
-    /// 
     /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.
+    ///
+    /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSessionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3069,8 +3055,8 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityRead`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3172,7 +3158,7 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = "https://www.googleapis.com/fitness/v1/users/{userId}/sessions/{sessionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId"), ("{sessionId}", "sessionId")].iter() {
@@ -3276,50 +3262,48 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Session) -> UserSessionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The ID of the session to be created.
+    ///
     /// Sets the *session id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the session to be created.
     pub fn session_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, A> {
         self._session_id = new_value.to_string();
         self
     }
-    /// Sets the *current time millis* query property to the given value.
-    ///
-    /// 
     /// The client's current time in milliseconds since epoch.
+    ///
+    /// Sets the *current time millis* query property to the given value.
     pub fn current_time_millis(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSessionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3349,8 +3333,8 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3449,7 +3433,7 @@ impl<'a, C, A> UserDataSourcePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = "https://www.googleapis.com/fitness/v1/users/{userId}/dataSources/{dataSourceId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
+            self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId"), ("{dataSourceId}", "dataSourceId")].iter() {
@@ -3553,42 +3537,41 @@ impl<'a, C, A> UserDataSourcePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &DataSource) -> UserDataSourcePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourcePatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The data stream ID of the data source to update.
+    ///
     /// Sets the *data source id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The data stream ID of the data source to update.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourcePatchCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourcePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3618,8 +3601,8 @@ impl<'a, C, A> UserDataSourcePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityWrite`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3812,32 +3795,30 @@ impl<'a, C, A> UserDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
     /// Sets the *user id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
+    /// The names of data types to include in the list. If not specified, all data sources will be returned.
+    ///
     /// Append the given value to the *data type name* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The names of data types to include in the list. If not specified, all data sources will be returned.
     pub fn add_data_type_name(mut self, new_value: &str) -> UserDataSourceListCall<'a, C, A> {
         self._data_type_name.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3867,8 +3848,8 @@ impl<'a, C, A> UserDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityRead`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

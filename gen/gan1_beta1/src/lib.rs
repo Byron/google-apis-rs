@@ -123,16 +123,18 @@
 //! 
 //! match result {
 //!     Err(e) => match e {
-//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!         Error::MissingToken => println!("OAuth2: Missing Token"),
-//!         Error::Cancelled => println!("Operation canceled by user"),
-//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!         // The Error enum provides details about what exactly happened.
+//!         // You can also just use its `Debug`, `Display` or `Error` traits
+//!         Error::HttpError(_)
+//!         |Error::MissingAPIKey
+//!         |Error::MissingToken
+//!         |Error::Cancelled
+//!         |Error::UploadSizeLimitExceeded(_, _)
+//!         |Error::Failure(_)
+//!         |Error::FieldClash(_)
+//!         |Error::JsonDecodeError(_) => println!("{}", e),
 //!     },
-//!     Ok(_) => println!("Success (value doesn't print)"),
+//!     Ok(res) => println!("Success: {:?}", res),
 //! }
 //! # }
 //! ```
@@ -281,16 +283,18 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// 
 /// match result {
 ///     Err(e) => match e {
-///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///         Error::MissingToken => println!("OAuth2: Missing Token"),
-///         Error::Cancelled => println!("Operation canceled by user"),
-///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///         Error::HttpError(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_) => println!("{}", e),
 ///     },
-///     Ok(_) => println!("Success (value doesn't print)"),
+///     Ok(res) => println!("Success: {:?}", res),
 /// }
 /// # }
 /// ```
@@ -357,7 +361,7 @@ impl<'a, C, A> Gan<C, A>
 /// * [list advertisers](struct.AdvertiserListCall.html) (none)
 /// * [get advertisers](struct.AdvertiserGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Advertiser {
     /// The status of the requesting publisher's relationship this advertiser.
     pub status: String,
@@ -425,7 +429,7 @@ impl ResponseResult for Advertiser {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOfferRewards {
     /// The kind of purchases covered by this rule.
     pub category: String,
@@ -458,7 +462,7 @@ impl Part for CcOfferRewards {}
 /// 
 /// * [list links](struct.LinkListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Links {
     /// The next page token.
     #[serde(rename="nextPageToken")]
@@ -481,7 +485,7 @@ impl ResponseResult for Links {}
 /// 
 /// * [list publishers](struct.PublisherListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Publishers {
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
     #[serde(rename="nextPageToken")]
@@ -521,7 +525,7 @@ impl Part for Money {}
 /// * [list publishers](struct.PublisherListCall.html) (none)
 /// * [get publishers](struct.PublisherGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Publisher {
     /// The status of the requesting advertiser's relationship with this publisher.
     pub status: String,
@@ -600,7 +604,7 @@ impl Part for LinkSpecialOffers {}
 /// 
 /// * [list events](struct.EventListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Events {
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
     #[serde(rename="nextPageToken")]
@@ -618,7 +622,7 @@ impl ResponseResult for Events {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOfferBonusRewards {
     /// How many units of reward will be granted.
     pub amount: f64,
@@ -634,7 +638,7 @@ impl Part for CcOfferBonusRewards {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOfferDefaultFees {
     /// The type of charge, for example Purchases.
     pub category: String,
@@ -662,7 +666,7 @@ impl Part for CcOfferDefaultFees {}
 /// 
 /// * [list cc offers](struct.CcOfferListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOffers {
     /// The credit card offers.
     pub items: Vec<CcOffer>,
@@ -753,7 +757,7 @@ impl ResponseResult for Link {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventProducts {
     /// Fee that the advertiser paid to the Google Affiliate Network for this product.
     #[serde(rename="networkFee")]
@@ -794,7 +798,7 @@ impl Part for EventProducts {}
 /// 
 /// * [get reports](struct.ReportGetCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Report {
     /// The totals rows for the report
     pub totals_rows: Vec<Vec<String>>,
@@ -828,7 +832,7 @@ impl ResponseResult for Report {}
 /// 
 /// * [list advertisers](struct.AdvertiserListCall.html) (response)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Advertisers {
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
     #[serde(rename="nextPageToken")]
@@ -851,7 +855,7 @@ impl ResponseResult for Advertisers {}
 /// 
 /// * [list events](struct.EventListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
     /// The order ID for this event. Only returned for conversion events.
     #[serde(rename="orderId")]
@@ -917,7 +921,7 @@ impl Resource for Event {}
 /// 
 /// * [list cc offers](struct.CcOfferListCall.html) (none)
 /// 
-#[derive(Default, Clone, Debug, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOffer {
     /// If you get coverage when you use the card for the given activity, this field describes it.
     #[serde(rename="luggageInsurance")]
@@ -1809,89 +1813,81 @@ impl<'a, C, A> PublisherListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
+    ///
     /// Sets the *role* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
     pub fn role(mut self, new_value: &str) -> PublisherListCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
+    /// The ID of the requesting advertiser or publisher.
+    ///
     /// Sets the *role id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the requesting advertiser or publisher.
     pub fn role_id(mut self, new_value: &str) -> PublisherListCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
-    /// Sets the *relationship status* query property to the given value.
-    ///
-    /// 
     /// Filters out all publishers for which do not have the given relationship status with the requesting publisher.
+    ///
+    /// Sets the *relationship status* query property to the given value.
     pub fn relationship_status(mut self, new_value: &str) -> PublisherListCall<'a, C, A> {
         self._relationship_status = Some(new_value.to_string());
         self
     }
-    /// Sets the *publisher category* query property to the given value.
-    ///
-    /// 
     /// Caret(^) delimted list of publisher categories. Valid categories: (unclassified|community_and_content|shopping_and_promotion|loyalty_and_rewards|network|search_specialist|comparison_shopping|email). Filters out all publishers not in one of the given advertiser categories. Optional.
+    ///
+    /// Sets the *publisher category* query property to the given value.
     pub fn publisher_category(mut self, new_value: &str) -> PublisherListCall<'a, C, A> {
         self._publisher_category = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of 'nextPageToken' from the previous page. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PublisherListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *min seven day epc* query property to the given value.
-    ///
-    /// 
     /// Filters out all publishers that have a seven day EPC average lower than the given value (inclusive). Min value 0.0. Optional.
+    ///
+    /// Sets the *min seven day epc* query property to the given value.
     pub fn min_seven_day_epc(mut self, new_value: f64) -> PublisherListCall<'a, C, A> {
         self._min_seven_day_epc = Some(new_value);
         self
     }
-    /// Sets the *min payout rank* query property to the given value.
-    ///
-    /// 
     /// A value between 1 and 4, where 1 represents the quartile of publishers with the lowest ranks and 4 represents the quartile of publishers with the highest ranks. Filters out all publishers with a lower rank than the given quartile. For example if a 2 was given only publishers with a payout rank of 25 or higher would be included. Optional.
+    ///
+    /// Sets the *min payout rank* query property to the given value.
     pub fn min_payout_rank(mut self, new_value: i32) -> PublisherListCall<'a, C, A> {
         self._min_payout_rank = Some(new_value);
         self
     }
-    /// Sets the *min ninety day epc* query property to the given value.
-    ///
-    /// 
     /// Filters out all publishers that have a ninety day EPC average lower than the given value (inclusive). Min value: 0.0. Optional.
+    ///
+    /// Sets the *min ninety day epc* query property to the given value.
     pub fn min_ninety_day_epc(mut self, new_value: f64) -> PublisherListCall<'a, C, A> {
         self._min_ninety_day_epc = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Max number of items to return in this page. Optional. Defaults to 20.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PublisherListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PublisherListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2094,41 +2090,39 @@ impl<'a, C, A> PublisherGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
+    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
+    ///
     /// Sets the *role* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
     pub fn role(mut self, new_value: &str) -> PublisherGetCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
+    /// The ID of the requesting advertiser or publisher.
+    ///
     /// Sets the *role id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the requesting advertiser or publisher.
     pub fn role_id(mut self, new_value: &str) -> PublisherGetCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
-    /// Sets the *publisher id* query property to the given value.
-    ///
-    /// 
     /// The ID of the publisher to look up. Optional.
+    ///
+    /// Sets the *publisher id* query property to the given value.
     pub fn publisher_id(mut self, new_value: &str) -> PublisherGetCall<'a, C, A> {
         self._publisher_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PublisherGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2341,42 +2335,41 @@ impl<'a, C, A> LinkInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
     pub fn request(mut self, new_value: &Link) -> LinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
+    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
+    ///
     /// Sets the *role* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
     pub fn role(mut self, new_value: &str) -> LinkInsertCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
+    /// The ID of the requesting advertiser or publisher.
+    ///
     /// Sets the *role id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the requesting advertiser or publisher.
     pub fn role_id(mut self, new_value: &str) -> LinkInsertCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2576,43 +2569,42 @@ impl<'a, C, A> LinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
+    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
+    ///
     /// Sets the *role* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
     pub fn role(mut self, new_value: &str) -> LinkGetCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
+    /// The ID of the requesting advertiser or publisher.
+    ///
     /// Sets the *role id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the requesting advertiser or publisher.
     pub fn role_id(mut self, new_value: &str) -> LinkGetCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
+    /// The ID of the link to look up.
+    ///
     /// Sets the *link id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the link to look up.
     pub fn link_id(mut self, new_value: &str) -> LinkGetCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LinkGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -2887,140 +2879,126 @@ impl<'a, C, A> LinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
+    ///
     /// Sets the *role* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
     pub fn role(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
+    /// The ID of the requesting advertiser or publisher.
+    ///
     /// Sets the *role id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the requesting advertiser or publisher.
     pub fn role_id(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
-    /// Sets the *start date min* query property to the given value.
-    ///
-    /// 
     /// The beginning of the start date range.
+    ///
+    /// Sets the *start date min* query property to the given value.
     pub fn start_date_min(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._start_date_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *start date max* query property to the given value.
-    ///
-    /// 
     /// The end of the start date range.
+    ///
+    /// Sets the *start date max* query property to the given value.
     pub fn start_date_max(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._start_date_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *search text* query property to the given value.
-    ///
-    /// 
     /// Field for full text search across title and merchandising text, supports link id search.
+    ///
+    /// Sets the *search text* query property to the given value.
     pub fn search_text(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._search_text = Some(new_value.to_string());
         self
     }
-    /// Sets the *relationship status* query property to the given value.
-    ///
-    /// 
     /// The status of the relationship.
+    ///
+    /// Sets the *relationship status* query property to the given value.
     pub fn relationship_status(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._relationship_status = Some(new_value.to_string());
         self
     }
+    /// The promotion type.
+    ///
     /// Append the given value to the *promotion type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The promotion type.
     pub fn add_promotion_type(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._promotion_type.push(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of 'nextPageToken' from the previous page. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Max number of items to return in this page. Optional. Defaults to 20.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *link type* query property to the given value.
-    ///
-    /// 
     /// The type of the link.
+    ///
+    /// Sets the *link type* query property to the given value.
     pub fn link_type(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._link_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *create date min* query property to the given value.
-    ///
-    /// 
     /// The beginning of the create date range.
+    ///
+    /// Sets the *create date min* query property to the given value.
     pub fn create_date_min(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._create_date_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *create date max* query property to the given value.
-    ///
-    /// 
     /// The end of the create date range.
+    ///
+    /// Sets the *create date max* query property to the given value.
     pub fn create_date_max(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._create_date_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *authorship* query property to the given value.
-    ///
-    /// 
     /// The role of the author of the link.
+    ///
+    /// Sets the *authorship* query property to the given value.
     pub fn authorship(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._authorship = Some(new_value.to_string());
         self
     }
+    /// The size of the given asset.
+    ///
     /// Append the given value to the *asset size* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The size of the given asset.
     pub fn add_asset_size(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._asset_size.push(new_value.to_string());
         self
     }
+    /// Limits the resulting links to the ones belonging to the listed advertisers.
+    ///
     /// Append the given value to the *advertiser id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Limits the resulting links to the ones belonging to the listed advertisers.
     pub fn add_advertiser_id(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._advertiser_id.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> LinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3291,135 +3269,123 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
+    ///
     /// Sets the *role* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
     pub fn role(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
+    /// The ID of the requesting advertiser or publisher.
+    ///
     /// Sets the *role id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the requesting advertiser or publisher.
     pub fn role_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
+    /// The type of report being requested. Valid values: 'order_delta'. Required.
+    ///
     /// Sets the *report type* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The type of report being requested. Valid values: 'order_delta'. Required.
     pub fn report_type(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._report_type = new_value.to_string();
         self
     }
-    /// Sets the *status* query property to the given value.
-    ///
-    /// 
     /// Filters out all events that do not have the given status. Valid values: 'active', 'canceled', or 'invalid'. Optional.
+    ///
+    /// Sets the *status* query property to the given value.
     pub fn status(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._status = Some(new_value.to_string());
         self
     }
-    /// Sets the *start index* query property to the given value.
-    ///
-    /// 
     /// Offset on which to return results when paging. Optional.
+    ///
+    /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> ReportGetCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
-    /// Sets the *start date* query property to the given value.
-    ///
-    /// 
     /// The start date (inclusive), in RFC 3339 format, for the report data to be returned. Defaults to one day before endDate, if that is given, or yesterday. Optional.
+    ///
+    /// Sets the *start date* query property to the given value.
     pub fn start_date(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
+    /// The IDs of the publishers to look up, if applicable.
+    ///
     /// Append the given value to the *publisher id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The IDs of the publishers to look up, if applicable.
     pub fn add_publisher_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._publisher_id.push(new_value.to_string());
         self
     }
+    /// Filters to capture one of the given order IDs. Optional.
+    ///
     /// Append the given value to the *order id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Filters to capture one of the given order IDs. Optional.
     pub fn add_order_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._order_id.push(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Max number of items to return in this page. Optional. Defaults to return all results.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ReportGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
+    /// Filters to capture one of given link IDs. Optional.
+    ///
     /// Append the given value to the *link id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// Filters to capture one of given link IDs. Optional.
     pub fn add_link_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._link_id.push(new_value.to_string());
         self
     }
-    /// Sets the *event type* query property to the given value.
-    ///
-    /// 
     /// Filters out all events that are not of the given type. Valid values: 'action', 'transaction', or 'charge'. Optional.
+    ///
+    /// Sets the *event type* query property to the given value.
     pub fn event_type(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._event_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *end date* query property to the given value.
-    ///
-    /// 
     /// The end date (exclusive), in RFC 3339 format, for the report data to be returned. Defaults to one day after startDate, if that is given, or today. Optional.
+    ///
+    /// Sets the *end date* query property to the given value.
     pub fn end_date(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._end_date = Some(new_value.to_string());
         self
     }
-    /// Sets the *calculate totals* query property to the given value.
-    ///
-    /// 
     /// Whether or not to calculate totals rows. Optional.
+    ///
+    /// Sets the *calculate totals* query property to the given value.
     pub fn calculate_totals(mut self, new_value: bool) -> ReportGetCall<'a, C, A> {
         self._calculate_totals = Some(new_value);
         self
     }
+    /// The IDs of the advertisers to look up, if applicable.
+    ///
     /// Append the given value to the *advertiser id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The IDs of the advertisers to look up, if applicable.
     pub fn add_advertiser_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._advertiser_id.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3629,40 +3595,37 @@ impl<'a, C, A> CcOfferListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the publisher in question.
+    ///
     /// Sets the *publisher* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the publisher in question.
     pub fn publisher(mut self, new_value: &str) -> CcOfferListCall<'a, C, A> {
         self._publisher = new_value.to_string();
         self
     }
-    /// Sets the *projection* query property to the given value.
-    ///
-    /// 
     /// The set of fields to return.
+    ///
+    /// Sets the *projection* query property to the given value.
     pub fn projection(mut self, new_value: &str) -> CcOfferListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
+    /// The advertiser ID of a card issuer whose offers to include. Optional, may be repeated.
+    ///
     /// Append the given value to the *advertiser* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// 
-    /// The advertiser ID of a card issuer whose offers to include. Optional, may be repeated.
     pub fn add_advertiser(mut self, new_value: &str) -> CcOfferListCall<'a, C, A> {
         self._advertiser.push(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> CcOfferListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -3865,41 +3828,39 @@ impl<'a, C, A> AdvertiserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
+    ///
     /// Sets the *role* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
     pub fn role(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
+    /// The ID of the requesting advertiser or publisher.
+    ///
     /// Sets the *role id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the requesting advertiser or publisher.
     pub fn role_id(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
-    /// Sets the *advertiser id* query property to the given value.
-    ///
-    /// 
     /// The ID of the advertiser to look up. Optional.
+    ///
+    /// Sets the *advertiser id* query property to the given value.
     pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, A> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4132,89 +4093,81 @@ impl<'a, C, A> AdvertiserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
+    ///
     /// Sets the *role* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
     pub fn role(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
+    /// The ID of the requesting advertiser or publisher.
+    ///
     /// Sets the *role id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the requesting advertiser or publisher.
     pub fn role_id(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
-    /// Sets the *relationship status* query property to the given value.
-    ///
-    /// 
     /// Filters out all advertisers for which do not have the given relationship status with the requesting publisher.
+    ///
+    /// Sets the *relationship status* query property to the given value.
     pub fn relationship_status(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._relationship_status = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of 'nextPageToken' from the previous page. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *min seven day epc* query property to the given value.
-    ///
-    /// 
     /// Filters out all advertisers that have a seven day EPC average lower than the given value (inclusive). Min value: 0.0. Optional.
+    ///
+    /// Sets the *min seven day epc* query property to the given value.
     pub fn min_seven_day_epc(mut self, new_value: f64) -> AdvertiserListCall<'a, C, A> {
         self._min_seven_day_epc = Some(new_value);
         self
     }
-    /// Sets the *min payout rank* query property to the given value.
-    ///
-    /// 
     /// A value between 1 and 4, where 1 represents the quartile of advertisers with the lowest ranks and 4 represents the quartile of advertisers with the highest ranks. Filters out all advertisers with a lower rank than the given quartile. For example if a 2 was given only advertisers with a payout rank of 25 or higher would be included. Optional.
+    ///
+    /// Sets the *min payout rank* query property to the given value.
     pub fn min_payout_rank(mut self, new_value: i32) -> AdvertiserListCall<'a, C, A> {
         self._min_payout_rank = Some(new_value);
         self
     }
-    /// Sets the *min ninety day epc* query property to the given value.
-    ///
-    /// 
     /// Filters out all advertisers that have a ninety day EPC average lower than the given value (inclusive). Min value: 0.0. Optional.
+    ///
+    /// Sets the *min ninety day epc* query property to the given value.
     pub fn min_ninety_day_epc(mut self, new_value: f64) -> AdvertiserListCall<'a, C, A> {
         self._min_ninety_day_epc = Some(new_value);
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Max number of items to return in this page. Optional. Defaults to 20.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> AdvertiserListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *advertiser category* query property to the given value.
-    ///
-    /// 
     /// Caret(^) delimted list of advertiser categories. Valid categories are defined here: http://www.google.com/support/affiliatenetwork/advertiser/bin/answer.py?hl=en&answer=107581. Filters out all advertisers not in one of the given advertiser categories. Optional.
+    ///
+    /// Sets the *advertiser category* query property to the given value.
     pub fn advertiser_category(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._advertiser_category = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
@@ -4492,161 +4445,144 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
+    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
+    ///
     /// Sets the *role* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
     pub fn role(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
+    /// The ID of the requesting advertiser or publisher.
+    ///
     /// Sets the *role id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    /// 
-    /// The ID of the requesting advertiser or publisher.
     pub fn role_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
-    /// Sets the *type* query property to the given value.
-    ///
-    /// 
     /// Filters out all events that are not of the given type. Valid values: 'action', 'transaction', 'charge'. Optional.
+    ///
+    /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Sets the *status* query property to the given value.
-    ///
-    /// 
     /// Filters out all events that do not have the given status. Valid values: 'active', 'canceled'. Optional.
+    ///
+    /// Sets the *status* query property to the given value.
     pub fn status(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._status = Some(new_value.to_string());
         self
     }
-    /// Sets the *sku* query property to the given value.
-    ///
-    /// 
     /// Caret(^) delimited list of SKUs. Filters out all events that do not reference one of the given SKU. Optional.
+    ///
+    /// Sets the *sku* query property to the given value.
     pub fn sku(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._sku = Some(new_value.to_string());
         self
     }
-    /// Sets the *publisher id* query property to the given value.
-    ///
-    /// 
     /// Caret(^) delimited list of publisher IDs. Filters out all events that do not reference one of the given publishers IDs. Only used when under advertiser role. Optional.
+    ///
+    /// Sets the *publisher id* query property to the given value.
     pub fn publisher_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._publisher_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *product category* query property to the given value.
-    ///
-    /// 
     /// Caret(^) delimited list of product categories. Filters out all events that do not reference a product in one of the given product categories. Optional.
+    ///
+    /// Sets the *product category* query property to the given value.
     pub fn product_category(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._product_category = Some(new_value.to_string());
         self
     }
-    /// Sets the *page token* query property to the given value.
-    ///
-    /// 
     /// The value of 'nextPageToken' from the previous page. Optional.
+    ///
+    /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sets the *order id* query property to the given value.
-    ///
-    /// 
     /// Caret(^) delimited list of order IDs. Filters out all events that do not reference one of the given order IDs. Optional.
+    ///
+    /// Sets the *order id* query property to the given value.
     pub fn order_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._order_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *modify date min* query property to the given value.
-    ///
-    /// 
     /// Filters out all events modified earlier than given date. Optional. Defaults to 24 hours before the current modifyDateMax, if modifyDateMax is explicitly set.
+    ///
+    /// Sets the *modify date min* query property to the given value.
     pub fn modify_date_min(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._modify_date_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *modify date max* query property to the given value.
-    ///
-    /// 
     /// Filters out all events modified later than given date. Optional. Defaults to 24 hours after modifyDateMin, if modifyDateMin is explicitly set.
+    ///
+    /// Sets the *modify date max* query property to the given value.
     pub fn modify_date_max(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._modify_date_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *member id* query property to the given value.
-    ///
-    /// 
     /// Caret(^) delimited list of member IDs. Filters out all events that do not reference one of the given member IDs. Optional.
+    ///
+    /// Sets the *member id* query property to the given value.
     pub fn member_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._member_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *max results* query property to the given value.
-    ///
-    /// 
     /// Max number of offers to return in this page. Optional. Defaults to 20.
+    ///
+    /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> EventListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Sets the *link id* query property to the given value.
-    ///
-    /// 
     /// Caret(^) delimited list of link IDs. Filters out all events that do not reference one of the given link IDs. Optional.
+    ///
+    /// Sets the *link id* query property to the given value.
     pub fn link_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._link_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *event date min* query property to the given value.
-    ///
-    /// 
     /// Filters out all events earlier than given date. Optional. Defaults to 24 hours from current date/time.
+    ///
+    /// Sets the *event date min* query property to the given value.
     pub fn event_date_min(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._event_date_min = Some(new_value.to_string());
         self
     }
-    /// Sets the *event date max* query property to the given value.
-    ///
-    /// 
     /// Filters out all events later than given date. Optional. Defaults to 24 hours after eventMin.
+    ///
+    /// Sets the *event date max* query property to the given value.
     pub fn event_date_max(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._event_date_max = Some(new_value.to_string());
         self
     }
-    /// Sets the *charge type* query property to the given value.
-    ///
-    /// 
     /// Filters out all charge events that are not of the given charge type. Valid values: 'other', 'slotting_fee', 'monthly_minimum', 'tier_bonus', 'credit', 'debit'. Optional.
+    ///
+    /// Sets the *charge type* query property to the given value.
     pub fn charge_type(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._charge_type = Some(new_value.to_string());
         self
     }
-    /// Sets the *advertiser id* query property to the given value.
-    ///
-    /// 
     /// Caret(^) delimited list of advertiser IDs. Filters out all events that do not reference one of the given advertiser IDs. Only used when under publishers role. Optional.
+    ///
+    /// Sets the *advertiser id* query property to the given value.
     pub fn advertiser_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
-    /// Sets the *delegate* property to the given value.
-    ///
-    /// 
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
