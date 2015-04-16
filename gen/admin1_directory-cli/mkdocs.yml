@@ -1,0 +1,83 @@
+site_name: directory v0.0.1+20150309
+site_url: http://byron.github.io/google-apis-rs/google-admin1_directory-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/admin1_directory-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['asps_delete.md', 'Asps', 'Delete']
+- ['asps_get.md', 'Asps', 'Get']
+- ['asps_list.md', 'Asps', 'List']
+- ['channels_stop.md', 'Channels', 'Stop']
+- ['chromeosdevices_get.md', 'Chromeosdevices', 'Get']
+- ['chromeosdevices_list.md', 'Chromeosdevices', 'List']
+- ['chromeosdevices_patch.md', 'Chromeosdevices', 'Patch']
+- ['chromeosdevices_update.md', 'Chromeosdevices', 'Update']
+- ['groups_aliases-delete.md', 'Groups', 'Aliases Delete']
+- ['groups_aliases-insert.md', 'Groups', 'Aliases Insert']
+- ['groups_aliases-list.md', 'Groups', 'Aliases List']
+- ['groups_delete.md', 'Groups', 'Delete']
+- ['groups_get.md', 'Groups', 'Get']
+- ['groups_insert.md', 'Groups', 'Insert']
+- ['groups_list.md', 'Groups', 'List']
+- ['groups_patch.md', 'Groups', 'Patch']
+- ['groups_update.md', 'Groups', 'Update']
+- ['members_delete.md', 'Members', 'Delete']
+- ['members_get.md', 'Members', 'Get']
+- ['members_insert.md', 'Members', 'Insert']
+- ['members_list.md', 'Members', 'List']
+- ['members_patch.md', 'Members', 'Patch']
+- ['members_update.md', 'Members', 'Update']
+- ['mobiledevices_action.md', 'Mobiledevices', 'Action']
+- ['mobiledevices_delete.md', 'Mobiledevices', 'Delete']
+- ['mobiledevices_get.md', 'Mobiledevices', 'Get']
+- ['mobiledevices_list.md', 'Mobiledevices', 'List']
+- ['notifications_delete.md', 'Notifications', 'Delete']
+- ['notifications_get.md', 'Notifications', 'Get']
+- ['notifications_list.md', 'Notifications', 'List']
+- ['notifications_patch.md', 'Notifications', 'Patch']
+- ['notifications_update.md', 'Notifications', 'Update']
+- ['orgunits_delete.md', 'Orgunits', 'Delete']
+- ['orgunits_get.md', 'Orgunits', 'Get']
+- ['orgunits_insert.md', 'Orgunits', 'Insert']
+- ['orgunits_list.md', 'Orgunits', 'List']
+- ['orgunits_patch.md', 'Orgunits', 'Patch']
+- ['orgunits_update.md', 'Orgunits', 'Update']
+- ['schemas_delete.md', 'Schemas', 'Delete']
+- ['schemas_get.md', 'Schemas', 'Get']
+- ['schemas_insert.md', 'Schemas', 'Insert']
+- ['schemas_list.md', 'Schemas', 'List']
+- ['schemas_patch.md', 'Schemas', 'Patch']
+- ['schemas_update.md', 'Schemas', 'Update']
+- ['tokens_delete.md', 'Tokens', 'Delete']
+- ['tokens_get.md', 'Tokens', 'Get']
+- ['tokens_list.md', 'Tokens', 'List']
+- ['users_aliases-delete.md', 'Users', 'Aliases Delete']
+- ['users_aliases-insert.md', 'Users', 'Aliases Insert']
+- ['users_aliases-list.md', 'Users', 'Aliases List']
+- ['users_aliases-watch.md', 'Users', 'Aliases Watch']
+- ['users_delete.md', 'Users', 'Delete']
+- ['users_get.md', 'Users', 'Get']
+- ['users_insert.md', 'Users', 'Insert']
+- ['users_list.md', 'Users', 'List']
+- ['users_make-admin.md', 'Users', 'Make Admin']
+- ['users_patch.md', 'Users', 'Patch']
+- ['users_photos-delete.md', 'Users', 'Photos Delete']
+- ['users_photos-get.md', 'Users', 'Photos Get']
+- ['users_photos-patch.md', 'Users', 'Photos Patch']
+- ['users_photos-update.md', 'Users', 'Photos Update']
+- ['users_undelete.md', 'Users', 'Undelete']
+- ['users_update.md', 'Users', 'Update']
+- ['users_watch.md', 'Users', 'Watch']
+- ['verification-codes_generate.md', 'Verification Codes', 'Generate']
+- ['verification-codes_invalidate.md', 'Verification Codes', 'Invalidate']
+- ['verification-codes_list.md', 'Verification Codes', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

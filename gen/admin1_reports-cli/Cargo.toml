@@ -1,0 +1,30 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-admin1_reports-cli"
+version = "0.0.1+20150115"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with reports (protocol reports_v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/admin1_reports-cli"
+homepage = "https://developers.google.com/admin-sdk/reports/"
+documentation = "http://byron.github.io/google-apis-rs/google_admin1_reports_cli"
+license = "MIT"
+keywords = ["admin", "google", "cli"]
+
+[[bin]]
+name = "admin1-reports"
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+docopt = "= 0.6.59"
+docopt_macros = "= 0.6.59"
+rustc-serialize = "*"
+serde = ">= 0.3.0"
+serde_macros = "*"
+
+[dependencies.google-admin1_reports]
+path = "../admin1_reports"

@@ -1,0 +1,27 @@
+site_name: fitness v0.0.1+20150222
+site_url: http://byron.github.io/google-apis-rs/google-fitness1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/fitness1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['users_data-sources-create.md', 'Users', 'Data Sources Create']
+- ['users_data-sources-datasets-delete.md', 'Users', 'Data Sources Datasets Delete']
+- ['users_data-sources-datasets-get.md', 'Users', 'Data Sources Datasets Get']
+- ['users_data-sources-datasets-patch.md', 'Users', 'Data Sources Datasets Patch']
+- ['users_data-sources-get.md', 'Users', 'Data Sources Get']
+- ['users_data-sources-list.md', 'Users', 'Data Sources List']
+- ['users_data-sources-patch.md', 'Users', 'Data Sources Patch']
+- ['users_data-sources-update.md', 'Users', 'Data Sources Update']
+- ['users_sessions-delete.md', 'Users', 'Sessions Delete']
+- ['users_sessions-list.md', 'Users', 'Sessions List']
+- ['users_sessions-update.md', 'Users', 'Sessions Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

@@ -2,7 +2,6 @@
 .pyenv
 .virtualenv
 gen/doc/
-gen/*-cli/
 *.go
 *.pyc
 **target/

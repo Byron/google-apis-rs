@@ -20,9 +20,11 @@ name = "youtube3"
 hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
+docopt = "= 0.6.59"
+docopt_macros = "= 0.6.59"
 rustc-serialize = "*"
+serde = ">= 0.3.0"
+serde_macros = "*"
 
 [dependencies.google-youtube3]
 path = "../youtube3"

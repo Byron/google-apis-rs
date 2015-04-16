@@ -1,0 +1,50 @@
+site_name: storage v0.0.1+20150326
+site_url: http://byron.github.io/google-apis-rs/google-storage1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/storage1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['bucket-access-controls_delete.md', 'Bucket Access Controls', 'Delete']
+- ['bucket-access-controls_get.md', 'Bucket Access Controls', 'Get']
+- ['bucket-access-controls_insert.md', 'Bucket Access Controls', 'Insert']
+- ['bucket-access-controls_list.md', 'Bucket Access Controls', 'List']
+- ['bucket-access-controls_patch.md', 'Bucket Access Controls', 'Patch']
+- ['bucket-access-controls_update.md', 'Bucket Access Controls', 'Update']
+- ['buckets_delete.md', 'Buckets', 'Delete']
+- ['buckets_get.md', 'Buckets', 'Get']
+- ['buckets_insert.md', 'Buckets', 'Insert']
+- ['buckets_list.md', 'Buckets', 'List']
+- ['buckets_patch.md', 'Buckets', 'Patch']
+- ['buckets_update.md', 'Buckets', 'Update']
+- ['channels_stop.md', 'Channels', 'Stop']
+- ['default-object-access-controls_delete.md', 'Default Object Access Controls', 'Delete']
+- ['default-object-access-controls_get.md', 'Default Object Access Controls', 'Get']
+- ['default-object-access-controls_insert.md', 'Default Object Access Controls', 'Insert']
+- ['default-object-access-controls_list.md', 'Default Object Access Controls', 'List']
+- ['default-object-access-controls_patch.md', 'Default Object Access Controls', 'Patch']
+- ['default-object-access-controls_update.md', 'Default Object Access Controls', 'Update']
+- ['object-access-controls_delete.md', 'Object Access Controls', 'Delete']
+- ['object-access-controls_get.md', 'Object Access Controls', 'Get']
+- ['object-access-controls_insert.md', 'Object Access Controls', 'Insert']
+- ['object-access-controls_list.md', 'Object Access Controls', 'List']
+- ['object-access-controls_patch.md', 'Object Access Controls', 'Patch']
+- ['object-access-controls_update.md', 'Object Access Controls', 'Update']
+- ['objects_compose.md', 'Objects', 'Compose']
+- ['objects_copy.md', 'Objects', 'Copy']
+- ['objects_delete.md', 'Objects', 'Delete']
+- ['objects_get.md', 'Objects', 'Get']
+- ['objects_insert.md', 'Objects', 'Insert']
+- ['objects_list.md', 'Objects', 'List']
+- ['objects_patch.md', 'Objects', 'Patch']
+- ['objects_update.md', 'Objects', 'Update']
+- ['objects_watch-all.md', 'Objects', 'Watch All']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

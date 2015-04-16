@@ -1,0 +1,20 @@
+site_name: oauth2 v0.0.1+20150319
+site_url: http://byron.github.io/google-apis-rs/google-oauth2_v2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/oauth2_v2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['methods_get-cert-for-open-id-connect.md', 'Methods', 'Get Cert For Open Id Connect']
+- ['methods_tokeninfo.md', 'Methods', 'Tokeninfo']
+- ['userinfo_get.md', 'Userinfo', 'Get']
+- ['userinfo_v2-me-get.md', 'Userinfo', 'V2 Me Get']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

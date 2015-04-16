@@ -1,0 +1,22 @@
+site_name: cloudsearch v0.0.1+20150309
+site_url: http://byron.github.io/google-apis-rs/google-cloudsearch1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudsearch1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_indexes-documents-create.md', 'Projects', 'Indexes Documents Create']
+- ['projects_indexes-documents-delete.md', 'Projects', 'Indexes Documents Delete']
+- ['projects_indexes-documents-get.md', 'Projects', 'Indexes Documents Get']
+- ['projects_indexes-documents-list.md', 'Projects', 'Indexes Documents List']
+- ['projects_indexes-list.md', 'Projects', 'Indexes List']
+- ['projects_indexes-search.md', 'Projects', 'Indexes Search']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

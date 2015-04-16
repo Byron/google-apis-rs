@@ -1,0 +1,30 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-storage1-cli"
+version = "0.0.1+20150326"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with storage (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/storage1-cli"
+homepage = "https://developers.google.com/storage/docs/json_api/"
+documentation = "http://byron.github.io/google-apis-rs/google_storage1_cli"
+license = "MIT"
+keywords = ["storage", "google", "cli"]
+
+[[bin]]
+name = "storage1"
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+docopt = "= 0.6.59"
+docopt_macros = "= 0.6.59"
+rustc-serialize = "*"
+serde = ">= 0.3.0"
+serde_macros = "*"
+
+[dependencies.google-storage1]
+path = "../storage1"

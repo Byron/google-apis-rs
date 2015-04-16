@@ -1,0 +1,30 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-calendar3-cli"
+version = "0.0.1+20150303"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with calendar (protocol v3)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/calendar3-cli"
+homepage = "https://developers.google.com/google-apps/calendar/firstapp"
+documentation = "http://byron.github.io/google-apis-rs/google_calendar3_cli"
+license = "MIT"
+keywords = ["calendar", "google", "cli"]
+
+[[bin]]
+name = "calendar3"
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+docopt = "= 0.6.59"
+docopt_macros = "= 0.6.59"
+rustc-serialize = "*"
+serde = ">= 0.3.0"
+serde_macros = "*"
+
+[dependencies.google-calendar3]
+path = "../calendar3"

@@ -1,0 +1,29 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-dataflow1_b4-cli"
+version = "0.0.1+20150401"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with dataflow (protocol v1b4)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dataflow1_b4-cli"
+documentation = "http://byron.github.io/google-apis-rs/google_dataflow1_b4_cli"
+license = "MIT"
+keywords = ["dataflow", "google", "cli"]
+
+[[bin]]
+name = "dataflow1-b4"
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+docopt = "= 0.6.59"
+docopt_macros = "= 0.6.59"
+rustc-serialize = "*"
+serde = ">= 0.3.0"
+serde_macros = "*"
+
+[dependencies.google-dataflow1_b4]
+path = "../dataflow1_b4"

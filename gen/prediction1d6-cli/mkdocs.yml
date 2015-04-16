@@ -1,0 +1,24 @@
+site_name: prediction v0.0.1+20140522
+site_url: http://byron.github.io/google-apis-rs/google-prediction1d6-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/prediction1d6-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['hostedmodels_predict.md', 'Hostedmodels', 'Predict']
+- ['trainedmodels_analyze.md', 'Trainedmodels', 'Analyze']
+- ['trainedmodels_delete.md', 'Trainedmodels', 'Delete']
+- ['trainedmodels_get.md', 'Trainedmodels', 'Get']
+- ['trainedmodels_insert.md', 'Trainedmodels', 'Insert']
+- ['trainedmodels_list.md', 'Trainedmodels', 'List']
+- ['trainedmodels_predict.md', 'Trainedmodels', 'Predict']
+- ['trainedmodels_update.md', 'Trainedmodels', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

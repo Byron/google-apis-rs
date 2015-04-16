@@ -1,0 +1,26 @@
+site_name: YouTube Analytics v0.0.1+20150304
+site_url: http://byron.github.io/google-apis-rs/google-youtubeanalytics1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/youtubeanalytics1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['batch-report-definitions_list.md', 'Batch Report Definitions', 'List']
+- ['batch-reports_list.md', 'Batch Reports', 'List']
+- ['group-items_delete.md', 'Group Items', 'Delete']
+- ['group-items_insert.md', 'Group Items', 'Insert']
+- ['group-items_list.md', 'Group Items', 'List']
+- ['groups_delete.md', 'Groups', 'Delete']
+- ['groups_insert.md', 'Groups', 'Insert']
+- ['groups_list.md', 'Groups', 'List']
+- ['groups_update.md', 'Groups', 'Update']
+- ['reports_query.md', 'Reports', 'Query']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

@@ -1,0 +1,49 @@
+site_name: fusiontables v0.0.1+20150226
+site_url: http://byron.github.io/google-apis-rs/google-fusiontables2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/fusiontables2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['column_delete.md', 'Column', 'Delete']
+- ['column_get.md', 'Column', 'Get']
+- ['column_insert.md', 'Column', 'Insert']
+- ['column_list.md', 'Column', 'List']
+- ['column_patch.md', 'Column', 'Patch']
+- ['column_update.md', 'Column', 'Update']
+- ['query_sql.md', 'Query', 'Sql']
+- ['query_sql-get.md', 'Query', 'Sql Get']
+- ['style_delete.md', 'Style', 'Delete']
+- ['style_get.md', 'Style', 'Get']
+- ['style_insert.md', 'Style', 'Insert']
+- ['style_list.md', 'Style', 'List']
+- ['style_patch.md', 'Style', 'Patch']
+- ['style_update.md', 'Style', 'Update']
+- ['table_copy.md', 'Table', 'Copy']
+- ['table_delete.md', 'Table', 'Delete']
+- ['table_get.md', 'Table', 'Get']
+- ['table_import-rows.md', 'Table', 'Import Rows']
+- ['table_import-table.md', 'Table', 'Import Table']
+- ['table_insert.md', 'Table', 'Insert']
+- ['table_list.md', 'Table', 'List']
+- ['table_patch.md', 'Table', 'Patch']
+- ['table_replace-rows.md', 'Table', 'Replace Rows']
+- ['table_update.md', 'Table', 'Update']
+- ['task_delete.md', 'Task', 'Delete']
+- ['task_get.md', 'Task', 'Get']
+- ['task_list.md', 'Task', 'List']
+- ['template_delete.md', 'Template', 'Delete']
+- ['template_get.md', 'Template', 'Get']
+- ['template_insert.md', 'Template', 'Insert']
+- ['template_list.md', 'Template', 'List']
+- ['template_patch.md', 'Template', 'Patch']
+- ['template_update.md', 'Template', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

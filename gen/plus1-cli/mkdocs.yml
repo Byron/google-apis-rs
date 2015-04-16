@@ -1,0 +1,28 @@
+site_name: plus v0.0.1+20150326
+site_url: http://byron.github.io/google-apis-rs/google-plus1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/plus1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['activities_get.md', 'Activities', 'Get']
+- ['activities_list.md', 'Activities', 'List']
+- ['activities_search.md', 'Activities', 'Search']
+- ['comments_get.md', 'Comments', 'Get']
+- ['comments_list.md', 'Comments', 'List']
+- ['moments_insert.md', 'Moments', 'Insert']
+- ['moments_list.md', 'Moments', 'List']
+- ['moments_remove.md', 'Moments', 'Remove']
+- ['people_get.md', 'People', 'Get']
+- ['people_list.md', 'People', 'List']
+- ['people_list-by-activity.md', 'People', 'List By Activity']
+- ['people_search.md', 'People', 'Search']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

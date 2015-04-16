@@ -1,0 +1,30 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-freebase1_sandbox-cli"
+version = "0.0.1+20150330"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with freebase (protocol v1sandbox)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/freebase1_sandbox-cli"
+homepage = "https://developers.google.com/freebase/"
+documentation = "http://byron.github.io/google-apis-rs/google_freebase1_sandbox_cli"
+license = "MIT"
+keywords = ["freebase", "google", "cli"]
+
+[[bin]]
+name = "freebase1-sandbox"
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+docopt = "= 0.6.59"
+docopt_macros = "= 0.6.59"
+rustc-serialize = "*"
+serde = ">= 0.3.0"
+serde_macros = "*"
+
+[dependencies.google-freebase1_sandbox]
+path = "../freebase1_sandbox"

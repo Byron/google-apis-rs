@@ -1,0 +1,21 @@
+site_name: App State v0.0.1+20150326
+site_url: http://byron.github.io/google-apis-rs/google-appstate1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/appstate1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['states_clear.md', 'States', 'Clear']
+- ['states_delete.md', 'States', 'Delete']
+- ['states_get.md', 'States', 'Get']
+- ['states_list.md', 'States', 'List']
+- ['states_update.md', 'States', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

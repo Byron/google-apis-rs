@@ -1,0 +1,60 @@
+site_name: Android Enterprise v0.0.1+20150309
+site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['collections_delete.md', 'Collections', 'Delete']
+- ['collections_get.md', 'Collections', 'Get']
+- ['collections_insert.md', 'Collections', 'Insert']
+- ['collections_list.md', 'Collections', 'List']
+- ['collections_patch.md', 'Collections', 'Patch']
+- ['collections_update.md', 'Collections', 'Update']
+- ['collectionviewers_delete.md', 'Collectionviewers', 'Delete']
+- ['collectionviewers_get.md', 'Collectionviewers', 'Get']
+- ['collectionviewers_list.md', 'Collectionviewers', 'List']
+- ['collectionviewers_patch.md', 'Collectionviewers', 'Patch']
+- ['collectionviewers_update.md', 'Collectionviewers', 'Update']
+- ['devices_get.md', 'Devices', 'Get']
+- ['devices_get-state.md', 'Devices', 'Get State']
+- ['devices_list.md', 'Devices', 'List']
+- ['devices_set-state.md', 'Devices', 'Set State']
+- ['enterprises_delete.md', 'Enterprises', 'Delete']
+- ['enterprises_enroll.md', 'Enterprises', 'Enroll']
+- ['enterprises_get.md', 'Enterprises', 'Get']
+- ['enterprises_insert.md', 'Enterprises', 'Insert']
+- ['enterprises_list.md', 'Enterprises', 'List']
+- ['enterprises_set-account.md', 'Enterprises', 'Set Account']
+- ['enterprises_unenroll.md', 'Enterprises', 'Unenroll']
+- ['entitlements_delete.md', 'Entitlements', 'Delete']
+- ['entitlements_get.md', 'Entitlements', 'Get']
+- ['entitlements_list.md', 'Entitlements', 'List']
+- ['entitlements_patch.md', 'Entitlements', 'Patch']
+- ['entitlements_update.md', 'Entitlements', 'Update']
+- ['grouplicenses_get.md', 'Grouplicenses', 'Get']
+- ['grouplicenses_list.md', 'Grouplicenses', 'List']
+- ['grouplicenseusers_list.md', 'Grouplicenseusers', 'List']
+- ['installs_delete.md', 'Installs', 'Delete']
+- ['installs_get.md', 'Installs', 'Get']
+- ['installs_list.md', 'Installs', 'List']
+- ['installs_patch.md', 'Installs', 'Patch']
+- ['installs_update.md', 'Installs', 'Update']
+- ['permissions_get.md', 'Permissions', 'Get']
+- ['products_get.md', 'Products', 'Get']
+- ['products_get-app-restrictions-schema.md', 'Products', 'Get App Restrictions Schema']
+- ['products_get-permissions.md', 'Products', 'Get Permissions']
+- ['products_update-permissions.md', 'Products', 'Update Permissions']
+- ['users_generate-token.md', 'Users', 'Generate Token']
+- ['users_get.md', 'Users', 'Get']
+- ['users_list.md', 'Users', 'List']
+- ['users_revoke-token.md', 'Users', 'Revoke Token']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

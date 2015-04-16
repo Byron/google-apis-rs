@@ -1,0 +1,22 @@
+site_name: Cloud Monitoring v0.0.1+20150303
+site_url: http://byron.github.io/google-apis-rs/google-cloudmonitoring2_beta2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudmonitoring2_beta2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['metric-descriptors_create.md', 'Metric Descriptors', 'Create']
+- ['metric-descriptors_delete.md', 'Metric Descriptors', 'Delete']
+- ['metric-descriptors_list.md', 'Metric Descriptors', 'List']
+- ['timeseries_list.md', 'Timeseries', 'List']
+- ['timeseries_write.md', 'Timeseries', 'Write']
+- ['timeseries-descriptors_list.md', 'Timeseries Descriptors', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

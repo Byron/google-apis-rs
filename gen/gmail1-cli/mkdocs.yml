@@ -1,0 +1,46 @@
+site_name: gmail v0.0.1+20150303
+site_url: http://byron.github.io/google-apis-rs/google-gmail1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/gmail1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['users_drafts-create.md', 'Users', 'Drafts Create']
+- ['users_drafts-delete.md', 'Users', 'Drafts Delete']
+- ['users_drafts-get.md', 'Users', 'Drafts Get']
+- ['users_drafts-list.md', 'Users', 'Drafts List']
+- ['users_drafts-send.md', 'Users', 'Drafts Send']
+- ['users_drafts-update.md', 'Users', 'Drafts Update']
+- ['users_get-profile.md', 'Users', 'Get Profile']
+- ['users_history-list.md', 'Users', 'History List']
+- ['users_labels-create.md', 'Users', 'Labels Create']
+- ['users_labels-delete.md', 'Users', 'Labels Delete']
+- ['users_labels-get.md', 'Users', 'Labels Get']
+- ['users_labels-list.md', 'Users', 'Labels List']
+- ['users_labels-patch.md', 'Users', 'Labels Patch']
+- ['users_labels-update.md', 'Users', 'Labels Update']
+- ['users_messages-attachments-get.md', 'Users', 'Messages Attachments Get']
+- ['users_messages-delete.md', 'Users', 'Messages Delete']
+- ['users_messages-get.md', 'Users', 'Messages Get']
+- ['users_messages-import.md', 'Users', 'Messages Import']
+- ['users_messages-insert.md', 'Users', 'Messages Insert']
+- ['users_messages-list.md', 'Users', 'Messages List']
+- ['users_messages-modify.md', 'Users', 'Messages Modify']
+- ['users_messages-send.md', 'Users', 'Messages Send']
+- ['users_messages-trash.md', 'Users', 'Messages Trash']
+- ['users_messages-untrash.md', 'Users', 'Messages Untrash']
+- ['users_threads-delete.md', 'Users', 'Threads Delete']
+- ['users_threads-get.md', 'Users', 'Threads Get']
+- ['users_threads-list.md', 'Users', 'Threads List']
+- ['users_threads-modify.md', 'Users', 'Threads Modify']
+- ['users_threads-trash.md', 'Users', 'Threads Trash']
+- ['users_threads-untrash.md', 'Users', 'Threads Untrash']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

@@ -1,0 +1,40 @@
+site_name: mirror v0.0.1+20150220
+site_url: http://byron.github.io/google-apis-rs/google-mirror1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/mirror1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['accounts_insert.md', 'Accounts', 'Insert']
+- ['contacts_delete.md', 'Contacts', 'Delete']
+- ['contacts_get.md', 'Contacts', 'Get']
+- ['contacts_insert.md', 'Contacts', 'Insert']
+- ['contacts_list.md', 'Contacts', 'List']
+- ['contacts_patch.md', 'Contacts', 'Patch']
+- ['contacts_update.md', 'Contacts', 'Update']
+- ['locations_get.md', 'Locations', 'Get']
+- ['locations_list.md', 'Locations', 'List']
+- ['settings_get.md', 'Settings', 'Get']
+- ['subscriptions_delete.md', 'Subscriptions', 'Delete']
+- ['subscriptions_insert.md', 'Subscriptions', 'Insert']
+- ['subscriptions_list.md', 'Subscriptions', 'List']
+- ['subscriptions_update.md', 'Subscriptions', 'Update']
+- ['timeline_attachments-delete.md', 'Timeline', 'Attachments Delete']
+- ['timeline_attachments-get.md', 'Timeline', 'Attachments Get']
+- ['timeline_attachments-insert.md', 'Timeline', 'Attachments Insert']
+- ['timeline_attachments-list.md', 'Timeline', 'Attachments List']
+- ['timeline_delete.md', 'Timeline', 'Delete']
+- ['timeline_get.md', 'Timeline', 'Get']
+- ['timeline_insert.md', 'Timeline', 'Insert']
+- ['timeline_list.md', 'Timeline', 'List']
+- ['timeline_patch.md', 'Timeline', 'Patch']
+- ['timeline_update.md', 'Timeline', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

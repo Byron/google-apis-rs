@@ -1,0 +1,57 @@
+site_name: Shopping Content v0.0.1+20150317
+site_url: http://byron.github.io/google-apis-rs/google-content2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/content2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['accounts_authinfo.md', 'Accounts', 'Authinfo']
+- ['accounts_custombatch.md', 'Accounts', 'Custombatch']
+- ['accounts_delete.md', 'Accounts', 'Delete']
+- ['accounts_get.md', 'Accounts', 'Get']
+- ['accounts_insert.md', 'Accounts', 'Insert']
+- ['accounts_list.md', 'Accounts', 'List']
+- ['accounts_patch.md', 'Accounts', 'Patch']
+- ['accounts_update.md', 'Accounts', 'Update']
+- ['accountshipping_custombatch.md', 'Accountshipping', 'Custombatch']
+- ['accountshipping_get.md', 'Accountshipping', 'Get']
+- ['accountshipping_list.md', 'Accountshipping', 'List']
+- ['accountshipping_patch.md', 'Accountshipping', 'Patch']
+- ['accountshipping_update.md', 'Accountshipping', 'Update']
+- ['accountstatuses_custombatch.md', 'Accountstatuses', 'Custombatch']
+- ['accountstatuses_get.md', 'Accountstatuses', 'Get']
+- ['accountstatuses_list.md', 'Accountstatuses', 'List']
+- ['accounttax_custombatch.md', 'Accounttax', 'Custombatch']
+- ['accounttax_get.md', 'Accounttax', 'Get']
+- ['accounttax_list.md', 'Accounttax', 'List']
+- ['accounttax_patch.md', 'Accounttax', 'Patch']
+- ['accounttax_update.md', 'Accounttax', 'Update']
+- ['datafeeds_custombatch.md', 'Datafeeds', 'Custombatch']
+- ['datafeeds_delete.md', 'Datafeeds', 'Delete']
+- ['datafeeds_get.md', 'Datafeeds', 'Get']
+- ['datafeeds_insert.md', 'Datafeeds', 'Insert']
+- ['datafeeds_list.md', 'Datafeeds', 'List']
+- ['datafeeds_patch.md', 'Datafeeds', 'Patch']
+- ['datafeeds_update.md', 'Datafeeds', 'Update']
+- ['datafeedstatuses_custombatch.md', 'Datafeedstatuses', 'Custombatch']
+- ['datafeedstatuses_get.md', 'Datafeedstatuses', 'Get']
+- ['datafeedstatuses_list.md', 'Datafeedstatuses', 'List']
+- ['inventory_custombatch.md', 'Inventory', 'Custombatch']
+- ['inventory_set.md', 'Inventory', 'Set']
+- ['products_custombatch.md', 'Products', 'Custombatch']
+- ['products_delete.md', 'Products', 'Delete']
+- ['products_get.md', 'Products', 'Get']
+- ['products_insert.md', 'Products', 'Insert']
+- ['products_list.md', 'Products', 'List']
+- ['productstatuses_custombatch.md', 'Productstatuses', 'Custombatch']
+- ['productstatuses_get.md', 'Productstatuses', 'Get']
+- ['productstatuses_list.md', 'Productstatuses', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

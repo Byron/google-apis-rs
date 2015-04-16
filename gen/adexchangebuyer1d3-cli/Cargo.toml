@@ -1,0 +1,30 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-adexchangebuyer1d3-cli"
+version = "0.0.1+20150323"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with Ad Exchange Buyer (protocol v1.3)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer1d3-cli"
+homepage = "https://developers.google.com/ad-exchange/buyer-rest"
+documentation = "http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3_cli"
+license = "MIT"
+keywords = ["adexchangebuyer", "google", "cli"]
+
+[[bin]]
+name = "adexchangebuyer1d3"
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+docopt = "= 0.6.59"
+docopt_macros = "= 0.6.59"
+rustc-serialize = "*"
+serde = ">= 0.3.0"
+serde_macros = "*"
+
+[dependencies.google-adexchangebuyer1d3]
+path = "../adexchangebuyer1d3"

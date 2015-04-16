@@ -1,0 +1,36 @@
+site_name: bigquery v0.0.1+20150326
+site_url: http://byron.github.io/google-apis-rs/google-bigquery2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/bigquery2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['datasets_delete.md', 'Datasets', 'Delete']
+- ['datasets_get.md', 'Datasets', 'Get']
+- ['datasets_insert.md', 'Datasets', 'Insert']
+- ['datasets_list.md', 'Datasets', 'List']
+- ['datasets_patch.md', 'Datasets', 'Patch']
+- ['datasets_update.md', 'Datasets', 'Update']
+- ['jobs_get.md', 'Jobs', 'Get']
+- ['jobs_get-query-results.md', 'Jobs', 'Get Query Results']
+- ['jobs_insert.md', 'Jobs', 'Insert']
+- ['jobs_list.md', 'Jobs', 'List']
+- ['jobs_query.md', 'Jobs', 'Query']
+- ['projects_list.md', 'Projects', 'List']
+- ['tabledata_insert-all.md', 'Tabledata', 'Insert All']
+- ['tabledata_list.md', 'Tabledata', 'List']
+- ['tables_delete.md', 'Tables', 'Delete']
+- ['tables_get.md', 'Tables', 'Get']
+- ['tables_insert.md', 'Tables', 'Insert']
+- ['tables_list.md', 'Tables', 'List']
+- ['tables_patch.md', 'Tables', 'Patch']
+- ['tables_update.md', 'Tables', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

@@ -1,0 +1,18 @@
+site_name: freebase v0.0.1+20150330
+site_url: http://byron.github.io/google-apis-rs/google-freebase1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/freebase1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['methods_reconcile.md', 'Methods', 'Reconcile']
+- ['methods_search.md', 'Methods', 'Search']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

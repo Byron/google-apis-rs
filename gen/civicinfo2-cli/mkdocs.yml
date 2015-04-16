@@ -1,0 +1,21 @@
+site_name: Civic Info v0.0.1+20150302
+site_url: http://byron.github.io/google-apis-rs/google-civicinfo2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/civicinfo2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['divisions_search.md', 'Divisions', 'Search']
+- ['elections_election-query.md', 'Elections', 'Election Query']
+- ['elections_voter-info-query.md', 'Elections', 'Voter Info Query']
+- ['representatives_representative-info-by-address.md', 'Representatives', 'Representative Info By Address']
+- ['representatives_representative-info-by-division.md', 'Representatives', 'Representative Info By Division']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

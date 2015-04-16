@@ -1,0 +1,30 @@
+site_name: reseller v0.0.1+20141112
+site_url: http://byron.github.io/google-apis-rs/google-reseller1_sandbox-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/reseller1_sandbox-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['customers_get.md', 'Customers', 'Get']
+- ['customers_insert.md', 'Customers', 'Insert']
+- ['customers_patch.md', 'Customers', 'Patch']
+- ['customers_update.md', 'Customers', 'Update']
+- ['subscriptions_activate.md', 'Subscriptions', 'Activate']
+- ['subscriptions_change-plan.md', 'Subscriptions', 'Change Plan']
+- ['subscriptions_change-renewal-settings.md', 'Subscriptions', 'Change Renewal Settings']
+- ['subscriptions_change-seats.md', 'Subscriptions', 'Change Seats']
+- ['subscriptions_delete.md', 'Subscriptions', 'Delete']
+- ['subscriptions_get.md', 'Subscriptions', 'Get']
+- ['subscriptions_insert.md', 'Subscriptions', 'Insert']
+- ['subscriptions_list.md', 'Subscriptions', 'List']
+- ['subscriptions_start-paid-service.md', 'Subscriptions', 'Start Paid Service']
+- ['subscriptions_suspend.md', 'Subscriptions', 'Suspend']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

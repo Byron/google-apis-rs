@@ -1,0 +1,29 @@
+site_name: Games Configuration v0.0.1+20150325
+site_url: http://byron.github.io/google-apis-rs/google-gamesconfiguration1_configuration-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/gamesconfiguration1_configuration-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['achievement-configurations_delete.md', 'Achievement Configurations', 'Delete']
+- ['achievement-configurations_get.md', 'Achievement Configurations', 'Get']
+- ['achievement-configurations_insert.md', 'Achievement Configurations', 'Insert']
+- ['achievement-configurations_list.md', 'Achievement Configurations', 'List']
+- ['achievement-configurations_patch.md', 'Achievement Configurations', 'Patch']
+- ['achievement-configurations_update.md', 'Achievement Configurations', 'Update']
+- ['image-configurations_upload.md', 'Image Configurations', 'Upload']
+- ['leaderboard-configurations_delete.md', 'Leaderboard Configurations', 'Delete']
+- ['leaderboard-configurations_get.md', 'Leaderboard Configurations', 'Get']
+- ['leaderboard-configurations_insert.md', 'Leaderboard Configurations', 'Insert']
+- ['leaderboard-configurations_list.md', 'Leaderboard Configurations', 'List']
+- ['leaderboard-configurations_patch.md', 'Leaderboard Configurations', 'Patch']
+- ['leaderboard-configurations_update.md', 'Leaderboard Configurations', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

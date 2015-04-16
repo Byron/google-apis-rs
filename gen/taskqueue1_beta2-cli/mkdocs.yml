@@ -1,0 +1,24 @@
+site_name: taskqueue v0.0.1+20141111
+site_url: http://byron.github.io/google-apis-rs/google-taskqueue1_beta2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/taskqueue1_beta2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['taskqueues_get.md', 'Taskqueues', 'Get']
+- ['tasks_delete.md', 'Tasks', 'Delete']
+- ['tasks_get.md', 'Tasks', 'Get']
+- ['tasks_insert.md', 'Tasks', 'Insert']
+- ['tasks_lease.md', 'Tasks', 'Lease']
+- ['tasks_list.md', 'Tasks', 'List']
+- ['tasks_patch.md', 'Tasks', 'Patch']
+- ['tasks_update.md', 'Tasks', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

@@ -1,0 +1,26 @@
+site_name: doubleclicksearch v0.0.1+20150303
+site_url: http://byron.github.io/google-apis-rs/google-doubleclicksearch2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/doubleclicksearch2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['conversion_get.md', 'Conversion', 'Get']
+- ['conversion_insert.md', 'Conversion', 'Insert']
+- ['conversion_patch.md', 'Conversion', 'Patch']
+- ['conversion_update.md', 'Conversion', 'Update']
+- ['conversion_update-availability.md', 'Conversion', 'Update Availability']
+- ['reports_generate.md', 'Reports', 'Generate']
+- ['reports_get.md', 'Reports', 'Get']
+- ['reports_get-file.md', 'Reports', 'Get File']
+- ['reports_request.md', 'Reports', 'Request']
+- ['saved-columns_list.md', 'Saved Columns', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

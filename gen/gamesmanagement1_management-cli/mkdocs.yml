@@ -1,0 +1,43 @@
+site_name: Games Management v0.0.1+20150325
+site_url: http://byron.github.io/google-apis-rs/google-gamesmanagement1_management-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/gamesmanagement1_management-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['achievements_reset.md', 'Achievements', 'Reset']
+- ['achievements_reset-all.md', 'Achievements', 'Reset All']
+- ['achievements_reset-all-for-all-players.md', 'Achievements', 'Reset All For All Players']
+- ['achievements_reset-for-all-players.md', 'Achievements', 'Reset For All Players']
+- ['achievements_reset-multiple-for-all-players.md', 'Achievements', 'Reset Multiple For All Players']
+- ['applications_list-hidden.md', 'Applications', 'List Hidden']
+- ['events_reset.md', 'Events', 'Reset']
+- ['events_reset-all.md', 'Events', 'Reset All']
+- ['events_reset-all-for-all-players.md', 'Events', 'Reset All For All Players']
+- ['events_reset-for-all-players.md', 'Events', 'Reset For All Players']
+- ['events_reset-multiple-for-all-players.md', 'Events', 'Reset Multiple For All Players']
+- ['players_hide.md', 'Players', 'Hide']
+- ['players_unhide.md', 'Players', 'Unhide']
+- ['quests_reset.md', 'Quests', 'Reset']
+- ['quests_reset-all.md', 'Quests', 'Reset All']
+- ['quests_reset-all-for-all-players.md', 'Quests', 'Reset All For All Players']
+- ['quests_reset-for-all-players.md', 'Quests', 'Reset For All Players']
+- ['quests_reset-multiple-for-all-players.md', 'Quests', 'Reset Multiple For All Players']
+- ['rooms_reset.md', 'Rooms', 'Reset']
+- ['rooms_reset-for-all-players.md', 'Rooms', 'Reset For All Players']
+- ['scores_reset.md', 'Scores', 'Reset']
+- ['scores_reset-all.md', 'Scores', 'Reset All']
+- ['scores_reset-all-for-all-players.md', 'Scores', 'Reset All For All Players']
+- ['scores_reset-for-all-players.md', 'Scores', 'Reset For All Players']
+- ['scores_reset-multiple-for-all-players.md', 'Scores', 'Reset Multiple For All Players']
+- ['turn-based-matches_reset.md', 'Turn Based Matches', 'Reset']
+- ['turn-based-matches_reset-for-all-players.md', 'Turn Based Matches', 'Reset For All Players']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+
