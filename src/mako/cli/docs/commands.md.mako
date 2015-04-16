@@ -158,36 +158,48 @@ ${SPLIT_END}
     - ${p.get('description') or NO_DESC | xml_escape ,indent_all_but_first_by(2)}
 </%def>
 
-<%def name="_list_schem_args(schema, abs_cursor='')">\
+<%def name="_list_schem_args(schema, cursor_tokens=list())">\
 <%
+    if len(cursor_tokens) == 0:
+        cursor_tokens = [FIELD_SEP]
+
     def cursor_fmt(cursor):
-        return '-%s %s ' % (STRUCT_FLAG, cursor)
+        fndfi = 0 # first non-dot field index
+        for (fndfi, v) in enumerate(cursor):
+            if v != FIELD_SEP:
+                break
+        return '-%s %s ' % (STRUCT_FLAG, ''.join(cursor[:fndfi]) + FIELD_SEP.join(cursor[fndfi:]))
 
     def cursor_arg():
-        if abs_cursor:
-            return cursor_fmt(abs_cursor)
+        if cursor_tokens:
+            res = cursor_fmt(cursor_tokens)
+            del cursor_tokens[:]
+            return res
         return ''
-    abs_cursor_arg = cursor_arg()
 %>\
 % for fn in sorted(schema.fields.keys()):
 <% 
     f = schema.fields[fn] 
-    cursor_prefix = ''
-    if abs_cursor == '':
-        cursor_prefix = FIELD_SEP
 %>\
 % if isinstance(f, SchemaEntry):
-* **${abs_cursor_arg}-${STRUCT_FLAG} ${mangle_subcommand(fn)}=${field_to_value(f)}**
+* **${cursor_arg()}-${STRUCT_FLAG} ${mangle_subcommand(fn)}=${field_to_value(f)}**
     - ${f.property.get('description', NO_DESC) | xml_escape, indent_all_but_first_by(2)}
 % if f.container_type == CTYPE_ARRAY:
     - Each invocation of this argument appends the given value to the array.
 % elif f.container_type == CTYPE_MAP:
     - the value will be associated with the given `key`
 % endif # handle container type
-<% abs_cursor_arg = '' %>
 % else:
-${self._list_schem_args(f, '%s%s' % (cursor_prefix, mangle_subcommand(fn)))}
-<% abs_cursor_arg = cursor_fmt(FIELD_SEP + FIELD_SEP) %>\
+<%
+    cursor_tokens.append(mangle_subcommand(fn))
+%>\
+${self._list_schem_args(f, cursor_tokens)}
+<%
+    assert not cursor_tokens or cursor_tokens[-1] == FIELD_SEP
+    if not cursor_tokens:
+        cursor_tokens.append(FIELD_SEP)
+    cursor_tokens.append(FIELD_SEP) 
+%>\
 % endif
 % endfor
 </%def>
