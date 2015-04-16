@@ -1,7 +1,7 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%!
     from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type, setter_fn_name, ADD_PARAM_FN,
-                      upload_action_fn)
+                      upload_action_fn, is_schema_with_optionals, schema_markers)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_VALUE_MAP,
@@ -238,13 +238,21 @@ ${value_unwrap}\
 % endif # handle call parameters
 % if mc.request_value:
 <%
+    allow_optionals_fn = lambda s: is_schema_with_optionals(schema_markers(s, c, transitive=False))
+
     def flatten_schema_fields(schema, res, cur=list()):
         if len(cur) == 0:
             cur = list()
+
+        opt_access = '.as_mut().unwrap()'
+        if not allow_optionals_fn(schema):
+            opt_access = ''
         for fn, f in schema.fields.iteritems():
-            cur.append(fn)
+
+            cur.append(['%s%s' % (mangle_ident(fn), opt_access), fn])
             if isinstance(f, SchemaEntry):
-                res.append((f, list(cur)))
+                cur[-1][0] = mangle_ident(fn)
+                res.append((schema, f, list(cur)))
             else:
                 flatten_schema_fields(f, res, cur)
             cur.pop()
@@ -261,35 +269,40 @@ for kvarg in ${SOPT + arg_ident(KEY_VALUE_ARG)}.iter() {
         err.issues.push(field_err);
     }
     match &field_name.to_string()[..] {
-        % for fv, f in schema_fields:
+    % for schema, fe, f in schema_fields:
 <%
     # TODO: Deduplicate !
-    ptype = fv.actual_property.type
-    if ptype == 'string' and 'Count' in f[-1]:
+    ptype = fe.actual_property.type
+    if ptype == 'string' and 'Count' in f[-1][1]:
         ptype = 'int64'
     value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_VALUE_MAP[ptype]
-    pname = FIELD_SEP.join(mangle_subcommand(ft) for ft in f)
+    pname = FIELD_SEP.join(mangle_subcommand(t[1]) for t in f)
 
-    struct_field = 'request.' + '.'.join('%s.as_mut().unwrap()' % mangle_ident(ft) for ft in f[:-1])
-    if len(f) > 1:
-        struct_field += '.'    
-    struct_field += mangle_ident(f[-1])
+    allow_optionals = True
+    opt_prefix = 'Some('
+    opt_suffix = ')'
+    if not allow_optionals_fn(schema):
+        opt_prefix = opt_suffix = ''
+
+    struct_field = 'request.' + '.'.join(t[0] for t in f)
 %>\
         "${pname}" => {
-        % if fv.container_type == CTYPE_POD:
-                ${struct_field} = Some(\
+        % if fe.container_type == CTYPE_POD:
+                ${struct_field} = ${opt_prefix}\
         % else:
-                if ${struct_field}.is_none() {
-                    ${struct_field} = Some(Default::default());
-                }
-                ${struct_field}.as_mut().unwrap().push(\
+                ${struct_field}.push(\
         % endif
         % if ptype != 'string':
 arg_from_str(${value_unwrap}, err, "${pname}", "${ptype}")\
         % else:
 ${value_unwrap}.to_string()\
         % endif
-);
+        % if fe.container_type == CTYPE_POD:
+${opt_suffix}\
+        % else:
+)\
+        % endif
+;
             },
         % endfor # each nested field
         _ => {

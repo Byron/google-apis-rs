@@ -4,7 +4,7 @@ import os
 import re
 import collections
 from copy import deepcopy
-from random import (randint, random, choice, seed)
+from random import (randint, random, choice)
 
 SPLIT_START = '>>>>>>>'
 SPLIT_END = '<<<<<<<'

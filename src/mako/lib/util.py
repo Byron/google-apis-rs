@@ -448,6 +448,9 @@ def schema_markers(s, c, transitive=True):
 
 ## -- End Rust TypeSystem -- @}
 
+def is_schema_with_optionals(schema_markers):
+    return not (PART_MARKER_TRAIT in schema_markers
+            or RESPONSE_MARKER_TRAIT in schema_markers and REQUEST_MARKER_TRAIT not in schema_markers)
 
 # -------------------------
 ## @name Activity Utilities

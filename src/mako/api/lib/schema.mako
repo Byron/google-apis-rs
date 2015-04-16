@@ -2,7 +2,7 @@
     from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
                       NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE, unique_type_name, 
-                      PART_MARKER_TRAIT, canonical_type_name, TO_PARTS_MARKER, UNUSED_TYPE_MARKER)
+                      PART_MARKER_TRAIT, canonical_type_name, TO_PARTS_MARKER, UNUSED_TYPE_MARKER, is_schema_with_optionals)
 
     default_traits = ('RustcEncodable', 'Clone', 'Default')
 %>\
@@ -63,15 +63,11 @@ ${struct};
     if 'variant' not in s:
         traits.insert(0, 'Default')
     
-    allow_optionals = True
     if RESPONSE_MARKER_TRAIT in markers:
         traits.append('Deserialize')
 
     nt_markers = schema_markers(s, c, transitive=False)
-    if (   PART_MARKER_TRAIT in nt_markers
-        or RESPONSE_MARKER_TRAIT in nt_markers and REQUEST_MARKER_TRAIT not in nt_markers):
-        allow_optionals = False
-    # use optionals only when needed
+    allow_optionals = is_schema_with_optionals(nt_markers)
     
     # waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
     if s.type == 'any':
