@@ -13,19 +13,72 @@ use std::io::{Write, Read, stdout};
 
 use std::default::Default;
 
-const FIELD_SEP: &'static str = ".";
+const FIELD_SEP: char = 'c';
 
 #[derive(Clone, Default)]
 pub struct FieldCursor(Vec<String>);
 
 impl ToString for  FieldCursor {
     fn to_string(&self) -> String {
-        String::new()
+        self.0.connect(".")
     }
 }
 
 impl FieldCursor {
     pub fn set(&mut self, value: &str) -> Result<(), CLIError> {
+        let mut first_is_field_sep = false;
+        let mut char_count: usize = 0;
+        let mut last_c = FIELD_SEP;
+        let mut num_conscutive_field_seps = 0;
+
+        let mut field = String::new();
+        let mut fields = self.0.clone();
+
+        let push_field = |fields: &mut Vec<String>, field: &mut String| {
+            if field.len() > 0 {
+                fields.push(field.clone());
+                field.truncate(0);
+            }
+        };
+
+        for (cid, c) in value.chars().enumerate() {
+            char_count = cid + 1;
+
+            if cid == 0 && c == FIELD_SEP {
+                first_is_field_sep = true;
+            }
+            if c == FIELD_SEP {
+                num_conscutive_field_seps += 1;
+                if last_c == FIELD_SEP {
+                    if fields.pop().is_none() {
+                        return Err(CLIError::Field(FieldError::PopOnEmpty))
+                    }
+                } else {
+                    push_field(&mut fields, &mut field);
+                }
+            } else {
+                num_conscutive_field_seps = 0;
+                if cid == 1 {
+                    if first_is_field_sep {
+                        fields.truncate(0);
+                    }
+                }
+                field.push(c);
+            }
+
+            last_c = c;
+        }
+
+        push_field(&mut fields, &mut field);
+
+        if char_count == 1 && first_is_field_sep {
+            fields.truncate(0);
+        }
+        if char_count > 1 && num_conscutive_field_seps == 1 {
+            return Err(CLIError::Field(FieldError::TrailingFieldSep))
+        }
+
+        self.0 = fields;
         Ok(())
     }
 
@@ -198,12 +251,32 @@ impl fmt::Display for InputError {
 }
 
 #[derive(Debug)]
+pub enum FieldError {
+    PopOnEmpty,
+    TrailingFieldSep,
+}
+
+
+impl fmt::Display for FieldError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        match *self {
+            FieldError::PopOnEmpty
+                => writeln!(f, "Cannot move up on empty field cursor"),
+            FieldError::TrailingFieldSep
+                => writeln!(f, "Single field separator may not be last character"),
+        }
+    }
+}
+
+
+#[derive(Debug)]
 pub enum CLIError {
     Configuration(ConfigurationError),
     ParseError((&'static str, &'static str, String, String)),
     UnknownParameter(String),
     InvalidKeyValueSyntax(String),
     Input(InputError),
+    Field(FieldError),
 }
 
 impl fmt::Display for CLIError {
@@ -211,6 +284,7 @@ impl fmt::Display for CLIError {
         match *self {
             CLIError::Configuration(ref err) => write!(f, "Configuration -> {}", err),
             CLIError::Input(ref err) => write!(f, "Input -> {}", err),
+            CLIError::Field(ref err) => write!(f, "Field -> {}", err),
             CLIError::ParseError((arg_name, type_name, ref value, ref err_desc)) 
                 => writeln!(f, "Failed to parse argument '{}' with value '{}' as {} with error: {}",
                             arg_name, value, type_name, err_desc),

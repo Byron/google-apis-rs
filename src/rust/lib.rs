@@ -165,6 +165,7 @@ mod test_cli {
 
         assert_eq!(c.to_string(), "");
         assert_eq!(c.num_fields(), 0);
+        assert!(c.set("").is_err());
         assert!(c.set(".").is_ok());
         assert!(c.set("..").is_err());
         assert_eq!(c.num_fields(), 0);
@@ -190,5 +191,8 @@ mod test_cli {
         assert!(c.set(".one.two.three...beer").is_ok());
         assert_eq!(c.num_fields(), 2);
         assert_eq!(c.to_string(), "one.beer");
+        assert!(c.set("one.two.three...").is_ok());
+        assert_eq!(c.num_fields(), 3);
+        assert_eq!(c.to_string(), "one.beer.one");
     }
 }
