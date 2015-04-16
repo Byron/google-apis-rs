@@ -152,3 +152,43 @@ bar\r\n\
         assert_eq!(r.0.last, 42);
     }
 }
+
+#[cfg(test)]
+mod test_cli {
+    use super::cli::cmn::*;
+
+    use std::default::Default;
+
+    #[test]
+    fn cursor() {
+        let mut c: FieldCursor = Default::default();
+
+        assert_eq!(c.to_string(), "");
+        assert_eq!(c.num_fields(), 0);
+        assert!(c.set(".").is_ok());
+        assert!(c.set("..").is_err());
+        assert_eq!(c.num_fields(), 0);
+
+        assert!(c.set("foo").is_ok());
+        assert_eq!(c.to_string(), "foo");
+        assert_eq!(c.num_fields(), 1);
+        assert!(c.set("..").is_ok());
+        assert_eq!(c.num_fields(), 0);
+        assert_eq!(c.to_string(), "");
+
+        assert!(c.set("foo.").is_err());
+
+        assert!(c.set("foo.bar").is_ok());
+        assert_eq!(c.num_fields(), 2);
+        assert_eq!(c.to_string(), "foo.bar");
+        assert!(c.set("sub.level").is_ok());
+        assert_eq!(c.num_fields(), 4);
+        assert_eq!(c.to_string(), "foo.bar.sub.level");
+        assert!(c.set("...other").is_ok());
+        assert_eq!(c.to_string(), "foo.bar.other");
+        assert_eq!(c.num_fields(), 3);
+        assert!(c.set(".one.two.three...beer").is_ok());
+        assert_eq!(c.num_fields(), 2);
+        assert_eq!(c.to_string(), "one.beer");
+    }
+}

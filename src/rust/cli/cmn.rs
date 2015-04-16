@@ -8,10 +8,31 @@ use std::io;
 use std::fmt;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
-
+use std::string::ToString;
 use std::io::{Write, Read, stdout};
 
 use std::default::Default;
+
+const FIELD_SEP: &'static str = ".";
+
+#[derive(Clone, Default)]
+pub struct FieldCursor(Vec<String>);
+
+impl ToString for  FieldCursor {
+    fn to_string(&self) -> String {
+        String::new()
+    }
+}
+
+impl FieldCursor {
+    pub fn set(&mut self, value: &str) -> Result<(), CLIError> {
+        Ok(())
+    }
+
+    pub fn num_fields(&self) -> usize {
+        self.0.len()
+    }
+}
 
 pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError)
                                                                         -> (&'a str, Option<&'a str>) {
