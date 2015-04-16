@@ -14,6 +14,7 @@ STRUCT_FLAG = 'r'
 UPLOAD_FLAG = 'u'
 OUTPUT_FLAG = 'o'
 VALUE_ARG = 'v'
+KEY_VALUE_ARG = 'kv'
 SCOPE_FLAG = 'scope'
 CONFIG_DIR_FLAG = 'config-dir'
 

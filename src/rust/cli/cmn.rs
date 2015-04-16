@@ -13,7 +13,7 @@ use std::io::{Write, Read, stdout};
 
 use std::default::Default;
 
-const FIELD_SEP: char = 'c';
+const FIELD_SEP: char = '.';
 
 #[derive(Clone, Default)]
 pub struct FieldCursor(Vec<String>);
@@ -26,6 +26,10 @@ impl ToString for  FieldCursor {
 
 impl FieldCursor {
     pub fn set(&mut self, value: &str) -> Result<(), CLIError> {
+        if value.len() == 0 {
+            return Err(CLIError::Field(FieldError::Empty))
+        }
+
         let mut first_is_field_sep = false;
         let mut char_count: usize = 0;
         let mut last_c = FIELD_SEP;
@@ -34,24 +38,24 @@ impl FieldCursor {
         let mut field = String::new();
         let mut fields = self.0.clone();
 
-        let push_field = |fields: &mut Vec<String>, field: &mut String| {
-            if field.len() > 0 {
-                fields.push(field.clone());
-                field.truncate(0);
+        let push_field = |fs: &mut Vec<String>, f: &mut String| {
+            if f.len() > 0 {
+                fs.push(f.clone());
+                f.truncate(0);
             }
         };
 
         for (cid, c) in value.chars().enumerate() {
-            char_count = cid + 1;
+            char_count += 1;
 
-            if cid == 0 && c == FIELD_SEP {
-                first_is_field_sep = true;
-            }
             if c == FIELD_SEP {
+                if cid == 0 {
+                    first_is_field_sep = true;
+                }
                 num_conscutive_field_seps += 1;
-                if last_c == FIELD_SEP {
+                if cid > 0 && last_c == FIELD_SEP {
                     if fields.pop().is_none() {
-                        return Err(CLIError::Field(FieldError::PopOnEmpty))
+                        return Err(CLIError::Field(FieldError::PopOnEmpty(value.to_string())))
                     }
                 } else {
                     push_field(&mut fields, &mut field);
@@ -75,7 +79,7 @@ impl FieldCursor {
             fields.truncate(0);
         }
         if char_count > 1 && num_conscutive_field_seps == 1 {
-            return Err(CLIError::Field(FieldError::TrailingFieldSep))
+            return Err(CLIError::Field(FieldError::TrailingFieldSep(value.to_string())))
         }
 
         self.0 = fields;
@@ -88,7 +92,7 @@ impl FieldCursor {
 }
 
 pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError)
-                                                                        -> (&'a str, Option<&'a str>) {
+                                                        -> (&'a str, Option<&'a str>) {
     let mut add_err = || err.issues.push(CLIError::InvalidKeyValueSyntax(kv.to_string()));
     match kv.rfind('=') {
         None => {
@@ -252,18 +256,24 @@ impl fmt::Display for InputError {
 
 #[derive(Debug)]
 pub enum FieldError {
-    PopOnEmpty,
-    TrailingFieldSep,
+    PopOnEmpty(String),
+    TrailingFieldSep(String),
+    Unknown(String),
+    Empty,
 }
 
 
 impl fmt::Display for FieldError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
-            FieldError::PopOnEmpty
-                => writeln!(f, "Cannot move up on empty field cursor"),
-            FieldError::TrailingFieldSep
-                => writeln!(f, "Single field separator may not be last character"),
+            FieldError::PopOnEmpty(ref field)
+                => writeln!(f, "'{}': Cannot move up on empty field cursor", field),
+            FieldError::TrailingFieldSep(ref field)
+                => writeln!(f, "'{}': Single field separator may not be last character", field),
+            FieldError::Unknown(ref field)
+                => writeln!(f, "Field '{}' does not exist", field),
+            FieldError::Empty
+                => writeln!(f, "Field names must not be empty"),
         }
     }
 }

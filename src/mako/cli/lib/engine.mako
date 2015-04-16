@@ -4,7 +4,8 @@
                       upload_action_fn)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_VALUE_MAP)
+                     cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_VALUE_MAP,
+                     KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt.'
@@ -26,7 +27,7 @@
 %>\
 mod cmn;
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -145,6 +146,8 @@ self.opt.${cmd_ident(method)} {
     if parameters is not UNDEFINED:
         global_parameter_names = list(pn for pn in sorted(parameters.keys()) if pn not in optional_prop_names)
     handle_props = optional_props or parameters is not UNDEFINED
+    if mc.request_value:
+        request_cli_schema = to_cli_schema(c, mc.request_value)
 %>\
     ## REQUIRED PARAMETERS
 % for p in mc.required_props:
@@ -154,7 +157,7 @@ self.opt.${cmd_ident(method)} {
     opt_ident = to_opt_arg_ident(p)
 %>\
     % if is_request_value_property(mc, p):
-let ${prop_name}: api::${prop_type} = Default::default();
+let mut ${prop_name}: api::${prop_type} = Default::default();
     % elif p.type != 'string':
 let ${prop_name}: ${prop_type} = arg_from_str(&${opt_ident}, err, "<${mangle_subcommand(p.name)}>", "${p.type}");
     % endif # handle request value
@@ -194,7 +197,7 @@ for parg in ${SOPT + arg_ident(VALUE_ARG)}.iter() {
         % endif
             call = call.${mangle_ident(setter_fn_name(p))}(\
         % if ptype != 'string':
-arg_from_str(${value_unwrap}, err, "${mangle_subcommand(p.name)}", "${p.type}")\
+arg_from_str(${value_unwrap}, err, "${mangle_subcommand(p.name)}", "${ptype}")\
         % else:
 ${value_unwrap}\
         % endif # handle conversion
@@ -233,6 +236,68 @@ ${value_unwrap}\
     }
 }
 % endif # handle call parameters
+% if mc.request_value:
+<%
+    def flatten_schema_fields(schema, res, cur=list()):
+        if len(cur) == 0:
+            cur = list()
+        for fn, f in schema.fields.iteritems():
+            cur.append(fn)
+            if isinstance(f, SchemaEntry):
+                res.append((f, list(cur)))
+            else:
+                flatten_schema_fields(f, res, cur)
+            cur.pop()
+        # endfor
+    # end utility
+
+    schema_fields = list()
+    flatten_schema_fields(request_cli_schema, schema_fields)
+%>\
+let mut field_name: FieldCursor = Default::default();
+for kvarg in ${SOPT + arg_ident(KEY_VALUE_ARG)}.iter() {
+    let (key, value) = parse_kv_arg(&*kvarg, err);
+    if let Err(field_err) = field_name.set(&*key) {
+        err.issues.push(field_err);
+    }
+    match &field_name.to_string()[..] {
+        % for fv, f in schema_fields:
+<%
+    # TODO: Deduplicate !
+    ptype = fv.actual_property.type
+    if ptype == 'string' and 'Count' in f[-1]:
+        ptype = 'int64'
+    value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_VALUE_MAP[ptype]
+    pname = FIELD_SEP.join(mangle_subcommand(ft) for ft in f)
+
+    struct_field = 'request.' + '.'.join('%s.as_mut().unwrap()' % mangle_ident(ft) for ft in f[:-1])
+    if len(f) > 1:
+        struct_field += '.'    
+    struct_field += mangle_ident(f[-1])
+%>\
+        "${pname}" => {
+        % if fv.container_type == CTYPE_POD:
+                ${struct_field} = Some(\
+        % else:
+                if ${struct_field}.is_none() {
+                    ${struct_field} = Some(Default::default());
+                }
+                ${struct_field}.as_mut().unwrap().push(\
+        % endif
+        % if ptype != 'string':
+arg_from_str(${value_unwrap}, err, "${pname}", "${ptype}")\
+        % else:
+${value_unwrap}.to_string()\
+        % endif
+);
+            },
+        % endfor # each nested field
+        _ => {
+            err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+        }
+    }
+}
+% endif # handle struct parsing
 % if mc.media_params:
 let protocol = 
 % for p in mc.media_params:

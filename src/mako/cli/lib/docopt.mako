@@ -3,9 +3,7 @@
     from util import (put_and, supports_scopes)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     CONFIG_DIR_FLAG)
-
-    v_arg = '<%s>' % VALUE_ARG
+                     CONFIG_DIR_FLAG, KEY_VALUE_ARG)
 %>\
 <%def name="new(c)">\
 <%
@@ -29,7 +27,7 @@ Usage:
     # end for each required property
 
     if mc.request_value:
-        args.append('-%s %s...' % (STRUCT_FLAG, v_arg))
+        args.append('-%s %s...' % (STRUCT_FLAG, '<%s>' % KEY_VALUE_ARG))
         struct_used = True
     # end request_value
 
@@ -41,7 +39,7 @@ Usage:
     # end upload handling
 
     if mc.optional_props or parameters is not UNDEFINED:
-        args.append('[-%s %s]...' % (PARAM_FLAG, v_arg))
+        args.append('[-%s %s]...' % (PARAM_FLAG, '<%s>' % VALUE_ARG))
         param_used = True
     # end paramters
     

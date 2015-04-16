@@ -168,21 +168,24 @@ ${SPLIT_END}
         for (fndfi, v) in enumerate(cursor):
             if v != FIELD_SEP:
                 break
-        return '-%s %s ' % (STRUCT_FLAG, ''.join(cursor[:fndfi]) + FIELD_SEP.join(cursor[fndfi:]))
+        res = ''.join(cursor[:fndfi]) + FIELD_SEP.join(cursor[fndfi:])
+        if not res.endswith(FIELD_SEP):
+            res += FIELD_SEP
+        return res
 
-    def cursor_arg():
+    def cursor_arg(field):
+        prefix = ''
         if cursor_tokens:
-            res = cursor_fmt(cursor_tokens)
+            prefix = cursor_fmt(cursor_tokens)
             del cursor_tokens[:]
-            return res
-        return ''
+        return prefix + field
 %>\
 % for fn in sorted(schema.fields.keys()):
 <% 
     f = schema.fields[fn] 
 %>\
 % if isinstance(f, SchemaEntry):
-* **${cursor_arg()}-${STRUCT_FLAG} ${mangle_subcommand(fn)}=${field_to_value(f)}**
+* **-${STRUCT_FLAG} ${cursor_arg(mangle_subcommand(fn))}=${field_to_value(f)}**
     - ${f.property.get('description', NO_DESC) | xml_escape, indent_all_but_first_by(2)}
 % if f.container_type == CTYPE_ARRAY:
     - Each invocation of this argument appends the given value to the array.
