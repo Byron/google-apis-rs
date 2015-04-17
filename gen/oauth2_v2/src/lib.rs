@@ -565,7 +565,6 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
             _id_token: Default::default(),
             _access_token: Default::default(),
             _delegate: Default::default(),
-            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -574,7 +573,6 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
         MethodGetCertForOpenIdConnectCall {
             hub: self.hub,
             _delegate: Default::default(),
-            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }

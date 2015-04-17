@@ -1519,7 +1519,6 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _account_type: account_type.to_string(),
             _account_name: account_name.to_string(),
             _delegate: Default::default(),
-            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }

@@ -2794,7 +2794,6 @@ impl<'a, C, A> StreamingVariantStoreMethods<'a, C, A> {
             hub: self.hub,
             _request: request.clone(),
             _delegate: Default::default(),
-            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
