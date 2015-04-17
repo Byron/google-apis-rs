@@ -1,5 +1,5 @@
 .timestamp
-.pyenv
+.pyenv-*
 .virtualenv
 gen/doc/
 *.go
