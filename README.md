@@ -90,6 +90,24 @@ For example, to update all json files and possibly retrieve new API schemas, do 
 rm -f .api.deps .cli.deps && make update-json -j8
 ```
 
+## Cross Platform Compilation
+
+This is still a difficult topic in Rust, and even though in theory it's possible to do that on a single system without virutalization, it's difficult to achieve when you are not a pure Rust program. Therefore using VMs is the only option, and we are trying to make this as easy as possible.
+
+### Linux AMD-64 from OSX
+
+This setup is based on Docker, which comes with a *virtual-box*-based linux VM. To use it, just install [boot2docker](http://boot2docker.io/).
+
+The following commands should do the job:
+
+```bash
+boot2docker up
+# export listed variables to prepare your shell
+make wheezy-build
+```
+
+You will find your *release* build in the *build/* subdirectory of the project's root.
+
 # License
 
 The license of everything not explicitly under a different license are licensed as specified in `LICENSE.md`.
