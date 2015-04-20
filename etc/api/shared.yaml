@@ -25,7 +25,7 @@ cargo:
   doc_base_url: http://byron.github.io/google-apis-rs
   authors:
     # don't forget to possibly add them to copyright authors
-    - Sebastian Thiel <byronimo@gmail>
+    - Sebastian Thiel <byronimo@gmail.com>
   keywords: [google]
   # All APIs should live in the same repository
   repository_url: https://github.com/Byron/google-apis-rs
