@@ -108,13 +108,18 @@ def call_method_ident(resource, method):
 def subcommand_md_filename(resource, method):
     return mangle_subcommand(resource) + '_' + mangle_subcommand(method) + '.md'
 
-
 def docopt_mode(protocols):
     mode = '|'.join(protocols)
     if len(protocols) > 1:
         mode = '(%s)' % mode
     return mode
 
+# Returns a possibly remapped type, based on its name.
+# Useful to map strings to more suitable types, i.e. counts 
+def actual_json_type(name, type):
+    if type == 'string' and 'Count' in name:
+        return 'int64'
+    return type
 
 # Return schema' with fields dict: { 'field1' : SchemaField(...), 'SubSchema': schema' }
 def to_cli_schema(c, schema):
