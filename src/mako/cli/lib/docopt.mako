@@ -66,5 +66,8 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ${CONFIG_DIR}]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 </%def>

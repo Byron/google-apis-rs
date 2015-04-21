@@ -112,9 +112,18 @@ self.opt.${cmd_ident(method)} {
                                         program_name: "${util.program_name()}",
                                         db_dir: config_dir.clone(),
                                       }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: ${hub_type_name}::new(hyper::Client::new(), auth),
+            hub: ${hub_type_name}::new(client, auth),
         };
 
         match engine._doit(true) {

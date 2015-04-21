@@ -29,5 +29,6 @@ cargo:
     - docopt = "*"
     - docopt_macros = "*"
     - rustc-serialize = "*"
+    - yup-hyper-mock = "*"
     - serde = ">= 0.3.0"
     - serde_macros = "*"

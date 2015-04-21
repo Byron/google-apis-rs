@@ -325,7 +325,7 @@ ${capture(lib.test_hub, hub_type_name, comments=show_all) | hide_filter}
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // ${random_value_warning}
-let mut ${rb_name}: ${request_value_type} = Default::default();
+let mut ${rb_name} = ${request_value_type}::default();
 % for spn, sp in request_value.get('properties', dict()).iteritems():
 % if parts is not None and spn not in parts:
 <% continue %>
@@ -579,6 +579,7 @@ else {
         let mut url = "${baseUrl}${m.path}".to_string();
         % endif
         % if not default_scope:
+        % if no_auth is UNDEFINED:
         <% 
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
         %>
@@ -593,6 +594,7 @@ else {
                 return Err(Error::MissingAPIKey)
             }
         }
+        % endif
         % else:
         if self.${api.properties.scopes}.len() == 0 {
             self.${api.properties.scopes}.insert(${scope_url_to_variant(name, default_scope, fully_qualified=True)}.as_ref().to_string(), ());
