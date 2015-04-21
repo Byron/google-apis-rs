@@ -106,21 +106,15 @@ self.opt.${cmd_ident(method)} {
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "${util.program_name()}",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        ${self._debug_client('debug_auth') | indent_all_but_first_by(10)},
+                                        JsonTokenStorage {
+                                          program_name: "${util.program_name()}",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
 
         let client = 
-            if opt.flag_debug {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpConnector(None) 
-                    })
-            } else {
-                hyper::Client::new()
-            };
+            ${self._debug_client('debug') | indent_all_but_first_by(3)};
         let engine = Engine {
             opt: opt,
             hub: ${hub_type_name}::new(client, auth),
@@ -138,6 +132,16 @@ self.opt.${cmd_ident(method)} {
         self._doit(false).0
     }
 }
+</%def>
+
+<%def name="_debug_client(flag_name)" buffered="True">\
+if opt.flag_${flag_name} {
+    hyper::Client::with_connector(mock::TeeConnector {
+            connector: hyper::net::HttpConnector(None) 
+        })
+} else {
+    hyper::Client::new()
+}\
 </%def>
 
 <%def name="_method_call_impl(c, resource, method)" buffered="True">\
@@ -247,7 +251,7 @@ ${value_unwrap}\
 }
 % endif # handle call parameters
 % if mc.request_value:
-${self._request_value_impl(c, request_cli_schema)}\
+${self._request_value_impl(c, request_cli_schema, request_prop_type)}\
 % endif # handle struct parsing
 % if mc.media_params:
 let protocol = 
@@ -319,7 +323,7 @@ if dry_run {
 }\
 </%def>
 
-<%def name="_request_value_impl(c, request_cli_schema)">
+<%def name="_request_value_impl(c, request_cli_schema, request_prop_type)">
 <%
     allow_optionals_fn = lambda s: is_schema_with_optionals(schema_markers(s, c, transitive=False))
 

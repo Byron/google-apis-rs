@@ -69,5 +69,8 @@ Configuration:
   --debug
             Output all server communication to standard error. `tx` and `rx` are placed into 
             the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 </%def>
