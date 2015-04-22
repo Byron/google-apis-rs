@@ -5,7 +5,7 @@
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_VALUE_MAP,
-                     KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP)
+                     KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt.'
@@ -55,9 +55,9 @@ impl Engine {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Option<api::Error>;
         let mut err_opt: Option<InvalidOptionsError> = None;
-
 ## RESOURCE LOOP: check for set primary subcommand
 % for resource in sorted(c.rta_map.keys()):
+
         % if loop.first:
         if \
         % else:

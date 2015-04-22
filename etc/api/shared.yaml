@@ -2,7 +2,8 @@ api:
   blacklist:
     # exclude APIs which currently don't build correctly. State the reason for the exclusion as well
     # to allow looking at it at a later point.
-    - 
+    # in beta, there is not a single method !
+    - dataflow
   terms:
     # how to actually do something with the API
     action: doit
