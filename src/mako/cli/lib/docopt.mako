@@ -3,7 +3,7 @@
     from util import (put_and, supports_scopes)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     CONFIG_DIR_FLAG, KEY_VALUE_ARG)
+                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg)
 %>\
 <%def name="new(c)">\
 <%
@@ -23,7 +23,7 @@ Usage:
     for p in mc.required_props:
         if is_request_value_property(mc, p):
             continue
-        args.append('<%s>' % mangle_subcommand(p.name))
+        args.append(to_docopt_arg(p))
     # end for each required property
 
     if mc.request_value:

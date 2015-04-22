@@ -15,7 +15,7 @@
     def borrow_prefix(p):
         ptype = p.get('type', None)
         borrow = ''
-        if ptype not in POD_TYPES or ptype in ('string', None):
+        if ptype not in POD_TYPES or ptype in ('string', None) or p.get('repeated', False):
             borrow = '&'
         return borrow
 
@@ -175,7 +175,14 @@ if opt.flag_${flag_name} {
     <% request_prop_type = prop_type %>\
 let mut ${prop_name} = api::${prop_type}::default();
     % elif p.type != 'string':
+    % if p.get('repeated', False): 
+let ${prop_name}: Vec<${prop_type} = Vec::new();
+for (arg_id, arg) in ${opt_ident}.iter().enumerate() {
+    ${prop_name}.push(arg_from_str(&arg, err, "<${mangle_subcommand(p.name)}>", arg_id), "${p.type}"));
+}
+    % else:
 let ${prop_name}: ${prop_type} = arg_from_str(&${opt_ident}, err, "<${mangle_subcommand(p.name)}>", "${p.type}");
+    % endif # handle repeated values
     % endif # handle request value
 % endfor # each required parameter
 <%

@@ -121,6 +121,11 @@ def actual_json_type(name, type):
         return 'int64'
     return type
 
+# return a string representing property `p` suitable for docopt argument parsing
+def to_docopt_arg(p):
+    return '<%s>%s' % (mangle_subcommand(p.name), p.get('repeated', False) and '...' or '')
+
+
 # Return schema' with fields dict: { 'field1' : SchemaField(...), 'SubSchema': schema' }
 def to_cli_schema(c, schema):
     res = deepcopy(schema)
