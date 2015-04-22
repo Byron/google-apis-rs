@@ -91,10 +91,10 @@ impl FieldCursor {
     }
 }
 
-pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError)
+pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError, for_hashmap: bool)
                                                         -> (&'a str, Option<&'a str>) {
-    let mut add_err = || err.issues.push(CLIError::InvalidKeyValueSyntax(kv.to_string()));
-    match kv.rfind('=') {
+    let mut add_err = || err.issues.push(CLIError::InvalidKeyValueSyntax(kv.to_string(),for_hashmap));
+    match kv.find('=') {
         None => {
             add_err();
             return (kv, None)
@@ -284,7 +284,7 @@ pub enum CLIError {
     Configuration(ConfigurationError),
     ParseError((&'static str, &'static str, String, String)),
     UnknownParameter(String),
-    InvalidKeyValueSyntax(String),
+    InvalidKeyValueSyntax(String, bool),
     Input(InputError),
     Field(FieldError),
 }
@@ -300,9 +300,10 @@ impl fmt::Display for CLIError {
                             arg_name, value, type_name, err_desc),
             CLIError::UnknownParameter(ref param_name) 
                 => writeln!(f, "Parameter '{}' is unknown.", param_name),
-            CLIError::InvalidKeyValueSyntax(ref kv)
-                => writeln!(f, "'{}' does not match pattern <key>=<value>", kv),
-
+            CLIError::InvalidKeyValueSyntax(ref kv, is_hashmap) => {
+                let hashmap_info = if is_hashmap { "hashmap " } else { "" };
+                writeln!(f, "'{}' does not match {}pattern <key>=<value>", kv, hashmap_info)
+            },
         }
     }
 }

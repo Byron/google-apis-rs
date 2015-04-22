@@ -5,7 +5,7 @@
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_VALUE_MAP,
-                     KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type)
+                     KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt.'
@@ -172,7 +172,7 @@ if opt.flag_${flag_name} {
     opt_ident = to_opt_arg_ident(p)
 %>\
     % if is_request_value_property(mc, p):
-    <% request_prop_type = prop_type %>\
+<% request_prop_type = prop_type %>\
 let mut ${prop_name} = api::${prop_type}::default();
     % elif p.type != 'string':
     % if p.get('repeated', False): 
@@ -203,7 +203,7 @@ let mut download_mode = false;
 let mut call = self.hub.${mangle_ident(resource)}().${mangle_ident(method)}(${', '.join(call_args)});
 % if handle_props:
 for parg in ${SOPT + arg_ident(VALUE_ARG)}.iter() {
-    let (key, value) = parse_kv_arg(&*parg, err);
+    let (key, value) = parse_kv_arg(&*parg, err, false);
     match key {
 % for p in optional_props:
 <% 
@@ -379,7 +379,7 @@ if dry_run {
 %>\
 let mut field_name = FieldCursor::default();
 for kvarg in ${SOPT + arg_ident(KEY_VALUE_ARG)}.iter() {
-    let (key, value) = parse_kv_arg(&*kvarg, err);
+    let (key, value) = parse_kv_arg(&*kvarg, err, false);
     if let Err(field_err) = field_name.set(&*key) {
         err.issues.push(field_err);
     }
@@ -396,11 +396,15 @@ ${init_fn_map[name] | indent_by(4)}
     allow_optionals = True
     opt_prefix = 'Some('
     opt_suffix = ')'
+    struct_field = 'request.' + '.'.join(t[0] for t in f)
+
+    opt_init = 'if ' + struct_field + '.is_none() {\n'
+    opt_init += '   ' + struct_field + ' = Some(Default::default());\n'
+    opt_init += '}\n'
+
     opt_access = '.as_mut().unwrap()'
     if not allow_optionals_fn(schema):
-        opt_prefix = opt_suffix = opt_access = ''
-
-    struct_field = 'request.' + '.'.join(t[0] for t in f)
+        opt_prefix = opt_suffix = opt_access = opt_init = ''
 %>\
         "${pname}" => {
             % if init_call:
@@ -408,14 +412,14 @@ ${init_fn_map[name] | indent_by(4)}
             % endif
         % if fe.container_type == CTYPE_POD:
                 ${struct_field} = ${opt_prefix}\
-        % else:
-                % if opt_prefix:
-                if ${struct_field}.is_none() {
-                    ${struct_field} = Some(Default::default());
-                }
-                % endif
+        % elif fe.container_type == CTYPE_ARRAY:
+                ${opt_init | indent_all_but_first_by(4)}\
                 ${struct_field}${opt_access}.push(\
-        % endif
+        % elif fe.container_type == CTYPE_MAP:
+                ${opt_init | indent_all_but_first_by(4)}\
+let (key, value) = parse_kv_arg(${value_unwrap}, err, true);
+                ${struct_field}${opt_access}.insert(key.to_string(), \
+        % endif # container type handling
         % if ptype != 'string':
 arg_from_str(${value_unwrap}, err, "${pname}", "${ptype}")\
         % else:
