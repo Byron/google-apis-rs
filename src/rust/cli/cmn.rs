@@ -169,25 +169,38 @@ impl JsonTokenStorage {
 }
 
 impl TokenStorage for JsonTokenStorage {
+    type Error = io::Error;
+
     // NOTE: logging might be interesting, currently we swallow all errors
-    fn set(&mut self, scope_hash: u64, token: Option<Token>) {
+    fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Option<io::Error> {
         let json_token = json::encode(&token).unwrap();
-        let res = fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash));
-        if let Ok(mut f) = res {
-            f.write(json_token.as_bytes()).ok();
+        match fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash)) {
+            Ok(mut f) => {
+                match f.write(json_token.as_bytes()) {
+                    Ok(_) => None,
+                    Err(io_err) => Some(io_err),
+                }
+            },
+            Err(io_err) => Some(io_err)
         }
     }
 
-    fn get(&self, scope_hash: u64) -> Option<Token> {
-        if let Ok(mut f) = fs::File::open(&self.path(scope_hash)) {
-            let mut json_string = String::new();
-            if let Ok(_) = f.read_to_string(&mut json_string) {
-                if let Ok(token) = json::decode::<Token>(&json_string) {
-                    return Some(token)
+    fn get(&self, scope_hash: u64, _: &Vec<&str>) -> Result<Option<Token>, io::Error> {
+        match fs::File::open(&self.path(scope_hash)) {
+            Ok(mut f) => {
+                let mut json_string = String::new();
+                match f.read_to_string(&mut json_string) {
+                    Ok(_) => Ok(Some(json::decode::<Token>(&json_string).unwrap())),
+                    Err(io_err) => Err(io_err),
+                }
+            },
+            Err(io_err) => {
+                match io_err.kind() {
+                    io::ErrorKind::NotFound => Ok(None),
+                    _ => Err(io_err)
                 }
             }
         }
-        None
     }
 }
 

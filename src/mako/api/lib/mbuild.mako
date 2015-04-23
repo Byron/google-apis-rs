@@ -665,16 +665,20 @@ else {
 
         loop {
             % if default_scope:
-            let mut token = ${auth_call}.token(self.${api.properties.scopes}.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                ${delegate_finish}(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match ${auth_call}.token(self.${api.properties.scopes}.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            ${delegate_finish}(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             % endif
             % if request_value:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
