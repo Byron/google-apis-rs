@@ -173,15 +173,29 @@ impl TokenStorage for JsonTokenStorage {
 
     // NOTE: logging might be interesting, currently we swallow all errors
     fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Option<io::Error> {
-        let json_token = json::encode(&token).unwrap();
-        match fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash)) {
-            Ok(mut f) => {
-                match f.write(json_token.as_bytes()) {
-                    Ok(_) => None,
-                    Err(io_err) => Some(io_err),
+        match token {
+            None => {
+                match fs::remove_file(self.path(scope_hash)) {
+                    Err(err) => 
+                        match err.kind() {
+                            io::ErrorKind::NotFound => None,
+                            _ => Some(err)
+                        },
+                    Ok(_) => None
                 }
-            },
-            Err(io_err) => Some(io_err)
+            }
+            Some(token) => {
+                let json_token = json::encode(&token).unwrap();
+                match fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash)) {
+                    Ok(mut f) => {
+                        match f.write(json_token.as_bytes()) {
+                            Ok(_) => None,
+                            Err(io_err) => Some(io_err),
+                        }
+                    },
+                    Err(io_err) => Some(io_err)
+                }
+            }
         }
     }
 
