@@ -448,9 +448,11 @@ def schema_markers(s, c, transitive=True):
 
 ## -- End Rust TypeSystem -- @}
 
+# NOTE: unfortunately, it turned out that sometimes fields are missing. The only way to handle this is to 
+# use optionals everywhere. If that should ever change, we can make a decision here based on the 
+# non-transitive markers that we get here !
 def is_schema_with_optionals(schema_markers):
-    return not (PART_MARKER_TRAIT in schema_markers
-            or RESPONSE_MARKER_TRAIT in schema_markers and REQUEST_MARKER_TRAIT not in schema_markers)
+    return True
 
 # -------------------------
 ## @name Activity Utilities

@@ -305,7 +305,6 @@ if dry_run {
         % else:
         Ok(mut response) => {
         % endif # handle output structure
-            println!("DEBUG: REMOVE ME {:?}", response);
             ## We are not generating optimal code, but hope it will still be logically correct.
             ## If not, we might build the code in python
             ## TODO: Fix this
@@ -313,7 +312,7 @@ if dry_run {
             if !download_mode {
             % endif
             % if mc.response_schema:
-            serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+            serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
             % endif
             % if track_download_flag:
             } else {
