@@ -1,0 +1,2 @@
+api:
+  credentials: "{\n  \"installed\": {\n    \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",\n    \"client_secret\": \"UqkDJd5RFwnHoiG5x5Rub8SI\",\n    \"token_uri\": \"https://accounts.google.com/o/oauth2/token\",\n    \"client_email\": \"\",\n    \"redirect_uris\": [\n      \"urn:ietf:wg:oauth:2.0:oob\",\n      \"oob\"\n    ],\n    \"client_x509_cert_url\": \"\",\n    \"client_id\": \"14070749909-vgip2f1okm7bkvajhi9jugan6126io9v.apps.googleusercontent.com\",\n    \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\"\n  }\n}"

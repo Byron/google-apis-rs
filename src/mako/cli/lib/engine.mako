@@ -100,7 +100,8 @@ self.opt.${cmd_ident(method)} {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "${util.program_name()}-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "${util.program_name()}-secret.json", 
+                                                         "${api.credentials.replace('"', r'\"')}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }

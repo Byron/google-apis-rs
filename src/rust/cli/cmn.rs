@@ -395,7 +395,10 @@ pub fn assure_config_dir_exists(dir: &str) -> Result<String, CLIError> {
     Ok(expanded_config_dir)
 }
 
-pub fn application_secret_from_directory(dir: &str, secret_basename: &str) -> Result<ApplicationSecret, CLIError> {
+pub fn application_secret_from_directory(dir: &str, 
+                                         secret_basename: &str, 
+                                         json_app_secret: &str)
+                                                        -> Result<ApplicationSecret, CLIError> {
     let secret_path = Path::new(dir).join(secret_basename);
     let secret_str = || secret_path.as_path().to_str().unwrap().to_string();
     let secret_io_error = |io_err: io::Error| {
@@ -409,27 +412,11 @@ pub fn application_secret_from_directory(dir: &str, secret_basename: &str) -> Re
             Err(mut err) => {
                 if err.kind() == io::ErrorKind::NotFound {
                     // Write our built-in one - user may adjust the written file at will
-                    let secret = ApplicationSecret {
-                        client_id: "14070749909-vgip2f1okm7bkvajhi9jugan6126io9v.apps.googleusercontent.com".to_string(),
-                        client_secret: "UqkDJd5RFwnHoiG5x5Rub8SI".to_string(),
-                        token_uri: "https://accounts.google.com/o/oauth2/token".to_string(),
-                        auth_uri: Default::default(),
-                        redirect_uris: Default::default(),
-                        client_email: None,
-                        auth_provider_x509_cert_url: None,
-                        client_x509_cert_url: Some("https://www.googleapis.com/oauth2/v1/certs".to_string())
-                    };
 
-                    let app_secret = ConsoleApplicationSecret {
-                        installed: Some(secret),
-                        web: None,
-                    };
-
-                    let json_enocded_secret = json::encode(&app_secret).unwrap();
                     err = match fs::OpenOptions::new().create(true).write(true).open(&secret_path) {
                         Err(cfe) => cfe,
                         Ok(mut f) => {
-                            match f.write(json_enocded_secret.as_bytes()) {
+                            match f.write(json_app_secret.as_bytes()) {
                                 Err(io_err) => io_err,
                                 Ok(_) => continue,
                             }
