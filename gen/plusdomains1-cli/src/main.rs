@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -51,6 +52,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -74,7 +81,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.activities().get(&self.opt.arg_activity_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -106,8 +113,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -116,10 +122,10 @@ impl Engine {
 
     fn _activities_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Activity = Default::default();
+        let mut request = api::Activity::default();
         let mut call = self.hub.activities().insert(&request, &self.opt.arg_user_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "preview" => {
                     call = call.preview(arg_from_str(value.unwrap_or("false"), err, "preview", "boolean"));
@@ -142,9 +148,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -154,9 +161,30 @@ impl Engine {
                 }
             }
             
+            fn request_actor_image_init(request: &mut api::Activity) {
+                request_actor_init(request);
+                if request.actor.as_mut().unwrap().image.is_none() {
+                    request.actor.as_mut().unwrap().image = Some(Default::default());
+                }
+            }
+            
             fn request_actor_init(request: &mut api::Activity) {
                 if request.actor.is_none() {
                     request.actor = Some(Default::default());
+                }
+            }
+            
+            fn request_actor_name_init(request: &mut api::Activity) {
+                request_actor_init(request);
+                if request.actor.as_mut().unwrap().name.is_none() {
+                    request.actor.as_mut().unwrap().name = Some(Default::default());
+                }
+            }
+            
+            fn request_location_address_init(request: &mut api::Activity) {
+                request_location_init(request);
+                if request.location.as_mut().unwrap().address.is_none() {
+                    request.location.as_mut().unwrap().address = Some(Default::default());
                 }
             }
             
@@ -166,9 +194,58 @@ impl Engine {
                 }
             }
             
+            fn request_location_position_init(request: &mut api::Activity) {
+                request_location_init(request);
+                if request.location.as_mut().unwrap().position.is_none() {
+                    request.location.as_mut().unwrap().position = Some(Default::default());
+                }
+            }
+            
+            fn request_object_actor_image_init(request: &mut api::Activity) {
+                request_object_actor_init(request);
+                if request.object.as_mut().unwrap().actor.as_mut().unwrap().image.is_none() {
+                    request.object.as_mut().unwrap().actor.as_mut().unwrap().image = Some(Default::default());
+                }
+            }
+            
+            fn request_object_actor_init(request: &mut api::Activity) {
+                request_object_init(request);
+                if request.object.as_mut().unwrap().actor.is_none() {
+                    request.object.as_mut().unwrap().actor = Some(Default::default());
+                }
+            }
+            
             fn request_object_init(request: &mut api::Activity) {
                 if request.object.is_none() {
                     request.object = Some(Default::default());
+                }
+            }
+            
+            fn request_object_plusoners_init(request: &mut api::Activity) {
+                request_object_init(request);
+                if request.object.as_mut().unwrap().plusoners.is_none() {
+                    request.object.as_mut().unwrap().plusoners = Some(Default::default());
+                }
+            }
+            
+            fn request_object_replies_init(request: &mut api::Activity) {
+                request_object_init(request);
+                if request.object.as_mut().unwrap().replies.is_none() {
+                    request.object.as_mut().unwrap().replies = Some(Default::default());
+                }
+            }
+            
+            fn request_object_resharers_init(request: &mut api::Activity) {
+                request_object_init(request);
+                if request.object.as_mut().unwrap().resharers.is_none() {
+                    request.object.as_mut().unwrap().resharers = Some(Default::default());
+                }
+            }
+            
+            fn request_object_status_for_viewer_init(request: &mut api::Activity) {
+                request_object_init(request);
+                if request.object.as_mut().unwrap().status_for_viewer.is_none() {
+                    request.object.as_mut().unwrap().status_for_viewer = Some(Default::default());
                 }
             }
             
@@ -187,7 +264,7 @@ impl Engine {
                     },
                 "provider.title" => {
                         request_provider_init(&mut request);
-                        request.provider.as_mut().unwrap().title = value.unwrap_or("").to_string();
+                        request.provider.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
                     },
                 "title" => {
                         request_provider_init(&mut request);
@@ -202,84 +279,84 @@ impl Engine {
                         request.geocode = Some(value.unwrap_or("").to_string());
                     },
                 "object.resharers.total-items" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().resharers.total_items = arg_from_str(value.unwrap_or("-0"), err, "object.resharers.total-items", "integer");
+                        request_object_resharers_init(&mut request);
+                        request.object.as_mut().unwrap().resharers.as_mut().unwrap().total_items = Some(arg_from_str(value.unwrap_or("-0"), err, "object.resharers.total-items", "integer"));
                     },
                 "object.resharers.self-link" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().resharers.self_link = value.unwrap_or("").to_string();
+                        request_object_resharers_init(&mut request);
+                        request.object.as_mut().unwrap().resharers.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
                     },
                 "object.original-content" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().original_content = value.unwrap_or("").to_string();
+                        request_object_resharers_init(&mut request);
+                        request.object.as_mut().unwrap().original_content = Some(value.unwrap_or("").to_string());
                     },
                 "object.plusoners.total-items" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().plusoners.total_items = arg_from_str(value.unwrap_or("-0"), err, "object.plusoners.total-items", "integer");
+                        request_object_plusoners_init(&mut request);
+                        request.object.as_mut().unwrap().plusoners.as_mut().unwrap().total_items = Some(arg_from_str(value.unwrap_or("-0"), err, "object.plusoners.total-items", "integer"));
                     },
                 "object.plusoners.self-link" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().plusoners.self_link = value.unwrap_or("").to_string();
+                        request_object_plusoners_init(&mut request);
+                        request.object.as_mut().unwrap().plusoners.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
                     },
                 "object.actor.url" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().actor.url = value.unwrap_or("").to_string();
+                        request_object_actor_init(&mut request);
+                        request.object.as_mut().unwrap().actor.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "object.actor.image.url" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().actor.image.url = value.unwrap_or("").to_string();
+                        request_object_actor_image_init(&mut request);
+                        request.object.as_mut().unwrap().actor.as_mut().unwrap().image.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "object.actor.display-name" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().actor.display_name = value.unwrap_or("").to_string();
+                        request_object_actor_image_init(&mut request);
+                        request.object.as_mut().unwrap().actor.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "object.actor.id" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().actor.id = value.unwrap_or("").to_string();
+                        request_object_actor_image_init(&mut request);
+                        request.object.as_mut().unwrap().actor.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "object.content" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().content = value.unwrap_or("").to_string();
+                        request_object_actor_init(&mut request);
+                        request.object.as_mut().unwrap().content = Some(value.unwrap_or("").to_string());
                     },
                 "object.url" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request_object_actor_init(&mut request);
+                        request.object.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "object.status-for-viewer.can-plusone" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().status_for_viewer.can_plusone = arg_from_str(value.unwrap_or("false"), err, "object.status-for-viewer.can-plusone", "boolean");
+                        request_object_status_for_viewer_init(&mut request);
+                        request.object.as_mut().unwrap().status_for_viewer.as_mut().unwrap().can_plusone = Some(arg_from_str(value.unwrap_or("false"), err, "object.status-for-viewer.can-plusone", "boolean"));
                     },
                 "object.status-for-viewer.can-update" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().status_for_viewer.can_update = arg_from_str(value.unwrap_or("false"), err, "object.status-for-viewer.can-update", "boolean");
+                        request_object_status_for_viewer_init(&mut request);
+                        request.object.as_mut().unwrap().status_for_viewer.as_mut().unwrap().can_update = Some(arg_from_str(value.unwrap_or("false"), err, "object.status-for-viewer.can-update", "boolean"));
                     },
                 "object.status-for-viewer.is-plus-oned" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().status_for_viewer.is_plus_oned = arg_from_str(value.unwrap_or("false"), err, "object.status-for-viewer.is-plus-oned", "boolean");
+                        request_object_status_for_viewer_init(&mut request);
+                        request.object.as_mut().unwrap().status_for_viewer.as_mut().unwrap().is_plus_oned = Some(arg_from_str(value.unwrap_or("false"), err, "object.status-for-viewer.is-plus-oned", "boolean"));
                     },
                 "object.status-for-viewer.resharing-disabled" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().status_for_viewer.resharing_disabled = arg_from_str(value.unwrap_or("false"), err, "object.status-for-viewer.resharing-disabled", "boolean");
+                        request_object_status_for_viewer_init(&mut request);
+                        request.object.as_mut().unwrap().status_for_viewer.as_mut().unwrap().resharing_disabled = Some(arg_from_str(value.unwrap_or("false"), err, "object.status-for-viewer.resharing-disabled", "boolean"));
                     },
                 "object.status-for-viewer.can-comment" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().status_for_viewer.can_comment = arg_from_str(value.unwrap_or("false"), err, "object.status-for-viewer.can-comment", "boolean");
+                        request_object_status_for_viewer_init(&mut request);
+                        request.object.as_mut().unwrap().status_for_viewer.as_mut().unwrap().can_comment = Some(arg_from_str(value.unwrap_or("false"), err, "object.status-for-viewer.can-comment", "boolean"));
                     },
                 "object.replies.total-items" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().replies.total_items = arg_from_str(value.unwrap_or("-0"), err, "object.replies.total-items", "integer");
+                        request_object_replies_init(&mut request);
+                        request.object.as_mut().unwrap().replies.as_mut().unwrap().total_items = Some(arg_from_str(value.unwrap_or("-0"), err, "object.replies.total-items", "integer"));
                     },
                 "object.replies.self-link" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().replies.self_link = value.unwrap_or("").to_string();
+                        request_object_replies_init(&mut request);
+                        request.object.as_mut().unwrap().replies.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
                     },
                 "object.id" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request_object_replies_init(&mut request);
+                        request.object.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "object.object-type" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().object_type = value.unwrap_or("").to_string();
+                        request_object_replies_init(&mut request);
+                        request.object.as_mut().unwrap().object_type = Some(value.unwrap_or("").to_string());
                     },
                 "kind" => {
                         request_object_init(&mut request);
@@ -287,27 +364,27 @@ impl Engine {
                     },
                 "actor.url" => {
                         request_actor_init(&mut request);
-                        request.actor.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.actor.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "actor.image.url" => {
-                        request_actor_init(&mut request);
-                        request.actor.as_mut().unwrap().image.url = value.unwrap_or("").to_string();
+                        request_actor_image_init(&mut request);
+                        request.actor.as_mut().unwrap().image.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "actor.display-name" => {
-                        request_actor_init(&mut request);
-                        request.actor.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request_actor_image_init(&mut request);
+                        request.actor.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "actor.id" => {
-                        request_actor_init(&mut request);
-                        request.actor.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request_actor_image_init(&mut request);
+                        request.actor.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "actor.name.given-name" => {
-                        request_actor_init(&mut request);
-                        request.actor.as_mut().unwrap().name.given_name = value.unwrap_or("").to_string();
+                        request_actor_name_init(&mut request);
+                        request.actor.as_mut().unwrap().name.as_mut().unwrap().given_name = Some(value.unwrap_or("").to_string());
                     },
                 "actor.name.family-name" => {
-                        request_actor_init(&mut request);
-                        request.actor.as_mut().unwrap().name.family_name = value.unwrap_or("").to_string();
+                        request_actor_name_init(&mut request);
+                        request.actor.as_mut().unwrap().name.as_mut().unwrap().family_name = Some(value.unwrap_or("").to_string());
                     },
                 "place-id" => {
                         request_actor_init(&mut request);
@@ -315,15 +392,15 @@ impl Engine {
                     },
                 "access.kind" => {
                         request_access_init(&mut request);
-                        request.access.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.access.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "access.description" => {
                         request_access_init(&mut request);
-                        request.access.as_mut().unwrap().description = value.unwrap_or("").to_string();
+                        request.access.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
                     },
                 "access.domain-restricted" => {
                         request_access_init(&mut request);
-                        request.access.as_mut().unwrap().domain_restricted = arg_from_str(value.unwrap_or("false"), err, "access.domain-restricted", "boolean");
+                        request.access.as_mut().unwrap().domain_restricted = Some(arg_from_str(value.unwrap_or("false"), err, "access.domain-restricted", "boolean"));
                     },
                 "etag" => {
                         request_access_init(&mut request);
@@ -334,28 +411,28 @@ impl Engine {
                         request.radius = Some(value.unwrap_or("").to_string());
                     },
                 "location.position.latitude" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().position.latitude = arg_from_str(value.unwrap_or("0.0"), err, "location.position.latitude", "number");
+                        request_location_position_init(&mut request);
+                        request.location.as_mut().unwrap().position.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.position.latitude", "number"));
                     },
                 "location.position.longitude" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().position.longitude = arg_from_str(value.unwrap_or("0.0"), err, "location.position.longitude", "number");
+                        request_location_position_init(&mut request);
+                        request.location.as_mut().unwrap().position.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.position.longitude", "number"));
                     },
                 "location.kind" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request_location_position_init(&mut request);
+                        request.location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "location.display-name" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request_location_position_init(&mut request);
+                        request.location.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "location.id" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request_location_position_init(&mut request);
+                        request.location.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "location.address.formatted" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().address.formatted = value.unwrap_or("").to_string();
+                        request_location_address_init(&mut request);
+                        request.location.as_mut().unwrap().address.as_mut().unwrap().formatted = Some(value.unwrap_or("").to_string());
                     },
                 "verb" => {
                         request_location_init(&mut request);
@@ -398,8 +475,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -410,7 +486,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.activities().list(&self.opt.arg_user_id, &self.opt.arg_collection);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -448,8 +524,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -460,7 +535,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.audiences().list(&self.opt.arg_user_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -498,8 +573,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -510,7 +584,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.circles().add_people(&self.opt.arg_circle_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "user-id" => {
                     call = call.add_user_id(value.unwrap_or(""));
@@ -548,8 +622,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -560,7 +633,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.circles().get(&self.opt.arg_circle_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -592,8 +665,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -602,10 +674,10 @@ impl Engine {
 
     fn _circles_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Circle = Default::default();
+        let mut request = api::Circle::default();
         let mut call = self.hub.circles().insert(&request, &self.opt.arg_user_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -625,9 +697,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -649,7 +722,7 @@ impl Engine {
                     },
                 "people.total-items" => {
                         request_people_init(&mut request);
-                        request.people.as_mut().unwrap().total_items = arg_from_str(value.unwrap_or("-0"), err, "people.total-items", "integer");
+                        request.people.as_mut().unwrap().total_items = Some(arg_from_str(value.unwrap_or("-0"), err, "people.total-items", "integer"));
                     },
                 "etag" => {
                         request_people_init(&mut request);
@@ -680,8 +753,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -692,7 +764,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.circles().list(&self.opt.arg_user_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -730,8 +802,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -740,10 +811,10 @@ impl Engine {
 
     fn _circles_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Circle = Default::default();
+        let mut request = api::Circle::default();
         let mut call = self.hub.circles().patch(&request, &self.opt.arg_circle_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -763,9 +834,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -787,7 +859,7 @@ impl Engine {
                     },
                 "people.total-items" => {
                         request_people_init(&mut request);
-                        request.people.as_mut().unwrap().total_items = arg_from_str(value.unwrap_or("-0"), err, "people.total-items", "integer");
+                        request.people.as_mut().unwrap().total_items = Some(arg_from_str(value.unwrap_or("-0"), err, "people.total-items", "integer"));
                     },
                 "etag" => {
                         request_people_init(&mut request);
@@ -818,8 +890,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -830,7 +901,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.circles().remove(&self.opt.arg_circle_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -861,7 +932,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -872,7 +942,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.circles().remove_people(&self.opt.arg_circle_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "user-id" => {
                     call = call.add_user_id(value.unwrap_or(""));
@@ -909,7 +979,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -918,10 +987,10 @@ impl Engine {
 
     fn _circles_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Circle = Default::default();
+        let mut request = api::Circle::default();
         let mut call = self.hub.circles().update(&request, &self.opt.arg_circle_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -941,9 +1010,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -965,7 +1035,7 @@ impl Engine {
                     },
                 "people.total-items" => {
                         request_people_init(&mut request);
-                        request.people.as_mut().unwrap().total_items = arg_from_str(value.unwrap_or("-0"), err, "people.total-items", "integer");
+                        request.people.as_mut().unwrap().total_items = Some(arg_from_str(value.unwrap_or("-0"), err, "people.total-items", "integer"));
                     },
                 "etag" => {
                         request_people_init(&mut request);
@@ -996,8 +1066,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1008,7 +1077,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.comments().get(&self.opt.arg_comment_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1040,8 +1109,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1050,10 +1118,10 @@ impl Engine {
 
     fn _comments_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Comment = Default::default();
+        let mut request = api::Comment::default();
         let mut call = self.hub.comments().insert(&request, &self.opt.arg_activity_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1073,12 +1141,20 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_actor_image_init(request: &mut api::Comment) {
+                request_actor_init(request);
+                if request.actor.as_mut().unwrap().image.is_none() {
+                    request.actor.as_mut().unwrap().image = Some(Default::default());
+                }
+            }
+            
             fn request_actor_init(request: &mut api::Comment) {
                 if request.actor.is_none() {
                     request.actor = Some(Default::default());
@@ -1103,19 +1179,19 @@ impl Engine {
                     },
                 "plusoners.total-items" => {
                         request_plusoners_init(&mut request);
-                        request.plusoners.as_mut().unwrap().total_items = arg_from_str(value.unwrap_or("-0"), err, "plusoners.total-items", "integer");
+                        request.plusoners.as_mut().unwrap().total_items = Some(arg_from_str(value.unwrap_or("-0"), err, "plusoners.total-items", "integer"));
                     },
                 "object.content" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().content = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().content = Some(value.unwrap_or("").to_string());
                     },
                 "object.original-content" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().original_content = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().original_content = Some(value.unwrap_or("").to_string());
                     },
                 "object.object-type" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().object_type = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().object_type = Some(value.unwrap_or("").to_string());
                     },
                 "updated" => {
                         request_object_init(&mut request);
@@ -1123,19 +1199,19 @@ impl Engine {
                     },
                 "actor.url" => {
                         request_actor_init(&mut request);
-                        request.actor.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.actor.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "actor.image.url" => {
-                        request_actor_init(&mut request);
-                        request.actor.as_mut().unwrap().image.url = value.unwrap_or("").to_string();
+                        request_actor_image_init(&mut request);
+                        request.actor.as_mut().unwrap().image.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "actor.display-name" => {
-                        request_actor_init(&mut request);
-                        request.actor.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request_actor_image_init(&mut request);
+                        request.actor.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "actor.id" => {
-                        request_actor_init(&mut request);
-                        request.actor.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request_actor_image_init(&mut request);
+                        request.actor.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "verb" => {
                         request_actor_init(&mut request);
@@ -1174,8 +1250,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1186,7 +1261,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.comments().list(&self.opt.arg_activity_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
@@ -1227,8 +1302,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1237,10 +1311,10 @@ impl Engine {
 
     fn _media_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Media = Default::default();
+        let mut request = api::Media::default();
         let mut call = self.hub.media().insert(&request, &self.opt.arg_user_id, &self.opt.arg_collection);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1260,12 +1334,20 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_author_image_init(request: &mut api::Media) {
+                request_author_init(request);
+                if request.author.as_mut().unwrap().image.is_none() {
+                    request.author.as_mut().unwrap().image = Some(Default::default());
+                }
+            }
+            
             fn request_author_init(request: &mut api::Media) {
                 if request.author.is_none() {
                     request.author = Some(Default::default());
@@ -1287,23 +1369,23 @@ impl Engine {
                     },
                 "exif.time" => {
                         request_exif_init(&mut request);
-                        request.exif.as_mut().unwrap().time = value.unwrap_or("").to_string();
+                        request.exif.as_mut().unwrap().time = Some(value.unwrap_or("").to_string());
                     },
                 "author.url" => {
                         request_author_init(&mut request);
-                        request.author.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.author.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "author.image.url" => {
-                        request_author_init(&mut request);
-                        request.author.as_mut().unwrap().image.url = value.unwrap_or("").to_string();
+                        request_author_image_init(&mut request);
+                        request.author.as_mut().unwrap().image.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "author.display-name" => {
-                        request_author_init(&mut request);
-                        request.author.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request_author_image_init(&mut request);
+                        request.author.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "author.id" => {
-                        request_author_init(&mut request);
-                        request.author.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request_author_image_init(&mut request);
+                        request.author.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "url" => {
                         request_author_init(&mut request);
@@ -1384,8 +1466,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1396,7 +1477,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.people().get(&self.opt.arg_user_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1428,8 +1509,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1440,7 +1520,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.people().list(&self.opt.arg_user_id, &self.opt.arg_collection);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1481,8 +1561,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1493,7 +1572,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.people().list_by_activity(&self.opt.arg_activity_id, &self.opt.arg_collection);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1531,8 +1610,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1543,7 +1621,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.people().list_by_circle(&self.opt.arg_circle_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1581,8 +1659,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1604,13 +1681,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_audiences {
+        }
+ else if self.opt.cmd_audiences {
             if self.opt.cmd_list {
                 call_result = self._audiences_list(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_circles {
+        }
+ else if self.opt.cmd_circles {
             if self.opt.cmd_add_people {
                 call_result = self._circles_add_people(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -1630,7 +1709,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_comments {
+        }
+ else if self.opt.cmd_comments {
             if self.opt.cmd_get {
                 call_result = self._comments_get(dry_run, &mut err);
             } else if self.opt.cmd_insert {
@@ -1640,13 +1720,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_media {
+        }
+ else if self.opt.cmd_media {
             if self.opt.cmd_insert {
                 call_result = self._media_insert(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_people {
+        }
+ else if self.opt.cmd_people {
             if self.opt.cmd_get {
                 call_result = self._people_get(dry_run, &mut err);
             } else if self.opt.cmd_list {
@@ -1678,21 +1760,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "plusdomains1-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "plusdomains1-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "plusdomains1",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "plusdomains1",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::PlusDomains::new(hyper::Client::new(), auth),
+            hub: api::PlusDomains::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -1712,12 +1810,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *plus* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *plus* crate version *0.1.5+20150303*, where *20150303* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *plus* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/+/api/).
@@ -362,11 +362,11 @@ impl<'a, C, A> Plus<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachmentsThumbnails {
     /// URL of the webpage containing the image.
-    pub url: String,
+    pub url: Option<String>,
     /// Image resource.
-    pub image: ActivityObjectAttachmentsThumbnailsImage,
+    pub image: Option<ActivityObjectAttachmentsThumbnailsImage>,
     /// Potential name of the thumbnail.
-    pub description: String,
+    pub description: Option<String>,
 }
 
 impl NestedType for ActivityObjectAttachmentsThumbnails {}
@@ -381,10 +381,10 @@ impl Part for ActivityObjectAttachmentsThumbnails {}
 pub struct ActivityActorName {
     /// The given name ("first name") of the actor.
     #[serde(rename="givenName")]
-    pub given_name: String,
+    pub given_name: Option<String>,
     /// The family name ("last name") of the actor.
     #[serde(rename="familyName")]
-    pub family_name: String,
+    pub family_name: Option<String>,
 }
 
 impl NestedType for ActivityActorName {}
@@ -405,25 +405,25 @@ impl Part for ActivityActorName {}
 pub struct ActivityFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies this resource as a collection of activities. Value: "plus#activityFeed".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The title of this collection of activities, which is a truncated portion of the content.
-    pub title: String,
+    pub title: Option<String>,
     /// The activities in this page of results.
-    pub items: Vec<Activity>,
+    pub items: Option<Vec<Activity>>,
     /// The time at which this collection of activities was last updated. Formatted as an RFC 3339 timestamp.
-    pub updated: String,
+    pub updated: Option<String>,
     /// Link to the next page of activities.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The ID of this collection of activities. Deprecated.
-    pub id: String,
+    pub id: Option<String>,
     /// Link to this activity resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for ActivityFeed {}
@@ -441,11 +441,11 @@ pub struct PersonUrls {
     /// - "website" - URL for this Google+ Page's primary website. 
     /// - "other" - Other URL.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The URL value.
-    pub value: String,
+    pub value: Option<String>,
     /// The label of the URL.
-    pub label: String,
+    pub label: Option<String>,
 }
 
 impl NestedType for PersonUrls {}
@@ -464,9 +464,9 @@ pub struct PersonEmails {
     /// - "work" - Work email address. 
     /// - "other" - Other.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The email address.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for PersonEmails {}
@@ -481,27 +481,27 @@ impl Part for PersonEmails {}
 pub struct PersonOrganizations {
     /// The date that the person joined this organization.
     #[serde(rename="startDate")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     /// The date that the person left this organization.
     #[serde(rename="endDate")]
-    pub end_date: String,
+    pub end_date: Option<String>,
     /// A short description of the person's role in this organization. Deprecated.
-    pub description: String,
+    pub description: Option<String>,
     /// The person's job title or role within the organization.
-    pub title: String,
+    pub title: Option<String>,
     /// If "true", indicates this organization is the person's primary one, which is typically interpreted as the current one.
-    pub primary: bool,
+    pub primary: Option<bool>,
     /// The location of this organization. Deprecated.
-    pub location: String,
+    pub location: Option<String>,
     /// The department within the organization. Deprecated.
-    pub department: String,
+    pub department: Option<String>,
     /// The type of organization. Possible values include, but are not limited to, the following values:  
     /// - "work" - Work. 
     /// - "school" - School.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The name of the organization.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for PersonOrganizations {}
@@ -516,10 +516,10 @@ impl Part for PersonOrganizations {}
 pub struct ActivityObjectReplies {
     /// Total number of comments on this activity.
     #[serde(rename="totalItems")]
-    pub total_items: u32,
+    pub total_items: Option<u32>,
     /// The URL for the collection of comments in reply to this activity.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl NestedType for ActivityObjectReplies {}
@@ -533,10 +533,10 @@ impl Part for ActivityObjectReplies {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachmentsEmbed {
     /// URL of the link.
-    pub url: String,
+    pub url: Option<String>,
     /// Media type of the link.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for ActivityObjectAttachmentsEmbed {}
@@ -551,7 +551,7 @@ impl Part for ActivityObjectAttachmentsEmbed {}
 pub struct PlusAclentryResource {
     /// A descriptive name for this entry. Suitable for display.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// The type of entry describing to whom access is granted. Possible values are:  
     /// - "person" - Access to an individual. 
     /// - "circle" - Access to members of a circle. 
@@ -560,9 +560,9 @@ pub struct PlusAclentryResource {
     /// - "domain" - Access to members of the person's Google Apps domain. 
     /// - "public" - Access to anyone on the web.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The ID of the entry. For entries of type "person" or "circle", this is the ID of the resource. For other types, this property is not set.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for PlusAclentryResource {}
@@ -575,9 +575,9 @@ impl Part for PlusAclentryResource {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonPlacesLived {
     /// If "true", this place of residence is this person's primary residence.
-    pub primary: bool,
+    pub primary: Option<bool>,
     /// A place where this person has lived. For example: "Seattle, WA", "Near Toronto".
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for PersonPlacesLived {}
@@ -591,14 +591,14 @@ impl Part for PersonPlacesLived {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentObject {
     /// The HTML-formatted content, suitable for display.
-    pub content: String,
+    pub content: Option<String>,
     /// The object type of this comment. Possible values are:  
     /// - "comment" - A comment in reply to an activity.
     #[serde(rename="objectType")]
-    pub object_type: String,
+    pub object_type: Option<String>,
     /// The content (text) as provided by the author, stored without any HTML formatting. When creating or updating a comment, this value must be supplied as plain text in the request.
     #[serde(rename="originalContent")]
-    pub original_content: String,
+    pub original_content: Option<String>,
 }
 
 impl NestedType for CommentObject {}
@@ -613,144 +613,144 @@ impl Part for CommentObject {}
 pub struct ItemScope {
     /// The start date and time of the event (in ISO 8601 date format).
     #[serde(rename="startDate")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     /// The end date and time of the event (in ISO 8601 date format).
     #[serde(rename="endDate")]
-    pub end_date: String,
+    pub end_date: Option<String>,
     /// The text that is the result of the app activity. For example, if a user leaves a review of a restaurant, this might be the text of the review.
-    pub text: String,
+    pub text: Option<String>,
     /// A URL to the image that represents this result. For example, if a user writes a review of a restaurant and attaches a photo of their meal, you might use that photo as the result.image.
-    pub image: String,
+    pub image: Option<String>,
     /// Review rating.
     #[serde(rename="reviewRating")]
-    pub review_rating: Option<Box<ItemScope>>,
+    pub review_rating: Option<Option<Box<ItemScope>>>,
     /// Date of birth.
     #[serde(rename="birthDate")]
-    pub birth_date: String,
+    pub birth_date: Option<String>,
     /// The initial date that the result was published. For example, a user writes a comment on a blog, which has a result.dateCreated of when they submit it. If the blog users comment moderation, the result.datePublished value would match the date when the owner approved the message.
     #[serde(rename="datePublished")]
-    pub date_published: String,
+    pub date_published: Option<String>,
     /// Address locality.
     #[serde(rename="addressLocality")]
-    pub address_locality: String,
+    pub address_locality: Option<String>,
     /// The duration of the item (movie, audio recording, event, etc.) in ISO 8601 date format.
-    pub duration: String,
+    pub duration: Option<String>,
     /// An additional name for a Person, can be used for a middle name.
     #[serde(rename="additionalName")]
-    pub additional_name: Vec<String>,
+    pub additional_name: Option<Vec<String>>,
     /// Worst possible rating value that a result might obtain. This property defines the lower bound for the ratingValue.
     #[serde(rename="worstRating")]
-    pub worst_rating: String,
+    pub worst_rating: Option<String>,
     /// A list of contributors to this result.
-    pub contributor: Vec<ItemScope>,
+    pub contributor: Option<Vec<ItemScope>>,
     /// A URL to a thumbnail image that represents this result.
     #[serde(rename="thumbnailUrl")]
-    pub thumbnail_url: String,
+    pub thumbnail_url: Option<String>,
     /// An identifier for the object. Your app can choose how to identify objects. The object.id is required if you are writing an action that does not have a corresponding web page or object.url property.
-    pub id: String,
+    pub id: Option<String>,
     /// Post office box number.
     #[serde(rename="postOfficeBoxNumber")]
-    pub post_office_box_number: String,
+    pub post_office_box_number: Option<String>,
     /// A person attending the event.
-    pub attendees: Vec<ItemScope>,
+    pub attendees: Option<Vec<ItemScope>>,
     /// The person or persons who created this result. In the example of restaurant reviews, this might be the reviewer's name.
-    pub author: Vec<ItemScope>,
+    pub author: Option<Vec<ItemScope>>,
     /// The encoding.
-    pub associated_media: Vec<ItemScope>,
+    pub associated_media: Option<Vec<ItemScope>>,
     /// Best possible rating value that a result might obtain. This property defines the upper bound for the ratingValue. For example, you might have a 5 star rating scale, you would provide 5 as the value for this property.
     #[serde(rename="bestRating")]
-    pub best_rating: String,
+    pub best_rating: Option<String>,
     /// Address country.
     #[serde(rename="addressCountry")]
-    pub address_country: i64,
+    pub address_country: Option<i64>,
     /// The width of the media object.
-    pub width: String,
+    pub width: Option<String>,
     /// Street address.
     #[serde(rename="streetAddress")]
-    pub street_address: String,
+    pub street_address: Option<String>,
     /// The location of the event or organization.
-    pub location: Option<Box<ItemScope>>,
+    pub location: Option<Option<Box<ItemScope>>>,
     /// Latitude.
-    pub latitude: f64,
+    pub latitude: Option<f64>,
     /// From http://schema.org/MusicRecording, the artist that performed this recording.
     #[serde(rename="byArtist")]
-    pub by_artist: Option<Box<ItemScope>>,
+    pub by_artist: Option<Option<Box<ItemScope>>>,
     /// The schema.org URL that best describes the referenced object and matches the type of moment.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The date the result was last modified such as the date that a review was last edited.
     #[serde(rename="dateModified")]
-    pub date_modified: String,
+    pub date_modified: Option<String>,
     /// File size in (mega/kilo) bytes.
     #[serde(rename="contentSize")]
-    pub content_size: String,
+    pub content_size: Option<String>,
     /// Actual bytes of the media object, for example the image file or video file.
     #[serde(rename="contentUrl")]
-    pub content_url: String,
+    pub content_url: Option<String>,
     /// Family name. This property can be used with givenName instead of the name property.
     #[serde(rename="familyName")]
-    pub family_name: String,
+    pub family_name: Option<String>,
     /// The string that describes the content of the result.
-    pub description: String,
+    pub description: Option<String>,
     /// Property of http://schema.org/TVEpisode indicating which series the episode belongs to.
     #[serde(rename="partOfTVSeries")]
-    pub part_of_tv_series: Option<Box<ItemScope>>,
+    pub part_of_tv_series: Option<Option<Box<ItemScope>>>,
     /// The subject matter of the content.
-    pub about: Option<Box<ItemScope>>,
+    pub about: Option<Option<Box<ItemScope>>>,
     /// The date the result was created such as the date that a review was first created.
     #[serde(rename="dateCreated")]
-    pub date_created: String,
+    pub date_created: Option<String>,
     /// Postal code.
     #[serde(rename="postalCode")]
-    pub postal_code: String,
+    pub postal_code: Option<String>,
     /// Number of attendees.
     #[serde(rename="attendeeCount")]
-    pub attendee_count: i32,
+    pub attendee_count: Option<i32>,
     /// From http://schema.org/MusicRecording, which album a song is in.
     #[serde(rename="inAlbum")]
-    pub in_album: Option<Box<ItemScope>>,
+    pub in_album: Option<Option<Box<ItemScope>>>,
     /// Postal address.
-    pub address: Option<Box<ItemScope>>,
+    pub address: Option<Option<Box<ItemScope>>>,
     /// The height of the media object.
-    pub height: String,
+    pub height: Option<String>,
     /// Geo coordinates.
-    pub geo: Option<Box<ItemScope>>,
+    pub geo: Option<Option<Box<ItemScope>>>,
     /// A URL pointing to a player for a specific video. In general, this is the information in the src element of an embed tag and should not be the same as the content of the loc tag.
     #[serde(rename="embedUrl")]
-    pub embed_url: String,
+    pub embed_url: Option<String>,
     /// The exchange traded instrument associated with a Corporation object. The tickerSymbol is expressed as an exchange and an instrument name separated by a space character. For the exchange component of the tickerSymbol attribute, we recommend using the controlled vocabulary of Market Identifier Codes (MIC) specified in ISO15022.
     #[serde(rename="tickerSymbol")]
-    pub ticker_symbol: String,
+    pub ticker_symbol: Option<String>,
     /// The name of the result. In the example of a restaurant review, this might be the summary the user gave their review such as "Great ambiance, but overpriced."
-    pub name: String,
+    pub name: Option<String>,
     /// Identifies this resource as an itemScope.
-    pub kind: String,
+    pub kind: Option<String>,
     /// From http://schema.org/MusicRecording, the audio file.
-    pub audio: Option<Box<ItemScope>>,
+    pub audio: Option<Option<Box<ItemScope>>>,
     /// Player type that is required. For example: Flash or Silverlight.
     #[serde(rename="playerType")]
-    pub player_type: String,
+    pub player_type: Option<String>,
     /// The main performer or performers of the event-for example, a presenter, musician, or actor.
-    pub performers: Vec<ItemScope>,
+    pub performers: Option<Vec<ItemScope>>,
     /// The URL that points to the result object. For example, a permalink directly to a restaurant reviewer's comment.
-    pub url: String,
+    pub url: Option<String>,
     /// Gender of the person.
-    pub gender: String,
+    pub gender: Option<String>,
     /// Longitude.
-    pub longitude: f64,
+    pub longitude: Option<f64>,
     /// Thumbnail image for an image or video.
-    pub thumbnail: Option<Box<ItemScope>>,
+    pub thumbnail: Option<Option<Box<ItemScope>>>,
     /// Address region.
     #[serde(rename="addressRegion")]
-    pub address_region: String,
+    pub address_region: Option<String>,
     /// The caption for this object.
-    pub caption: String,
+    pub caption: Option<String>,
     /// Rating value.
     #[serde(rename="ratingValue")]
-    pub rating_value: String,
+    pub rating_value: Option<String>,
     /// Given name. This property can be used with familyName instead of the name property.
     #[serde(rename="givenName")]
-    pub given_name: String,
+    pub given_name: Option<String>,
 }
 
 impl Part for ItemScope {}
@@ -763,14 +763,14 @@ impl Part for ItemScope {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachmentsImage {
     /// Image URL.
-    pub url: String,
+    pub url: Option<String>,
     /// The width, in pixels, of the linked resource.
-    pub width: u32,
+    pub width: Option<u32>,
     /// Media type of the link.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The height, in pixels, of the linked resource.
-    pub height: u32,
+    pub height: Option<u32>,
 }
 
 impl NestedType for ActivityObjectAttachmentsImage {}
@@ -784,9 +784,9 @@ impl Part for ActivityObjectAttachmentsImage {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentInReplyTo {
     /// The URL of the activity.
-    pub url: String,
+    pub url: Option<String>,
     /// The ID of the activity.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl NestedType for CommentInReplyTo {}
@@ -808,21 +808,21 @@ impl Part for CommentInReplyTo {}
 pub struct PeopleFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies this resource as a collection of people. Value: "plus#peopleFeed".
-    pub kind: String,
+    pub kind: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The title of this collection of people.
-    pub title: String,
+    pub title: Option<String>,
     /// The total number of people available in this list. The number of people in a response might be smaller due to paging. This might not be set for all collections.
     #[serde(rename="totalItems")]
-    pub total_items: i32,
+    pub total_items: Option<i32>,
     /// The people in this page of results. Each item includes the id, displayName, image, and url for the person. To retrieve additional profile data, see the people.get method.
-    pub items: Vec<Person>,
+    pub items: Option<Vec<Person>>,
     /// Link to this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for PeopleFeed {}
@@ -835,14 +835,14 @@ impl ResponseResult for PeopleFeed {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentActor {
     /// A link to the Person resource for this actor.
-    pub url: String,
+    pub url: Option<String>,
     /// The image representation of this actor.
-    pub image: CommentActorImage,
+    pub image: Option<CommentActorImage>,
     /// The name of this actor, suitable for display.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// The ID of the actor.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl NestedType for CommentActor {}
@@ -856,16 +856,16 @@ impl Part for CommentActor {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityActor {
     /// The link to the actor's Google profile.
-    pub url: String,
+    pub url: Option<String>,
     /// The image representation of the actor.
-    pub image: ActivityActorImage,
+    pub image: Option<ActivityActorImage>,
     /// The name of the actor, suitable for display.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// The ID of the actor's Person resource.
-    pub id: String,
+    pub id: Option<String>,
     /// An object representation of the individual components of name.
-    pub name: ActivityActorName,
+    pub name: Option<ActivityActorName>,
 }
 
 impl NestedType for ActivityActor {}
@@ -879,7 +879,7 @@ impl Part for ActivityActor {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityProvider {
     /// Name of the service provider.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl NestedType for ActivityProvider {}
@@ -893,9 +893,9 @@ impl Part for ActivityProvider {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlacePosition {
     /// The latitude of this position.
-    pub latitude: f64,
+    pub latitude: Option<f64>,
     /// The longitude of this position.
-    pub longitude: f64,
+    pub longitude: Option<f64>,
 }
 
 impl NestedType for PlacePosition {}
@@ -910,10 +910,10 @@ impl Part for PlacePosition {}
 pub struct ActivityObjectPlusoners {
     /// Total number of people who +1'd this activity.
     #[serde(rename="totalItems")]
-    pub total_items: u32,
+    pub total_items: Option<u32>,
     /// The URL for the collection of people who +1'd this activity.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl NestedType for ActivityObjectPlusoners {}
@@ -928,10 +928,10 @@ impl Part for ActivityObjectPlusoners {}
 pub struct PersonCoverCoverInfo {
     /// The difference between the left position of the cover image and the actual displayed cover image. Only valid for banner layout.
     #[serde(rename="leftImageOffset")]
-    pub left_image_offset: i32,
+    pub left_image_offset: Option<i32>,
     /// The difference between the top position of the cover image and the actual displayed cover image. Only valid for banner layout.
     #[serde(rename="topImageOffset")]
-    pub top_image_offset: i32,
+    pub top_image_offset: Option<i32>,
 }
 
 impl NestedType for PersonCoverCoverInfo {}
@@ -981,7 +981,7 @@ impl ResponseResult for Moment {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentActorImage {
     /// The URL of the actor's profile photo. To resize the image and crop it to a square, append the query string ?sz=x, where x is the dimension in pixels of each side.
-    pub url: String,
+    pub url: Option<String>,
 }
 
 impl NestedType for CommentActorImage {}
@@ -995,10 +995,10 @@ impl Part for CommentActorImage {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonImage {
     /// The URL of the person's profile photo. To resize the image and crop it to a square, append the query string ?sz=x, where x is the dimension in pixels of each side.
-    pub url: String,
+    pub url: Option<String>,
     /// Whether the person's profile photo is the default one
     #[serde(rename="isDefault")]
-    pub is_default: bool,
+    pub is_default: Option<bool>,
 }
 
 impl NestedType for PersonImage {}
@@ -1013,7 +1013,7 @@ impl Part for PersonImage {}
 pub struct CommentPlusoners {
     /// Total number of people who +1'd this comment.
     #[serde(rename="totalItems")]
-    pub total_items: u32,
+    pub total_items: Option<u32>,
 }
 
 impl NestedType for CommentPlusoners {}
@@ -1028,29 +1028,29 @@ impl Part for CommentPlusoners {}
 pub struct ActivityObjectAttachments {
     /// The title of the attachment, such as a photo caption or an article title.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// If the attachment is an album, this property is a list of potential additional thumbnails from the album.
-    pub thumbnails: Vec<ActivityObjectAttachmentsThumbnails>,
+    pub thumbnails: Option<Vec<ActivityObjectAttachmentsThumbnails>>,
     /// The full image URL for photo attachments.
     #[serde(rename="fullImage")]
-    pub full_image: ActivityObjectAttachmentsFullImage,
+    pub full_image: Option<ActivityObjectAttachmentsFullImage>,
     /// The link to the attachment, which should be of type text/html.
-    pub url: String,
+    pub url: Option<String>,
     /// The preview image for photos or videos.
-    pub image: ActivityObjectAttachmentsImage,
+    pub image: Option<ActivityObjectAttachmentsImage>,
     /// If the attachment is an article, this property contains a snippet of text from the article. It can also include descriptions for other types.
-    pub content: String,
+    pub content: Option<String>,
     /// If the attachment is a video, the embeddable link.
-    pub embed: ActivityObjectAttachmentsEmbed,
+    pub embed: Option<ActivityObjectAttachmentsEmbed>,
     /// The ID of the attachment.
-    pub id: String,
+    pub id: Option<String>,
     /// The type of media object. Possible values include, but are not limited to, the following values:  
     /// - "photo" - A photo. 
     /// - "album" - A photo album. 
     /// - "video" - A video. 
     /// - "article" - An article, specified by a link.
     #[serde(rename="objectType")]
-    pub object_type: String,
+    pub object_type: Option<String>,
 }
 
 impl NestedType for ActivityObjectAttachments {}
@@ -1064,11 +1064,11 @@ impl Part for ActivityObjectAttachments {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonCoverCoverPhoto {
     /// The URL of the image.
-    pub url: String,
+    pub url: Option<String>,
     /// The width of the image.
-    pub width: i32,
+    pub width: Option<i32>,
     /// The height of the image.
-    pub height: i32,
+    pub height: Option<i32>,
 }
 
 impl NestedType for PersonCoverCoverPhoto {}
@@ -1082,14 +1082,14 @@ impl Part for PersonCoverCoverPhoto {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachmentsFullImage {
     /// URL of the image.
-    pub url: String,
+    pub url: Option<String>,
     /// The width, in pixels, of the linked resource.
-    pub width: u32,
+    pub width: Option<u32>,
     /// Media type of the link.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The height, in pixels, of the linked resource.
-    pub height: u32,
+    pub height: Option<u32>,
 }
 
 impl NestedType for ActivityObjectAttachmentsFullImage {}
@@ -1104,13 +1104,13 @@ impl Part for ActivityObjectAttachmentsFullImage {}
 pub struct PersonCover {
     /// Extra information about the cover photo.
     #[serde(rename="coverInfo")]
-    pub cover_info: PersonCoverCoverInfo,
+    pub cover_info: Option<PersonCoverCoverInfo>,
     /// The layout of the cover art. Possible values include, but are not limited to, the following values:  
     /// - "banner" - One large image banner.
-    pub layout: String,
+    pub layout: Option<String>,
     /// The person's primary cover image.
     #[serde(rename="coverPhoto")]
-    pub cover_photo: PersonCoverCoverPhoto,
+    pub cover_photo: Option<PersonCoverCoverPhoto>,
 }
 
 impl NestedType for PersonCover {}
@@ -1124,11 +1124,11 @@ impl Part for PersonCover {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Acl {
     /// The list of access entries.
-    pub items: Vec<PlusAclentryResource>,
+    pub items: Option<Vec<PlusAclentryResource>>,
     /// Identifies this resource as a collection of access controls. Value: "plus#acl".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Description of the access granted, suitable for display.
-    pub description: String,
+    pub description: Option<String>,
 }
 
 impl Part for Acl {}
@@ -1147,7 +1147,7 @@ impl Part for Acl {}
 pub struct Person {
     /// The "bragging rights" line of this person.
     #[serde(rename="braggingRights")]
-    pub bragging_rights: String,
+    pub bragging_rights: Option<String>,
     /// The person's relationship status. Possible values include, but are not limited to, the following values:  
     /// - "single" - Person is single. 
     /// - "in_a_relationship" - Person is in a relationship. 
@@ -1159,77 +1159,77 @@ pub struct Person {
     /// - "in_domestic_partnership" - Person is in a domestic partnership. 
     /// - "in_civil_union" - Person is in a civil union.
     #[serde(rename="relationshipStatus")]
-    pub relationship_status: String,
+    pub relationship_status: Option<String>,
     /// The representation of the person's profile photo.
-    pub image: PersonImage,
+    pub image: Option<PersonImage>,
     /// The hosted domain name for the user's Google Apps account. For instance, example.com. The plus.profile.emails.read or email scope is needed to get this domain name.
-    pub domain: String,
+    pub domain: Option<String>,
     /// A list of places where this person has lived.
     #[serde(rename="placesLived")]
-    pub places_lived: Vec<PersonPlacesLived>,
+    pub places_lived: Option<Vec<PersonPlacesLived>>,
     /// The person's date of birth, represented as YYYY-MM-DD.
-    pub birthday: String,
+    pub birthday: Option<String>,
     /// The name of this person, which is suitable for display.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// The nickname of this person.
-    pub nickname: String,
+    pub nickname: Option<String>,
     /// A list of email addresses that this person has, including their Google account email address, and the public verified email addresses on their Google+ profile. The plus.profile.emails.read scope is needed to retrieve these email addresses, or the email scope can be used to retrieve just the Google account email address.
-    pub emails: Vec<PersonEmails>,
+    pub emails: Option<Vec<PersonEmails>>,
     /// The occupation of this person.
-    pub occupation: String,
+    pub occupation: Option<String>,
     /// A list of current or past organizations with which this person is associated.
-    pub organizations: Vec<PersonOrganizations>,
+    pub organizations: Option<Vec<PersonOrganizations>>,
     /// Identifies this resource as a person. Value: "plus#person".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Whether the person or Google+ Page has been verified.
-    pub verified: bool,
+    pub verified: Option<bool>,
     /// An object representation of the individual components of a person's name.
-    pub name: PersonName,
+    pub name: Option<PersonName>,
     /// The user's preferred language for rendering.
-    pub language: String,
+    pub language: Option<String>,
     /// Whether this user has signed up for Google+.
     #[serde(rename="isPlusUser")]
-    pub is_plus_user: bool,
+    pub is_plus_user: Option<bool>,
     /// The person's skills.
-    pub skills: String,
+    pub skills: Option<String>,
     /// The brief description (tagline) of this person.
-    pub tagline: String,
+    pub tagline: Option<String>,
     /// (this field is not currently used)
     #[serde(rename="currentLocation")]
-    pub current_location: String,
+    pub current_location: Option<String>,
     /// The cover photo content.
-    pub cover: PersonCover,
+    pub cover: Option<PersonCover>,
     /// The ID of this person.
-    pub id: String,
+    pub id: Option<String>,
     /// The URL of this person's profile.
-    pub url: String,
+    pub url: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
     /// If a Google+ Page, the number of people who have +1'd this page.
     #[serde(rename="plusOneCount")]
-    pub plus_one_count: i32,
+    pub plus_one_count: Option<i32>,
     /// A list of URLs for this person.
-    pub urls: Vec<PersonUrls>,
+    pub urls: Option<Vec<PersonUrls>>,
     /// The person's gender. Possible values include, but are not limited to, the following values:  
     /// - "male" - Male gender. 
     /// - "female" - Female gender. 
     /// - "other" - Other.
-    pub gender: String,
+    pub gender: Option<String>,
     /// The age range of the person. Valid ranges are 17 or younger, 18 to 20, and 21 or older. Age is determined from the user's birthday using Western age reckoning.
     #[serde(rename="ageRange")]
-    pub age_range: PersonAgeRange,
+    pub age_range: Option<PersonAgeRange>,
     /// For followers who are visible, the number of people who have added this person or page to a circle.
     #[serde(rename="circledByCount")]
-    pub circled_by_count: i32,
+    pub circled_by_count: Option<i32>,
     /// Type of person within Google+. Possible values include, but are not limited to, the following values:  
     /// - "person" - represents an actual person. 
     /// - "page" - represents a page.
     #[serde(rename="objectType")]
-    pub object_type: String,
+    pub object_type: Option<String>,
     /// A short biography for this person.
     #[serde(rename="aboutMe")]
-    pub about_me: String,
+    pub about_me: Option<String>,
 }
 
 impl ResponseResult for Person {}
@@ -1242,14 +1242,14 @@ impl ResponseResult for Person {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectActor {
     /// A link to the original actor's Google profile.
-    pub url: String,
+    pub url: Option<String>,
     /// The image representation of the original actor.
-    pub image: ActivityObjectActorImage,
+    pub image: Option<ActivityObjectActorImage>,
     /// The original actor's name, which is suitable for display.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// ID of the original actor.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl NestedType for ActivityObjectActor {}
@@ -1269,23 +1269,23 @@ impl Part for ActivityObjectActor {}
 pub struct MomentsFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies this resource as a collection of moments. Value: "plus#momentsFeed".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The title of this collection of moments.
-    pub title: String,
+    pub title: Option<String>,
     /// The moments in this page of results.
-    pub items: Vec<Moment>,
+    pub items: Option<Vec<Moment>>,
     /// The RFC 339 timestamp for when this collection of moments was last updated.
-    pub updated: String,
+    pub updated: Option<String>,
     /// Link to the next page of moments.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
     /// Link to this page of moments.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for MomentsFeed {}
@@ -1304,49 +1304,49 @@ impl ResponseResult for MomentsFeed {}
 pub struct Activity {
     /// Name of the place where this activity occurred.
     #[serde(rename="placeName")]
-    pub place_name: String,
+    pub place_name: Option<String>,
     /// The time at which this activity was last updated. Formatted as an RFC 3339 timestamp.
-    pub updated: String,
+    pub updated: Option<String>,
     /// The object of this activity.
-    pub object: ActivityObject,
+    pub object: Option<ActivityObject>,
     /// This activity's verb, which indicates the action that was performed. Possible values include, but are not limited to, the following values:  
     /// - "post" - Publish content to the stream. 
     /// - "share" - Reshare an activity.
-    pub verb: String,
+    pub verb: Option<String>,
     /// Radius, in meters, of the region where this activity occurred, centered at the latitude and longitude identified in geocode.
-    pub radius: String,
+    pub radius: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
     /// Street address where this activity occurred.
-    pub address: String,
+    pub address: Option<String>,
     /// Additional content added by the person who shared this activity, applicable only when resharing an activity.
-    pub annotation: String,
+    pub annotation: Option<String>,
     /// Identifies this resource as an activity. Value: "plus#activity".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Title of this activity.
-    pub title: String,
+    pub title: Option<String>,
     /// The link to this activity.
-    pub url: String,
+    pub url: Option<String>,
     /// ID of the place where this activity occurred.
     #[serde(rename="placeId")]
-    pub place_id: String,
+    pub place_id: Option<String>,
     /// The person who performed this activity.
-    pub actor: ActivityActor,
+    pub actor: Option<ActivityActor>,
     /// The ID of this activity.
-    pub id: String,
+    pub id: Option<String>,
     /// Identifies who has access to see this activity.
-    pub access: Acl,
+    pub access: Option<Acl>,
     /// Latitude and longitude where this activity occurred. Format is latitude followed by longitude, space separated.
-    pub geocode: String,
+    pub geocode: Option<String>,
     /// The location where this activity occurred.
-    pub location: Place,
+    pub location: Option<Place>,
     /// The service provider that initially published this activity.
-    pub provider: ActivityProvider,
+    pub provider: Option<ActivityProvider>,
     /// If this activity is a crosspost from another system, this property specifies the ID of the original activity.
     #[serde(rename="crosspostSource")]
-    pub crosspost_source: String,
+    pub crosspost_source: Option<String>,
     /// The time at which this activity was initially published. Formatted as an RFC 3339 timestamp.
-    pub published: String,
+    pub published: Option<String>,
 }
 
 impl ResponseResult for Activity {}
@@ -1365,22 +1365,22 @@ impl ResponseResult for Activity {}
 pub struct CommentFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies this resource as a collection of comments. Value: "plus#commentFeed".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The title of this collection of comments.
-    pub title: String,
+    pub title: Option<String>,
     /// The comments in this page of results.
-    pub items: Vec<Comment>,
+    pub items: Option<Vec<Comment>>,
     /// The time at which this collection of comments was last updated. Formatted as an RFC 3339 timestamp.
-    pub updated: String,
+    pub updated: Option<String>,
     /// Link to the next page of activities.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The ID of this collection of comments.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl ResponseResult for CommentFeed {}
@@ -1394,10 +1394,10 @@ impl ResponseResult for CommentFeed {}
 pub struct ActivityObjectResharers {
     /// Total number of people who reshared this activity.
     #[serde(rename="totalItems")]
-    pub total_items: u32,
+    pub total_items: Option<u32>,
     /// The URL for the collection of resharers.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl NestedType for ActivityObjectResharers {}
@@ -1411,7 +1411,7 @@ impl Part for ActivityObjectResharers {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityActorImage {
     /// The URL of the actor's profile photo. To resize the image and crop it to a square, append the query string ?sz=x, where x is the dimension in pixels of each side.
-    pub url: String,
+    pub url: Option<String>,
 }
 
 impl NestedType for ActivityActorImage {}
@@ -1432,29 +1432,29 @@ impl Part for ActivityActorImage {}
 pub struct Comment {
     /// The activity this comment replied to.
     #[serde(rename="inReplyTo")]
-    pub in_reply_to: Vec<CommentInReplyTo>,
+    pub in_reply_to: Option<Vec<CommentInReplyTo>>,
     /// Identifies this resource as a comment. Value: "plus#comment".
-    pub kind: String,
+    pub kind: Option<String>,
     /// People who +1'd this comment.
-    pub plusoners: CommentPlusoners,
+    pub plusoners: Option<CommentPlusoners>,
     /// The object of this comment.
-    pub object: CommentObject,
+    pub object: Option<CommentObject>,
     /// The time at which this comment was last updated. Formatted as an RFC 3339 timestamp.
-    pub updated: String,
+    pub updated: Option<String>,
     /// The person who posted this comment.
-    pub actor: CommentActor,
+    pub actor: Option<CommentActor>,
     /// This comment's verb, indicating what action was performed. Possible values are:  
     /// - "post" - Publish content to the stream.
-    pub verb: String,
+    pub verb: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The time at which this comment was initially published. Formatted as an RFC 3339 timestamp.
-    pub published: String,
+    pub published: Option<String>,
     /// The ID of this comment.
-    pub id: String,
+    pub id: Option<String>,
     /// Link to this comment resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl Resource for Comment {}
@@ -1468,7 +1468,7 @@ impl ResponseResult for Comment {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectActorImage {
     /// A URL that points to a thumbnail photo of the original actor.
-    pub url: String,
+    pub url: Option<String>,
 }
 
 impl NestedType for ActivityObjectActorImage {}
@@ -1484,11 +1484,11 @@ pub struct PersonAgeRange {
     /// The age range's upper bound, if any. Possible values include, but are not limited to, the following:  
     /// - "17" - for age 17 
     /// - "20" - for age 20
-    pub max: i32,
+    pub max: Option<i32>,
     /// The age range's lower bound, if any. Possible values include, but are not limited to, the following:  
     /// - "21" - for age 21 
     /// - "18" - for age 18
-    pub min: i32,
+    pub min: Option<i32>,
 }
 
 impl NestedType for PersonAgeRange {}
@@ -1503,21 +1503,21 @@ impl Part for PersonAgeRange {}
 pub struct PersonName {
     /// The honorific prefixes (such as "Dr." or "Mrs.") for this person.
     #[serde(rename="honorificPrefix")]
-    pub honorific_prefix: String,
+    pub honorific_prefix: Option<String>,
     /// The given name (first name) of this person.
     #[serde(rename="givenName")]
-    pub given_name: String,
+    pub given_name: Option<String>,
     /// The middle name of this person.
     #[serde(rename="middleName")]
-    pub middle_name: String,
+    pub middle_name: Option<String>,
     /// The family name (last name) of this person.
     #[serde(rename="familyName")]
-    pub family_name: String,
+    pub family_name: Option<String>,
     /// The full name of this person, including middle names, suffixes, etc.
-    pub formatted: String,
+    pub formatted: Option<String>,
     /// The honorific suffixes (such as "Jr.") for this person.
     #[serde(rename="honorificSuffix")]
-    pub honorific_suffix: String,
+    pub honorific_suffix: Option<String>,
 }
 
 impl NestedType for PersonName {}
@@ -1531,14 +1531,14 @@ impl Part for PersonName {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectAttachmentsThumbnailsImage {
     /// Image url.
-    pub url: String,
+    pub url: Option<String>,
     /// The width, in pixels, of the linked resource.
-    pub width: u32,
+    pub width: Option<u32>,
     /// Media type of the link.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The height, in pixels, of the linked resource.
-    pub height: u32,
+    pub height: Option<u32>,
 }
 
 impl NestedType for ActivityObjectAttachmentsThumbnailsImage {}
@@ -1552,7 +1552,7 @@ impl Part for ActivityObjectAttachmentsThumbnailsImage {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaceAddress {
     /// The formatted address for display.
-    pub formatted: String,
+    pub formatted: Option<String>,
 }
 
 impl NestedType for PlaceAddress {}
@@ -1566,29 +1566,29 @@ impl Part for PlaceAddress {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObject {
     /// The HTML-formatted content, which is suitable for display.
-    pub content: String,
+    pub content: Option<String>,
     /// The media objects attached to this activity.
-    pub attachments: Vec<ActivityObjectAttachments>,
+    pub attachments: Option<Vec<ActivityObjectAttachments>>,
     /// The content (text) as provided by the author, which is stored without any HTML formatting. When creating or updating an activity, this value must be supplied as plain text in the request.
     #[serde(rename="originalContent")]
-    pub original_content: String,
+    pub original_content: Option<String>,
     /// People who +1'd this activity.
-    pub plusoners: ActivityObjectPlusoners,
+    pub plusoners: Option<ActivityObjectPlusoners>,
     /// If this activity's object is itself another activity, such as when a person reshares an activity, this property specifies the original activity's actor.
-    pub actor: ActivityObjectActor,
+    pub actor: Option<ActivityObjectActor>,
     /// People who reshared this activity.
-    pub resharers: ActivityObjectResharers,
+    pub resharers: Option<ActivityObjectResharers>,
     /// The URL that points to the linked resource.
-    pub url: String,
+    pub url: Option<String>,
     /// Comments in reply to this activity.
-    pub replies: ActivityObjectReplies,
+    pub replies: Option<ActivityObjectReplies>,
     /// The ID of the object. When resharing an activity, this is the ID of the activity that is being reshared.
-    pub id: String,
+    pub id: Option<String>,
     /// The type of the object. Possible values include, but are not limited to, the following values:  
     /// - "note" - Textual content. 
     /// - "activity" - A Google+ activity.
     #[serde(rename="objectType")]
-    pub object_type: String,
+    pub object_type: Option<String>,
 }
 
 impl NestedType for ActivityObject {}
@@ -1602,16 +1602,16 @@ impl Part for ActivityObject {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Place {
     /// The position of the place.
-    pub position: PlacePosition,
+    pub position: Option<PlacePosition>,
     /// Identifies this resource as a place. Value: "plus#place".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The display name of the place.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// The id of the place.
-    pub id: String,
+    pub id: Option<String>,
     /// The physical address of the place.
-    pub address: PlaceAddress,
+    pub address: Option<PlaceAddress>,
 }
 
 impl Part for Place {}
@@ -2057,7 +2057,7 @@ impl<'a, C, A> PeopleMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Moment = Default::default();
+/// let mut req = Moment::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2156,16 +2156,20 @@ impl<'a, C, A> MomentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2438,16 +2442,20 @@ impl<'a, C, A> MomentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2705,16 +2713,20 @@ impl<'a, C, A> MomentRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2921,16 +2933,20 @@ impl<'a, C, A> ActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3179,16 +3195,20 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3421,16 +3441,20 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3690,16 +3714,20 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3941,16 +3969,20 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4162,16 +4194,20 @@ impl<'a, C, A> PeopleSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4425,16 +4461,20 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4696,16 +4736,20 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4957,16 +5001,20 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

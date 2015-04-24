@@ -41,6 +41,7 @@ pages:
 - ['objects_insert.md', 'Objects', 'Insert']
 - ['objects_list.md', 'Objects', 'List']
 - ['objects_patch.md', 'Objects', 'Patch']
+- ['objects_rewrite.md', 'Objects', 'Rewrite']
 - ['objects_update.md', 'Objects', 'Update']
 - ['objects_watch-all.md', 'Objects', 'Watch All']
 

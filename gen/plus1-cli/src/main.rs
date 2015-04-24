@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -43,6 +44,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -66,7 +73,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.activities().get(&self.opt.arg_activity_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -98,8 +105,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -110,7 +116,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.activities().list(&self.opt.arg_user_id, &self.opt.arg_collection);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -148,8 +154,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -160,7 +165,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.activities().search(&self.opt.arg_query);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -204,8 +209,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -216,7 +220,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.comments().get(&self.opt.arg_comment_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -248,8 +252,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -260,7 +263,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.comments().list(&self.opt.arg_activity_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
@@ -301,8 +304,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -311,10 +313,10 @@ impl Engine {
 
     fn _moments_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Moment = Default::default();
+        let mut request = api::Moment::default();
         let mut call = self.hub.moments().insert(&request, &self.opt.arg_user_id, &self.opt.arg_collection);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "debug" => {
                     call = call.debug(arg_from_str(value.unwrap_or("false"), err, "debug", "boolean"));
@@ -337,9 +339,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -370,483 +373,492 @@ impl Engine {
                     },
                 "target.start-date" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().start_date = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().start_date = Some(value.unwrap_or("").to_string());
                     },
                 "target.end-date" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().end_date = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().end_date = Some(value.unwrap_or("").to_string());
                     },
                 "target.text" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().text = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
                     },
                 "target.image" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().image = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().image = Some(value.unwrap_or("").to_string());
                     },
                 "target.birth-date" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().birth_date = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().birth_date = Some(value.unwrap_or("").to_string());
                     },
                 "target.date-published" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().date_published = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().date_published = Some(value.unwrap_or("").to_string());
                     },
                 "target.address-locality" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().address_locality = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().address_locality = Some(value.unwrap_or("").to_string());
                     },
                 "target.additional-name" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().additional_name.push(value.unwrap_or("").to_string());
+                        if request.target.as_mut().unwrap().additional_name.is_none() {
+                           request.target.as_mut().unwrap().additional_name = Some(Default::default());
+                        }
+                                        request.target.as_mut().unwrap().additional_name.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "target.worst-rating" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().worst_rating = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().worst_rating = Some(value.unwrap_or("").to_string());
                     },
                 "target.duration" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().duration = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().duration = Some(value.unwrap_or("").to_string());
                     },
                 "target.thumbnail-url" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().thumbnail_url = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().thumbnail_url = Some(value.unwrap_or("").to_string());
                     },
                 "target.id" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "target.post-office-box-number" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().post_office_box_number = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().post_office_box_number = Some(value.unwrap_or("").to_string());
                     },
                 "target.caption" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().caption = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().caption = Some(value.unwrap_or("").to_string());
                     },
                 "target.best-rating" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().best_rating = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().best_rating = Some(value.unwrap_or("").to_string());
                     },
                 "target.address-country" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().address_country = arg_from_str(value.unwrap_or("-0"), err, "target.address-country", "int64");
+                        request.target.as_mut().unwrap().address_country = Some(arg_from_str(value.unwrap_or("-0"), err, "target.address-country", "int64"));
                     },
                 "target.width" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().width = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().width = Some(value.unwrap_or("").to_string());
                     },
                 "target.street-address" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().street_address = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().street_address = Some(value.unwrap_or("").to_string());
                     },
                 "target.latitude" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().latitude = arg_from_str(value.unwrap_or("0.0"), err, "target.latitude", "number");
+                        request.target.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "target.latitude", "number"));
                     },
                 "target.embed-url" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().embed_url = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().embed_url = Some(value.unwrap_or("").to_string());
                     },
                 "target.type" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "target.date-modified" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().date_modified = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().date_modified = Some(value.unwrap_or("").to_string());
                     },
                 "target.content-size" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().content_size = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().content_size = Some(value.unwrap_or("").to_string());
                     },
                 "target.content-url" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().content_url = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().content_url = Some(value.unwrap_or("").to_string());
                     },
                 "target.description" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().description = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
                     },
                 "target.family-name" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().family_name = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().family_name = Some(value.unwrap_or("").to_string());
                     },
                 "target.date-created" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().date_created = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().date_created = Some(value.unwrap_or("").to_string());
                     },
                 "target.postal-code" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().postal_code = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
                     },
                 "target.attendee-count" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().attendee_count = arg_from_str(value.unwrap_or("-0"), err, "target.attendee-count", "integer");
+                        request.target.as_mut().unwrap().attendee_count = Some(arg_from_str(value.unwrap_or("-0"), err, "target.attendee-count", "integer"));
                     },
                 "target.height" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().height = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().height = Some(value.unwrap_or("").to_string());
                     },
                 "target.ticker-symbol" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().ticker_symbol = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().ticker_symbol = Some(value.unwrap_or("").to_string());
                     },
                 "target.player-type" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().player_type = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().player_type = Some(value.unwrap_or("").to_string());
                     },
                 "target.kind" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "target.name" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "target.url" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "target.gender" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().gender = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().gender = Some(value.unwrap_or("").to_string());
                     },
                 "target.longitude" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().longitude = arg_from_str(value.unwrap_or("0.0"), err, "target.longitude", "number");
+                        request.target.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "target.longitude", "number"));
                     },
                 "target.address-region" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().address_region = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().address_region = Some(value.unwrap_or("").to_string());
                     },
                 "target.rating-value" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().rating_value = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().rating_value = Some(value.unwrap_or("").to_string());
                     },
                 "target.given-name" => {
                         request_target_init(&mut request);
-                        request.target.as_mut().unwrap().given_name = value.unwrap_or("").to_string();
+                        request.target.as_mut().unwrap().given_name = Some(value.unwrap_or("").to_string());
                     },
                 "object.start-date" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().start_date = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().start_date = Some(value.unwrap_or("").to_string());
                     },
                 "object.end-date" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().end_date = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().end_date = Some(value.unwrap_or("").to_string());
                     },
                 "object.text" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().text = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
                     },
                 "object.image" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().image = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().image = Some(value.unwrap_or("").to_string());
                     },
                 "object.birth-date" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().birth_date = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().birth_date = Some(value.unwrap_or("").to_string());
                     },
                 "object.date-published" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().date_published = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().date_published = Some(value.unwrap_or("").to_string());
                     },
                 "object.address-locality" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().address_locality = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().address_locality = Some(value.unwrap_or("").to_string());
                     },
                 "object.additional-name" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().additional_name.push(value.unwrap_or("").to_string());
+                        if request.object.as_mut().unwrap().additional_name.is_none() {
+                           request.object.as_mut().unwrap().additional_name = Some(Default::default());
+                        }
+                                        request.object.as_mut().unwrap().additional_name.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "object.worst-rating" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().worst_rating = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().worst_rating = Some(value.unwrap_or("").to_string());
                     },
                 "object.duration" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().duration = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().duration = Some(value.unwrap_or("").to_string());
                     },
                 "object.thumbnail-url" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().thumbnail_url = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().thumbnail_url = Some(value.unwrap_or("").to_string());
                     },
                 "object.id" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "object.post-office-box-number" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().post_office_box_number = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().post_office_box_number = Some(value.unwrap_or("").to_string());
                     },
                 "object.caption" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().caption = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().caption = Some(value.unwrap_or("").to_string());
                     },
                 "object.best-rating" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().best_rating = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().best_rating = Some(value.unwrap_or("").to_string());
                     },
                 "object.address-country" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().address_country = arg_from_str(value.unwrap_or("-0"), err, "object.address-country", "int64");
+                        request.object.as_mut().unwrap().address_country = Some(arg_from_str(value.unwrap_or("-0"), err, "object.address-country", "int64"));
                     },
                 "object.width" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().width = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().width = Some(value.unwrap_or("").to_string());
                     },
                 "object.street-address" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().street_address = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().street_address = Some(value.unwrap_or("").to_string());
                     },
                 "object.latitude" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().latitude = arg_from_str(value.unwrap_or("0.0"), err, "object.latitude", "number");
+                        request.object.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "object.latitude", "number"));
                     },
                 "object.embed-url" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().embed_url = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().embed_url = Some(value.unwrap_or("").to_string());
                     },
                 "object.type" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "object.date-modified" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().date_modified = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().date_modified = Some(value.unwrap_or("").to_string());
                     },
                 "object.content-size" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().content_size = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().content_size = Some(value.unwrap_or("").to_string());
                     },
                 "object.content-url" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().content_url = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().content_url = Some(value.unwrap_or("").to_string());
                     },
                 "object.description" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().description = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
                     },
                 "object.family-name" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().family_name = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().family_name = Some(value.unwrap_or("").to_string());
                     },
                 "object.date-created" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().date_created = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().date_created = Some(value.unwrap_or("").to_string());
                     },
                 "object.postal-code" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().postal_code = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
                     },
                 "object.attendee-count" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().attendee_count = arg_from_str(value.unwrap_or("-0"), err, "object.attendee-count", "integer");
+                        request.object.as_mut().unwrap().attendee_count = Some(arg_from_str(value.unwrap_or("-0"), err, "object.attendee-count", "integer"));
                     },
                 "object.height" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().height = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().height = Some(value.unwrap_or("").to_string());
                     },
                 "object.ticker-symbol" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().ticker_symbol = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().ticker_symbol = Some(value.unwrap_or("").to_string());
                     },
                 "object.player-type" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().player_type = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().player_type = Some(value.unwrap_or("").to_string());
                     },
                 "object.kind" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "object.name" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "object.url" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "object.gender" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().gender = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().gender = Some(value.unwrap_or("").to_string());
                     },
                 "object.longitude" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().longitude = arg_from_str(value.unwrap_or("0.0"), err, "object.longitude", "number");
+                        request.object.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "object.longitude", "number"));
                     },
                 "object.address-region" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().address_region = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().address_region = Some(value.unwrap_or("").to_string());
                     },
                 "object.rating-value" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().rating_value = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().rating_value = Some(value.unwrap_or("").to_string());
                     },
                 "object.given-name" => {
                         request_object_init(&mut request);
-                        request.object.as_mut().unwrap().given_name = value.unwrap_or("").to_string();
+                        request.object.as_mut().unwrap().given_name = Some(value.unwrap_or("").to_string());
                     },
                 "result.start-date" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().start_date = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().start_date = Some(value.unwrap_or("").to_string());
                     },
                 "result.end-date" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().end_date = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().end_date = Some(value.unwrap_or("").to_string());
                     },
                 "result.text" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().text = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
                     },
                 "result.image" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().image = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().image = Some(value.unwrap_or("").to_string());
                     },
                 "result.birth-date" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().birth_date = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().birth_date = Some(value.unwrap_or("").to_string());
                     },
                 "result.date-published" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().date_published = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().date_published = Some(value.unwrap_or("").to_string());
                     },
                 "result.address-locality" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().address_locality = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().address_locality = Some(value.unwrap_or("").to_string());
                     },
                 "result.additional-name" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().additional_name.push(value.unwrap_or("").to_string());
+                        if request.result.as_mut().unwrap().additional_name.is_none() {
+                           request.result.as_mut().unwrap().additional_name = Some(Default::default());
+                        }
+                                        request.result.as_mut().unwrap().additional_name.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "result.worst-rating" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().worst_rating = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().worst_rating = Some(value.unwrap_or("").to_string());
                     },
                 "result.duration" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().duration = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().duration = Some(value.unwrap_or("").to_string());
                     },
                 "result.thumbnail-url" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().thumbnail_url = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().thumbnail_url = Some(value.unwrap_or("").to_string());
                     },
                 "result.id" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "result.post-office-box-number" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().post_office_box_number = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().post_office_box_number = Some(value.unwrap_or("").to_string());
                     },
                 "result.caption" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().caption = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().caption = Some(value.unwrap_or("").to_string());
                     },
                 "result.best-rating" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().best_rating = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().best_rating = Some(value.unwrap_or("").to_string());
                     },
                 "result.address-country" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().address_country = arg_from_str(value.unwrap_or("-0"), err, "result.address-country", "int64");
+                        request.result.as_mut().unwrap().address_country = Some(arg_from_str(value.unwrap_or("-0"), err, "result.address-country", "int64"));
                     },
                 "result.width" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().width = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().width = Some(value.unwrap_or("").to_string());
                     },
                 "result.street-address" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().street_address = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().street_address = Some(value.unwrap_or("").to_string());
                     },
                 "result.latitude" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().latitude = arg_from_str(value.unwrap_or("0.0"), err, "result.latitude", "number");
+                        request.result.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "result.latitude", "number"));
                     },
                 "result.embed-url" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().embed_url = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().embed_url = Some(value.unwrap_or("").to_string());
                     },
                 "result.type" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "result.date-modified" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().date_modified = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().date_modified = Some(value.unwrap_or("").to_string());
                     },
                 "result.content-size" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().content_size = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().content_size = Some(value.unwrap_or("").to_string());
                     },
                 "result.content-url" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().content_url = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().content_url = Some(value.unwrap_or("").to_string());
                     },
                 "result.description" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().description = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
                     },
                 "result.family-name" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().family_name = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().family_name = Some(value.unwrap_or("").to_string());
                     },
                 "result.date-created" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().date_created = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().date_created = Some(value.unwrap_or("").to_string());
                     },
                 "result.postal-code" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().postal_code = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
                     },
                 "result.attendee-count" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().attendee_count = arg_from_str(value.unwrap_or("-0"), err, "result.attendee-count", "integer");
+                        request.result.as_mut().unwrap().attendee_count = Some(arg_from_str(value.unwrap_or("-0"), err, "result.attendee-count", "integer"));
                     },
                 "result.height" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().height = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().height = Some(value.unwrap_or("").to_string());
                     },
                 "result.ticker-symbol" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().ticker_symbol = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().ticker_symbol = Some(value.unwrap_or("").to_string());
                     },
                 "result.player-type" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().player_type = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().player_type = Some(value.unwrap_or("").to_string());
                     },
                 "result.kind" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "result.name" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "result.url" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "result.gender" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().gender = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().gender = Some(value.unwrap_or("").to_string());
                     },
                 "result.longitude" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().longitude = arg_from_str(value.unwrap_or("0.0"), err, "result.longitude", "number");
+                        request.result.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "result.longitude", "number"));
                     },
                 "result.address-region" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().address_region = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().address_region = Some(value.unwrap_or("").to_string());
                     },
                 "result.rating-value" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().rating_value = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().rating_value = Some(value.unwrap_or("").to_string());
                     },
                 "result.given-name" => {
                         request_result_init(&mut request);
-                        request.result.as_mut().unwrap().given_name = value.unwrap_or("").to_string();
+                        request.result.as_mut().unwrap().given_name = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_result_init(&mut request);
@@ -873,8 +885,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -885,7 +896,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.moments().list(&self.opt.arg_user_id, &self.opt.arg_collection);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "type" => {
                     call = call.type_(value.unwrap_or(""));
@@ -929,8 +940,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -941,7 +951,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.moments().remove(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -972,7 +982,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -983,7 +992,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.people().get(&self.opt.arg_user_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1015,8 +1024,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1027,7 +1035,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.people().list(&self.opt.arg_user_id, &self.opt.arg_collection);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1068,8 +1076,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1080,7 +1087,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.people().list_by_activity(&self.opt.arg_activity_id, &self.opt.arg_collection);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1118,8 +1125,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1130,7 +1136,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.people().search(&self.opt.arg_query);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1171,8 +1177,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1194,7 +1199,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_comments {
+        }
+ else if self.opt.cmd_comments {
             if self.opt.cmd_get {
                 call_result = self._comments_get(dry_run, &mut err);
             } else if self.opt.cmd_list {
@@ -1202,7 +1208,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_moments {
+        }
+ else if self.opt.cmd_moments {
             if self.opt.cmd_insert {
                 call_result = self._moments_insert(dry_run, &mut err);
             } else if self.opt.cmd_list {
@@ -1212,7 +1219,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_people {
+        }
+ else if self.opt.cmd_people {
             if self.opt.cmd_get {
                 call_result = self._people_get(dry_run, &mut err);
             } else if self.opt.cmd_list {
@@ -1244,21 +1252,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "plus1-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "plus1-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "plus1",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "plus1",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::Plus::new(hyper::Client::new(), auth),
+            hub: api::Plus::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -1278,12 +1302,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

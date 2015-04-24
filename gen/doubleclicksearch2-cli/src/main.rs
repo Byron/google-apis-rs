@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -41,6 +42,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -68,7 +75,7 @@ impl Engine {
         let start_row: u32 = arg_from_str(&self.opt.arg_start_row, err, "<start-row>", "integer");
         let mut call = self.hub.conversion().get(&self.opt.arg_agency_id, &self.opt.arg_advertiser_id, &self.opt.arg_engine_account_id, end_date, row_count, start_date, start_row);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "criterion-id" => {
                     call = call.criterion_id(value.unwrap_or(""));
@@ -112,8 +119,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -122,10 +128,10 @@ impl Engine {
 
     fn _conversion_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ConversionList = Default::default();
+        let mut request = api::ConversionList::default();
         let mut call = self.hub.conversion().insert(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -145,9 +151,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -172,8 +179,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -182,14 +188,14 @@ impl Engine {
 
     fn _conversion_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ConversionList = Default::default();
+        let mut request = api::ConversionList::default();
         let end_date: i32 = arg_from_str(&self.opt.arg_end_date, err, "<end-date>", "integer");
         let row_count: i32 = arg_from_str(&self.opt.arg_row_count, err, "<row-count>", "integer");
         let start_date: i32 = arg_from_str(&self.opt.arg_start_date, err, "<start-date>", "integer");
         let start_row: u32 = arg_from_str(&self.opt.arg_start_row, err, "<start-row>", "integer");
         let mut call = self.hub.conversion().patch(&request, &self.opt.arg_advertiser_id, &self.opt.arg_agency_id, end_date, &self.opt.arg_engine_account_id, row_count, start_date, start_row);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -209,9 +215,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -236,8 +243,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -246,10 +252,10 @@ impl Engine {
 
     fn _conversion_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ConversionList = Default::default();
+        let mut request = api::ConversionList::default();
         let mut call = self.hub.conversion().update(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -269,9 +275,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -296,8 +303,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -306,10 +312,10 @@ impl Engine {
 
     fn _conversion_update_availability(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::UpdateAvailabilityRequest = Default::default();
+        let mut request = api::UpdateAvailabilityRequest::default();
         let mut call = self.hub.conversion().update_availability(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -329,9 +335,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -353,8 +360,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -363,10 +369,10 @@ impl Engine {
 
     fn _reports_generate(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ReportRequest = Default::default();
+        let mut request = api::ReportRequest::default();
         let mut call = self.hub.reports().generate(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -386,9 +392,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -407,31 +414,31 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "report-scope.ad-group-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().ad_group_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().ad_group_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.agency-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().agency_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().agency_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.engine-account-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().engine_account_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().engine_account_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.campaign-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().campaign_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().campaign_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.advertiser-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().advertiser_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().advertiser_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.keyword-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().keyword_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().keyword_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.ad-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().ad_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().ad_id = Some(value.unwrap_or("").to_string());
                     },
                 "max-rows-per-file" => {
                         request_report_scope_init(&mut request);
@@ -443,19 +450,19 @@ impl Engine {
                     },
                 "time-range.changed-metrics-since-timestamp" => {
                         request_time_range_init(&mut request);
-                        request.time_range.as_mut().unwrap().changed_metrics_since_timestamp = value.unwrap_or("").to_string();
+                        request.time_range.as_mut().unwrap().changed_metrics_since_timestamp = Some(value.unwrap_or("").to_string());
                     },
                 "time-range.end-date" => {
                         request_time_range_init(&mut request);
-                        request.time_range.as_mut().unwrap().end_date = value.unwrap_or("").to_string();
+                        request.time_range.as_mut().unwrap().end_date = Some(value.unwrap_or("").to_string());
                     },
                 "time-range.changed-attributes-since-timestamp" => {
                         request_time_range_init(&mut request);
-                        request.time_range.as_mut().unwrap().changed_attributes_since_timestamp = value.unwrap_or("").to_string();
+                        request.time_range.as_mut().unwrap().changed_attributes_since_timestamp = Some(value.unwrap_or("").to_string());
                     },
                 "time-range.start-date" => {
                         request_time_range_init(&mut request);
-                        request.time_range.as_mut().unwrap().start_date = value.unwrap_or("").to_string();
+                        request.time_range.as_mut().unwrap().start_date = Some(value.unwrap_or("").to_string());
                     },
                 "start-row" => {
                         request_time_range_init(&mut request);
@@ -502,8 +509,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -514,7 +520,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.reports().get(&self.opt.arg_report_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -546,8 +552,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -560,7 +565,7 @@ impl Engine {
         let mut download_mode = false;
         let mut call = self.hub.reports().get_file(&self.opt.arg_report_id, report_fragment);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -595,7 +600,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     if !download_mode {
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
@@ -608,10 +612,10 @@ impl Engine {
 
     fn _reports_request(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ReportRequest = Default::default();
+        let mut request = api::ReportRequest::default();
         let mut call = self.hub.reports().request(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -631,9 +635,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -652,31 +657,31 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "report-scope.ad-group-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().ad_group_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().ad_group_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.agency-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().agency_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().agency_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.engine-account-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().engine_account_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().engine_account_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.campaign-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().campaign_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().campaign_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.advertiser-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().advertiser_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().advertiser_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.keyword-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().keyword_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().keyword_id = Some(value.unwrap_or("").to_string());
                     },
                 "report-scope.ad-id" => {
                         request_report_scope_init(&mut request);
-                        request.report_scope.as_mut().unwrap().ad_id = value.unwrap_or("").to_string();
+                        request.report_scope.as_mut().unwrap().ad_id = Some(value.unwrap_or("").to_string());
                     },
                 "max-rows-per-file" => {
                         request_report_scope_init(&mut request);
@@ -688,19 +693,19 @@ impl Engine {
                     },
                 "time-range.changed-metrics-since-timestamp" => {
                         request_time_range_init(&mut request);
-                        request.time_range.as_mut().unwrap().changed_metrics_since_timestamp = value.unwrap_or("").to_string();
+                        request.time_range.as_mut().unwrap().changed_metrics_since_timestamp = Some(value.unwrap_or("").to_string());
                     },
                 "time-range.end-date" => {
                         request_time_range_init(&mut request);
-                        request.time_range.as_mut().unwrap().end_date = value.unwrap_or("").to_string();
+                        request.time_range.as_mut().unwrap().end_date = Some(value.unwrap_or("").to_string());
                     },
                 "time-range.changed-attributes-since-timestamp" => {
                         request_time_range_init(&mut request);
-                        request.time_range.as_mut().unwrap().changed_attributes_since_timestamp = value.unwrap_or("").to_string();
+                        request.time_range.as_mut().unwrap().changed_attributes_since_timestamp = Some(value.unwrap_or("").to_string());
                     },
                 "time-range.start-date" => {
                         request_time_range_init(&mut request);
-                        request.time_range.as_mut().unwrap().start_date = value.unwrap_or("").to_string();
+                        request.time_range.as_mut().unwrap().start_date = Some(value.unwrap_or("").to_string());
                     },
                 "start-row" => {
                         request_time_range_init(&mut request);
@@ -747,8 +752,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -759,7 +763,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.saved_columns().list(&self.opt.arg_agency_id, &self.opt.arg_advertiser_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -791,8 +795,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -818,7 +821,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_reports {
+        }
+ else if self.opt.cmd_reports {
             if self.opt.cmd_generate {
                 call_result = self._reports_generate(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -830,7 +834,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_saved_columns {
+        }
+ else if self.opt.cmd_saved_columns {
             if self.opt.cmd_list {
                 call_result = self._saved_columns_list(dry_run, &mut err);
             } else {
@@ -856,21 +861,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "doubleclicksearch2-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "doubleclicksearch2-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "doubleclicksearch2",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "doubleclicksearch2",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::Doubleclicksearch::new(hyper::Client::new(), auth),
+            hub: api::Doubleclicksearch::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -890,12 +911,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

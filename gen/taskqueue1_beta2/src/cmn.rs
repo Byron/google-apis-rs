@@ -127,9 +127,12 @@ pub trait Delegate {
     }
 
     /// Called whenever the Authenticator didn't yield a token. The delegate
-    /// may attempt to provide one, or just take is a general information about the
-    /// pending impending failure
-    fn token(&mut self) -> Option<oauth2::Token> {
+    /// may attempt to provide one, or just take it as a general information about the
+    /// impending failure.
+    /// The given Error provides information about why the token couldn't be acquired in the
+    /// first place
+    fn token(&mut self, err: &error::Error) -> Option<oauth2::Token> {
+        let _ = err;
         None
     }
 
@@ -232,7 +235,7 @@ pub enum Error {
     MissingAPIKey,
 
     /// We required a Token, but didn't get one from the Authenticator
-    MissingToken,
+    MissingToken(Box<error::Error>),
 
     /// The delgate instructed to cancel the operation
     Cancelled,
@@ -260,8 +263,8 @@ impl Display for Error {
                 writeln!(f, "The application's API key was not found in the configuration").ok();
                 writeln!(f, "It is used as there are no Scopes defined for this method.")
             },
-            Error::MissingToken =>
-                writeln!(f, "Didn't obtain authentication token from authenticator"),
+            Error::MissingToken(ref err) =>
+                writeln!(f, "Token retrieval failed with error: {}", err),
             Error::Cancelled => 
                 writeln!(f, "Operation cancelled by delegate"),
             Error::FieldClash(field) =>

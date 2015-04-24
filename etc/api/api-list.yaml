@@ -62,11 +62,11 @@ api:
     deploymentmanager:
     - v2beta1
     dfareporting:
-    - v2.0
+    - v2.1
     discovery:
     - v1
     dns:
-    - v1beta1
+    - v1
     doubleclickbidmanager:
     - v1
     doubleclicksearch:

@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -109,6 +110,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -132,7 +139,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.data().ga_get(&self.opt.arg_ids, &self.opt.arg_start_date, &self.opt.arg_end_date, &self.opt.arg_metrics);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -188,8 +195,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -200,7 +206,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.data().mcf_get(&self.opt.arg_ids, &self.opt.arg_start_date, &self.opt.arg_end_date, &self.opt.arg_metrics);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -250,8 +256,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -262,7 +267,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.data().realtime_get(&self.opt.arg_ids, &self.opt.arg_metrics);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sort" => {
                     call = call.sort(value.unwrap_or(""));
@@ -306,8 +311,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -318,7 +322,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().account_summaries_list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -356,8 +360,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -368,7 +371,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().account_user_links_delete(&self.opt.arg_account_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -399,7 +402,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -408,10 +410,10 @@ impl Engine {
 
     fn _management_account_user_links_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::EntityUserLink = Default::default();
+        let mut request = api::EntityUserLink::default();
         let mut call = self.hub.management().account_user_links_insert(&request, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -431,15 +433,37 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().account_ref.is_none() {
+                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
+                }
+            }
+            
             fn request_entity_init(request: &mut api::EntityUserLink) {
                 if request.entity.is_none() {
                     request.entity = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().profile_ref.is_none() {
+                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
+                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
                 }
             }
             
@@ -460,84 +484,84 @@ impl Engine {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.href = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.id = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.name = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.name = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.href = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.name = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.href = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.kind" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.email" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.id" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_user_ref_init(&mut request);
@@ -549,11 +573,17 @@ impl Engine {
                     },
                 "permissions.local" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().local.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().local.is_none() {
+                           request.permissions.as_mut().unwrap().local = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -572,8 +602,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -584,7 +613,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().account_user_links_list(&self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -622,8 +651,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -632,10 +660,10 @@ impl Engine {
 
     fn _management_account_user_links_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::EntityUserLink = Default::default();
+        let mut request = api::EntityUserLink::default();
         let mut call = self.hub.management().account_user_links_update(&request, &self.opt.arg_account_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -655,15 +683,37 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().account_ref.is_none() {
+                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
+                }
+            }
+            
             fn request_entity_init(request: &mut api::EntityUserLink) {
                 if request.entity.is_none() {
                     request.entity = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().profile_ref.is_none() {
+                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
+                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
                 }
             }
             
@@ -684,84 +734,84 @@ impl Engine {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.href = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.id = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.name = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.name = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.href = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.name = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.href = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.kind" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.email" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.id" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_user_ref_init(&mut request);
@@ -773,11 +823,17 @@ impl Engine {
                     },
                 "permissions.local" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().local.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().local.is_none() {
+                           request.permissions.as_mut().unwrap().local = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -796,8 +852,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -808,7 +863,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().accounts_list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -846,8 +901,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -858,7 +912,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().custom_data_sources_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -896,8 +950,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -908,7 +961,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().custom_dimensions_get(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_custom_dimension_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -940,8 +993,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -950,10 +1002,10 @@ impl Engine {
 
     fn _management_custom_dimensions_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CustomDimension = Default::default();
+        let mut request = api::CustomDimension::default();
         let mut call = self.hub.management().custom_dimensions_insert(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -973,9 +1025,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1012,11 +1065,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_parent_link_init(&mut request);
@@ -1047,8 +1100,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1059,7 +1111,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().custom_dimensions_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -1097,8 +1149,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1107,10 +1158,10 @@ impl Engine {
 
     fn _management_custom_dimensions_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CustomDimension = Default::default();
+        let mut request = api::CustomDimension::default();
         let mut call = self.hub.management().custom_dimensions_patch(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_custom_dimension_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ignore-custom-data-source-links" => {
                     call = call.ignore_custom_data_source_links(arg_from_str(value.unwrap_or("false"), err, "ignore-custom-data-source-links", "boolean"));
@@ -1133,9 +1184,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1172,11 +1224,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_parent_link_init(&mut request);
@@ -1207,8 +1259,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1217,10 +1268,10 @@ impl Engine {
 
     fn _management_custom_dimensions_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CustomDimension = Default::default();
+        let mut request = api::CustomDimension::default();
         let mut call = self.hub.management().custom_dimensions_update(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_custom_dimension_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ignore-custom-data-source-links" => {
                     call = call.ignore_custom_data_source_links(arg_from_str(value.unwrap_or("false"), err, "ignore-custom-data-source-links", "boolean"));
@@ -1243,9 +1294,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1282,11 +1334,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_parent_link_init(&mut request);
@@ -1317,8 +1369,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1329,7 +1380,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().custom_metrics_get(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_custom_metric_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1361,8 +1412,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1371,10 +1421,10 @@ impl Engine {
 
     fn _management_custom_metrics_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CustomMetric = Default::default();
+        let mut request = api::CustomMetric::default();
         let mut call = self.hub.management().custom_metrics_insert(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1394,9 +1444,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1439,11 +1490,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_parent_link_init(&mut request);
@@ -1478,8 +1529,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1490,7 +1540,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().custom_metrics_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -1528,8 +1578,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1538,10 +1587,10 @@ impl Engine {
 
     fn _management_custom_metrics_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CustomMetric = Default::default();
+        let mut request = api::CustomMetric::default();
         let mut call = self.hub.management().custom_metrics_patch(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_custom_metric_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ignore-custom-data-source-links" => {
                     call = call.ignore_custom_data_source_links(arg_from_str(value.unwrap_or("false"), err, "ignore-custom-data-source-links", "boolean"));
@@ -1564,9 +1613,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1609,11 +1659,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_parent_link_init(&mut request);
@@ -1648,8 +1698,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1658,10 +1707,10 @@ impl Engine {
 
     fn _management_custom_metrics_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CustomMetric = Default::default();
+        let mut request = api::CustomMetric::default();
         let mut call = self.hub.management().custom_metrics_update(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_custom_metric_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ignore-custom-data-source-links" => {
                     call = call.ignore_custom_data_source_links(arg_from_str(value.unwrap_or("false"), err, "ignore-custom-data-source-links", "boolean"));
@@ -1684,9 +1733,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1729,11 +1779,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_parent_link_init(&mut request);
@@ -1768,8 +1818,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1780,7 +1829,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().experiments_delete(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_experiment_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1811,7 +1860,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1822,7 +1870,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().experiments_get(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_experiment_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1854,8 +1902,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1864,10 +1911,10 @@ impl Engine {
 
     fn _management_experiments_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Experiment = Default::default();
+        let mut request = api::Experiment::default();
         let mut call = self.hub.management().experiments_insert(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1887,9 +1934,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1974,11 +2022,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "end-time" => {
                         request_parent_link_init(&mut request);
@@ -2005,8 +2053,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2017,7 +2064,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().experiments_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -2055,8 +2102,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2065,10 +2111,10 @@ impl Engine {
 
     fn _management_experiments_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Experiment = Default::default();
+        let mut request = api::Experiment::default();
         let mut call = self.hub.management().experiments_patch(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_experiment_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2088,9 +2134,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2175,11 +2222,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "end-time" => {
                         request_parent_link_init(&mut request);
@@ -2206,8 +2253,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2216,10 +2262,10 @@ impl Engine {
 
     fn _management_experiments_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Experiment = Default::default();
+        let mut request = api::Experiment::default();
         let mut call = self.hub.management().experiments_update(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_experiment_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2239,9 +2285,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2326,11 +2373,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "end-time" => {
                         request_parent_link_init(&mut request);
@@ -2357,8 +2404,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2369,7 +2415,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().filters_delete(&self.opt.arg_account_id, &self.opt.arg_filter_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2401,8 +2447,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2413,7 +2458,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().filters_get(&self.opt.arg_account_id, &self.opt.arg_filter_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2445,8 +2490,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2455,10 +2499,10 @@ impl Engine {
 
     fn _management_filters_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Filter = Default::default();
+        let mut request = api::Filter::default();
         let mut call = self.hub.management().filters_insert(&request, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2478,9 +2522,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2538,7 +2583,7 @@ impl Engine {
                     },
                 "uppercase-details.field" => {
                         request_uppercase_details_init(&mut request);
-                        request.uppercase_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.uppercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "updated" => {
                         request_uppercase_details_init(&mut request);
@@ -2546,111 +2591,111 @@ impl Engine {
                     },
                 "advanced-details.extract-b" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_b = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().extract_b = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.override-output-field" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().override_output_field = arg_from_str(value.unwrap_or("false"), err, "advanced-details.override-output-field", "boolean");
+                        request.advanced_details.as_mut().unwrap().override_output_field = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.override-output-field", "boolean"));
                     },
                 "advanced-details.field-a-required" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a_required = arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-a-required", "boolean");
+                        request.advanced_details.as_mut().unwrap().field_a_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-a-required", "boolean"));
                     },
                 "advanced-details.output-constructor" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_constructor = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().output_constructor = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.field-b-required" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b_required = arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-b-required", "boolean");
+                        request.advanced_details.as_mut().unwrap().field_b_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-b-required", "boolean"));
                     },
                 "advanced-details.case-sensitive" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "advanced-details.case-sensitive", "boolean");
+                        request.advanced_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.case-sensitive", "boolean"));
                     },
                 "advanced-details.field-b" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().field_b = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.field-a" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().field_a = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.extract-a" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_a = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().extract_a = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.output-to-field" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_to_field = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().output_to_field = Some(value.unwrap_or("").to_string());
                     },
                 "lowercase-details.field" => {
                         request_lowercase_details_init(&mut request);
-                        request.lowercase_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.lowercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "search-and-replace-details.case-sensitive" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "search-and-replace-details.case-sensitive", "boolean");
+                        request.search_and_replace_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "search-and-replace-details.case-sensitive", "boolean"));
                     },
                 "search-and-replace-details.search-string" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().search_string = value.unwrap_or("").to_string();
+                        request.search_and_replace_details.as_mut().unwrap().search_string = Some(value.unwrap_or("").to_string());
                     },
                 "search-and-replace-details.replace-string" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().replace_string = value.unwrap_or("").to_string();
+                        request.search_and_replace_details.as_mut().unwrap().replace_string = Some(value.unwrap_or("").to_string());
                     },
                 "search-and-replace-details.field" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.search_and_replace_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.case-sensitive" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "exclude-details.case-sensitive", "boolean");
+                        request.exclude_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "exclude-details.case-sensitive", "boolean"));
                     },
                 "exclude-details.kind" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.match-type" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().match_type = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.expression-value" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().expression_value = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.field" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.case-sensitive" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "include-details.case-sensitive", "boolean");
+                        request.include_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "include-details.case-sensitive", "boolean"));
                     },
                 "include-details.kind" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.match-type" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().match_type = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.expression-value" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().expression_value = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.field" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_parent_link_init(&mut request);
@@ -2685,8 +2730,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2697,7 +2741,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().filters_list(&self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -2735,8 +2779,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2745,10 +2788,10 @@ impl Engine {
 
     fn _management_filters_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Filter = Default::default();
+        let mut request = api::Filter::default();
         let mut call = self.hub.management().filters_patch(&request, &self.opt.arg_account_id, &self.opt.arg_filter_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2768,9 +2811,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2828,7 +2872,7 @@ impl Engine {
                     },
                 "uppercase-details.field" => {
                         request_uppercase_details_init(&mut request);
-                        request.uppercase_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.uppercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "updated" => {
                         request_uppercase_details_init(&mut request);
@@ -2836,111 +2880,111 @@ impl Engine {
                     },
                 "advanced-details.extract-b" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_b = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().extract_b = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.override-output-field" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().override_output_field = arg_from_str(value.unwrap_or("false"), err, "advanced-details.override-output-field", "boolean");
+                        request.advanced_details.as_mut().unwrap().override_output_field = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.override-output-field", "boolean"));
                     },
                 "advanced-details.field-a-required" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a_required = arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-a-required", "boolean");
+                        request.advanced_details.as_mut().unwrap().field_a_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-a-required", "boolean"));
                     },
                 "advanced-details.output-constructor" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_constructor = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().output_constructor = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.field-b-required" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b_required = arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-b-required", "boolean");
+                        request.advanced_details.as_mut().unwrap().field_b_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-b-required", "boolean"));
                     },
                 "advanced-details.case-sensitive" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "advanced-details.case-sensitive", "boolean");
+                        request.advanced_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.case-sensitive", "boolean"));
                     },
                 "advanced-details.field-b" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().field_b = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.field-a" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().field_a = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.extract-a" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_a = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().extract_a = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.output-to-field" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_to_field = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().output_to_field = Some(value.unwrap_or("").to_string());
                     },
                 "lowercase-details.field" => {
                         request_lowercase_details_init(&mut request);
-                        request.lowercase_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.lowercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "search-and-replace-details.case-sensitive" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "search-and-replace-details.case-sensitive", "boolean");
+                        request.search_and_replace_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "search-and-replace-details.case-sensitive", "boolean"));
                     },
                 "search-and-replace-details.search-string" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().search_string = value.unwrap_or("").to_string();
+                        request.search_and_replace_details.as_mut().unwrap().search_string = Some(value.unwrap_or("").to_string());
                     },
                 "search-and-replace-details.replace-string" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().replace_string = value.unwrap_or("").to_string();
+                        request.search_and_replace_details.as_mut().unwrap().replace_string = Some(value.unwrap_or("").to_string());
                     },
                 "search-and-replace-details.field" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.search_and_replace_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.case-sensitive" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "exclude-details.case-sensitive", "boolean");
+                        request.exclude_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "exclude-details.case-sensitive", "boolean"));
                     },
                 "exclude-details.kind" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.match-type" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().match_type = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.expression-value" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().expression_value = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.field" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.case-sensitive" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "include-details.case-sensitive", "boolean");
+                        request.include_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "include-details.case-sensitive", "boolean"));
                     },
                 "include-details.kind" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.match-type" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().match_type = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.expression-value" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().expression_value = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.field" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_parent_link_init(&mut request);
@@ -2975,8 +3019,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2985,10 +3028,10 @@ impl Engine {
 
     fn _management_filters_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Filter = Default::default();
+        let mut request = api::Filter::default();
         let mut call = self.hub.management().filters_update(&request, &self.opt.arg_account_id, &self.opt.arg_filter_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3008,9 +3051,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3068,7 +3112,7 @@ impl Engine {
                     },
                 "uppercase-details.field" => {
                         request_uppercase_details_init(&mut request);
-                        request.uppercase_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.uppercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "updated" => {
                         request_uppercase_details_init(&mut request);
@@ -3076,111 +3120,111 @@ impl Engine {
                     },
                 "advanced-details.extract-b" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_b = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().extract_b = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.override-output-field" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().override_output_field = arg_from_str(value.unwrap_or("false"), err, "advanced-details.override-output-field", "boolean");
+                        request.advanced_details.as_mut().unwrap().override_output_field = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.override-output-field", "boolean"));
                     },
                 "advanced-details.field-a-required" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a_required = arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-a-required", "boolean");
+                        request.advanced_details.as_mut().unwrap().field_a_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-a-required", "boolean"));
                     },
                 "advanced-details.output-constructor" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_constructor = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().output_constructor = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.field-b-required" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b_required = arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-b-required", "boolean");
+                        request.advanced_details.as_mut().unwrap().field_b_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-b-required", "boolean"));
                     },
                 "advanced-details.case-sensitive" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "advanced-details.case-sensitive", "boolean");
+                        request.advanced_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.case-sensitive", "boolean"));
                     },
                 "advanced-details.field-b" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().field_b = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.field-a" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().field_a = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.extract-a" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_a = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().extract_a = Some(value.unwrap_or("").to_string());
                     },
                 "advanced-details.output-to-field" => {
                         request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_to_field = value.unwrap_or("").to_string();
+                        request.advanced_details.as_mut().unwrap().output_to_field = Some(value.unwrap_or("").to_string());
                     },
                 "lowercase-details.field" => {
                         request_lowercase_details_init(&mut request);
-                        request.lowercase_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.lowercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "search-and-replace-details.case-sensitive" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "search-and-replace-details.case-sensitive", "boolean");
+                        request.search_and_replace_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "search-and-replace-details.case-sensitive", "boolean"));
                     },
                 "search-and-replace-details.search-string" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().search_string = value.unwrap_or("").to_string();
+                        request.search_and_replace_details.as_mut().unwrap().search_string = Some(value.unwrap_or("").to_string());
                     },
                 "search-and-replace-details.replace-string" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().replace_string = value.unwrap_or("").to_string();
+                        request.search_and_replace_details.as_mut().unwrap().replace_string = Some(value.unwrap_or("").to_string());
                     },
                 "search-and-replace-details.field" => {
                         request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.search_and_replace_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.case-sensitive" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "exclude-details.case-sensitive", "boolean");
+                        request.exclude_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "exclude-details.case-sensitive", "boolean"));
                     },
                 "exclude-details.kind" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.match-type" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().match_type = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.expression-value" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().expression_value = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
                     },
                 "exclude-details.field" => {
                         request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.exclude_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.case-sensitive" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "include-details.case-sensitive", "boolean");
+                        request.include_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "include-details.case-sensitive", "boolean"));
                     },
                 "include-details.kind" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.match-type" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().match_type = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.expression-value" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().expression_value = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
                     },
                 "include-details.field" => {
                         request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().field = value.unwrap_or("").to_string();
+                        request.include_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_parent_link_init(&mut request);
@@ -3215,8 +3259,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3227,7 +3270,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().goals_get(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_goal_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3259,8 +3302,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3269,10 +3311,10 @@ impl Engine {
 
     fn _management_goals_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Goal = Default::default();
+        let mut request = api::Goal::default();
         let mut call = self.hub.management().goals_insert(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3292,9 +3334,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3334,11 +3377,11 @@ impl Engine {
                     },
                 "visit-time-on-site-details.comparison-type" => {
                         request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_type = value.unwrap_or("").to_string();
+                        request.visit_time_on_site_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
                     },
                 "visit-time-on-site-details.comparison-value" => {
                         request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_value = value.unwrap_or("").to_string();
+                        request.visit_time_on_site_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
                     },
                 "name" => {
                         request_visit_time_on_site_details_init(&mut request);
@@ -3350,19 +3393,19 @@ impl Engine {
                     },
                 "url-destination-details.url" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.url_destination_details.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "url-destination-details.case-sensitive" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "url-destination-details.case-sensitive", "boolean");
+                        request.url_destination_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.case-sensitive", "boolean"));
                     },
                 "url-destination-details.match-type" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().match_type = value.unwrap_or("").to_string();
+                        request.url_destination_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
                     },
                 "url-destination-details.first-step-required" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().first_step_required = arg_from_str(value.unwrap_or("false"), err, "url-destination-details.first-step-required", "boolean");
+                        request.url_destination_details.as_mut().unwrap().first_step_required = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.first-step-required", "boolean"));
                     },
                 "kind" => {
                         request_url_destination_details_init(&mut request);
@@ -3374,11 +3417,11 @@ impl Engine {
                     },
                 "visit-num-pages-details.comparison-type" => {
                         request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_type = value.unwrap_or("").to_string();
+                        request.visit_num_pages_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
                     },
                 "visit-num-pages-details.comparison-value" => {
                         request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_value = value.unwrap_or("").to_string();
+                        request.visit_num_pages_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
                     },
                 "internal-web-property-id" => {
                         request_visit_num_pages_details_init(&mut request);
@@ -3386,7 +3429,7 @@ impl Engine {
                     },
                 "event-details.use-event-value" => {
                         request_event_details_init(&mut request);
-                        request.event_details.as_mut().unwrap().use_event_value = arg_from_str(value.unwrap_or("false"), err, "event-details.use-event-value", "boolean");
+                        request.event_details.as_mut().unwrap().use_event_value = Some(arg_from_str(value.unwrap_or("false"), err, "event-details.use-event-value", "boolean"));
                     },
                 "web-property-id" => {
                         request_event_details_init(&mut request);
@@ -3402,11 +3445,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_parent_link_init(&mut request);
@@ -3441,8 +3484,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3453,7 +3495,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().goals_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -3491,8 +3533,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3501,10 +3542,10 @@ impl Engine {
 
     fn _management_goals_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Goal = Default::default();
+        let mut request = api::Goal::default();
         let mut call = self.hub.management().goals_patch(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_goal_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3524,9 +3565,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3566,11 +3608,11 @@ impl Engine {
                     },
                 "visit-time-on-site-details.comparison-type" => {
                         request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_type = value.unwrap_or("").to_string();
+                        request.visit_time_on_site_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
                     },
                 "visit-time-on-site-details.comparison-value" => {
                         request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_value = value.unwrap_or("").to_string();
+                        request.visit_time_on_site_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
                     },
                 "name" => {
                         request_visit_time_on_site_details_init(&mut request);
@@ -3582,19 +3624,19 @@ impl Engine {
                     },
                 "url-destination-details.url" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.url_destination_details.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "url-destination-details.case-sensitive" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "url-destination-details.case-sensitive", "boolean");
+                        request.url_destination_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.case-sensitive", "boolean"));
                     },
                 "url-destination-details.match-type" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().match_type = value.unwrap_or("").to_string();
+                        request.url_destination_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
                     },
                 "url-destination-details.first-step-required" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().first_step_required = arg_from_str(value.unwrap_or("false"), err, "url-destination-details.first-step-required", "boolean");
+                        request.url_destination_details.as_mut().unwrap().first_step_required = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.first-step-required", "boolean"));
                     },
                 "kind" => {
                         request_url_destination_details_init(&mut request);
@@ -3606,11 +3648,11 @@ impl Engine {
                     },
                 "visit-num-pages-details.comparison-type" => {
                         request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_type = value.unwrap_or("").to_string();
+                        request.visit_num_pages_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
                     },
                 "visit-num-pages-details.comparison-value" => {
                         request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_value = value.unwrap_or("").to_string();
+                        request.visit_num_pages_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
                     },
                 "internal-web-property-id" => {
                         request_visit_num_pages_details_init(&mut request);
@@ -3618,7 +3660,7 @@ impl Engine {
                     },
                 "event-details.use-event-value" => {
                         request_event_details_init(&mut request);
-                        request.event_details.as_mut().unwrap().use_event_value = arg_from_str(value.unwrap_or("false"), err, "event-details.use-event-value", "boolean");
+                        request.event_details.as_mut().unwrap().use_event_value = Some(arg_from_str(value.unwrap_or("false"), err, "event-details.use-event-value", "boolean"));
                     },
                 "web-property-id" => {
                         request_event_details_init(&mut request);
@@ -3634,11 +3676,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_parent_link_init(&mut request);
@@ -3673,8 +3715,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3683,10 +3724,10 @@ impl Engine {
 
     fn _management_goals_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Goal = Default::default();
+        let mut request = api::Goal::default();
         let mut call = self.hub.management().goals_update(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_goal_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3706,9 +3747,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3748,11 +3790,11 @@ impl Engine {
                     },
                 "visit-time-on-site-details.comparison-type" => {
                         request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_type = value.unwrap_or("").to_string();
+                        request.visit_time_on_site_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
                     },
                 "visit-time-on-site-details.comparison-value" => {
                         request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_value = value.unwrap_or("").to_string();
+                        request.visit_time_on_site_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
                     },
                 "name" => {
                         request_visit_time_on_site_details_init(&mut request);
@@ -3764,19 +3806,19 @@ impl Engine {
                     },
                 "url-destination-details.url" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.url_destination_details.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "url-destination-details.case-sensitive" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().case_sensitive = arg_from_str(value.unwrap_or("false"), err, "url-destination-details.case-sensitive", "boolean");
+                        request.url_destination_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.case-sensitive", "boolean"));
                     },
                 "url-destination-details.match-type" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().match_type = value.unwrap_or("").to_string();
+                        request.url_destination_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
                     },
                 "url-destination-details.first-step-required" => {
                         request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().first_step_required = arg_from_str(value.unwrap_or("false"), err, "url-destination-details.first-step-required", "boolean");
+                        request.url_destination_details.as_mut().unwrap().first_step_required = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.first-step-required", "boolean"));
                     },
                 "kind" => {
                         request_url_destination_details_init(&mut request);
@@ -3788,11 +3830,11 @@ impl Engine {
                     },
                 "visit-num-pages-details.comparison-type" => {
                         request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_type = value.unwrap_or("").to_string();
+                        request.visit_num_pages_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
                     },
                 "visit-num-pages-details.comparison-value" => {
                         request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_value = value.unwrap_or("").to_string();
+                        request.visit_num_pages_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
                     },
                 "internal-web-property-id" => {
                         request_visit_num_pages_details_init(&mut request);
@@ -3800,7 +3842,7 @@ impl Engine {
                     },
                 "event-details.use-event-value" => {
                         request_event_details_init(&mut request);
-                        request.event_details.as_mut().unwrap().use_event_value = arg_from_str(value.unwrap_or("false"), err, "event-details.use-event-value", "boolean");
+                        request.event_details.as_mut().unwrap().use_event_value = Some(arg_from_str(value.unwrap_or("false"), err, "event-details.use-event-value", "boolean"));
                     },
                 "web-property-id" => {
                         request_event_details_init(&mut request);
@@ -3816,11 +3858,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_parent_link_init(&mut request);
@@ -3855,8 +3897,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3867,7 +3908,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().profile_filter_links_delete(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3898,7 +3939,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -3909,7 +3949,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().profile_filter_links_get(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3941,8 +3981,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3951,10 +3990,10 @@ impl Engine {
 
     fn _management_profile_filter_links_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ProfileFilterLink = Default::default();
+        let mut request = api::ProfileFilterLink::default();
         let mut call = self.hub.management().profile_filter_links_insert(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3974,9 +4013,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4001,51 +4041,51 @@ impl Engine {
                     },
                 "filter-ref.kind" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.href" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.id" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.name" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.account-id" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().account_id = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.kind" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.name" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.internal-web-property-id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().internal_web_property_id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.href" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.web-property-id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().web_property_id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.account-id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().account_id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_profile_ref_init(&mut request);
@@ -4072,8 +4112,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4084,7 +4123,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().profile_filter_links_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -4122,8 +4161,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4132,10 +4170,10 @@ impl Engine {
 
     fn _management_profile_filter_links_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ProfileFilterLink = Default::default();
+        let mut request = api::ProfileFilterLink::default();
         let mut call = self.hub.management().profile_filter_links_patch(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4155,9 +4193,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4182,51 +4221,51 @@ impl Engine {
                     },
                 "filter-ref.kind" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.href" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.id" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.name" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.account-id" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().account_id = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.kind" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.name" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.internal-web-property-id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().internal_web_property_id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.href" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.web-property-id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().web_property_id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.account-id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().account_id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_profile_ref_init(&mut request);
@@ -4253,8 +4292,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4263,10 +4301,10 @@ impl Engine {
 
     fn _management_profile_filter_links_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ProfileFilterLink = Default::default();
+        let mut request = api::ProfileFilterLink::default();
         let mut call = self.hub.management().profile_filter_links_update(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4286,9 +4324,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4313,51 +4352,51 @@ impl Engine {
                     },
                 "filter-ref.kind" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.href" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.id" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.name" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "filter-ref.account-id" => {
                         request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().account_id = value.unwrap_or("").to_string();
+                        request.filter_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.kind" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.name" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.internal-web-property-id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().internal_web_property_id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.href" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.web-property-id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().web_property_id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-ref.account-id" => {
                         request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().account_id = value.unwrap_or("").to_string();
+                        request.profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_profile_ref_init(&mut request);
@@ -4384,8 +4423,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4396,7 +4434,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().profile_user_links_delete(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4427,7 +4465,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -4436,10 +4473,10 @@ impl Engine {
 
     fn _management_profile_user_links_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::EntityUserLink = Default::default();
+        let mut request = api::EntityUserLink::default();
         let mut call = self.hub.management().profile_user_links_insert(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4459,15 +4496,37 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().account_ref.is_none() {
+                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
+                }
+            }
+            
             fn request_entity_init(request: &mut api::EntityUserLink) {
                 if request.entity.is_none() {
                     request.entity = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().profile_ref.is_none() {
+                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
+                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
                 }
             }
             
@@ -4488,84 +4547,84 @@ impl Engine {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.href = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.id = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.name = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.name = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.href = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.name = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.href = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.kind" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.email" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.id" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_user_ref_init(&mut request);
@@ -4577,11 +4636,17 @@ impl Engine {
                     },
                 "permissions.local" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().local.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().local.is_none() {
+                           request.permissions.as_mut().unwrap().local = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -4600,8 +4665,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4612,7 +4676,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().profile_user_links_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -4650,8 +4714,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4660,10 +4723,10 @@ impl Engine {
 
     fn _management_profile_user_links_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::EntityUserLink = Default::default();
+        let mut request = api::EntityUserLink::default();
         let mut call = self.hub.management().profile_user_links_update(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4683,15 +4746,37 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().account_ref.is_none() {
+                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
+                }
+            }
+            
             fn request_entity_init(request: &mut api::EntityUserLink) {
                 if request.entity.is_none() {
                     request.entity = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().profile_ref.is_none() {
+                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
+                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
                 }
             }
             
@@ -4712,84 +4797,84 @@ impl Engine {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.href = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.id = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.name = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.name = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.href = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.name = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.href = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.kind" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.email" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.id" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_user_ref_init(&mut request);
@@ -4801,11 +4886,17 @@ impl Engine {
                     },
                 "permissions.local" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().local.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().local.is_none() {
+                           request.permissions.as_mut().unwrap().local = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -4824,8 +4915,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4836,7 +4926,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().profiles_delete(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4867,7 +4957,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -4878,7 +4967,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().profiles_get(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4910,8 +4999,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4920,10 +5008,10 @@ impl Engine {
 
     fn _management_profiles_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Profile = Default::default();
+        let mut request = api::Profile::default();
         let mut call = self.hub.management().profiles_insert(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4943,9 +5031,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -5006,11 +5095,11 @@ impl Engine {
                     },
                 "child-link.href" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "child-link.type" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "enhanced-e-commerce-tracking" => {
                         request_child_link_init(&mut request);
@@ -5018,7 +5107,10 @@ impl Engine {
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "default-page" => {
                         request_permissions_init(&mut request);
@@ -5050,11 +5142,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "self-link" => {
                         request_parent_link_init(&mut request);
@@ -5077,8 +5169,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5089,7 +5180,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().profiles_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -5127,8 +5218,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5137,10 +5227,10 @@ impl Engine {
 
     fn _management_profiles_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Profile = Default::default();
+        let mut request = api::Profile::default();
         let mut call = self.hub.management().profiles_patch(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -5160,9 +5250,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -5223,11 +5314,11 @@ impl Engine {
                     },
                 "child-link.href" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "child-link.type" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "enhanced-e-commerce-tracking" => {
                         request_child_link_init(&mut request);
@@ -5235,7 +5326,10 @@ impl Engine {
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "default-page" => {
                         request_permissions_init(&mut request);
@@ -5267,11 +5361,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "self-link" => {
                         request_parent_link_init(&mut request);
@@ -5294,8 +5388,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5304,10 +5397,10 @@ impl Engine {
 
     fn _management_profiles_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Profile = Default::default();
+        let mut request = api::Profile::default();
         let mut call = self.hub.management().profiles_update(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -5327,9 +5420,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -5390,11 +5484,11 @@ impl Engine {
                     },
                 "child-link.href" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "child-link.type" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "enhanced-e-commerce-tracking" => {
                         request_child_link_init(&mut request);
@@ -5402,7 +5496,10 @@ impl Engine {
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "default-page" => {
                         request_permissions_init(&mut request);
@@ -5434,11 +5531,11 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "self-link" => {
                         request_parent_link_init(&mut request);
@@ -5461,8 +5558,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5473,7 +5569,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().segments_list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -5511,8 +5607,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5523,7 +5618,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().unsampled_reports_get(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id, &self.opt.arg_unsampled_report_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -5555,8 +5650,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5565,10 +5659,10 @@ impl Engine {
 
     fn _management_unsampled_reports_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::UnsampledReport = Default::default();
+        let mut request = api::UnsampledReport::default();
         let mut call = self.hub.management().unsampled_reports_insert(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -5588,9 +5682,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -5615,11 +5710,11 @@ impl Engine {
                     },
                 "cloud-storage-download-details.bucket-id" => {
                         request_cloud_storage_download_details_init(&mut request);
-                        request.cloud_storage_download_details.as_mut().unwrap().bucket_id = value.unwrap_or("").to_string();
+                        request.cloud_storage_download_details.as_mut().unwrap().bucket_id = Some(value.unwrap_or("").to_string());
                     },
                 "cloud-storage-download-details.object-id" => {
                         request_cloud_storage_download_details_init(&mut request);
-                        request.cloud_storage_download_details.as_mut().unwrap().object_id = value.unwrap_or("").to_string();
+                        request.cloud_storage_download_details.as_mut().unwrap().object_id = Some(value.unwrap_or("").to_string());
                     },
                 "download-type" => {
                         request_cloud_storage_download_details_init(&mut request);
@@ -5647,7 +5742,7 @@ impl Engine {
                     },
                 "drive-download-details.document-id" => {
                         request_drive_download_details_init(&mut request);
-                        request.drive_download_details.as_mut().unwrap().document_id = value.unwrap_or("").to_string();
+                        request.drive_download_details.as_mut().unwrap().document_id = Some(value.unwrap_or("").to_string());
                     },
                 "profile-id" => {
                         request_drive_download_details_init(&mut request);
@@ -5702,8 +5797,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5714,7 +5808,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().unsampled_reports_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_profile_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -5752,8 +5846,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5762,10 +5855,10 @@ impl Engine {
 
     fn _management_uploads_delete_upload_data(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AnalyticsDataimportDeleteUploadDataRequest = Default::default();
+        let mut request = api::AnalyticsDataimportDeleteUploadDataRequest::default();
         let mut call = self.hub.management().uploads_delete_upload_data(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_custom_data_source_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -5785,18 +5878,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "custom-data-import-uids" => {
                         if request.custom_data_import_uids.is_none() {
-                            request.custom_data_import_uids = Some(Default::default());
+                           request.custom_data_import_uids = Some(Default::default());
                         }
-                        request.custom_data_import_uids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.custom_data_import_uids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -5814,7 +5908,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -5825,7 +5918,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().uploads_get(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_custom_data_source_id, &self.opt.arg_upload_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -5857,8 +5950,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5869,7 +5961,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().uploads_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_custom_data_source_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -5907,8 +5999,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5919,7 +6010,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().uploads_upload_data(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_custom_data_source_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -5961,8 +6052,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5973,7 +6063,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().web_property_ad_words_links_delete(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_web_property_ad_words_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -6004,7 +6094,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -6015,7 +6104,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().web_property_ad_words_links_get(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_web_property_ad_words_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -6047,8 +6136,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -6057,10 +6145,10 @@ impl Engine {
 
     fn _management_web_property_ad_words_links_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::EntityAdWordsLink = Default::default();
+        let mut request = api::EntityAdWordsLink::default();
         let mut call = self.hub.management().web_property_ad_words_links_insert(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -6080,15 +6168,23 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             fn request_entity_init(request: &mut api::EntityAdWordsLink) {
                 if request.entity.is_none() {
                     request.entity = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_web_property_ref_init(request: &mut api::EntityAdWordsLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
+                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
                 }
             }
             
@@ -6101,33 +6197,33 @@ impl Engine {
                     },
                 "profile-ids" => {
                         if request.profile_ids.is_none() {
-                            request.profile_ids = Some(Default::default());
+                           request.profile_ids = Some(Default::default());
                         }
-                        request.profile_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.profile_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.name = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.href = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_entity_init(&mut request);
@@ -6154,8 +6250,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -6166,7 +6261,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().web_property_ad_words_links_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -6204,8 +6299,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -6214,10 +6308,10 @@ impl Engine {
 
     fn _management_web_property_ad_words_links_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::EntityAdWordsLink = Default::default();
+        let mut request = api::EntityAdWordsLink::default();
         let mut call = self.hub.management().web_property_ad_words_links_patch(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_web_property_ad_words_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -6237,15 +6331,23 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             fn request_entity_init(request: &mut api::EntityAdWordsLink) {
                 if request.entity.is_none() {
                     request.entity = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_web_property_ref_init(request: &mut api::EntityAdWordsLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
+                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
                 }
             }
             
@@ -6258,33 +6360,33 @@ impl Engine {
                     },
                 "profile-ids" => {
                         if request.profile_ids.is_none() {
-                            request.profile_ids = Some(Default::default());
+                           request.profile_ids = Some(Default::default());
                         }
-                        request.profile_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.profile_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.name = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.href = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_entity_init(&mut request);
@@ -6311,8 +6413,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -6321,10 +6422,10 @@ impl Engine {
 
     fn _management_web_property_ad_words_links_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::EntityAdWordsLink = Default::default();
+        let mut request = api::EntityAdWordsLink::default();
         let mut call = self.hub.management().web_property_ad_words_links_update(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_web_property_ad_words_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -6344,15 +6445,23 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             fn request_entity_init(request: &mut api::EntityAdWordsLink) {
                 if request.entity.is_none() {
                     request.entity = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_web_property_ref_init(request: &mut api::EntityAdWordsLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
+                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
                 }
             }
             
@@ -6365,33 +6474,33 @@ impl Engine {
                     },
                 "profile-ids" => {
                         if request.profile_ids.is_none() {
-                            request.profile_ids = Some(Default::default());
+                           request.profile_ids = Some(Default::default());
                         }
-                        request.profile_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.profile_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.name = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.href = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_entity_init(&mut request);
@@ -6418,8 +6527,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -6430,7 +6538,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().webproperties_get(&self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -6462,8 +6570,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -6472,10 +6579,10 @@ impl Engine {
 
     fn _management_webproperties_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Webproperty = Default::default();
+        let mut request = api::Webproperty::default();
         let mut call = self.hub.management().webproperties_insert(&request, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -6495,9 +6602,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -6549,11 +6657,11 @@ impl Engine {
                     },
                 "child-link.href" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "child-link.type" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "industry-vertical" => {
                         request_child_link_init(&mut request);
@@ -6561,15 +6669,18 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_permissions_init(&mut request);
@@ -6600,8 +6711,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -6612,7 +6722,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().webproperties_list(&self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -6650,8 +6760,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -6660,10 +6769,10 @@ impl Engine {
 
     fn _management_webproperties_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Webproperty = Default::default();
+        let mut request = api::Webproperty::default();
         let mut call = self.hub.management().webproperties_patch(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -6683,9 +6792,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -6737,11 +6847,11 @@ impl Engine {
                     },
                 "child-link.href" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "child-link.type" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "industry-vertical" => {
                         request_child_link_init(&mut request);
@@ -6749,15 +6859,18 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_permissions_init(&mut request);
@@ -6788,8 +6901,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -6798,10 +6910,10 @@ impl Engine {
 
     fn _management_webproperties_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Webproperty = Default::default();
+        let mut request = api::Webproperty::default();
         let mut call = self.hub.management().webproperties_update(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -6821,9 +6933,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -6875,11 +6988,11 @@ impl Engine {
                     },
                 "child-link.href" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "child-link.type" => {
                         request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "industry-vertical" => {
                         request_child_link_init(&mut request);
@@ -6887,15 +7000,18 @@ impl Engine {
                     },
                 "parent-link.href" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "parent-link.type" => {
                         request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_permissions_init(&mut request);
@@ -6926,8 +7042,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -6938,7 +7053,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().webproperty_user_links_delete(&self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -6969,7 +7084,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -6978,10 +7092,10 @@ impl Engine {
 
     fn _management_webproperty_user_links_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::EntityUserLink = Default::default();
+        let mut request = api::EntityUserLink::default();
         let mut call = self.hub.management().webproperty_user_links_insert(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -7001,15 +7115,37 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().account_ref.is_none() {
+                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
+                }
+            }
+            
             fn request_entity_init(request: &mut api::EntityUserLink) {
                 if request.entity.is_none() {
                     request.entity = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().profile_ref.is_none() {
+                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
+                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
                 }
             }
             
@@ -7030,84 +7166,84 @@ impl Engine {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.href = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.id = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.name = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.name = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.href = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.name = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.href = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.kind" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.email" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.id" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_user_ref_init(&mut request);
@@ -7119,11 +7255,17 @@ impl Engine {
                     },
                 "permissions.local" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().local.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().local.is_none() {
+                           request.permissions.as_mut().unwrap().local = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -7142,8 +7284,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -7154,7 +7295,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.management().webproperty_user_links_list(&self.opt.arg_account_id, &self.opt.arg_web_property_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -7192,8 +7333,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -7202,10 +7342,10 @@ impl Engine {
 
     fn _management_webproperty_user_links_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::EntityUserLink = Default::default();
+        let mut request = api::EntityUserLink::default();
         let mut call = self.hub.management().webproperty_user_links_update(&request, &self.opt.arg_account_id, &self.opt.arg_web_property_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -7225,15 +7365,37 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().account_ref.is_none() {
+                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
+                }
+            }
+            
             fn request_entity_init(request: &mut api::EntityUserLink) {
                 if request.entity.is_none() {
                     request.entity = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().profile_ref.is_none() {
+                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
+                }
+            }
+            
+            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
+                request_entity_init(request);
+                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
+                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
                 }
             }
             
@@ -7254,84 +7416,84 @@ impl Engine {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.href = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.id = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.account-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.name = value.unwrap_or("").to_string();
+                        request_entity_account_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.name = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.href = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.web_property_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.profile-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_profile_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.kind" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.kind = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.name" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.name = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.internal_web_property_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.href" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.href = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "entity.web-property-ref.account-id" => {
-                        request_entity_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.account_id = value.unwrap_or("").to_string();
+                        request_entity_web_property_ref_init(&mut request);
+                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.kind" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.email" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "user-ref.id" => {
                         request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_user_ref_init(&mut request);
@@ -7343,11 +7505,17 @@ impl Engine {
                     },
                 "permissions.local" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().local.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().local.is_none() {
+                           request.permissions.as_mut().unwrap().local = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "permissions.effective" => {
                         request_permissions_init(&mut request);
-                        request.permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.permissions.as_mut().unwrap().effective.is_none() {
+                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -7366,8 +7534,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -7378,7 +7545,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.metadata().columns_list(&self.opt.arg_report_type);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -7410,8 +7577,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -7420,10 +7586,10 @@ impl Engine {
 
     fn _provisioning_create_account_ticket(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AccountTicket = Default::default();
+        let mut request = api::AccountTicket::default();
         let mut call = self.hub.provisioning().create_account_ticket(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -7443,15 +7609,30 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_account_child_link_init(request: &mut api::AccountTicket) {
+                request_account_init(request);
+                if request.account.as_mut().unwrap().child_link.is_none() {
+                    request.account.as_mut().unwrap().child_link = Some(Default::default());
+                }
+            }
+            
             fn request_account_init(request: &mut api::AccountTicket) {
                 if request.account.is_none() {
                     request.account = Some(Default::default());
+                }
+            }
+            
+            fn request_account_permissions_init(request: &mut api::AccountTicket) {
+                request_account_init(request);
+                if request.account.as_mut().unwrap().permissions.is_none() {
+                    request.account.as_mut().unwrap().permissions = Some(Default::default());
                 }
             }
             
@@ -7560,11 +7741,11 @@ impl Engine {
                     },
                 "profile.child-link.href" => {
                         request_profile_child_link_init(&mut request);
-                        request.profile.as_mut().unwrap().child_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.profile.as_mut().unwrap().child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "profile.child-link.type" => {
                         request_profile_child_link_init(&mut request);
-                        request.profile.as_mut().unwrap().child_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.profile.as_mut().unwrap().child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "profile.enhanced-e-commerce-tracking" => {
                         request_profile_child_link_init(&mut request);
@@ -7572,7 +7753,10 @@ impl Engine {
                     },
                 "profile.permissions.effective" => {
                         request_profile_permissions_init(&mut request);
-                        request.profile.as_mut().unwrap().permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.profile.as_mut().unwrap().permissions.as_mut().unwrap().effective.is_none() {
+                           request.profile.as_mut().unwrap().permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.profile.as_mut().unwrap().permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "profile.default-page" => {
                         request_profile_permissions_init(&mut request);
@@ -7604,11 +7788,11 @@ impl Engine {
                     },
                 "profile.parent-link.href" => {
                         request_profile_parent_link_init(&mut request);
-                        request.profile.as_mut().unwrap().parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.profile.as_mut().unwrap().parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "profile.parent-link.type" => {
                         request_profile_parent_link_init(&mut request);
-                        request.profile.as_mut().unwrap().parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.profile.as_mut().unwrap().parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "profile.self-link" => {
                         request_profile_parent_link_init(&mut request);
@@ -7616,39 +7800,42 @@ impl Engine {
                     },
                 "account.kind" => {
                         request_account_init(&mut request);
-                        request.account.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.account.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "account.name" => {
                         request_account_init(&mut request);
-                        request.account.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.account.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "account.created" => {
                         request_account_init(&mut request);
-                        request.account.as_mut().unwrap().created = value.unwrap_or("").to_string();
+                        request.account.as_mut().unwrap().created = Some(value.unwrap_or("").to_string());
                     },
                 "account.updated" => {
                         request_account_init(&mut request);
-                        request.account.as_mut().unwrap().updated = value.unwrap_or("").to_string();
+                        request.account.as_mut().unwrap().updated = Some(value.unwrap_or("").to_string());
                     },
                 "account.child-link.href" => {
-                        request_account_init(&mut request);
-                        request.account.as_mut().unwrap().child_link.href = value.unwrap_or("").to_string();
+                        request_account_child_link_init(&mut request);
+                        request.account.as_mut().unwrap().child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "account.child-link.type" => {
-                        request_account_init(&mut request);
-                        request.account.as_mut().unwrap().child_link.type_ = value.unwrap_or("").to_string();
+                        request_account_child_link_init(&mut request);
+                        request.account.as_mut().unwrap().child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "account.id" => {
-                        request_account_init(&mut request);
-                        request.account.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request_account_child_link_init(&mut request);
+                        request.account.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "account.self-link" => {
-                        request_account_init(&mut request);
-                        request.account.as_mut().unwrap().self_link = value.unwrap_or("").to_string();
+                        request_account_child_link_init(&mut request);
+                        request.account.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
                     },
                 "account.permissions.effective" => {
-                        request_account_init(&mut request);
-                        request.account.as_mut().unwrap().permissions.effective.push(value.unwrap_or("").to_string());
+                        request_account_permissions_init(&mut request);
+                        if request.account.as_mut().unwrap().permissions.as_mut().unwrap().effective.is_none() {
+                           request.account.as_mut().unwrap().permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.account.as_mut().unwrap().permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "webproperty.website-url" => {
                         request_webproperty_init(&mut request);
@@ -7688,11 +7875,11 @@ impl Engine {
                     },
                 "webproperty.child-link.href" => {
                         request_webproperty_child_link_init(&mut request);
-                        request.webproperty.as_mut().unwrap().child_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.webproperty.as_mut().unwrap().child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "webproperty.child-link.type" => {
                         request_webproperty_child_link_init(&mut request);
-                        request.webproperty.as_mut().unwrap().child_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.webproperty.as_mut().unwrap().child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "webproperty.industry-vertical" => {
                         request_webproperty_child_link_init(&mut request);
@@ -7700,15 +7887,18 @@ impl Engine {
                     },
                 "webproperty.parent-link.href" => {
                         request_webproperty_parent_link_init(&mut request);
-                        request.webproperty.as_mut().unwrap().parent_link.as_mut().unwrap().href = value.unwrap_or("").to_string();
+                        request.webproperty.as_mut().unwrap().parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
                     },
                 "webproperty.parent-link.type" => {
                         request_webproperty_parent_link_init(&mut request);
-                        request.webproperty.as_mut().unwrap().parent_link.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.webproperty.as_mut().unwrap().parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "webproperty.permissions.effective" => {
                         request_webproperty_permissions_init(&mut request);
-                        request.webproperty.as_mut().unwrap().permissions.as_mut().unwrap().effective.push(value.unwrap_or("").to_string());
+                        if request.webproperty.as_mut().unwrap().permissions.as_mut().unwrap().effective.is_none() {
+                           request.webproperty.as_mut().unwrap().permissions.as_mut().unwrap().effective = Some(Default::default());
+                        }
+                                        request.webproperty.as_mut().unwrap().permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "webproperty.id" => {
                         request_webproperty_permissions_init(&mut request);
@@ -7751,8 +7941,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -7774,7 +7963,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_management {
+        }
+ else if self.opt.cmd_management {
             if self.opt.cmd_account_summaries_list {
                 call_result = self._management_account_summaries_list(dry_run, &mut err);
             } else if self.opt.cmd_account_user_links_delete {
@@ -7924,13 +8114,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_metadata {
+        }
+ else if self.opt.cmd_metadata {
             if self.opt.cmd_columns_list {
                 call_result = self._metadata_columns_list(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_provisioning {
+        }
+ else if self.opt.cmd_provisioning {
             if self.opt.cmd_create_account_ticket {
                 call_result = self._provisioning_create_account_ticket(dry_run, &mut err);
             } else {
@@ -7956,21 +8148,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "analytics3-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "analytics3-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "analytics3",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "analytics3",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::Analytics::new(hyper::Client::new(), auth),
+            hub: api::Analytics::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -7990,12 +8198,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

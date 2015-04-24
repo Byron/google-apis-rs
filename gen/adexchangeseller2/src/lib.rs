@@ -368,13 +368,13 @@ impl<'a, C, A> AdExchangeSeller<C, A>
 pub struct UrlChannels {
     /// Continuation token used to page through URL channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The URL channels returned in this list response.
-    pub items: Vec<UrlChannel>,
+    pub items: Option<Vec<UrlChannel>>,
     /// Kind of list this is, in this case adexchangeseller#urlChannels.
-    pub kind: String,
+    pub kind: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
 }
 
 impl ResponseResult for UrlChannels {}
@@ -405,11 +405,11 @@ impl ResponseResult for UrlChannels {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
     /// Kind of resource this is, in this case adexchangeseller#account.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Unique identifier of this account.
-    pub id: String,
+    pub id: Option<String>,
     /// Name of this account.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Resource for Account {}
@@ -429,13 +429,13 @@ impl ResponseResult for Account {}
 pub struct CustomChannels {
     /// Continuation token used to page through custom channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The custom channels returned in this list response.
-    pub items: Vec<CustomChannel>,
+    pub items: Option<Vec<CustomChannel>>,
     /// Kind of list this is, in this case adexchangeseller#customChannels.
-    pub kind: String,
+    pub kind: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
 }
 
 impl ResponseResult for CustomChannels {}
@@ -453,9 +453,9 @@ impl ResponseResult for CustomChannels {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Alerts {
     /// The alerts returned in this list response.
-    pub items: Vec<Alert>,
+    pub items: Option<Vec<Alert>>,
     /// Kind of list this is, in this case adexchangeseller#alerts.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Alerts {}
@@ -468,11 +468,11 @@ impl ResponseResult for Alerts {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SavedReport {
     /// Kind of resource this is, in this case adexchangeseller#savedReport.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Unique identifier of this saved report.
-    pub id: String,
+    pub id: Option<String>,
     /// This saved report's name.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for SavedReport {}
@@ -486,17 +486,17 @@ impl Part for SavedReport {}
 pub struct AdClient {
     /// This ad client's product code, which corresponds to the PRODUCT_CODE report dimension.
     #[serde(rename="productCode")]
-    pub product_code: String,
+    pub product_code: Option<String>,
     /// Kind of resource this is, in this case adexchangeseller#adClient.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Unique identifier of this ad client.
-    pub id: String,
+    pub id: Option<String>,
     /// Whether this ad client is opted in to ARC.
     #[serde(rename="arcOptIn")]
-    pub arc_opt_in: bool,
+    pub arc_opt_in: Option<bool>,
     /// Whether this ad client supports being reported on.
     #[serde(rename="supportsReporting")]
-    pub supports_reporting: bool,
+    pub supports_reporting: Option<bool>,
 }
 
 impl Part for AdClient {}
@@ -514,9 +514,9 @@ impl Part for AdClient {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PreferredDeals {
     /// The preferred deals returned in this list response.
-    pub items: Vec<PreferredDeal>,
+    pub items: Option<Vec<PreferredDeal>>,
     /// Kind of list this is, in this case adexchangeseller#preferredDeals.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for PreferredDeals {}
@@ -530,23 +530,23 @@ impl ResponseResult for PreferredDeals {}
 pub struct ReportingMetadataEntry {
     /// The names of the metrics which the dimension or metric this reporting metadata entry describes requires to also be present in order for the report to be valid. Omitting these will not cause an error or warning, but may result in data which cannot be correctly interpreted.
     #[serde(rename="requiredMetrics")]
-    pub required_metrics: Vec<String>,
+    pub required_metrics: Option<Vec<String>>,
     /// Kind of resource this is, in this case adexchangeseller#reportingMetadataEntry.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The names of the metrics the dimension or metric this reporting metadata entry describes is compatible with.
     #[serde(rename="compatibleMetrics")]
-    pub compatible_metrics: Vec<String>,
+    pub compatible_metrics: Option<Vec<String>>,
     /// For metrics this is a list of dimension IDs which the metric is compatible with, for dimensions it is a list of compatibility groups the dimension belongs to.
     #[serde(rename="compatibleDimensions")]
-    pub compatible_dimensions: Vec<String>,
+    pub compatible_dimensions: Option<Vec<String>>,
     /// Unique identifier of this reporting metadata entry, corresponding to the name of the appropriate dimension or metric.
-    pub id: String,
+    pub id: Option<String>,
     /// The names of the dimensions which the dimension or metric this reporting metadata entry describes requires to also be present in order for the report to be valid. Omitting these will not cause an error or warning, but may result in data which cannot be correctly interpreted.
     #[serde(rename="requiredDimensions")]
-    pub required_dimensions: Vec<String>,
+    pub required_dimensions: Option<Vec<String>>,
     /// The codes of the projects supported by the dimension or metric this reporting metadata entry describes.
     #[serde(rename="supportedProducts")]
-    pub supported_products: Vec<String>,
+    pub supported_products: Option<Vec<String>>,
 }
 
 impl Part for ReportingMetadataEntry {}
@@ -559,15 +559,15 @@ impl Part for ReportingMetadataEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomChannelTargetingInfo {
     /// The external description of the channel.
-    pub description: String,
+    pub description: Option<String>,
     /// The language of the sites ads will be displayed on.
     #[serde(rename="siteLanguage")]
-    pub site_language: String,
+    pub site_language: Option<String>,
     /// The locations in which ads appear. (Only valid for content and mobile content ads). Acceptable values for content ads are: TOP_LEFT, TOP_CENTER, TOP_RIGHT, MIDDLE_LEFT, MIDDLE_CENTER, MIDDLE_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, MULTIPLE_LOCATIONS. Acceptable values for mobile content ads are: TOP, MIDDLE, BOTTOM, MULTIPLE_LOCATIONS.
-    pub location: String,
+    pub location: Option<String>,
     /// The name used to describe this channel externally.
     #[serde(rename="adsAppearOn")]
-    pub ads_appear_on: String,
+    pub ads_appear_on: Option<String>,
 }
 
 impl NestedType for CustomChannelTargetingInfo {}
@@ -587,9 +587,9 @@ impl Part for CustomChannelTargetingInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
     /// no description provided
-    pub items: Vec<ReportingMetadataEntry>,
+    pub items: Option<Vec<ReportingMetadataEntry>>,
     /// Kind of list this is, in this case adexchangeseller#metadata.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Metadata {}
@@ -602,12 +602,12 @@ impl ResponseResult for Metadata {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlChannel {
     /// Kind of resource this is, in this case adexchangeseller#urlChannel.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Unique identifier of this URL channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
-    pub id: String,
+    pub id: Option<String>,
     /// URL Pattern of this URL channel. Does not include "http://" or "https://". Example: www.example.com/home
     #[serde(rename="urlPattern")]
-    pub url_pattern: String,
+    pub url_pattern: Option<String>,
 }
 
 impl Part for UrlChannel {}
@@ -626,13 +626,13 @@ impl Part for UrlChannel {}
 pub struct AdClients {
     /// Continuation token used to page through ad clients. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The ad clients returned in this list response.
-    pub items: Vec<AdClient>,
+    pub items: Option<Vec<AdClient>>,
     /// Kind of list this is, in this case adexchangeseller#adClients.
-    pub kind: String,
+    pub kind: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
 }
 
 impl ResponseResult for AdClients {}
@@ -650,27 +650,27 @@ impl ResponseResult for AdClients {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PreferredDeal {
     /// Kind of resource this is, in this case adexchangeseller#preferredDeal.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The name of the buyer network this deal is for.
     #[serde(rename="buyerNetworkName")]
-    pub buyer_network_name: String,
+    pub buyer_network_name: Option<String>,
     /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.
     #[serde(rename="currencyCode")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
     /// The name of the advertiser this deal is for.
     #[serde(rename="advertiserName")]
-    pub advertiser_name: String,
+    pub advertiser_name: Option<String>,
     /// The fixed price for this preferred deal. In cpm micros of currency according to currencyCode. If set, then this preferred deal is eligible for the fixed price tier of buying (highest priority, pay exactly the configured fixed price).
     #[serde(rename="fixedCpm")]
-    pub fixed_cpm: String,
+    pub fixed_cpm: Option<String>,
     /// Time when this deal becomes active in seconds since the epoch (GMT). If not set then this deal is active immediately upon creation.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
     /// Time when this deal stops being active in seconds since the epoch (GMT). If not set then this deal is valid until manually disabled by the publisher.
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// Unique identifier of this preferred deal.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl ResponseResult for PreferredDeal {}
@@ -689,13 +689,13 @@ impl ResponseResult for PreferredDeal {}
 pub struct SavedReports {
     /// Continuation token used to page through saved reports. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The saved reports returned in this list response.
-    pub items: Vec<SavedReport>,
+    pub items: Option<Vec<SavedReport>>,
     /// Kind of list this is, in this case adexchangeseller#savedReports.
-    pub kind: String,
+    pub kind: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
 }
 
 impl ResponseResult for SavedReports {}
@@ -708,12 +708,12 @@ impl ResponseResult for SavedReports {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportHeaders {
     /// The currency of this column. Only present if the header type is METRIC_CURRENCY.
-    pub currency: String,
+    pub currency: Option<String>,
     /// The type of the header; one of DIMENSION, METRIC_TALLY, METRIC_RATIO, or METRIC_CURRENCY.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The name of the header.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for ReportHeaders {}
@@ -727,16 +727,16 @@ impl Part for ReportHeaders {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Alert {
     /// Unique identifier of this alert. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
-    pub id: String,
+    pub id: Option<String>,
     /// Kind of resource this is, in this case adexchangeseller#alert.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Type of this alert. Possible values: SELF_HOLD, MIGRATED_TO_BILLING3, ADDRESS_PIN_VERIFICATION, PHONE_PIN_VERIFICATION, CORPORATE_ENTITY, GRAYLISTED_PUBLISHER, API_HOLD.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The localized alert message.
-    pub message: String,
+    pub message: Option<String>,
     /// Severity of this alert. Possible values: INFO, WARNING, SEVERE.
-    pub severity: String,
+    pub severity: Option<String>,
 }
 
 impl Part for Alert {}
@@ -755,13 +755,13 @@ impl Part for Alert {}
 pub struct Accounts {
     /// Continuation token used to page through accounts. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The accounts returned in this list response.
-    pub items: Vec<Account>,
+    pub items: Option<Vec<Account>>,
     /// Kind of list this is, in this case adexchangeseller#accounts.
-    pub kind: String,
+    pub kind: Option<String>,
     /// ETag of this response for caching purposes.
-    pub etag: String,
+    pub etag: Option<String>,
 }
 
 impl ResponseResult for Accounts {}
@@ -780,20 +780,20 @@ impl ResponseResult for Accounts {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Report {
     /// The header information of the columns requested in the report. This is a list of headers; one for each dimension in the request, followed by one for each metric in the request.
-    pub headers: Vec<ReportHeaders>,
+    pub headers: Option<Vec<ReportHeaders>>,
     /// Kind this is, in this case adexchangeseller#report.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The output rows of the report. Each row is a list of cells; one for each dimension in the request, followed by one for each metric in the request. The dimension cells contain strings, and the metric cells contain numbers.
-    pub rows: Vec<Vec<String>>,
+    pub rows: Option<Vec<Vec<String>>>,
     /// The total number of rows matched by the report request. Fewer rows may be returned in the response due to being limited by the row count requested or the report row limit.
     #[serde(rename="totalMatchedRows")]
-    pub total_matched_rows: String,
+    pub total_matched_rows: Option<String>,
     /// Any warnings associated with generation of the report.
-    pub warnings: Vec<String>,
+    pub warnings: Option<Vec<String>>,
     /// The averages of the report. This is the same length as any other row in the report; cells corresponding to dimension columns are empty.
-    pub averages: Vec<String>,
+    pub averages: Option<Vec<String>>,
     /// The totals of the report. This is the same length as any other row in the report; cells corresponding to dimension columns are empty.
-    pub totals: Vec<String>,
+    pub totals: Option<Vec<String>>,
 }
 
 impl ResponseResult for Report {}
@@ -811,16 +811,16 @@ impl ResponseResult for Report {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomChannel {
     /// Kind of resource this is, in this case adexchangeseller#customChannel.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Code of this custom channel, not necessarily unique across ad clients.
-    pub code: String,
+    pub code: Option<String>,
     /// The targeting information of this custom channel, if activated.
     #[serde(rename="targetingInfo")]
-    pub targeting_info: CustomChannelTargetingInfo,
+    pub targeting_info: Option<CustomChannelTargetingInfo>,
     /// Unique identifier of this custom channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
-    pub id: String,
+    pub id: Option<String>,
     /// Name of this custom channel.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl ResponseResult for CustomChannel {}
@@ -1273,16 +1273,20 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1534,16 +1538,20 @@ impl<'a, C, A> AccountMetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1840,16 +1848,20 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2155,16 +2167,20 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2419,16 +2435,20 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2665,16 +2685,20 @@ impl<'a, C, A> AccountPreferreddealGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2915,16 +2939,20 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3159,16 +3187,20 @@ impl<'a, C, A> AccountMetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3393,16 +3425,20 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3655,16 +3691,20 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3893,16 +3933,20 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4132,16 +4176,20 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4369,16 +4417,20 @@ impl<'a, C, A> AccountPreferreddealListCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4599,16 +4651,20 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

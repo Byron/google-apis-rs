@@ -445,10 +445,10 @@ impl RequestValue for Seats {}
 pub struct SubscriptionTransferInfo {
     /// Time when transfer token or intent to transfer will expire.
     #[serde(rename="transferabilityExpirationTime")]
-    pub transferability_expiration_time: String,
+    pub transferability_expiration_time: Option<String>,
     /// no description provided
     #[serde(rename="minimumTransferableSeats")]
-    pub minimum_transferable_seats: i32,
+    pub minimum_transferable_seats: Option<i32>,
 }
 
 impl NestedType for SubscriptionTransferInfo {}
@@ -463,10 +463,10 @@ impl Part for SubscriptionTransferInfo {}
 pub struct SubscriptionPlanCommitmentInterval {
     /// End time of the commitment interval in milliseconds since Unix epoch.
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// Start time of the commitment interval in milliseconds since Unix epoch.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
 }
 
 impl NestedType for SubscriptionPlanCommitmentInterval {}
@@ -486,11 +486,11 @@ impl Part for SubscriptionPlanCommitmentInterval {}
 pub struct Subscriptions {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies the resource as a collection of subscriptions.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The subscriptions in this page of results.
-    pub subscriptions: Vec<Subscription>,
+    pub subscriptions: Option<Vec<Subscription>>,
 }
 
 impl ResponseResult for Subscriptions {}
@@ -530,10 +530,10 @@ impl RequestValue for ChangePlanRequest {}
 pub struct SubscriptionTrialSettings {
     /// End time of the trial in milliseconds since Unix epoch.
     #[serde(rename="trialEndTime")]
-    pub trial_end_time: String,
+    pub trial_end_time: Option<String>,
     /// Whether the subscription is in trial.
     #[serde(rename="isInTrial")]
-    pub is_in_trial: bool,
+    pub is_in_trial: Option<bool>,
 }
 
 impl NestedType for SubscriptionTrialSettings {}
@@ -548,13 +548,13 @@ impl Part for SubscriptionTrialSettings {}
 pub struct SubscriptionPlan {
     /// The plan name of this subscription's plan.
     #[serde(rename="planName")]
-    pub plan_name: String,
+    pub plan_name: Option<String>,
     /// Interval of the commitment if it is a commitment plan.
     #[serde(rename="commitmentInterval")]
-    pub commitment_interval: SubscriptionPlanCommitmentInterval,
+    pub commitment_interval: Option<SubscriptionPlanCommitmentInterval>,
     /// Whether the plan is a commitment plan or not.
     #[serde(rename="isCommitmentPlan")]
-    pub is_commitment_plan: bool,
+    pub is_commitment_plan: Option<bool>,
 }
 
 impl NestedType for SubscriptionPlan {}
@@ -568,32 +568,32 @@ impl Part for SubscriptionPlan {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Address {
     /// Identifies the resource as a customer address.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Name of the organization.
     #[serde(rename="organizationName")]
-    pub organization_name: String,
+    pub organization_name: Option<String>,
     /// ISO 3166 country code.
     #[serde(rename="countryCode")]
-    pub country_code: String,
+    pub country_code: Option<String>,
     /// Name of the locality. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
-    pub locality: String,
+    pub locality: Option<String>,
     /// Name of the region. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
-    pub region: String,
+    pub region: Option<String>,
     /// Address line 2 of the address.
     #[serde(rename="addressLine2")]
-    pub address_line2: String,
+    pub address_line2: Option<String>,
     /// Address line 3 of the address.
     #[serde(rename="addressLine3")]
-    pub address_line3: String,
+    pub address_line3: Option<String>,
     /// Name of the contact person.
     #[serde(rename="contactName")]
-    pub contact_name: String,
+    pub contact_name: Option<String>,
     /// Address line 1 of the address.
     #[serde(rename="addressLine1")]
-    pub address_line1: String,
+    pub address_line1: Option<String>,
     /// The postal code. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
     #[serde(rename="postalCode")]
-    pub postal_code: String,
+    pub postal_code: Option<String>,
 }
 
 impl Part for Address {}
@@ -1054,7 +1054,7 @@ impl<'a, C, A> SubscriptionMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Customer = Default::default();
+/// let mut req = Customer::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1146,16 +1146,20 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1308,7 +1312,7 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Customer = Default::default();
+/// let mut req = Customer::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1379,16 +1383,20 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1538,7 +1546,7 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Customer = Default::default();
+/// let mut req = Customer::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1630,16 +1638,20 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1873,16 +1885,20 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2022,7 +2038,7 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Subscription = Default::default();
+/// let mut req = Subscription::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2119,16 +2135,20 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2372,16 +2392,20 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2614,16 +2638,20 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2853,16 +2881,20 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3027,7 +3059,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: RenewalSettings = Default::default();
+/// let mut req = RenewalSettings::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3121,16 +3153,20 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3376,16 +3412,20 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -3535,7 +3575,7 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Seats = Default::default();
+/// let mut req = Seats::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3629,16 +3669,20 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3884,16 +3928,20 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -4126,16 +4174,20 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -4285,7 +4337,7 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ChangePlanRequest = Default::default();
+/// let mut req = ChangePlanRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -4379,16 +4431,20 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

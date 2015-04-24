@@ -355,9 +355,9 @@ impl<'a, C, A> Replicapool<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarningsData {
     /// [Output Only] Metadata key for this warning.
-    pub key: String,
+    pub key: Option<String>,
     /// [Output Only] Metadata value for this warning.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for OperationWarningsData {}
@@ -390,11 +390,11 @@ impl RequestValue for InstanceGroupManagersRecreateInstancesRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarnings {
     /// [Output only] Optional human-readable details for this warning.
-    pub message: String,
+    pub message: Option<String>,
     /// [Output only] The warning type identifier for this warning.
-    pub code: String,
+    pub code: Option<String>,
     /// [Output only] Metadata for this warning in key:value format.
-    pub data: Vec<OperationWarningsData>,
+    pub data: Option<Vec<OperationWarningsData>>,
 }
 
 impl NestedType for OperationWarnings {}
@@ -414,16 +414,16 @@ impl Part for OperationWarnings {}
 pub struct OperationList {
     /// A token used to continue a truncated list request (output only).
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The operation resources.
-    pub items: Vec<Operation>,
+    pub items: Option<Vec<Operation>>,
     /// Type of resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
-    pub id: String,
+    pub id: Option<String>,
     /// Server defined URL for this resource (output only).
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for OperationList {}
@@ -455,11 +455,11 @@ impl RequestValue for InstanceGroupManagersSetInstanceTemplateRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationErrorErrors {
     /// [Output Only] An optional, human-readable error message.
-    pub message: String,
+    pub message: Option<String>,
     /// [Output Only] The error type identifier for this error.
-    pub code: String,
+    pub code: Option<String>,
     /// [Output Only] Indicates the field in the request which caused the error. This property is optional.
-    pub location: String,
+    pub location: Option<String>,
 }
 
 impl NestedType for OperationErrorErrors {}
@@ -479,16 +479,16 @@ impl Part for OperationErrorErrors {}
 pub struct InstanceGroupManagerList {
     /// A token used to continue a truncated list request (output only).
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of instance resources.
-    pub items: Vec<InstanceGroupManager>,
+    pub items: Option<Vec<InstanceGroupManager>>,
     /// Type of resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
-    pub id: String,
+    pub id: Option<String>,
     /// Server defined URL for this resource (output only).
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for InstanceGroupManagerList {}
@@ -501,7 +501,7 @@ impl ResponseResult for InstanceGroupManagerList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationError {
     /// [Output Only] The array of errors encountered while processing this operation.
-    pub errors: Vec<OperationErrorErrors>,
+    pub errors: Option<Vec<OperationErrorErrors>>,
 }
 
 impl NestedType for OperationError {}
@@ -648,61 +648,61 @@ impl RequestValue for InstanceGroupManagersDeleteInstancesRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// [Output Only] Status of the operation.
-    pub status: String,
+    pub status: Option<String>,
     /// [Output Only] The time that this operation was requested, in RFC3339 text format.
     #[serde(rename="insertTime")]
-    pub insert_time: String,
+    pub insert_time: Option<String>,
     /// [Output Only] If there are issues with this operation, a warning is returned.
-    pub warnings: Vec<OperationWarnings>,
+    pub warnings: Option<Vec<OperationWarnings>>,
     /// [Output Only] If errors occurred during processing of this operation, this field will be populated.
-    pub error: OperationError,
+    pub error: Option<OperationError>,
     /// [Output Only] Unique target ID which identifies a particular incarnation of the target.
     #[serde(rename="targetId")]
-    pub target_id: String,
+    pub target_id: Option<String>,
     /// [Output only] URL of the resource the operation is mutating.
     #[serde(rename="targetLink")]
-    pub target_link: String,
+    pub target_link: Option<String>,
     /// [Output Only] The time that this operation was started by the server, in RFC3339 text format.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
     /// [Output only] An optional identifier specified by the client when the mutation was initiated. Must be unique for all operation resources in the project.
     #[serde(rename="clientOperationId")]
-    pub client_operation_id: String,
+    pub client_operation_id: Option<String>,
     /// [Output Only] The time that this operation was requested, in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
-    pub creation_timestamp: String,
+    pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource, generated by the server.
-    pub id: String,
+    pub id: Option<String>,
     /// [Output only] Type of the resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// [Output Only] Name of the resource.
-    pub name: String,
+    pub name: Option<String>,
     /// [Output Only] URL of the zone where the operation resides. Only available when performing per-zone operations.
-    pub zone: String,
+    pub zone: Option<String>,
     /// [Output Only] URL of the region where the operation resides. Only available when performing regional operations.
-    pub region: String,
+    pub region: Option<String>,
     /// [Output Only] Server-defined fully-qualified URL for this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// [Output only] Type of the operation. Operations include insert, update, and delete.
     #[serde(rename="operationType")]
-    pub operation_type: String,
+    pub operation_type: Option<String>,
     /// [Output only] If operation fails, the HTTP error message returned.
     #[serde(rename="httpErrorMessage")]
-    pub http_error_message: String,
+    pub http_error_message: Option<String>,
     /// [Output only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses.
-    pub progress: i32,
+    pub progress: Option<i32>,
     /// [Output Only] The time that this operation was completed, in RFC3339 text format.
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// [Output only] If operation fails, the HTTP error status code returned.
     #[serde(rename="httpErrorStatusCode")]
-    pub http_error_status_code: i32,
+    pub http_error_status_code: Option<i32>,
     /// [Output Only] An optional textual description of the current status of the operation.
     #[serde(rename="statusMessage")]
-    pub status_message: String,
+    pub status_message: Option<String>,
     /// [Output Only] User who requested the operation, for example: user@example.com.
-    pub user: String,
+    pub user: Option<String>,
 }
 
 impl ResponseResult for Operation {}
@@ -1194,16 +1194,20 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1459,16 +1463,20 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1628,7 +1636,7 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InstanceGroupManagersSetTargetPoolsRequest = Default::default();
+/// let mut req = InstanceGroupManagersSetTargetPoolsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1724,16 +1732,20 @@ impl<'a, C, A> InstanceGroupManagerSetTargetPoolCall<'a, C, A> where C: BorrowMu
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2004,16 +2016,20 @@ impl<'a, C, A> InstanceGroupManagerListCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2184,7 +2200,7 @@ impl<'a, C, A> InstanceGroupManagerListCall<'a, C, A> where C: BorrowMut<hyper::
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InstanceGroupManager = Default::default();
+/// let mut req = InstanceGroupManager::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2280,16 +2296,20 @@ impl<'a, C, A> InstanceGroupManagerInsertCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2547,16 +2567,20 @@ impl<'a, C, A> InstanceGroupManagerGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2716,7 +2740,7 @@ impl<'a, C, A> InstanceGroupManagerGetCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InstanceGroupManagersAbandonInstancesRequest = Default::default();
+/// let mut req = InstanceGroupManagersAbandonInstancesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2812,16 +2836,20 @@ impl<'a, C, A> InstanceGroupManagerAbandonInstanceCall<'a, C, A> where C: Borrow
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2994,7 +3022,7 @@ impl<'a, C, A> InstanceGroupManagerAbandonInstanceCall<'a, C, A> where C: Borrow
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InstanceGroupManagersRecreateInstancesRequest = Default::default();
+/// let mut req = InstanceGroupManagersRecreateInstancesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3090,16 +3118,20 @@ impl<'a, C, A> InstanceGroupManagerRecreateInstanceCall<'a, C, A> where C: Borro
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3357,16 +3389,20 @@ impl<'a, C, A> InstanceGroupManagerDeleteCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -3526,7 +3562,7 @@ impl<'a, C, A> InstanceGroupManagerDeleteCall<'a, C, A> where C: BorrowMut<hyper
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InstanceGroupManagersSetInstanceTemplateRequest = Default::default();
+/// let mut req = InstanceGroupManagersSetInstanceTemplateRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3622,16 +3658,20 @@ impl<'a, C, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> where C: Bo
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3891,16 +3931,20 @@ impl<'a, C, A> InstanceGroupManagerResizeCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -4070,7 +4114,7 @@ impl<'a, C, A> InstanceGroupManagerResizeCall<'a, C, A> where C: BorrowMut<hyper
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InstanceGroupManagersDeleteInstancesRequest = Default::default();
+/// let mut req = InstanceGroupManagersDeleteInstancesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -4166,16 +4210,20 @@ impl<'a, C, A> InstanceGroupManagerDeleteInstanceCall<'a, C, A> where C: BorrowM
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

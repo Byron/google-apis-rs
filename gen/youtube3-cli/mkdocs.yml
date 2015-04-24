@@ -1,4 +1,4 @@
-site_name: YouTube v0.0.1+20150327
+site_name: YouTube v0.0.1+20150414
 site_url: http://byron.github.io/google-apis-rs/google-youtube3-cli
 site_description: Write integrating applications with bcore
 
@@ -23,6 +23,15 @@ pages:
 - ['channel-sections_update.md', 'Channel Sections', 'Update']
 - ['channels_list.md', 'Channels', 'List']
 - ['channels_update.md', 'Channels', 'Update']
+- ['comment-threads_insert.md', 'Comment Threads', 'Insert']
+- ['comment-threads_list.md', 'Comment Threads', 'List']
+- ['comment-threads_update.md', 'Comment Threads', 'Update']
+- ['comments_delete.md', 'Comments', 'Delete']
+- ['comments_insert.md', 'Comments', 'Insert']
+- ['comments_list.md', 'Comments', 'List']
+- ['comments_mark-as-spam.md', 'Comments', 'Mark As Spam']
+- ['comments_set-moderation-status.md', 'Comments', 'Set Moderation Status']
+- ['comments_update.md', 'Comments', 'Update']
 - ['guide-categories_list.md', 'Guide Categories', 'List']
 - ['i18n-languages_list.md', 'I18n Languages', 'List']
 - ['i18n-regions_list.md', 'I18n Regions', 'List']
@@ -50,12 +59,14 @@ pages:
 - ['subscriptions_insert.md', 'Subscriptions', 'Insert']
 - ['subscriptions_list.md', 'Subscriptions', 'List']
 - ['thumbnails_set.md', 'Thumbnails', 'Set']
+- ['video-abuse-report-reasons_list.md', 'Video Abuse Report Reasons', 'List']
 - ['video-categories_list.md', 'Video Categories', 'List']
 - ['videos_delete.md', 'Videos', 'Delete']
 - ['videos_get-rating.md', 'Videos', 'Get Rating']
 - ['videos_insert.md', 'Videos', 'Insert']
 - ['videos_list.md', 'Videos', 'List']
 - ['videos_rate.md', 'Videos', 'Rate']
+- ['videos_report-abuse.md', 'Videos', 'Report Abuse']
 - ['videos_update.md', 'Videos', 'Update']
 - ['watermarks_set.md', 'Watermarks', 'Set']
 - ['watermarks_unset.md', 'Watermarks', 'Unset']

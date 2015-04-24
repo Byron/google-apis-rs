@@ -321,15 +321,15 @@ impl<'a, C, A> CivicInfo<C, A>
 pub struct AdministrationRegion {
     /// The election administration body for this area.
     #[serde(rename="electionAdministrationBody")]
-    pub election_administration_body: AdministrativeBody,
+    pub election_administration_body: Option<AdministrativeBody>,
     /// The city or county that provides election information for this voter. This object can have the same elements as state.
-    pub local_jurisdiction: Option<Box<AdministrationRegion>>,
+    pub local_jurisdiction: Option<Option<Box<AdministrationRegion>>>,
     /// An ID for this object. IDs may change in future requests and should not be cached. Access to this field requires special access that can be requested from the Request more link on the Quotas page.
-    pub id: String,
+    pub id: Option<String>,
     /// The name of the jurisdiction.
-    pub name: String,
+    pub name: Option<String>,
     /// A list of sources for this area. If multiple sources are listed the data has been aggregated from those sources.
-    pub sources: Vec<Source>,
+    pub sources: Option<Vec<Source>>,
 }
 
 impl Part for AdministrationRegion {}
@@ -342,22 +342,22 @@ impl Part for AdministrationRegion {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Official {
     /// The official's name.
-    pub name: String,
+    pub name: Option<String>,
     /// A URL for a photo of the official.
     #[serde(rename="photoUrl")]
-    pub photo_url: String,
+    pub photo_url: Option<String>,
     /// The official's public contact phone numbers.
-    pub phones: Vec<String>,
+    pub phones: Option<Vec<String>>,
     /// A list of known (social) media channels for this official.
-    pub channels: Vec<Channel>,
+    pub channels: Option<Vec<Channel>>,
     /// The official's public website URLs.
-    pub urls: Vec<String>,
+    pub urls: Option<Vec<String>>,
     /// Addresses at which to contact the official.
-    pub address: Vec<SimpleAddressType>,
+    pub address: Option<Vec<SimpleAddressType>>,
     /// The full name of the party the official belongs to.
-    pub party: String,
+    pub party: Option<String>,
     /// The direct email addresses for the official.
-    pub emails: Vec<String>,
+    pub emails: Option<Vec<String>>,
 }
 
 impl Part for Official {}
@@ -370,11 +370,11 @@ impl Part for Official {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ElectoralDistrict {
     /// The geographic scope of this district. If unspecified the district's geography is not known. One of: national, statewide, congressional, stateUpper, stateLower, countywide, judicial, schoolBoard, cityWide, township, countyCouncil, cityCouncil, ward, special
-    pub scope: String,
+    pub scope: Option<String>,
     /// An identifier for this district, relative to its scope. For example, the 34th State Senate district would have id "34" and a scope of stateUpper.
-    pub id: String,
+    pub id: Option<String>,
     /// The name of the district.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for ElectoralDistrict {}
@@ -392,9 +392,9 @@ impl Part for ElectoralDistrict {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DivisionSearchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "civicinfo#divisionSearchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub results: Vec<DivisionSearchResult>,
+    pub results: Option<Vec<DivisionSearchResult>>,
 }
 
 impl ResponseResult for DivisionSearchResponse {}
@@ -407,24 +407,24 @@ impl ResponseResult for DivisionSearchResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Candidate {
     /// The candidate's name.
-    pub name: String,
+    pub name: Option<String>,
     /// A URL for a photo of the candidate.
     #[serde(rename="photoUrl")]
-    pub photo_url: String,
+    pub photo_url: Option<String>,
     /// The URL for the candidate's campaign web site.
     #[serde(rename="candidateUrl")]
-    pub candidate_url: String,
+    pub candidate_url: Option<String>,
     /// A list of known (social) media channels for this candidate.
-    pub channels: Vec<Channel>,
+    pub channels: Option<Vec<Channel>>,
     /// The voice phone number for the candidate's campaign office.
-    pub phone: String,
+    pub phone: Option<String>,
     /// The order the candidate appears on the ballot for this contest.
     #[serde(rename="orderOnBallot")]
-    pub order_on_ballot: String,
+    pub order_on_ballot: Option<String>,
     /// The full name of the party the candidate is a member of.
-    pub party: String,
+    pub party: Option<String>,
     /// The email address for the candidate's campaign.
-    pub email: String,
+    pub email: Option<String>,
 }
 
 impl Part for Candidate {}
@@ -437,48 +437,48 @@ impl Part for Candidate {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Contest {
     /// The name of the office for this contest.
-    pub office: String,
+    pub office: Option<String>,
     /// A list of sources for this contest. If multiple sources are listed, the data has been aggregated from those sources.
-    pub sources: Vec<Source>,
+    pub sources: Option<Vec<Source>>,
     /// If this is a partisan election, the name of the party it is for.
     #[serde(rename="primaryParty")]
-    pub primary_party: String,
+    pub primary_party: Option<String>,
     /// A description of any additional eligibility requirements for voting in this contest.
     #[serde(rename="electorateSpecifications")]
-    pub electorate_specifications: String,
+    pub electorate_specifications: Option<String>,
     /// The number of candidates that will be elected to office in this contest.
     #[serde(rename="numberElected")]
-    pub number_elected: String,
+    pub number_elected: Option<String>,
     /// A link to the referendum. This field is only populated for contests of type 'Referendum'.
     #[serde(rename="referendumUrl")]
-    pub referendum_url: String,
+    pub referendum_url: Option<String>,
     /// The title of the referendum (e.g. 'Proposition 42'). This field is only populated for contests of type 'Referendum'.
     #[serde(rename="referendumTitle")]
-    pub referendum_title: String,
+    pub referendum_title: Option<String>,
     /// An ID for this object. IDs may change in future requests and should not be cached. Access to this field requires special access that can be requested from the Request more link on the Quotas page.
-    pub id: String,
+    pub id: Option<String>,
     /// "Yes" or "No" depending on whether this a contest being held outside the normal election cycle.
-    pub special: String,
+    pub special: Option<String>,
     /// The number of candidates that a voter may vote for in this contest.
     #[serde(rename="numberVotingFor")]
-    pub number_voting_for: String,
+    pub number_voting_for: Option<String>,
     /// Information about the electoral district that this contest is in.
-    pub district: ElectoralDistrict,
+    pub district: Option<ElectoralDistrict>,
     /// The roles which this office fulfills.
-    pub roles: Vec<String>,
+    pub roles: Option<Vec<String>>,
     /// The levels of government of the office for this contest. There may be more than one in cases where a jurisdiction effectively acts at two different levels of government; for example, the mayor of the District of Columbia acts at "locality" level, but also effectively at both "administrative-area-2" and "administrative-area-1".
-    pub level: Vec<String>,
+    pub level: Option<Vec<String>>,
     /// A number specifying the position of this contest on the voter's ballot.
     #[serde(rename="ballotPlacement")]
-    pub ballot_placement: String,
+    pub ballot_placement: Option<String>,
     /// A brief description of the referendum. This field is only populated for contests of type 'Referendum'.
     #[serde(rename="referendumSubtitle")]
-    pub referendum_subtitle: String,
+    pub referendum_subtitle: Option<String>,
     /// The candidate choices for this contest.
-    pub candidates: Vec<Candidate>,
+    pub candidates: Option<Vec<Candidate>>,
     /// The type of contest. Usually this will be 'General', 'Primary', or 'Run-off' for contests with candidates. For referenda this will be 'Referendum'.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl Part for Contest {}
@@ -496,9 +496,9 @@ impl Part for Contest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ElectionsQueryResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "civicinfo#electionsQueryResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of available elections
-    pub elections: Vec<Election>,
+    pub elections: Option<Vec<Election>>,
 }
 
 impl ResponseResult for ElectionsQueryResponse {}
@@ -516,16 +516,16 @@ impl ResponseResult for ElectionsQueryResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RepresentativeInfoResponse {
     /// Political geographic divisions that contain the requested address.
-    pub divisions: HashMap<String, GeographicDivision>,
+    pub divisions: Option<HashMap<String, GeographicDivision>>,
     /// Identifies what kind of resource this is. Value: the fixed string "civicinfo#representativeInfoResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Officials holding the offices listed above. Will only be present if includeOffices was true in the request.
-    pub officials: Vec<Official>,
+    pub officials: Option<Vec<Official>>,
     /// Elected offices referenced by the divisions listed above. Will only be present if includeOffices was true in the request.
-    pub offices: Vec<Office>,
+    pub offices: Option<Vec<Office>>,
     /// The normalized version of the requested address
     #[serde(rename="normalizedInput")]
-    pub normalized_input: SimpleAddressType,
+    pub normalized_input: Option<SimpleAddressType>,
 }
 
 impl ResponseResult for RepresentativeInfoResponse {}
@@ -538,9 +538,9 @@ impl ResponseResult for RepresentativeInfoResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Source {
     /// Whether this data comes from an official government source.
-    pub official: bool,
+    pub official: Option<bool>,
     /// The name of the data source.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for Source {}
@@ -554,17 +554,17 @@ impl Part for Source {}
 pub struct ElectionOfficial {
     /// The fax number of the election official.
     #[serde(rename="faxNumber")]
-    pub fax_number: String,
+    pub fax_number: Option<String>,
     /// The email address of the election official.
     #[serde(rename="emailAddress")]
-    pub email_address: String,
+    pub email_address: Option<String>,
     /// The full name of the election official.
-    pub name: String,
+    pub name: Option<String>,
     /// The office phone number of the election official.
     #[serde(rename="officePhoneNumber")]
-    pub office_phone_number: String,
+    pub office_phone_number: Option<String>,
     /// The title of the election official.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for ElectionOfficial {}
@@ -578,41 +578,41 @@ impl Part for ElectionOfficial {}
 pub struct AdministrativeBody {
     /// A URL provided by this administrative body for information on absentee voting.
     #[serde(rename="absenteeVotingInfoUrl")]
-    pub absentee_voting_info_url: String,
+    pub absentee_voting_info_url: Option<String>,
     /// A URL provided by this administrative body for looking up where to vote.
     #[serde(rename="votingLocationFinderUrl")]
-    pub voting_location_finder_url: String,
+    pub voting_location_finder_url: Option<String>,
     /// The name of this election administrative body.
-    pub name: String,
+    pub name: Option<String>,
     /// A URL provided by this administrative body for confirming that the voter is registered to vote.
     #[serde(rename="electionRegistrationConfirmationUrl")]
-    pub election_registration_confirmation_url: String,
+    pub election_registration_confirmation_url: Option<String>,
     /// A URL provided by this administrative body for looking up general election information.
     #[serde(rename="electionInfoUrl")]
-    pub election_info_url: String,
+    pub election_info_url: Option<String>,
     /// A URL provided by this administrative body for looking up how to register to vote.
     #[serde(rename="electionRegistrationUrl")]
-    pub election_registration_url: String,
+    pub election_registration_url: Option<String>,
     /// The election officials for this election administrative body.
     #[serde(rename="electionOfficials")]
-    pub election_officials: Vec<ElectionOfficial>,
+    pub election_officials: Option<Vec<ElectionOfficial>>,
     /// The mailing address of this administrative body.
     #[serde(rename="correspondenceAddress")]
-    pub correspondence_address: SimpleAddressType,
+    pub correspondence_address: Option<SimpleAddressType>,
     /// A URL provided by this administrative body describing election rules to the voter.
     #[serde(rename="electionRulesUrl")]
-    pub election_rules_url: String,
+    pub election_rules_url: Option<String>,
     /// A description of the services this administrative body may provide.
-    pub voter_services: Vec<String>,
+    pub voter_services: Option<Vec<String>>,
     /// A URL provided by this administrative body to give contest information to the voter.
     #[serde(rename="ballotInfoUrl")]
-    pub ballot_info_url: String,
+    pub ballot_info_url: Option<String>,
     /// A description of the hours of operation for this administrative body.
     #[serde(rename="hoursOfOperation")]
-    pub hours_of_operation: String,
+    pub hours_of_operation: Option<String>,
     /// The physical address of this administrative body.
     #[serde(rename="physicalAddress")]
-    pub physical_address: SimpleAddressType,
+    pub physical_address: Option<SimpleAddressType>,
 }
 
 impl Part for AdministrativeBody {}
@@ -626,9 +626,9 @@ impl Part for AdministrativeBody {}
 pub struct Channel {
     /// The type of channel. The following is a list of types of channels, but is not exhaustive. More channel types may be added at a later time. One of: GooglePlus, YouTube, Facebook, Twitter
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The unique public identifier for the candidate's channel.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for Channel {}
@@ -641,19 +641,19 @@ impl Part for Channel {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Office {
     /// A list of sources for this office. If multiple sources are listed, the data has been aggregated from those sources.
-    pub sources: Vec<Source>,
+    pub sources: Option<Vec<Source>>,
     /// The levels of government of which this office is part. There may be more than one in cases where a jurisdiction effectively acts at two different levels of government; for example, the mayor of the District of Columbia acts at "locality" level, but also effectively at both "administrative-area-2" and "administrative-area-1".
-    pub levels: Vec<String>,
+    pub levels: Option<Vec<String>>,
     /// The human-readable name of the office.
-    pub name: String,
+    pub name: Option<String>,
     /// The roles which this office fulfills. Roles are not meant to be exhaustive, or to exactly specify the entire set of responsibilities of a given office, but are meant to be rough categories that are useful for general selection from or sorting of a list of offices.
-    pub roles: Vec<String>,
+    pub roles: Option<Vec<String>>,
     /// The OCD ID of the division with which this office is associated.
     #[serde(rename="divisionId")]
-    pub division_id: String,
+    pub division_id: Option<String>,
     /// List of indices in the officials array of people who presently hold this office.
     #[serde(rename="officialIndices")]
-    pub official_indices: Vec<u32>,
+    pub official_indices: Option<Vec<u32>>,
 }
 
 impl Part for Office {}
@@ -667,11 +667,11 @@ impl Part for Office {}
 pub struct DivisionSearchResult {
     /// The unique Open Civic Data identifier for this division.
     #[serde(rename="ocdId")]
-    pub ocd_id: String,
+    pub ocd_id: Option<String>,
     /// The name of the division.
-    pub name: String,
+    pub name: Option<String>,
     /// Other Open Civic Data identifiers that refer to the same division -- for example, those that refer to other political divisions whose boundaries are defined to be coterminous with this one. For example, ocd-division/country:us/state:wy will include an alias of ocd-division/country:us/state:wy/cd:1, since Wyoming has only one Congressional district.
-    pub aliases: Vec<String>,
+    pub aliases: Option<Vec<String>>,
 }
 
 impl Part for DivisionSearchResult {}
@@ -685,19 +685,19 @@ impl Part for DivisionSearchResult {}
 pub struct SimpleAddressType {
     /// The name of the location.
     #[serde(rename="locationName")]
-    pub location_name: String,
+    pub location_name: Option<String>,
     /// The city or town for the address.
-    pub city: String,
+    pub city: Option<String>,
     /// The US two letter state abbreviation of the address.
-    pub state: String,
+    pub state: Option<String>,
     /// The US Postal Zip Code of the address.
-    pub zip: String,
+    pub zip: Option<String>,
     /// The third line of the address, if needed.
-    pub line3: String,
+    pub line3: Option<String>,
     /// The second line the address, if needed.
-    pub line2: String,
+    pub line2: Option<String>,
     /// The street name and number of this address.
-    pub line1: String,
+    pub line1: Option<String>,
 }
 
 impl Part for SimpleAddressType {}
@@ -711,16 +711,16 @@ impl Part for SimpleAddressType {}
 pub struct GeographicDivision {
     /// List of indices in the offices array, one for each office elected from this division. Will only be present if includeOffices was true (or absent) in the request.
     #[serde(rename="officeIndices")]
-    pub office_indices: Vec<u32>,
+    pub office_indices: Option<Vec<u32>>,
     /// Any other valid OCD IDs that refer to the same division.
     /// 
     /// Because OCD IDs are meant to be human-readable and at least somewhat predictable, there are occasionally several identifiers for a single division. These identifiers are defined to be equivalent to one another, and one is always indicated as the primary identifier. The primary identifier will be returned in ocd_id above, and any other equivalent valid identifiers will be returned in this list.
     /// 
     /// For example, if this division's OCD ID is ocd-division/country:us/district:dc, this will contain ocd-division/country:us/state:dc.
     #[serde(rename="alsoKnownAs")]
-    pub also_known_as: Vec<String>,
+    pub also_known_as: Option<Vec<String>>,
     /// The name of the division.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for GeographicDivision {}
@@ -734,26 +734,26 @@ impl Part for GeographicDivision {}
 pub struct PollingLocation {
     /// The first date that this early vote site or drop off location may be used. This field is not populated for polling locations.
     #[serde(rename="startDate")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     /// A description of when this location is open.
     #[serde(rename="pollingHours")]
-    pub polling_hours: String,
+    pub polling_hours: Option<String>,
     /// The last date that this early vote site or drop off location may be used. This field is not populated for polling locations.
     #[serde(rename="endDate")]
-    pub end_date: String,
+    pub end_date: Option<String>,
     /// The name of the early vote site or drop off location. This field is not populated for polling locations.
-    pub name: String,
+    pub name: Option<String>,
     /// Notes about this location (e.g. accessibility ramp or entrance to use).
-    pub notes: String,
+    pub notes: Option<String>,
     /// The address of the location.
-    pub address: SimpleAddressType,
+    pub address: Option<SimpleAddressType>,
     /// A list of sources for this location. If multiple sources are listed the data has been aggregated from those sources.
-    pub sources: Vec<Source>,
+    pub sources: Option<Vec<Source>>,
     /// The services provided by this early vote site or drop off location. This field is not populated for polling locations.
     #[serde(rename="voterServices")]
-    pub voter_services: String,
+    pub voter_services: Option<String>,
     /// An ID for this object. IDs may change in future requests and should not be cached. Access to this field requires special access that can be requested from the Request more link on the Quotas page.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for PollingLocation {}
@@ -771,11 +771,11 @@ impl Part for PollingLocation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RepresentativeInfoData {
     /// Political geographic divisions that contain the requested address.
-    pub divisions: HashMap<String, GeographicDivision>,
+    pub divisions: Option<HashMap<String, GeographicDivision>>,
     /// Officials holding the offices listed above. Will only be present if includeOffices was true in the request.
-    pub officials: Vec<Official>,
+    pub officials: Option<Vec<Official>>,
     /// Elected offices referenced by the divisions listed above. Will only be present if includeOffices was true in the request.
-    pub offices: Vec<Office>,
+    pub offices: Option<Vec<Office>>,
 }
 
 impl ResponseResult for RepresentativeInfoData {}
@@ -794,30 +794,30 @@ impl ResponseResult for RepresentativeInfoData {}
 pub struct VoterInfoResponse {
     /// Locations where the voter is eligible to vote early, prior to election day.
     #[serde(rename="earlyVoteSites")]
-    pub early_vote_sites: Vec<PollingLocation>,
+    pub early_vote_sites: Option<Vec<PollingLocation>>,
     /// Locations where a voter is eligible to drop off a completed ballot. The voter must have received and completed a ballot prior to arriving at the location. The location may not have ballots available on the premises. These locations could be open on or before election day as indicated in the pollingHours field.
     #[serde(rename="dropOffLocations")]
-    pub drop_off_locations: Vec<PollingLocation>,
+    pub drop_off_locations: Option<Vec<PollingLocation>>,
     /// If no election ID was specified in the query, and there was more than one election with data for the given voter, this will contain information about the other elections that could apply.
     #[serde(rename="otherElections")]
-    pub other_elections: Vec<Election>,
+    pub other_elections: Option<Vec<Election>>,
     /// Identifies what kind of resource this is. Value: the fixed string "civicinfo#voterInfoResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The normalized version of the requested address
     #[serde(rename="normalizedInput")]
-    pub normalized_input: SimpleAddressType,
+    pub normalized_input: Option<SimpleAddressType>,
     /// Local Election Information for the state that the voter votes in. For the US, there will only be one element in this array.
-    pub state: Vec<AdministrationRegion>,
+    pub state: Option<Vec<AdministrationRegion>>,
     /// no description provided
     #[serde(rename="precinctId")]
-    pub precinct_id: String,
+    pub precinct_id: Option<String>,
     /// The election that was queried.
-    pub election: Election,
+    pub election: Option<Election>,
     /// Locations where the voter is eligible to vote on election day.
     #[serde(rename="pollingLocations")]
-    pub polling_locations: Vec<PollingLocation>,
+    pub polling_locations: Option<Vec<PollingLocation>>,
     /// Contests that will appear on the voter's ballot.
-    pub contests: Vec<Contest>,
+    pub contests: Option<Vec<Contest>>,
 }
 
 impl ResponseResult for VoterInfoResponse {}

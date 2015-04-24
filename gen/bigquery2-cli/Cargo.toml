@@ -5,10 +5,10 @@
 
 name = "google-bigquery2-cli"
 version = "0.0.1+20150326"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with bigquery (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/bigquery2-cli"
-homepage = "https://developers.google.com/bigquery/docs/overview"
+homepage = "https://cloud.google.com/bigquery/"
 documentation = "http://byron.github.io/google-apis-rs/google_bigquery2_cli"
 license = "MIT"
 keywords = ["bigquery", "google", "cli"]
@@ -23,6 +23,7 @@ yup-oauth2 = "*"
 docopt = "*"
 docopt_macros = "*"
 rustc-serialize = "*"
+yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
 

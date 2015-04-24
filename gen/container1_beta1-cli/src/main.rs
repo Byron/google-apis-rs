@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -26,6 +27,7 @@ Usage:
   container1-beta1 [options] projects zones-clusters-list <project-id> <zone-id> [-p <v>]... [-o <out>]
   container1-beta1 [options] projects zones-operations-get <project-id> <zone-id> <operation-id> [-p <v>]... [-o <out>]
   container1-beta1 [options] projects zones-operations-list <project-id> <zone-id> [-p <v>]... [-o <out>]
+  container1-beta1 [options] projects zones-tokens-get <master-project-id> <zone-id> <project-number> <cluster-name> [-p <v>]... [-o <out>]
   container1-beta1 --help
 
 All documentation details can be found TODO: <URL to github.io docs here, see #51>
@@ -39,6 +41,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -62,7 +70,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.projects().clusters_list(&self.opt.arg_project_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -94,8 +102,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -106,7 +113,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.projects().operations_list(&self.opt.arg_project_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -138,8 +145,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -148,10 +154,10 @@ impl Engine {
 
     fn _projects_zones_clusters_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CreateClusterRequest = Default::default();
+        let mut request = api::CreateClusterRequest::default();
         let mut call = self.hub.projects().zones_clusters_create(&request, &self.opt.arg_project_id, &self.opt.arg_zone_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -171,9 +177,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -183,82 +190,100 @@ impl Engine {
                 }
             }
             
+            fn request_cluster_master_auth_init(request: &mut api::CreateClusterRequest) {
+                request_cluster_init(request);
+                if request.cluster.as_mut().unwrap().master_auth.is_none() {
+                    request.cluster.as_mut().unwrap().master_auth = Some(Default::default());
+                }
+            }
+            
+            fn request_cluster_node_config_init(request: &mut api::CreateClusterRequest) {
+                request_cluster_init(request);
+                if request.cluster.as_mut().unwrap().node_config.is_none() {
+                    request.cluster.as_mut().unwrap().node_config = Some(Default::default());
+                }
+            }
+            
             match &field_name.to_string()[..] {
                 "cluster.status" => {
                         request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().status = value.unwrap_or("").to_string();
+                        request.cluster.as_mut().unwrap().status = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.container-ipv4-cidr" => {
                         request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().container_ipv4_cidr = value.unwrap_or("").to_string();
+                        request.cluster.as_mut().unwrap().container_ipv4_cidr = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.description" => {
                         request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().description = value.unwrap_or("").to_string();
+                        request.cluster.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.zone" => {
                         request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().zone = value.unwrap_or("").to_string();
+                        request.cluster.as_mut().unwrap().zone = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.num-nodes" => {
                         request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().num_nodes = arg_from_str(value.unwrap_or("-0"), err, "cluster.num-nodes", "integer");
+                        request.cluster.as_mut().unwrap().num_nodes = Some(arg_from_str(value.unwrap_or("-0"), err, "cluster.num-nodes", "integer"));
                     },
                 "cluster.node-routing-prefix-size" => {
                         request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().node_routing_prefix_size = arg_from_str(value.unwrap_or("-0"), err, "cluster.node-routing-prefix-size", "integer");
+                        request.cluster.as_mut().unwrap().node_routing_prefix_size = Some(arg_from_str(value.unwrap_or("-0"), err, "cluster.node-routing-prefix-size", "integer"));
+                    },
+                "cluster.master-auth.bearer-token" => {
+                        request_cluster_master_auth_init(&mut request);
+                        request.cluster.as_mut().unwrap().master_auth.as_mut().unwrap().bearer_token = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.master-auth.password" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().master_auth.password = value.unwrap_or("").to_string();
+                        request_cluster_master_auth_init(&mut request);
+                        request.cluster.as_mut().unwrap().master_auth.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.master-auth.user" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().master_auth.user = value.unwrap_or("").to_string();
+                        request_cluster_master_auth_init(&mut request);
+                        request.cluster.as_mut().unwrap().master_auth.as_mut().unwrap().user = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.cluster-api-version" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().cluster_api_version = value.unwrap_or("").to_string();
+                        request_cluster_master_auth_init(&mut request);
+                        request.cluster.as_mut().unwrap().cluster_api_version = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.network" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().network = value.unwrap_or("").to_string();
+                        request_cluster_master_auth_init(&mut request);
+                        request.cluster.as_mut().unwrap().network = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.endpoint" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().endpoint = value.unwrap_or("").to_string();
+                        request_cluster_master_auth_init(&mut request);
+                        request.cluster.as_mut().unwrap().endpoint = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.node-config.machine-type" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().node_config.machine_type = value.unwrap_or("").to_string();
+                        request_cluster_node_config_init(&mut request);
+                        request.cluster.as_mut().unwrap().node_config.as_mut().unwrap().machine_type = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.node-config.source-image" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().node_config.source_image = value.unwrap_or("").to_string();
+                        request_cluster_node_config_init(&mut request);
+                        request.cluster.as_mut().unwrap().node_config.as_mut().unwrap().source_image = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.status-message" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().status_message = value.unwrap_or("").to_string();
+                        request_cluster_node_config_init(&mut request);
+                        request.cluster.as_mut().unwrap().status_message = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.services-ipv4-cidr" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().services_ipv4_cidr = value.unwrap_or("").to_string();
+                        request_cluster_node_config_init(&mut request);
+                        request.cluster.as_mut().unwrap().services_ipv4_cidr = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.creation-timestamp" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().creation_timestamp = value.unwrap_or("").to_string();
+                        request_cluster_node_config_init(&mut request);
+                        request.cluster.as_mut().unwrap().creation_timestamp = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.enable-cloud-logging" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().enable_cloud_logging = arg_from_str(value.unwrap_or("false"), err, "cluster.enable-cloud-logging", "boolean");
+                        request_cluster_node_config_init(&mut request);
+                        request.cluster.as_mut().unwrap().enable_cloud_logging = Some(arg_from_str(value.unwrap_or("false"), err, "cluster.enable-cloud-logging", "boolean"));
                     },
                 "cluster.self-link" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().self_link = value.unwrap_or("").to_string();
+                        request_cluster_node_config_init(&mut request);
+                        request.cluster.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
                     },
                 "cluster.name" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request_cluster_node_config_init(&mut request);
+                        request.cluster.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -277,8 +302,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -289,7 +313,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.projects().zones_clusters_delete(&self.opt.arg_project_id, &self.opt.arg_zone_id, &self.opt.arg_cluster_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -321,8 +345,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -333,7 +356,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.projects().zones_clusters_get(&self.opt.arg_project_id, &self.opt.arg_zone_id, &self.opt.arg_cluster_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -365,8 +388,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -377,7 +399,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.projects().zones_clusters_list(&self.opt.arg_project_id, &self.opt.arg_zone_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -409,8 +431,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -421,7 +442,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.projects().zones_operations_get(&self.opt.arg_project_id, &self.opt.arg_zone_id, &self.opt.arg_operation_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -453,8 +474,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -465,7 +485,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.projects().zones_operations_list(&self.opt.arg_project_id, &self.opt.arg_zone_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -497,8 +517,50 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    None
+                }
+            }
+        }
+    }
+
+    fn _projects_zones_tokens_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Option<api::Error> {
+        let mut call = self.hub.projects().zones_tokens_get(&self.opt.arg_master_project_id, &self.opt.arg_zone_id, &self.opt.arg_project_number, &self.opt.arg_cluster_name);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+            }
+        }
+        let protocol = "standard-request";
+        if dry_run {
+            None
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            match match protocol {
+                "standard-request" => call.doit(),
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Some(api_err),
+                Ok((mut response, output_schema)) => {
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -527,6 +589,8 @@ impl Engine {
                 call_result = self._projects_zones_operations_get(dry_run, &mut err);
             } else if self.opt.cmd_zones_operations_list {
                 call_result = self._projects_zones_operations_list(dry_run, &mut err);
+            } else if self.opt.cmd_zones_tokens_get {
+                call_result = self._projects_zones_tokens_get(dry_run, &mut err);
             } else {
                 unreachable!();
             }
@@ -550,21 +614,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "container1-beta1-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "container1-beta1-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "container1-beta1",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "container1-beta1",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::Container::new(hyper::Client::new(), auth),
+            hub: api::Container::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -584,12 +664,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

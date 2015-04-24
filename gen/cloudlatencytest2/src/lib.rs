@@ -91,7 +91,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: Stats = Default::default();
+//! let mut req = Stats::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -266,7 +266,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Stats = Default::default();
+/// let mut req = Stats::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -336,9 +336,9 @@ impl<'a, C, A> Cloudlatencytest<C, A>
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IntValue {
     /// no description provided
-    pub value: String,
+    pub value: Option<String>,
     /// no description provided
-    pub label: String,
+    pub label: Option<String>,
 }
 
 impl Part for IntValue {}
@@ -378,9 +378,9 @@ impl RequestValue for Stats {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct StringValue {
     /// no description provided
-    pub value: String,
+    pub value: Option<String>,
     /// no description provided
-    pub label: String,
+    pub label: Option<String>,
 }
 
 impl Part for StringValue {}
@@ -417,7 +417,7 @@ impl RequestValue for AggregatedStats {}
 pub struct AggregatedStatsReply {
     /// no description provided
     #[serde(rename="testValue")]
-    pub test_value: String,
+    pub test_value: Option<String>,
 }
 
 impl ResponseResult for AggregatedStatsReply {}
@@ -430,9 +430,9 @@ impl ResponseResult for AggregatedStatsReply {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DoubleValue {
     /// no description provided
-    pub value: f32,
+    pub value: Option<f32>,
     /// no description provided
-    pub label: String,
+    pub label: Option<String>,
 }
 
 impl Part for DoubleValue {}
@@ -451,7 +451,7 @@ impl Part for DoubleValue {}
 pub struct StatsReply {
     /// no description provided
     #[serde(rename="testValue")]
-    pub test_value: String,
+    pub test_value: Option<String>,
 }
 
 impl ResponseResult for StatsReply {}
@@ -570,7 +570,7 @@ impl<'a, C, A> StatscollectionMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AggregatedStats = Default::default();
+/// let mut req = AggregatedStats::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -636,16 +636,20 @@ impl<'a, C, A> StatscollectionUpdateaggregatedstatCall<'a, C, A> where C: Borrow
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -788,7 +792,7 @@ impl<'a, C, A> StatscollectionUpdateaggregatedstatCall<'a, C, A> where C: Borrow
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Stats = Default::default();
+/// let mut req = Stats::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -854,16 +858,20 @@ impl<'a, C, A> StatscollectionUpdatestatCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

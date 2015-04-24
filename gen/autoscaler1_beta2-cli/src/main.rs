@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -41,6 +42,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -64,7 +71,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.autoscalers().delete(&self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_autoscaler);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -96,8 +103,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -108,7 +114,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.autoscalers().get(&self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_autoscaler);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -140,8 +146,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -150,10 +155,10 @@ impl Engine {
 
     fn _autoscalers_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Autoscaler = Default::default();
+        let mut request = api::Autoscaler::default();
         let mut call = self.hub.autoscalers().insert(&request, &self.opt.arg_project, &self.opt.arg_zone);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -173,15 +178,30 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_autoscaling_policy_cpu_utilization_init(request: &mut api::Autoscaler) {
+                request_autoscaling_policy_init(request);
+                if request.autoscaling_policy.as_mut().unwrap().cpu_utilization.is_none() {
+                    request.autoscaling_policy.as_mut().unwrap().cpu_utilization = Some(Default::default());
+                }
+            }
+            
             fn request_autoscaling_policy_init(request: &mut api::Autoscaler) {
                 if request.autoscaling_policy.is_none() {
                     request.autoscaling_policy = Some(Default::default());
+                }
+            }
+            
+            fn request_autoscaling_policy_load_balancing_utilization_init(request: &mut api::Autoscaler) {
+                request_autoscaling_policy_init(request);
+                if request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization.is_none() {
+                    request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization = Some(Default::default());
                 }
             }
             
@@ -194,23 +214,23 @@ impl Engine {
                     },
                 "autoscaling-policy.max-num-replicas" => {
                         request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().max_num_replicas = arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.max-num-replicas", "integer");
+                        request.autoscaling_policy.as_mut().unwrap().max_num_replicas = Some(arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.max-num-replicas", "integer"));
                     },
                 "autoscaling-policy.cpu-utilization.utilization-target" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().cpu_utilization.utilization_target = arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.cpu-utilization.utilization-target", "number");
+                        request_autoscaling_policy_cpu_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().cpu_utilization.as_mut().unwrap().utilization_target = Some(arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.cpu-utilization.utilization-target", "number"));
                     },
                 "autoscaling-policy.min-num-replicas" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().min_num_replicas = arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.min-num-replicas", "integer");
+                        request_autoscaling_policy_cpu_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().min_num_replicas = Some(arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.min-num-replicas", "integer"));
                     },
                 "autoscaling-policy.cool-down-period-sec" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().cool_down_period_sec = arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.cool-down-period-sec", "integer");
+                        request_autoscaling_policy_cpu_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().cool_down_period_sec = Some(arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.cool-down-period-sec", "integer"));
                     },
                 "autoscaling-policy.load-balancing-utilization.utilization-target" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization.utilization_target = arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.load-balancing-utilization.utilization-target", "number");
+                        request_autoscaling_policy_load_balancing_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization.as_mut().unwrap().utilization_target = Some(arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.load-balancing-utilization.utilization-target", "number"));
                     },
                 "target" => {
                         request_autoscaling_policy_init(&mut request);
@@ -249,8 +269,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -261,7 +280,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.autoscalers().list(&self.opt.arg_project, &self.opt.arg_zone);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -302,8 +321,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -312,10 +330,10 @@ impl Engine {
 
     fn _autoscalers_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Autoscaler = Default::default();
+        let mut request = api::Autoscaler::default();
         let mut call = self.hub.autoscalers().patch(&request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_autoscaler);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -335,15 +353,30 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_autoscaling_policy_cpu_utilization_init(request: &mut api::Autoscaler) {
+                request_autoscaling_policy_init(request);
+                if request.autoscaling_policy.as_mut().unwrap().cpu_utilization.is_none() {
+                    request.autoscaling_policy.as_mut().unwrap().cpu_utilization = Some(Default::default());
+                }
+            }
+            
             fn request_autoscaling_policy_init(request: &mut api::Autoscaler) {
                 if request.autoscaling_policy.is_none() {
                     request.autoscaling_policy = Some(Default::default());
+                }
+            }
+            
+            fn request_autoscaling_policy_load_balancing_utilization_init(request: &mut api::Autoscaler) {
+                request_autoscaling_policy_init(request);
+                if request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization.is_none() {
+                    request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization = Some(Default::default());
                 }
             }
             
@@ -356,23 +389,23 @@ impl Engine {
                     },
                 "autoscaling-policy.max-num-replicas" => {
                         request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().max_num_replicas = arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.max-num-replicas", "integer");
+                        request.autoscaling_policy.as_mut().unwrap().max_num_replicas = Some(arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.max-num-replicas", "integer"));
                     },
                 "autoscaling-policy.cpu-utilization.utilization-target" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().cpu_utilization.utilization_target = arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.cpu-utilization.utilization-target", "number");
+                        request_autoscaling_policy_cpu_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().cpu_utilization.as_mut().unwrap().utilization_target = Some(arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.cpu-utilization.utilization-target", "number"));
                     },
                 "autoscaling-policy.min-num-replicas" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().min_num_replicas = arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.min-num-replicas", "integer");
+                        request_autoscaling_policy_cpu_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().min_num_replicas = Some(arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.min-num-replicas", "integer"));
                     },
                 "autoscaling-policy.cool-down-period-sec" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().cool_down_period_sec = arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.cool-down-period-sec", "integer");
+                        request_autoscaling_policy_cpu_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().cool_down_period_sec = Some(arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.cool-down-period-sec", "integer"));
                     },
                 "autoscaling-policy.load-balancing-utilization.utilization-target" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization.utilization_target = arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.load-balancing-utilization.utilization-target", "number");
+                        request_autoscaling_policy_load_balancing_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization.as_mut().unwrap().utilization_target = Some(arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.load-balancing-utilization.utilization-target", "number"));
                     },
                 "target" => {
                         request_autoscaling_policy_init(&mut request);
@@ -411,8 +444,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -421,10 +453,10 @@ impl Engine {
 
     fn _autoscalers_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Autoscaler = Default::default();
+        let mut request = api::Autoscaler::default();
         let mut call = self.hub.autoscalers().update(&request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_autoscaler);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -444,15 +476,30 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_autoscaling_policy_cpu_utilization_init(request: &mut api::Autoscaler) {
+                request_autoscaling_policy_init(request);
+                if request.autoscaling_policy.as_mut().unwrap().cpu_utilization.is_none() {
+                    request.autoscaling_policy.as_mut().unwrap().cpu_utilization = Some(Default::default());
+                }
+            }
+            
             fn request_autoscaling_policy_init(request: &mut api::Autoscaler) {
                 if request.autoscaling_policy.is_none() {
                     request.autoscaling_policy = Some(Default::default());
+                }
+            }
+            
+            fn request_autoscaling_policy_load_balancing_utilization_init(request: &mut api::Autoscaler) {
+                request_autoscaling_policy_init(request);
+                if request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization.is_none() {
+                    request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization = Some(Default::default());
                 }
             }
             
@@ -465,23 +512,23 @@ impl Engine {
                     },
                 "autoscaling-policy.max-num-replicas" => {
                         request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().max_num_replicas = arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.max-num-replicas", "integer");
+                        request.autoscaling_policy.as_mut().unwrap().max_num_replicas = Some(arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.max-num-replicas", "integer"));
                     },
                 "autoscaling-policy.cpu-utilization.utilization-target" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().cpu_utilization.utilization_target = arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.cpu-utilization.utilization-target", "number");
+                        request_autoscaling_policy_cpu_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().cpu_utilization.as_mut().unwrap().utilization_target = Some(arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.cpu-utilization.utilization-target", "number"));
                     },
                 "autoscaling-policy.min-num-replicas" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().min_num_replicas = arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.min-num-replicas", "integer");
+                        request_autoscaling_policy_cpu_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().min_num_replicas = Some(arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.min-num-replicas", "integer"));
                     },
                 "autoscaling-policy.cool-down-period-sec" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().cool_down_period_sec = arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.cool-down-period-sec", "integer");
+                        request_autoscaling_policy_cpu_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().cool_down_period_sec = Some(arg_from_str(value.unwrap_or("-0"), err, "autoscaling-policy.cool-down-period-sec", "integer"));
                     },
                 "autoscaling-policy.load-balancing-utilization.utilization-target" => {
-                        request_autoscaling_policy_init(&mut request);
-                        request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization.utilization_target = arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.load-balancing-utilization.utilization-target", "number");
+                        request_autoscaling_policy_load_balancing_utilization_init(&mut request);
+                        request.autoscaling_policy.as_mut().unwrap().load_balancing_utilization.as_mut().unwrap().utilization_target = Some(arg_from_str(value.unwrap_or("0.0"), err, "autoscaling-policy.load-balancing-utilization.utilization-target", "number"));
                     },
                 "target" => {
                         request_autoscaling_policy_init(&mut request);
@@ -520,8 +567,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -532,7 +578,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.zone_operations().delete(&self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_operation);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -563,7 +609,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -574,7 +619,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.zone_operations().get(&self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_operation);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -606,8 +651,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -618,7 +662,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.zone_operations().list(&self.opt.arg_project, &self.opt.arg_zone);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -659,8 +703,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -671,7 +714,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.zones().list(&self.opt.arg_project);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -712,8 +755,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -741,7 +783,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_zone_operations {
+        }
+ else if self.opt.cmd_zone_operations {
             if self.opt.cmd_delete {
                 call_result = self._zone_operations_delete(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -751,7 +794,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_zones {
+        }
+ else if self.opt.cmd_zones {
             if self.opt.cmd_list {
                 call_result = self._zones_list(dry_run, &mut err);
             } else {
@@ -777,21 +821,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "autoscaler1-beta2-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "autoscaler1-beta2-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "autoscaler1-beta2",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "autoscaler1-beta2",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::AutoscalerHub::new(hyper::Client::new(), auth),
+            hub: api::AutoscalerHub::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -811,12 +871,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

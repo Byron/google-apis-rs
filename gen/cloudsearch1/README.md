@@ -5,13 +5,11 @@ DO NOT EDIT !
 -->
 The `google-cloudsearch1` library allows access to all features of the *Google cloudsearch* service.
 
-This documentation was generated from *cloudsearch* crate version *0.1.5+20150309*, where *20150309* is the exact revision of the *cloudsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *cloudsearch* crate version *0.1.5+20150416*, where *20150416* is the exact revision of the *cloudsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_cloudsearch1/struct.Cloudsearch.html) ... 
+It seems there is nothing you can do here ... .
 
-* projects
- * [*indexes documents create*](http://byron.github.io/google-apis-rs/google_cloudsearch1/struct.ProjectIndexeDocumentCreateCall.html), [*indexes documents delete*](http://byron.github.io/google-apis-rs/google_cloudsearch1/struct.ProjectIndexeDocumentDeleteCall.html), [*indexes documents get*](http://byron.github.io/google-apis-rs/google_cloudsearch1/struct.ProjectIndexeDocumentGetCall.html), [*indexes documents list*](http://byron.github.io/google-apis-rs/google_cloudsearch1/struct.ProjectIndexeDocumentListCall.html), [*indexes list*](http://byron.github.io/google-apis-rs/google_cloudsearch1/struct.ProjectIndexeListCall.html) and [*indexes search*](http://byron.github.io/google-apis-rs/google_cloudsearch1/struct.ProjectIndexeSearchCall.html)
 
 
 
@@ -41,12 +39,6 @@ Generally speaking, you can invoke *Activities* like this:
 let r = hub.resource().activity(...).doit()
 ```
 
-Or specifically ...
-
-```ignore
-let r = hub.projects().indexes_documents_get(...).doit()
-let r = hub.projects().indexes_documents_create(...).doit()
-```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
 supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
@@ -70,7 +62,7 @@ google-cloudsearch1 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_cloudsearch1 as cloudsearch1;
-use cloudsearch1::{Result, Error};
+
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 use cloudsearch1::Cloudsearch;
@@ -87,29 +79,9 @@ let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
 let mut hub = Cloudsearch::new(hyper::Client::new(), auth);
-// You can configure optional parameters by calling the respective setters at will, and
-// execute the final call using `doit()`.
-// Values shown here are possibly random and not representative !
-let result = hub.projects().indexes_documents_get("projectId", "indexId", "docId")
-             .doit();
-
-match result {
-    Err(e) => match e {
-        // The Error enum provides details about what exactly happened.
-        // You can also just use its `Debug`, `Display` or `Error` traits
-        Error::HttpError(_)
-        |Error::MissingAPIKey
-        |Error::MissingToken
-        |Error::Cancelled
-        |Error::UploadSizeLimitExceeded(_, _)
-        |Error::Failure(_)
-        |Error::FieldClash(_)
-        |Error::JsonDecodeError(_) => println!("{}", e),
-    },
-    Ok(res) => println!("Success: {:?}", res),
-}
 
 ```
+
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google_cloudsearch1/enum.Result.html) enumeration as return value of 

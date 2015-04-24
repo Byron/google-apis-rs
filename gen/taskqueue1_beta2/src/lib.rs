@@ -395,9 +395,9 @@ impl ResponseResult for Task {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tasks2 {
     /// The actual list of tasks currently active in the TaskQueue.
-    pub items: Vec<Task>,
+    pub items: Option<Vec<Task>>,
     /// The kind of object returned, a list of tasks.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Tasks2 {}
@@ -411,16 +411,16 @@ impl ResponseResult for Tasks2 {}
 pub struct TaskQueueStats {
     /// The timestamp (in seconds since the epoch) of the oldest unfinished task.
     #[serde(rename="oldestTask")]
-    pub oldest_task: String,
+    pub oldest_task: Option<String>,
     /// Number of tasks leased in the last minute.
     #[serde(rename="leasedLastMinute")]
-    pub leased_last_minute: String,
+    pub leased_last_minute: Option<String>,
     /// Number of tasks leased in the last hour.
     #[serde(rename="leasedLastHour")]
-    pub leased_last_hour: String,
+    pub leased_last_hour: Option<String>,
     /// Number of tasks in the queue.
     #[serde(rename="totalTasks")]
-    pub total_tasks: i32,
+    pub total_tasks: Option<i32>,
 }
 
 impl NestedType for TaskQueueStats {}
@@ -435,13 +435,13 @@ impl Part for TaskQueueStats {}
 pub struct TaskQueueAcl {
     /// Email addresses of users who can "consume" tasks from the TaskQueue. This means they can Dequeue and Delete tasks from the queue.
     #[serde(rename="consumerEmails")]
-    pub consumer_emails: Vec<String>,
+    pub consumer_emails: Option<Vec<String>>,
     /// Email addresses of users who can "produce" tasks into the TaskQueue. This means they can Insert tasks into the queue.
     #[serde(rename="producerEmails")]
-    pub producer_emails: Vec<String>,
+    pub producer_emails: Option<Vec<String>>,
     /// Email addresses of users who are "admins" of the TaskQueue. This means they can control the queue, eg set ACLs for the queue.
     #[serde(rename="adminEmails")]
-    pub admin_emails: Vec<String>,
+    pub admin_emails: Option<Vec<String>>,
 }
 
 impl NestedType for TaskQueueAcl {}
@@ -460,16 +460,16 @@ impl Part for TaskQueueAcl {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskQueue {
     /// The kind of REST object returned, in this case taskqueue.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Statistics for the TaskQueue object in question.
-    pub stats: TaskQueueStats,
+    pub stats: Option<TaskQueueStats>,
     /// Name of the taskqueue.
-    pub id: String,
+    pub id: Option<String>,
     /// The number of times we should lease out tasks before giving up on them. If unset we lease them out forever until a worker deletes the task.
     #[serde(rename="maxLeases")]
-    pub max_leases: i32,
+    pub max_leases: Option<i32>,
     /// ACLs that are applicable to this TaskQueue object.
-    pub acl: TaskQueueAcl,
+    pub acl: Option<TaskQueueAcl>,
 }
 
 impl Resource for TaskQueue {}
@@ -488,9 +488,9 @@ impl ResponseResult for TaskQueue {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tasks {
     /// The actual list of tasks returned as a result of the lease operation.
-    pub items: Vec<Task>,
+    pub items: Option<Vec<Task>>,
     /// The kind of object returned, a list of tasks.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Tasks {}
@@ -881,16 +881,20 @@ impl<'a, C, A> TaskqueueGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1144,16 +1148,20 @@ impl<'a, C, A> TaskLeaseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -1337,7 +1345,7 @@ impl<'a, C, A> TaskLeaseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Task = Default::default();
+/// let mut req = Task::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1431,16 +1439,20 @@ impl<'a, C, A> TaskInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1687,16 +1699,20 @@ impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -1846,7 +1862,7 @@ impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Task = Default::default();
+/// let mut req = Task::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1944,16 +1960,20 @@ impl<'a, C, A> TaskPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2217,16 +2237,20 @@ impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2461,16 +2485,20 @@ impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2630,7 +2658,7 @@ impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Task = Default::default();
+/// let mut req = Task::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2728,16 +2756,20 @@ impl<'a, C, A> TaskUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

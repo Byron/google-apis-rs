@@ -5,7 +5,7 @@
 //! This documentation was generated from *bigquery* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
-//! [official documentation site](https://developers.google.com/bigquery/docs/overview).
+//! [official documentation site](https://cloud.google.com/bigquery/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/bigquery2).
 //! # Features
 //! 
@@ -111,7 +111,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: Table = Default::default();
+//! let mut req = Table::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -306,7 +306,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Table = Default::default();
+/// let mut req = Table::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -389,9 +389,9 @@ impl<'a, C, A> Bigquery<C, A>
 pub struct TableDataInsertAllRequestRows {
     /// [Optional] A unique ID for each row. BigQuery uses this property to detect duplicate insertion requests on a best-effort basis.
     #[serde(rename="insertId")]
-    pub insert_id: String,
+    pub insert_id: Option<String>,
     /// [Required] A JSON object that contains a row of data. The object's properties and values must match the destination table's schema.
-    pub json: JsonObject,
+    pub json: Option<JsonObject>,
 }
 
 impl NestedType for TableDataInsertAllRequestRows {}
@@ -406,7 +406,7 @@ impl Part for TableDataInsertAllRequestRows {}
 pub struct JobStatistics4 {
     /// [Experimental] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.
     #[serde(rename="destinationUriFileCounts")]
-    pub destination_uri_file_counts: Vec<i64>,
+    pub destination_uri_file_counts: Option<Vec<i64>>,
 }
 
 impl Part for JobStatistics4 {}
@@ -458,10 +458,10 @@ impl RequestValue for QueryRequest {}
 pub struct JobStatistics2 {
     /// [Output-only] Whether the query result was fetched from the query cache.
     #[serde(rename="cacheHit")]
-    pub cache_hit: bool,
+    pub cache_hit: Option<bool>,
     /// [Output-only] Total bytes processed for this job.
     #[serde(rename="totalBytesProcessed")]
-    pub total_bytes_processed: String,
+    pub total_bytes_processed: Option<String>,
 }
 
 impl Part for JobStatistics2 {}
@@ -475,16 +475,16 @@ impl Part for JobStatistics2 {}
 pub struct JobStatistics3 {
     /// [Output-only] Number of rows imported in a load job. Note that while an import job is in the running state, this value may change.
     #[serde(rename="outputRows")]
-    pub output_rows: String,
+    pub output_rows: Option<String>,
     /// [Output-only] Number of source files in a load job.
     #[serde(rename="inputFiles")]
-    pub input_files: String,
+    pub input_files: Option<String>,
     /// [Output-only] Number of bytes of source data in a joad job.
     #[serde(rename="inputFileBytes")]
-    pub input_file_bytes: String,
+    pub input_file_bytes: Option<String>,
     /// [Output-only] Size of the loaded data in bytes. Note that while an import job is in the running state, this value may change.
     #[serde(rename="outputBytes")]
-    pub output_bytes: String,
+    pub output_bytes: Option<String>,
 }
 
 impl Part for JobStatistics3 {}
@@ -495,7 +495,7 @@ impl Part for JobStatistics3 {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
-pub struct JsonObject(HashMap<String, JsonValue>);
+pub struct JsonObject(Option<HashMap<String, JsonValue>>);
 
 impl Part for JsonObject {}
 
@@ -513,16 +513,16 @@ impl Part for JsonObject {}
 pub struct ProjectList {
     /// A token to request the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The total number of projects in the list.
     #[serde(rename="totalItems")]
-    pub total_items: i32,
+    pub total_items: Option<i32>,
     /// The type of list.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A hash of the page of results
-    pub etag: String,
+    pub etag: Option<String>,
     /// Projects to which you have at least READ access.
-    pub projects: Vec<ProjectListProjects>,
+    pub projects: Option<Vec<ProjectListProjects>>,
 }
 
 impl ResponseResult for ProjectList {}
@@ -535,16 +535,16 @@ impl ResponseResult for ProjectList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableFieldSchema {
     /// [Optional] Describes the nested schema fields if the type property is set to RECORD.
-    pub fields: Vec<TableFieldSchema>,
+    pub fields: Option<Vec<TableFieldSchema>>,
     /// [Optional] The field description. The maximum length is 16K characters.
-    pub description: String,
+    pub description: Option<String>,
     /// [Required] The field data type. Possible values include STRING, INTEGER, FLOAT, BOOLEAN, TIMESTAMP or RECORD (where RECORD indicates that the field contains a nested schema).
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// [Optional] The field mode. Possible values include NULLABLE, REQUIRED and REPEATED. The default value is NULLABLE.
-    pub mode: String,
+    pub mode: Option<String>,
     /// [Required] The field name. The name must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_), and must start with a letter or underscore. The maximum length is 128 characters.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for TableFieldSchema {}
@@ -608,9 +608,9 @@ impl ResponseResult for Dataset {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableDataInsertAllResponseInsertErrors {
     /// The index of the row that error applies to.
-    pub index: u32,
+    pub index: Option<u32>,
     /// Error information for the row indicated by the index property.
-    pub errors: Vec<ErrorProto>,
+    pub errors: Option<Vec<ErrorProto>>,
 }
 
 impl NestedType for TableDataInsertAllResponseInsertErrors {}
@@ -624,7 +624,7 @@ impl Part for TableDataInsertAllResponseInsertErrors {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableCell {
     /// no description provided
-    pub v: String,
+    pub v: Option<String>,
 }
 
 impl Part for TableCell {}
@@ -638,10 +638,10 @@ impl Part for TableCell {}
 pub struct JobReference {
     /// [Required] The ID of the project containing this job.
     #[serde(rename="projectId")]
-    pub project_id: String,
+    pub project_id: Option<String>,
     /// [Required] The ID of the job. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). The maximum length is 1,024 characters.
     #[serde(rename="jobId")]
-    pub job_id: String,
+    pub job_id: Option<String>,
 }
 
 impl Part for JobReference {}
@@ -655,14 +655,14 @@ impl Part for JobReference {}
 pub struct DatasetListDatasets {
     /// A descriptive name for the dataset, if one exists.
     #[serde(rename="friendlyName")]
-    pub friendly_name: String,
+    pub friendly_name: Option<String>,
     /// The resource type. This property always returns the value "bigquery#dataset".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The fully-qualified, unique, opaque ID of the dataset.
-    pub id: String,
+    pub id: Option<String>,
     /// The dataset reference. Use this property to access specific parts of the dataset's ID, such as project ID or dataset ID.
     #[serde(rename="datasetReference")]
-    pub dataset_reference: DatasetReference,
+    pub dataset_reference: Option<DatasetReference>,
 }
 
 impl NestedType for DatasetListDatasets {}
@@ -677,17 +677,17 @@ impl Part for DatasetListDatasets {}
 pub struct TableListTables {
     /// The user-friendly name for this table.
     #[serde(rename="friendlyName")]
-    pub friendly_name: String,
+    pub friendly_name: Option<String>,
     /// The resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The type of table. Possible values are: TABLE, VIEW.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// An opaque ID of the table
-    pub id: String,
+    pub id: Option<String>,
     /// A reference uniquely identifying the table.
     #[serde(rename="tableReference")]
-    pub table_reference: TableReference,
+    pub table_reference: Option<TableReference>,
 }
 
 impl NestedType for TableListTables {}
@@ -707,16 +707,16 @@ impl Part for TableListTables {}
 pub struct TableList {
     /// A token to request the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Tables in the requested dataset.
-    pub tables: Vec<TableListTables>,
+    pub tables: Option<Vec<TableListTables>>,
     /// The type of list.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A hash of this page of results.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The total number of tables in the dataset.
     #[serde(rename="totalItems")]
-    pub total_items: i32,
+    pub total_items: Option<i32>,
 }
 
 impl ResponseResult for TableList {}
@@ -730,7 +730,7 @@ impl ResponseResult for TableList {}
 pub struct ProjectReference {
     /// [Required] ID of the project. Can be either the numeric ID or the assigned ID of the project.
     #[serde(rename="projectId")]
-    pub project_id: String,
+    pub project_id: Option<String>,
 }
 
 impl Part for ProjectReference {}
@@ -749,16 +749,16 @@ impl Part for ProjectReference {}
 pub struct TableDataList {
     /// A token used for paging results. Providing this token instead of the startIndex parameter can help you retrieve stable results when an underlying table is changing.
     #[serde(rename="pageToken")]
-    pub page_token: String,
+    pub page_token: Option<String>,
     /// The resource type of the response.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A hash of this page of results.
-    pub etag: String,
+    pub etag: Option<String>,
     /// Rows of results.
-    pub rows: Vec<TableRow>,
+    pub rows: Option<Vec<TableRow>>,
     /// The total number of rows in the complete table.
     #[serde(rename="totalRows")]
-    pub total_rows: String,
+    pub total_rows: Option<String>,
 }
 
 impl ResponseResult for TableDataList {}
@@ -813,25 +813,25 @@ impl ResponseResult for Job {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobListJobs {
     /// [Full-projection-only] Describes the state of the job.
-    pub status: JobStatus,
+    pub status: Option<JobStatus>,
     /// The resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// [Output-only] Information about the job, including starting time and ending time of the job.
-    pub statistics: JobStatistics,
+    pub statistics: Option<JobStatistics>,
     /// Job reference uniquely identifying the job.
     #[serde(rename="jobReference")]
-    pub job_reference: JobReference,
+    pub job_reference: Option<JobReference>,
     /// Running state of the job. When the state is DONE, errorResult can be checked to determine whether the job succeeded or failed.
-    pub state: String,
+    pub state: Option<String>,
     /// A result object that will be present only if the job has failed.
     #[serde(rename="errorResult")]
-    pub error_result: ErrorProto,
+    pub error_result: Option<ErrorProto>,
     /// [Full-projection-only] Specifies the job configuration.
-    pub configuration: JobConfiguration,
+    pub configuration: Option<JobConfiguration>,
     /// Unique opaque ID of the job.
-    pub id: String,
+    pub id: Option<String>,
     /// [Full-projection-only] Email address of the user who ran the job.
-    pub user_email: String,
+    pub user_email: Option<String>,
 }
 
 impl NestedType for JobListJobs {}
@@ -845,53 +845,53 @@ impl Part for JobListJobs {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationLoad {
     /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
-    pub encoding: String,
+    pub encoding: Option<String>,
     /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
-    pub quote: String,
+    pub quote: Option<String>,
     /// [Required] The destination table to load the data into.
     #[serde(rename="destinationTable")]
-    pub destination_table: TableReference,
+    pub destination_table: Option<TableReference>,
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name.
     #[serde(rename="sourceUris")]
-    pub source_uris: Vec<String>,
+    pub source_uris: Option<Vec<String>>,
     /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
     #[serde(rename="allowQuotedNewlines")]
-    pub allow_quoted_newlines: bool,
-    /// [Experimental] Names(case-sensitive) of properties to keep when importing data. If this is populated, only the specified properties will be imported for each entity. Currently, this is only supported for DATASTORE_BACKUP imports and only top level properties are supported. If any specified property is not found in the Datastore 'Kind' being imported, that is an error. Note: This feature is experimental and can change in the future.
+    pub allow_quoted_newlines: Option<bool>,
+    /// [Experimental] If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
     #[serde(rename="projectionFields")]
-    pub projection_fields: Vec<String>,
+    pub projection_fields: Option<Vec<String>>,
     /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.
     #[serde(rename="allowJaggedRows")]
-    pub allow_jagged_rows: bool,
+    pub allow_jagged_rows: Option<bool>,
     /// [Optional] The separator for fields in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
     #[serde(rename="fieldDelimiter")]
-    pub field_delimiter: String,
+    pub field_delimiter: Option<String>,
     /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". The default value is CSV.
     #[serde(rename="sourceFormat")]
-    pub source_format: String,
+    pub source_format: Option<String>,
     /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.
     #[serde(rename="maxBadRecords")]
-    pub max_bad_records: i32,
+    pub max_bad_records: Option<i32>,
     /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names
     #[serde(rename="ignoreUnknownValues")]
-    pub ignore_unknown_values: bool,
+    pub ignore_unknown_values: Option<bool>,
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="writeDisposition")]
-    pub write_disposition: String,
+    pub write_disposition: Option<String>,
     /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
     #[serde(rename="skipLeadingRows")]
-    pub skip_leading_rows: i32,
+    pub skip_leading_rows: Option<i32>,
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="createDisposition")]
-    pub create_disposition: String,
+    pub create_disposition: Option<String>,
     /// [Deprecated] The format of the schemaInline property.
     #[serde(rename="schemaInlineFormat")]
-    pub schema_inline_format: String,
+    pub schema_inline_format: Option<String>,
     /// [Deprecated] The inline schema. For CSV schemas, specify as "Field1:Type1[,Field2:Type2]*". For example, "foo:STRING, bar:INTEGER, baz:FLOAT".
     #[serde(rename="schemaInline")]
-    pub schema_inline: String,
+    pub schema_inline: Option<String>,
     /// [Optional] The schema for the destination table. The schema can be omitted if the destination table already exists or if the schema can be inferred from the loaded data.
-    pub schema: TableSchema,
+    pub schema: Option<TableSchema>,
 }
 
 impl Part for JobConfigurationLoad {}
@@ -910,16 +910,16 @@ impl Part for JobConfigurationLoad {}
 pub struct JobList {
     /// A token to request the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Total number of jobs in this collection.
     #[serde(rename="totalItems")]
-    pub total_items: i32,
+    pub total_items: Option<i32>,
     /// The resource type of the response.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A hash of this page of results.
-    pub etag: String,
+    pub etag: Option<String>,
     /// List of jobs that were requested.
-    pub jobs: Vec<JobListJobs>,
+    pub jobs: Option<Vec<JobListJobs>>,
 }
 
 impl ResponseResult for JobList {}
@@ -933,24 +933,24 @@ impl ResponseResult for JobList {}
 pub struct JobConfigurationExtract {
     /// [Pick one] DEPRECATED: Use destinationUris instead, passing only one URI as necessary. The fully-qualified Google Cloud Storage URI where the extracted table should be written.
     #[serde(rename="destinationUri")]
-    pub destination_uri: String,
+    pub destination_uri: Option<String>,
     /// [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON and AVRO. The default value is CSV. Tables with nested or repeated fields cannot be exported as CSV.
     #[serde(rename="destinationFormat")]
-    pub destination_format: String,
+    pub destination_format: Option<String>,
     /// [Optional] The compression type to use for exported files. Possible values include GZIP and NONE. The default value is NONE.
-    pub compression: String,
+    pub compression: Option<String>,
     /// [Pick one] A list of fully-qualified Google Cloud Storage URIs where the extracted table should be written.
     #[serde(rename="destinationUris")]
-    pub destination_uris: Vec<String>,
+    pub destination_uris: Option<Vec<String>>,
     /// [Optional] Whether to print out a header row in the results. Default is true.
     #[serde(rename="printHeader")]
-    pub print_header: bool,
+    pub print_header: Option<bool>,
     /// [Optional] Delimiter to use between fields in the exported data. Default is ','
     #[serde(rename="fieldDelimiter")]
-    pub field_delimiter: String,
+    pub field_delimiter: Option<String>,
     /// [Required] A reference to the table being exported.
     #[serde(rename="sourceTable")]
-    pub source_table: TableReference,
+    pub source_table: Option<TableReference>,
 }
 
 impl Part for JobConfigurationExtract {}
@@ -968,31 +968,31 @@ impl Part for JobConfigurationExtract {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetQueryResultsResponse {
     /// The resource type of the response.
-    pub kind: String,
+    pub kind: Option<String>,
     /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above. Present only when the query completes successfully.
-    pub rows: Vec<TableRow>,
+    pub rows: Option<Vec<TableRow>>,
     /// Reference to the BigQuery Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).
     #[serde(rename="jobReference")]
-    pub job_reference: JobReference,
+    pub job_reference: Option<JobReference>,
     /// Whether the query result was fetched from the query cache.
     #[serde(rename="cacheHit")]
-    pub cache_hit: bool,
+    pub cache_hit: Option<bool>,
     /// Whether the query has completed or not. If rows or totalRows are present, this will always be true. If this is false, totalRows will not be available.
     #[serde(rename="jobComplete")]
-    pub job_complete: bool,
+    pub job_complete: Option<bool>,
     /// The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results. Present only when the query completes successfully.
     #[serde(rename="totalRows")]
-    pub total_rows: String,
+    pub total_rows: Option<String>,
     /// The total number of bytes processed for this query.
     #[serde(rename="totalBytesProcessed")]
-    pub total_bytes_processed: String,
+    pub total_bytes_processed: Option<String>,
     /// A token used for paging results.
     #[serde(rename="pageToken")]
-    pub page_token: String,
+    pub page_token: Option<String>,
     /// A hash of this response.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The schema of the results. Present only when the query completes successfully.
-    pub schema: TableSchema,
+    pub schema: Option<TableSchema>,
 }
 
 impl ResponseResult for GetQueryResultsResponse {}
@@ -1006,20 +1006,20 @@ impl ResponseResult for GetQueryResultsResponse {}
 pub struct CsvOptions {
     /// [Optional] Indicates if BigQuery should accept rows that are missing trailing optional columns. If true, BigQuery treats missing trailing columns as null values. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false.
     #[serde(rename="allowJaggedRows")]
-    pub allow_jagged_rows: bool,
+    pub allow_jagged_rows: Option<bool>,
     /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
     #[serde(rename="skipLeadingRows")]
-    pub skip_leading_rows: i32,
+    pub skip_leading_rows: Option<i32>,
     /// [Optional] The separator for fields in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
     #[serde(rename="fieldDelimiter")]
-    pub field_delimiter: String,
+    pub field_delimiter: Option<String>,
     /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
-    pub encoding: String,
+    pub encoding: Option<String>,
     /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
-    pub quote: String,
+    pub quote: Option<String>,
     /// [Optional] Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
     #[serde(rename="allowQuotedNewlines")]
-    pub allow_quoted_newlines: bool,
+    pub allow_quoted_newlines: Option<bool>,
 }
 
 impl Part for CsvOptions {}
@@ -1033,23 +1033,23 @@ impl Part for CsvOptions {}
 pub struct ExternalDataConfiguration {
     /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns
     #[serde(rename="ignoreUnknownValues")]
-    pub ignore_unknown_values: bool,
+    pub ignore_unknown_values: Option<bool>,
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. CSV limits related to load jobs apply to external data sources, plus an additional limit of 10 GB maximum size across all URIs.
     #[serde(rename="sourceUris")]
-    pub source_uris: Vec<String>,
+    pub source_uris: Option<Vec<String>>,
     /// [Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE.
-    pub compression: String,
+    pub compression: Option<String>,
     /// Additional properties to set if sourceFormat is set to CSV.
     #[serde(rename="csvOptions")]
-    pub csv_options: CsvOptions,
+    pub csv_options: Option<CsvOptions>,
     /// [Optional] The data format. External data sources must be in CSV format. The default value is CSV.
     #[serde(rename="sourceFormat")]
-    pub source_format: String,
+    pub source_format: Option<String>,
     /// [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.
     #[serde(rename="maxBadRecords")]
-    pub max_bad_records: i32,
+    pub max_bad_records: Option<i32>,
     /// [Required] The schema for the data.
-    pub schema: TableSchema,
+    pub schema: Option<TableSchema>,
 }
 
 impl Part for ExternalDataConfiguration {}
@@ -1063,13 +1063,13 @@ impl Part for ExternalDataConfiguration {}
 pub struct ErrorProto {
     /// Debugging information. This property is internal to Google and should not be used.
     #[serde(rename="debugInfo")]
-    pub debug_info: String,
+    pub debug_info: Option<String>,
     /// A human-readable description of the error.
-    pub message: String,
+    pub message: Option<String>,
     /// A short error code that summarizes the error.
-    pub reason: String,
+    pub reason: Option<String>,
     /// Specifies where the error occurred, if present.
-    pub location: String,
+    pub location: Option<String>,
 }
 
 impl Part for ErrorProto {}
@@ -1083,16 +1083,16 @@ impl Part for ErrorProto {}
 pub struct JobConfigurationLink {
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="createDisposition")]
-    pub create_disposition: String,
+    pub create_disposition: Option<String>,
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="writeDisposition")]
-    pub write_disposition: String,
+    pub write_disposition: Option<String>,
     /// [Required] The destination table of the link job.
     #[serde(rename="destinationTable")]
-    pub destination_table: TableReference,
+    pub destination_table: Option<TableReference>,
     /// [Required] URI of source table to link.
     #[serde(rename="sourceUri")]
-    pub source_uri: Vec<String>,
+    pub source_uri: Option<Vec<String>>,
 }
 
 impl Part for JobConfigurationLink {}
@@ -1105,7 +1105,7 @@ impl Part for JobConfigurationLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ViewDefinition {
     /// [Required] A query that BigQuery executes when the view is referenced.
-    pub query: String,
+    pub query: Option<String>,
 }
 
 impl Part for ViewDefinition {}
@@ -1118,20 +1118,20 @@ impl Part for ViewDefinition {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetAccess {
     /// [Pick one] A domain to grant access to. Any users signed in with the domain specified will be granted the specified access. Example: "example.com".
-    pub domain: String,
+    pub domain: Option<String>,
     /// [Required] Describes the rights granted to the user specified by the other member of the access object. The following string values are supported: READER, WRITER, OWNER.
-    pub role: String,
+    pub role: Option<String>,
     /// [Pick one] An email address of a user to grant access to. For example: fred@example.com.
     #[serde(rename="userByEmail")]
-    pub user_by_email: String,
+    pub user_by_email: Option<String>,
     /// [Pick one] A special group to grant access to. Possible values include: projectOwners: Owners of the enclosing project. projectReaders: Readers of the enclosing project. projectWriters: Writers of the enclosing project. allAuthenticatedUsers: All authenticated BigQuery users.
     #[serde(rename="specialGroup")]
-    pub special_group: String,
+    pub special_group: Option<String>,
     /// [Pick one] An email address of a Google Group to grant access to.
     #[serde(rename="groupByEmail")]
-    pub group_by_email: String,
+    pub group_by_email: Option<String>,
     /// [Pick one] A view from a different dataset to grant access to. Queries executed against that view will have read access to tables in this dataset. The role field is not required when this field is set. If that view is updated by any user, access to the view needs to be granted again via an update operation.
-    pub view: TableReference,
+    pub view: Option<TableReference>,
 }
 
 impl NestedType for DatasetAccess {}
@@ -1145,12 +1145,12 @@ impl Part for DatasetAccess {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatus {
     /// [Output-only] Running state of the job.
-    pub state: String,
+    pub state: Option<String>,
     /// [Output-only] All errors encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.
-    pub errors: Vec<ErrorProto>,
+    pub errors: Option<Vec<ErrorProto>>,
     /// [Output-only] Final error result of the job. If present, indicates that the job has completed and was unsuccessful.
     #[serde(rename="errorResult")]
-    pub error_result: ErrorProto,
+    pub error_result: Option<ErrorProto>,
 }
 
 impl Part for JobStatus {}
@@ -1163,7 +1163,7 @@ impl Part for JobStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableSchema {
     /// Describes the fields in a table.
-    pub fields: Vec<TableFieldSchema>,
+    pub fields: Option<Vec<TableFieldSchema>>,
 }
 
 impl Part for TableSchema {}
@@ -1226,13 +1226,13 @@ impl RequestValue for TableDataInsertAllRequest {}
 pub struct DatasetList {
     /// A token that can be used to request the next results page. This property is omitted on the final results page.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The list type. This property always returns the value "bigquery#datasetList".
-    pub kind: String,
+    pub kind: Option<String>,
     /// An array of the dataset resources in the project. Each resource contains basic information. For full information about a particular dataset resource, use the Datasets: get method. This property is omitted when there are no datasets in the project.
-    pub datasets: Vec<DatasetListDatasets>,
+    pub datasets: Option<Vec<DatasetListDatasets>>,
     /// A hash value of the results page. You can use this property to determine if the page has changed since the last request.
-    pub etag: String,
+    pub etag: Option<String>,
 }
 
 impl ResponseResult for DatasetList {}
@@ -1245,23 +1245,23 @@ impl ResponseResult for DatasetList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics {
     /// [Output-only] Statistics for a load job.
-    pub load: JobStatistics3,
+    pub load: Option<JobStatistics3>,
     /// [Output-only] Statistics for an extract job.
-    pub extract: JobStatistics4,
+    pub extract: Option<JobStatistics4>,
     /// [Output-only] Start time of this job, in milliseconds since the epoch. This field will be present when the job transitions from the PENDING state to either RUNNING or DONE.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
     /// [Output-only] Statistics for a query job.
-    pub query: JobStatistics2,
+    pub query: Option<JobStatistics2>,
     /// [Output-only] End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// [Output-only] Creation time of this job, in milliseconds since the epoch. This field will be present on all jobs.
     #[serde(rename="creationTime")]
-    pub creation_time: String,
+    pub creation_time: Option<String>,
     /// [Output-only] [Deprecated] Use the bytes processed in the query statistics instead.
     #[serde(rename="totalBytesProcessed")]
-    pub total_bytes_processed: String,
+    pub total_bytes_processed: Option<String>,
 }
 
 impl Part for JobStatistics {}
@@ -1273,37 +1273,37 @@ impl Part for JobStatistics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationQuery {
-    /// [Experimental] Flattens all nested and repeated fields in the query results. The default value is true. allowLargeResults must be true if this is set to false.
+    /// [Optional] Flattens all nested and repeated fields in the query results. The default value is true. allowLargeResults must be true if this is set to false.
     #[serde(rename="flattenResults")]
-    pub flatten_results: bool,
+    pub flatten_results: Option<bool>,
     /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. Moreover, the query cache is only available when a query does not have a destination table specified.
     #[serde(rename="useQueryCache")]
-    pub use_query_cache: bool,
+    pub use_query_cache: Option<bool>,
     /// [Optional] Specifies the default dataset to use for unqualified table names in the query.
     #[serde(rename="defaultDataset")]
-    pub default_dataset: DatasetReference,
+    pub default_dataset: Option<DatasetReference>,
     /// [Optional] Describes the table where the query results should be stored. If not present, a new table will be created to store the results.
     #[serde(rename="destinationTable")]
-    pub destination_table: TableReference,
+    pub destination_table: Option<TableReference>,
     /// [Optional] Specifies a priority for the query. Possible values include INTERACTIVE and BATCH. The default value is INTERACTIVE.
-    pub priority: String,
+    pub priority: Option<String>,
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="writeDisposition")]
-    pub write_disposition: String,
+    pub write_disposition: Option<String>,
     /// If true, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set.
     #[serde(rename="allowLargeResults")]
-    pub allow_large_results: bool,
+    pub allow_large_results: Option<bool>,
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="createDisposition")]
-    pub create_disposition: String,
+    pub create_disposition: Option<String>,
     /// [Required] BigQuery SQL query to execute.
-    pub query: String,
+    pub query: Option<String>,
     /// [Deprecated] This property is deprecated.
     #[serde(rename="preserveNulls")]
-    pub preserve_nulls: bool,
+    pub preserve_nulls: Option<bool>,
     /// [Experimental] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
     #[serde(rename="tableDefinitions")]
-    pub table_definitions: HashMap<String, ExternalDataConfiguration>,
+    pub table_definitions: Option<HashMap<String, ExternalDataConfiguration>>,
 }
 
 impl Part for JobConfigurationQuery {}
@@ -1317,10 +1317,10 @@ impl Part for JobConfigurationQuery {}
 pub struct DatasetReference {
     /// [Optional] The ID of the project containing this dataset.
     #[serde(rename="projectId")]
-    pub project_id: String,
+    pub project_id: Option<String>,
     /// [Required] A unique ID for this dataset, without the project name. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
     #[serde(rename="datasetId")]
-    pub dataset_id: String,
+    pub dataset_id: Option<String>,
 }
 
 impl Part for DatasetReference {}
@@ -1333,7 +1333,7 @@ impl Part for DatasetReference {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableRow {
     /// no description provided
-    pub f: Vec<TableCell>,
+    pub f: Option<Vec<TableCell>>,
 }
 
 impl Part for TableRow {}
@@ -1346,18 +1346,18 @@ impl Part for TableRow {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfiguration {
     /// [Pick one] Configures a load job.
-    pub load: JobConfigurationLoad,
+    pub load: Option<JobConfigurationLoad>,
     /// [Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run. Behavior of non-query jobs is undefined.
     #[serde(rename="dryRun")]
-    pub dry_run: bool,
+    pub dry_run: Option<bool>,
     /// [Pick one] Configures a query job.
-    pub query: JobConfigurationQuery,
+    pub query: Option<JobConfigurationQuery>,
     /// [Pick one] Configures a link job.
-    pub link: JobConfigurationLink,
+    pub link: Option<JobConfigurationLink>,
     /// [Pick one] Copies a table.
-    pub copy: JobConfigurationTableCopy,
+    pub copy: Option<JobConfigurationTableCopy>,
     /// [Pick one] Configures an extract job.
-    pub extract: JobConfigurationExtract,
+    pub extract: Option<JobConfigurationExtract>,
 }
 
 impl Part for JobConfiguration {}
@@ -1371,17 +1371,17 @@ impl Part for JobConfiguration {}
 pub struct ProjectListProjects {
     /// A descriptive name for this project.
     #[serde(rename="friendlyName")]
-    pub friendly_name: String,
+    pub friendly_name: Option<String>,
     /// The resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The numeric ID of this project.
     #[serde(rename="numericId")]
-    pub numeric_id: String,
+    pub numeric_id: Option<String>,
     /// An opaque ID of this project.
-    pub id: String,
+    pub id: Option<String>,
     /// A unique reference to this project.
     #[serde(rename="projectReference")]
-    pub project_reference: ProjectReference,
+    pub project_reference: Option<ProjectReference>,
 }
 
 impl NestedType for ProjectListProjects {}
@@ -1396,13 +1396,13 @@ impl Part for ProjectListProjects {}
 pub struct TableReference {
     /// [Required] The ID of the project containing this table.
     #[serde(rename="projectId")]
-    pub project_id: String,
+    pub project_id: Option<String>,
     /// [Required] The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
     #[serde(rename="tableId")]
-    pub table_id: String,
+    pub table_id: Option<String>,
     /// [Required] The ID of the dataset containing this table.
     #[serde(rename="datasetId")]
-    pub dataset_id: String,
+    pub dataset_id: Option<String>,
 }
 
 impl Part for TableReference {}
@@ -1482,10 +1482,10 @@ impl ResponseResult for Table {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableDataInsertAllResponse {
     /// The resource type of the response.
-    pub kind: String,
+    pub kind: Option<String>,
     /// An array of errors for rows that were not inserted.
     #[serde(rename="insertErrors")]
-    pub insert_errors: Vec<TableDataInsertAllResponseInsertErrors>,
+    pub insert_errors: Option<Vec<TableDataInsertAllResponseInsertErrors>>,
 }
 
 impl ResponseResult for TableDataInsertAllResponse {}
@@ -1503,29 +1503,29 @@ impl ResponseResult for TableDataInsertAllResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryResponse {
     /// The resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above.
-    pub rows: Vec<TableRow>,
+    pub rows: Option<Vec<TableRow>>,
     /// Reference to the Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).
     #[serde(rename="jobReference")]
-    pub job_reference: JobReference,
+    pub job_reference: Option<JobReference>,
     /// Whether the query result was fetched from the query cache.
     #[serde(rename="cacheHit")]
-    pub cache_hit: bool,
+    pub cache_hit: Option<bool>,
     /// Whether the query has completed or not. If rows or totalRows are present, this will always be true. If this is false, totalRows will not be available.
     #[serde(rename="jobComplete")]
-    pub job_complete: bool,
+    pub job_complete: Option<bool>,
     /// The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results.
     #[serde(rename="totalRows")]
-    pub total_rows: String,
+    pub total_rows: Option<String>,
     /// The total number of bytes processed for this query. If this query was a dry run, this is the number of bytes that would be processed if the query were run.
     #[serde(rename="totalBytesProcessed")]
-    pub total_bytes_processed: String,
+    pub total_bytes_processed: Option<String>,
     /// A token used for paging results.
     #[serde(rename="pageToken")]
-    pub page_token: String,
+    pub page_token: Option<String>,
     /// The schema of the results. Present only when the query completes successfully.
-    pub schema: TableSchema,
+    pub schema: Option<TableSchema>,
 }
 
 impl ResponseResult for QueryResponse {}
@@ -1539,19 +1539,19 @@ impl ResponseResult for QueryResponse {}
 pub struct JobConfigurationTableCopy {
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="createDisposition")]
-    pub create_disposition: String,
+    pub create_disposition: Option<String>,
     /// [Pick one] Source tables to copy.
     #[serde(rename="sourceTables")]
-    pub source_tables: Vec<TableReference>,
+    pub source_tables: Option<Vec<TableReference>>,
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="writeDisposition")]
-    pub write_disposition: String,
+    pub write_disposition: Option<String>,
     /// [Required] The destination table
     #[serde(rename="destinationTable")]
-    pub destination_table: TableReference,
+    pub destination_table: Option<TableReference>,
     /// [Pick one] Source table to copy.
     #[serde(rename="sourceTable")]
-    pub source_table: TableReference,
+    pub source_table: Option<TableReference>,
 }
 
 impl Part for JobConfigurationTableCopy {}
@@ -1646,7 +1646,7 @@ impl<'a, C, A> TableMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all tables in the specified dataset.
+    /// Lists all tables in the specified dataset. Requires the READER dataset role.
     /// 
     /// # Arguments
     ///
@@ -1813,7 +1813,7 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the datasets in the specified project to which the caller has read access; however, a project owner can list (but not necessarily get) all datasets in his project.
+    /// Lists all datasets in the specified project to which you have been granted the READER dataset role.
     /// 
     /// # Arguments
     ///
@@ -1976,7 +1976,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the Jobs in the specified project that were started by the user. The job list returns in reverse chronological order of when the jobs were created, starting with the most recent job created.
+    /// Lists all jobs that you started in the specified project. The job list returns in reverse chronological order of when the jobs were created, starting with the most recent job created. Requires the Can View project role, or the Is Owner project role if you set the allUsers property.
     /// 
     /// # Arguments
     ///
@@ -1998,7 +1998,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the specified job by ID.
+    /// Returns information about a specific job. Job information is available for a six month period after creation. Requires that you're the person who ran the job, or have the Is Owner project role.
     /// 
     /// # Arguments
     ///
@@ -2017,7 +2017,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts a new asynchronous job.
+    /// Starts a new asynchronous job. Requires the Can View project role.
     /// 
     /// # Arguments
     ///
@@ -2077,7 +2077,7 @@ impl<'a, C, A> TabledataMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Streams data into BigQuery one record at a time without needing to run a load job.
+    /// Streams data into BigQuery one record at a time without needing to run a load job. Requires the WRITER dataset role.
     /// 
     /// # Arguments
     ///
@@ -2100,7 +2100,7 @@ impl<'a, C, A> TabledataMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves table data from a specified set of rows.
+    /// Retrieves table data from a specified set of rows. Requires the READER dataset role.
     /// 
     /// # Arguments
     ///
@@ -2165,7 +2165,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the projects to which you have at least read access.
+    /// Lists all projects to which you have been granted any project role.
     pub fn list(&self) -> ProjectListCall<'a, C, A> {
         ProjectListCall {
             hub: self.hub,
@@ -2213,7 +2213,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Table = Default::default();
+/// let mut req = Table::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2309,16 +2309,20 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2491,7 +2495,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Table = Default::default();
+/// let mut req = Table::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2585,16 +2589,20 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2730,7 +2738,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Lists all tables in the specified dataset.
+/// Lists all tables in the specified dataset. Requires the READER dataset role.
 ///
 /// A builder for the *list* method supported by a *table* resource.
 /// It is not used directly, but through a `TableMethods` instance.
@@ -2850,16 +2858,20 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3107,16 +3119,20 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -3351,16 +3367,20 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3520,7 +3540,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Table = Default::default();
+/// let mut req = Table::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3616,16 +3636,20 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3798,7 +3822,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Dataset = Default::default();
+/// let mut req = Dataset::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3892,16 +3916,20 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4147,16 +4175,20 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4279,7 +4311,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Lists all the datasets in the specified project to which the caller has read access; however, a project owner can list (but not necessarily get) all datasets in his project.
+/// Lists all datasets in the specified project to which you have been granted the READER dataset role.
 ///
 /// A builder for the *list* method supported by a *dataset* resource.
 /// It is not used directly, but through a `DatasetMethods` instance.
@@ -4402,16 +4434,20 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4572,7 +4608,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Dataset = Default::default();
+/// let mut req = Dataset::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -4666,16 +4702,20 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4925,16 +4965,20 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -5081,7 +5125,7 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Dataset = Default::default();
+/// let mut req = Dataset::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -5173,16 +5217,20 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -5335,7 +5383,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: QueryRequest = Default::default();
+/// let mut req = QueryRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -5427,16 +5475,20 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -5692,16 +5744,20 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5852,7 +5908,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Lists all the Jobs in the specified project that were started by the user. The job list returns in reverse chronological order of when the jobs were created, starting with the most recent job created.
+/// Lists all jobs that you started in the specified project. The job list returns in reverse chronological order of when the jobs were created, starting with the most recent job created. Requires the Can View project role, or the Is Owner project role if you set the allUsers property.
 ///
 /// A builder for the *list* method supported by a *job* resource.
 /// It is not used directly, but through a `JobMethods` instance.
@@ -5989,16 +6045,20 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6147,7 +6207,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Retrieves the specified job by ID.
+/// Returns information about a specific job. Job information is available for a six month period after creation. Requires that you're the person who ran the job, or have the Is Owner project role.
 ///
 /// A builder for the *get* method supported by a *job* resource.
 /// It is not used directly, but through a `JobMethods` instance.
@@ -6257,16 +6317,20 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6389,7 +6453,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 }
 
 
-/// Starts a new asynchronous job.
+/// Starts a new asynchronous job. Requires the Can View project role.
 ///
 /// A builder for the *insert* method supported by a *job* resource.
 /// It is not used directly, but through a `JobMethods` instance.
@@ -6417,7 +6481,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Job = Default::default();
+/// let mut req = Job::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
@@ -6520,16 +6584,20 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         let mut upload_url: Option<String> = None;
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
@@ -6754,7 +6822,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Streams data into BigQuery one record at a time without needing to run a load job.
+/// Streams data into BigQuery one record at a time without needing to run a load job. Requires the WRITER dataset role.
 ///
 /// A builder for the *insertAll* method supported by a *tabledata* resource.
 /// It is not used directly, but through a `TabledataMethods` instance.
@@ -6781,7 +6849,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: TableDataInsertAllRequest = Default::default();
+/// let mut req = TableDataInsertAllRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6877,16 +6945,20 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7032,7 +7104,7 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Retrieves table data from a specified set of rows.
+/// Retrieves table data from a specified set of rows. Requires the READER dataset role.
 ///
 /// A builder for the *list* method supported by a *tabledata* resource.
 /// It is not used directly, but through a `TabledataMethods` instance.
@@ -7159,16 +7231,20 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7322,7 +7398,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Lists the projects to which you have at least read access.
+/// Lists all projects to which you have been granted any project role.
 ///
 /// A builder for the *list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7414,16 +7490,20 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

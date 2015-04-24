@@ -330,17 +330,17 @@ impl<'a, C, A> Urlshortener<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyticsSummary {
     /// Click analytics over the last week.
-    pub week: AnalyticsSnapshot,
+    pub week: Option<AnalyticsSnapshot>,
     /// Click analytics over all time.
     #[serde(rename="allTime")]
-    pub all_time: AnalyticsSnapshot,
+    pub all_time: Option<AnalyticsSnapshot>,
     /// Click analytics over the last two hours.
     #[serde(rename="twoHours")]
-    pub two_hours: AnalyticsSnapshot,
+    pub two_hours: Option<AnalyticsSnapshot>,
     /// Click analytics over the last day.
-    pub day: AnalyticsSnapshot,
+    pub day: Option<AnalyticsSnapshot>,
     /// Click analytics over the last month.
-    pub month: AnalyticsSnapshot,
+    pub month: Option<AnalyticsSnapshot>,
 }
 
 impl Part for AnalyticsSummary {}
@@ -390,17 +390,17 @@ impl ResponseResult for Url {}
 pub struct UrlHistory {
     /// A token to provide to get the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of URL resources.
-    pub items: Vec<Url>,
+    pub items: Option<Vec<Url>>,
     /// The fixed string "urlshortener#urlHistory".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Number of items returned with each full "page" of results. Note that the last page could have fewer items than the "itemsPerPage" value.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Total number of short URLs associated with this user (may be approximate).
     #[serde(rename="totalItems")]
-    pub total_items: i32,
+    pub total_items: Option<i32>,
 }
 
 impl ResponseResult for UrlHistory {}
@@ -414,18 +414,18 @@ impl ResponseResult for UrlHistory {}
 pub struct AnalyticsSnapshot {
     /// Number of clicks on this short URL.
     #[serde(rename="shortUrlClicks")]
-    pub short_url_clicks: String,
+    pub short_url_clicks: Option<String>,
     /// Top platforms or OSes, e.g. "Windows"; sorted by (descending) click counts. Only present if this data is available.
-    pub platforms: Vec<StringCount>,
+    pub platforms: Option<Vec<StringCount>>,
     /// Top browsers, e.g. "Chrome"; sorted by (descending) click counts. Only present if this data is available.
-    pub browsers: Vec<StringCount>,
+    pub browsers: Option<Vec<StringCount>>,
     /// Top countries (expressed as country codes), e.g. "US" or "DE"; sorted by (descending) click counts. Only present if this data is available.
-    pub countries: Vec<StringCount>,
+    pub countries: Option<Vec<StringCount>>,
     /// Top referring hosts, e.g. "www.google.com"; sorted by (descending) click counts. Only present if this data is available.
-    pub referrers: Vec<StringCount>,
+    pub referrers: Option<Vec<StringCount>>,
     /// Number of clicks on all goo.gl short URLs pointing to this long URL.
     #[serde(rename="longUrlClicks")]
-    pub long_url_clicks: String,
+    pub long_url_clicks: Option<String>,
 }
 
 impl Part for AnalyticsSnapshot {}
@@ -438,9 +438,9 @@ impl Part for AnalyticsSnapshot {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StringCount {
     /// Number of clicks for this top entry, e.g. for this particular country or browser.
-    pub count: String,
+    pub count: Option<String>,
     /// Label assigned to this top entry, e.g. "US" or "Chrome".
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for StringCount {}
@@ -574,7 +574,7 @@ impl<'a, C, A> UrlMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Url = Default::default();
+/// let mut req = Url::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -640,16 +640,20 @@ impl<'a, C, A> UrlInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -854,16 +858,20 @@ impl<'a, C, A> UrlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1075,16 +1083,20 @@ impl<'a, C, A> UrlListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

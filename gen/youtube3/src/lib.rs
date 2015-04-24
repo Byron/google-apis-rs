@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *0.1.5+20150327*, where *20150327* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *YouTube* crate version *0.1.5+20150414*, where *20150414* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
@@ -21,6 +21,10 @@
 //!  * [*delete*](struct.ChannelSectionDeleteCall.html), [*insert*](struct.ChannelSectionInsertCall.html), [*list*](struct.ChannelSectionListCall.html) and [*update*](struct.ChannelSectionUpdateCall.html)
 //! * [channels](struct.Channel.html)
 //!  * [*list*](struct.ChannelListCall.html) and [*update*](struct.ChannelUpdateCall.html)
+//! * [comment threads](struct.CommentThread.html)
+//!  * [*insert*](struct.CommentThreadInsertCall.html), [*list*](struct.CommentThreadListCall.html) and [*update*](struct.CommentThreadUpdateCall.html)
+//! * [comments](struct.Comment.html)
+//!  * [*delete*](struct.CommentDeleteCall.html), [*insert*](struct.CommentInsertCall.html), [*list*](struct.CommentListCall.html), [*mark as spam*](struct.CommentMarkAsSpamCall.html), [*set moderation status*](struct.CommentSetModerationStatuCall.html) and [*update*](struct.CommentUpdateCall.html)
 //! * [guide categories](struct.GuideCategory.html)
 //!  * [*list*](struct.GuideCategoryListCall.html)
 //! * [i18n languages](struct.I18nLanguage.html)
@@ -41,10 +45,12 @@
 //!  * [*delete*](struct.SubscriptionDeleteCall.html), [*insert*](struct.SubscriptionInsertCall.html) and [*list*](struct.SubscriptionListCall.html)
 //! * [thumbnails](struct.Thumbnail.html)
 //!  * [*set*](struct.ThumbnailSetCall.html)
+//! * [video abuse report reasons](struct.VideoAbuseReportReason.html)
+//!  * [*list*](struct.VideoAbuseReportReasonListCall.html)
 //! * [video categories](struct.VideoCategory.html)
 //!  * [*list*](struct.VideoCategoryListCall.html)
 //! * [videos](struct.Video.html)
-//!  * [*delete*](struct.VideoDeleteCall.html), [*get rating*](struct.VideoGetRatingCall.html), [*insert*](struct.VideoInsertCall.html), [*list*](struct.VideoListCall.html), [*rate*](struct.VideoRateCall.html) and [*update*](struct.VideoUpdateCall.html)
+//!  * [*delete*](struct.VideoDeleteCall.html), [*get rating*](struct.VideoGetRatingCall.html), [*insert*](struct.VideoInsertCall.html), [*list*](struct.VideoListCall.html), [*rate*](struct.VideoRateCall.html), [*report abuse*](struct.VideoReportAbuseCall.html) and [*update*](struct.VideoUpdateCall.html)
 //! * watermarks
 //!  * [*set*](struct.WatermarkSetCall.html) and [*unset*](struct.WatermarkUnsetCall.html)
 //! 
@@ -98,13 +104,13 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.live_broadcasts().control(...).doit()
-//! let r = hub.live_broadcasts().insert(...).doit()
-//! let r = hub.live_broadcasts().list(...).doit()
-//! let r = hub.live_broadcasts().transition(...).doit()
-//! let r = hub.live_broadcasts().update(...).doit()
-//! let r = hub.live_broadcasts().delete(...).doit()
-//! let r = hub.live_broadcasts().bind(...).doit()
+//! let r = hub.videos().rate(...).doit()
+//! let r = hub.videos().report_abuse(...).doit()
+//! let r = hub.videos().get_rating(...).doit()
+//! let r = hub.videos().list(...).doit()
+//! let r = hub.videos().insert(...).doit()
+//! let r = hub.videos().update(...).doit()
+//! let r = hub.videos().delete(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -150,14 +156,17 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.live_broadcasts().list("part")
-//!              .page_token("justo")
-//!              .on_behalf_of_content_owner_channel("amet.")
-//!              .on_behalf_of_content_owner("erat")
-//!              .mine(true)
-//!              .max_results(92)
-//!              .id("nonumy")
-//!              .broadcast_status("dolores")
+//! let result = hub.videos().list("part")
+//!              .video_category_id("labore")
+//!              .region_code("sea")
+//!              .page_token("nonumy")
+//!              .on_behalf_of_content_owner("dolores")
+//!              .my_rating("gubergren")
+//!              .max_results(6)
+//!              .locale("aliquyam")
+//!              .id("ea")
+//!              .hl("no")
+//!              .chart("justo")
 //!              .doit();
 //! 
 //! match result {
@@ -346,14 +355,17 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().list("part")
-///              .page_token("sadipscing")
-///              .on_behalf_of_content_owner_channel("aliquyam")
-///              .on_behalf_of_content_owner("ea")
-///              .mine(false)
+/// let result = hub.videos().list("part")
+///              .video_category_id("et")
+///              .region_code("et")
+///              .page_token("diam")
+///              .on_behalf_of_content_owner("ipsum")
+///              .my_rating("Lorem")
 ///              .max_results(80)
-///              .id("justo")
-///              .broadcast_status("et")
+///              .locale("duo")
+///              .id("aliquyam")
+///              .hl("sea")
+///              .chart("Lorem")
 ///              .doit();
 /// 
 /// match result {
@@ -407,6 +419,12 @@ impl<'a, C, A> YouTube<C, A>
     pub fn channels(&'a self) -> ChannelMethods<'a, C, A> {
         ChannelMethods { hub: &self }
     }
+    pub fn comment_threads(&'a self) -> CommentThreadMethods<'a, C, A> {
+        CommentThreadMethods { hub: &self }
+    }
+    pub fn comments(&'a self) -> CommentMethods<'a, C, A> {
+        CommentMethods { hub: &self }
+    }
     pub fn guide_categories(&'a self) -> GuideCategoryMethods<'a, C, A> {
         GuideCategoryMethods { hub: &self }
     }
@@ -436,6 +454,9 @@ impl<'a, C, A> YouTube<C, A>
     }
     pub fn thumbnails(&'a self) -> ThumbnailMethods<'a, C, A> {
         ThumbnailMethods { hub: &self }
+    }
+    pub fn video_abuse_report_reasons(&'a self) -> VideoAbuseReportReasonMethods<'a, C, A> {
+        VideoAbuseReportReasonMethods { hub: &self }
     }
     pub fn video_categories(&'a self) -> VideoCategoryMethods<'a, C, A> {
         VideoCategoryMethods { hub: &self }
@@ -475,32 +496,51 @@ impl<'a, C, A> YouTube<C, A>
 pub struct SubscriptionListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#subscriptionListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of subscriptions that match the request criteria.
-    pub items: Vec<Subscription>,
+    pub items: Option<Vec<Subscription>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for SubscriptionListResponse {}
 
+impl ToParts for SubscriptionListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Basic details about a playlist, including title, description and thumbnails.
 /// 
@@ -509,27 +549,27 @@ impl ResponseResult for SubscriptionListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistSnippet {
     /// The playlist's description.
-    pub description: String,
+    pub description: Option<String>,
     /// The playlist's title.
-    pub title: String,
+    pub title: Option<String>,
     /// The ID that YouTube uses to uniquely identify the channel that published the playlist.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The date and time that the playlist was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishedAt")]
-    pub published_at: String,
+    pub published_at: Option<String>,
     /// Keyword tags associated with the playlist.
-    pub tags: Vec<String>,
+    pub tags: Option<Vec<String>>,
     /// The channel title of the channel that the video belongs to.
     #[serde(rename="channelTitle")]
-    pub channel_title: String,
+    pub channel_title: Option<String>,
     /// The language of the playlist's default title and description.
     #[serde(rename="defaultLanguage")]
-    pub default_language: String,
+    pub default_language: Option<String>,
     /// Localized title and description, read-only.
-    pub localized: PlaylistLocalization,
+    pub localized: Option<PlaylistLocalization>,
     /// A map of thumbnail images associated with the playlist. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-    pub thumbnails: ThumbnailDetails,
+    pub thumbnails: Option<ThumbnailDetails>,
 }
 
 impl Part for PlaylistSnippet {}
@@ -543,16 +583,16 @@ impl Part for PlaylistSnippet {}
 pub struct ChannelAuditDetails {
     /// Whether or not the channel has any copyright strikes.
     #[serde(rename="copyrightStrikesGoodStanding")]
-    pub copyright_strikes_good_standing: bool,
+    pub copyright_strikes_good_standing: Option<bool>,
     /// Whether or not the channel respects the community guidelines.
     #[serde(rename="communityGuidelinesGoodStanding")]
-    pub community_guidelines_good_standing: bool,
+    pub community_guidelines_good_standing: Option<bool>,
     /// Whether or not the channel has any unresolved claims.
     #[serde(rename="contentIdClaimsGoodStanding")]
-    pub content_id_claims_good_standing: bool,
+    pub content_id_claims_good_standing: Option<bool>,
     /// Describes the general state of the channel. This field will always show if there are any issues whatsoever with the channel. Currently this field represents the result of the logical and operation over the community guidelines good standing, the copyright strikes good standing and the content ID claims good standing, but this may change in the future.
     #[serde(rename="overallGoodStanding")]
-    pub overall_good_standing: bool,
+    pub overall_good_standing: Option<bool>,
 }
 
 impl Part for ChannelAuditDetails {}
@@ -571,16 +611,16 @@ impl Part for ChannelAuditDetails {}
 pub struct ThumbnailSetResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// A list of thumbnails.
-    pub items: Vec<ThumbnailDetails>,
+    pub items: Option<Vec<ThumbnailDetails>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#thumbnailSetResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for ThumbnailSetResponse {}
@@ -593,41 +633,43 @@ impl ResponseResult for ThumbnailSetResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSettings {
     /// Specifies the channel description.
-    pub description: String,
+    pub description: Option<String>,
     /// Specifies the channel title.
-    pub title: String,
-    /// Whether user-submitted comments left on the channel page need to be approved by the channel owner to be publicly visible.
-    #[serde(rename="moderateComments")]
-    pub moderate_comments: bool,
+    pub title: Option<String>,
+    /// The country of the channel.
+    pub country: Option<String>,
     /// Whether the tab to browse the videos should be displayed.
     #[serde(rename="showBrowseView")]
-    pub show_browse_view: bool,
+    pub show_browse_view: Option<bool>,
     /// Title for the featured channels tab.
     #[serde(rename="featuredChannelsTitle")]
-    pub featured_channels_title: String,
+    pub featured_channels_title: Option<String>,
     /// no description provided
     #[serde(rename="defaultLanguage")]
-    pub default_language: String,
+    pub default_language: Option<String>,
     /// The trailer of the channel, for users that are not subscribers.
     #[serde(rename="unsubscribedTrailer")]
-    pub unsubscribed_trailer: String,
+    pub unsubscribed_trailer: Option<String>,
     /// The list of featured channels.
     #[serde(rename="featuredChannelsUrls")]
-    pub featured_channels_urls: Vec<String>,
+    pub featured_channels_urls: Option<Vec<String>>,
     /// A prominent color that can be rendered on this channel page.
     #[serde(rename="profileColor")]
-    pub profile_color: String,
+    pub profile_color: Option<String>,
     /// Which content tab users should see when viewing the channel.
     #[serde(rename="defaultTab")]
-    pub default_tab: String,
+    pub default_tab: Option<String>,
+    /// Whether user-submitted comments left on the channel page need to be approved by the channel owner to be publicly visible.
+    #[serde(rename="moderateComments")]
+    pub moderate_comments: Option<bool>,
     /// Lists keywords associated with the channel, comma-separated.
-    pub keywords: String,
+    pub keywords: Option<String>,
     /// Whether related channels should be proposed.
     #[serde(rename="showRelatedChannels")]
-    pub show_related_channels: bool,
+    pub show_related_channels: Option<bool>,
     /// The ID for a Google Analytics account to track and measure traffic to the channels.
     #[serde(rename="trackingAnalyticsAccountId")]
-    pub tracking_analytics_account_id: String,
+    pub tracking_analytics_account_id: Option<String>,
 }
 
 impl Part for ChannelSettings {}
@@ -640,13 +682,13 @@ impl Part for ChannelSettings {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CdnSettings {
     /// The format of the video stream that you are sending to Youtube.
-    pub format: String,
+    pub format: Option<String>,
     /// The ingestionInfo object contains information that YouTube provides that you need to transmit your RTMP or HTTP stream to YouTube.
     #[serde(rename="ingestionInfo")]
-    pub ingestion_info: IngestionInfo,
+    pub ingestion_info: Option<IngestionInfo>,
     /// The method or protocol used to transmit the video stream.
     #[serde(rename="ingestionType")]
-    pub ingestion_type: String,
+    pub ingestion_type: Option<String>,
 }
 
 impl Part for CdnSettings {}
@@ -665,20 +707,63 @@ impl Part for CdnSettings {}
 pub struct VideoGetRatingResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// A list of ratings that match the request criteria.
-    pub items: Vec<VideoRating>,
+    pub items: Option<Vec<VideoRating>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoGetRatingResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for VideoGetRatingResponse {}
 
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list video abuse report reasons](struct.VideoAbuseReportReasonListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VideoAbuseReportReasonListResponse {
+    /// Serialized EventId of the request which produced this response.
+    #[serde(rename="eventId")]
+    pub event_id: Option<String>,
+    /// A list of valid abuse reasons that are used with video.ReportAbuse.
+    pub items: Option<Vec<VideoAbuseReportReason>>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoAbuseReportReasonListResponse".
+    pub kind: Option<String>,
+    /// Etag of this resource.
+    pub etag: Option<String>,
+    /// The visitorId identifies the visitor.
+    #[serde(rename="visitorId")]
+    pub visitor_id: Option<String>,
+}
+
+impl ResponseResult for VideoAbuseReportReasonListResponse {}
+
+impl ToParts for VideoAbuseReportReasonListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about a resource which was added to a channel.
 /// 
@@ -688,7 +773,7 @@ impl ResponseResult for VideoGetRatingResponse {}
 pub struct ActivityContentDetailsChannelItem {
     /// The resourceId object contains information that identifies the resource that was added to the channel.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsChannelItem {}
@@ -701,9 +786,9 @@ impl Part for ActivityContentDetailsChannelItem {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct I18nLanguageSnippet {
     /// The human-readable name of the language in the language itself.
-    pub name: String,
+    pub name: Option<String>,
     /// A short BCP-47 code that uniquely identifies a language.
-    pub hl: String,
+    pub hl: Option<String>,
 }
 
 impl Part for I18nLanguageSnippet {}
@@ -716,10 +801,10 @@ impl Part for I18nLanguageSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoRating {
     /// no description provided
-    pub rating: String,
+    pub rating: Option<String>,
     /// no description provided
     #[serde(rename="videoId")]
-    pub video_id: String,
+    pub video_id: Option<String>,
 }
 
 impl Part for VideoRating {}
@@ -738,20 +823,35 @@ impl Part for VideoRating {}
 pub struct I18nRegionListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// A list of regions where YouTube is available. In this map, the i18n region ID is the map key, and its value is the corresponding i18nRegion resource.
-    pub items: Vec<I18nRegion>,
+    pub items: Option<Vec<I18nRegion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegionListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for I18nRegionListResponse {}
 
+impl ToParts for I18nRegionListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -766,32 +866,51 @@ impl ResponseResult for I18nRegionListResponse {}
 pub struct LiveStreamListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveStreamListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of live streams that match the request criteria.
-    pub items: Vec<LiveStream>,
+    pub items: Option<Vec<LiveStream>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for LiveStreamListResponse {}
 
+impl ToParts for LiveStreamListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -806,32 +925,51 @@ impl ResponseResult for LiveStreamListResponse {}
 pub struct PlaylistListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of playlists that match the request criteria.
-    pub items: Vec<Playlist>,
+    pub items: Option<Vec<Playlist>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for PlaylistListResponse {}
 
+impl ToParts for PlaylistListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
 /// 
@@ -840,10 +978,10 @@ impl ResponseResult for PlaylistListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelConversionPing {
     /// Defines the context of the ping.
-    pub context: String,
+    pub context: Option<String>,
     /// The url (without the schema) that the player shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D cview%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.
     #[serde(rename="conversionUrl")]
-    pub conversion_url: String,
+    pub conversion_url: Option<String>,
 }
 
 impl Part for ChannelConversionPing {}
@@ -857,14 +995,14 @@ impl Part for ChannelConversionPing {}
 pub struct InvideoPromotion {
     /// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.
     #[serde(rename="defaultTiming")]
-    pub default_timing: InvideoTiming,
+    pub default_timing: Option<InvideoTiming>,
     /// List of promoted items in decreasing priority.
-    pub items: Vec<PromotedItem>,
+    pub items: Option<Vec<PromotedItem>>,
     /// Indicates whether the channel's promotional campaign uses "smart timing." This feature attempts to show promotions at a point in the video when they are more likely to be clicked and less likely to disrupt the viewing experience. This feature also picks up a single promotion to show on each video.
     #[serde(rename="useSmartTiming")]
-    pub use_smart_timing: bool,
+    pub use_smart_timing: Option<bool>,
     /// The spatial position within the video where the promoted item will be displayed.
-    pub position: InvideoPosition,
+    pub position: Option<InvideoPosition>,
 }
 
 impl Part for InvideoPromotion {}
@@ -936,16 +1074,16 @@ impl ToParts for PlaylistItem {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemContentDetails {
     /// A user-generated note for this item.
-    pub note: String,
+    pub note: Option<String>,
     /// The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.
     #[serde(rename="startAt")]
-    pub start_at: String,
+    pub start_at: Option<String>,
     /// The time, measured in seconds from the start of the video, when the video should stop playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) By default, assume that the video.endTime is the end of the video.
     #[serde(rename="endAt")]
-    pub end_at: String,
+    pub end_at: Option<String>,
     /// The ID that YouTube uses to uniquely identify a video. To retrieve the video resource, set the id query parameter to this value in your API request.
     #[serde(rename="videoId")]
-    pub video_id: String,
+    pub video_id: Option<String>,
 }
 
 impl Part for PlaylistItemContentDetails {}
@@ -958,15 +1096,15 @@ impl Part for PlaylistItemContentDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ThumbnailDetails {
     /// The default image for this resource.
-    pub default: Thumbnail,
+    pub default: Option<Thumbnail>,
     /// The high quality image for this resource.
-    pub high: Thumbnail,
+    pub high: Option<Thumbnail>,
     /// The medium quality image for this resource.
-    pub medium: Thumbnail,
+    pub medium: Option<Thumbnail>,
     /// The maximum resolution quality image for this resource.
-    pub maxres: Thumbnail,
+    pub maxres: Option<Thumbnail>,
     /// The standard quality image for this resource.
-    pub standard: Thumbnail,
+    pub standard: Option<Thumbnail>,
 }
 
 impl Part for ThumbnailDetails {}
@@ -979,7 +1117,7 @@ impl Part for ThumbnailDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoMonetizationDetails {
     /// The value of access indicates whether the video can be monetized or not.
-    pub access: AccessPolicy,
+    pub access: Option<AccessPolicy>,
 }
 
 impl Part for VideoMonetizationDetails {}
@@ -992,34 +1130,37 @@ impl Part for VideoMonetizationDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelContentDetailsRelatedPlaylists {
     /// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.
-    pub uploads: String,
+    pub uploads: Option<String>,
     /// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
     #[serde(rename="watchHistory")]
-    pub watch_history: String,
+    pub watch_history: Option<String>,
     /// The ID of the playlist that contains the channel"s liked videos. Use the   playlistItems.insert and  playlistItems.delete to add or remove items from that list.
-    pub likes: String,
+    pub likes: Option<String>,
     /// The ID of the playlist that contains the channel"s favorite videos. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
-    pub favorites: String,
+    pub favorites: Option<String>,
     /// The ID of the playlist that contains the channel"s watch later playlist. Use the playlistItems.insert and  playlistItems.delete to add or remove items from that list.
     #[serde(rename="watchLater")]
-    pub watch_later: String,
+    pub watch_later: Option<String>,
 }
 
 impl NestedType for ChannelContentDetailsRelatedPlaylists {}
 impl Part for ChannelContentDetailsRelatedPlaylists {}
 
 
-/// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
+/// Basic details about a video category, such as its localized title.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChannelConversionPings {
-    /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
-    pub pings: Vec<ChannelConversionPing>,
+pub struct VideoAbuseReportReasonSnippet {
+    /// The secondary reasons associated with this reason, if any are available. (There might be 0 or more.)
+    #[serde(rename="secondaryReasons")]
+    pub secondary_reasons: Option<Vec<VideoAbuseReportSecondaryReason>>,
+    /// The localized label belonging to this abuse report reason.
+    pub label: Option<String>,
 }
 
-impl Part for ChannelConversionPings {}
+impl Part for VideoAbuseReportReasonSnippet {}
 
 
 /// Describes processing status and progress and availability of some other Video resource parts.
@@ -1030,31 +1171,59 @@ impl Part for ChannelConversionPings {}
 pub struct VideoProcessingDetails {
     /// This value indicates whether file details are available for the uploaded video. You can retrieve a video's file details by requesting the fileDetails part in your videos.list() request.
     #[serde(rename="fileDetailsAvailability")]
-    pub file_details_availability: String,
+    pub file_details_availability: Option<String>,
     /// This value indicates whether video editing suggestions, which might improve video quality or the playback experience, are available for the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
     #[serde(rename="editorSuggestionsAvailability")]
-    pub editor_suggestions_availability: String,
+    pub editor_suggestions_availability: Option<String>,
     /// The video's processing status. This value indicates whether YouTube was able to process the video or if the video is still being processed.
     #[serde(rename="processingStatus")]
-    pub processing_status: String,
+    pub processing_status: Option<String>,
     /// This value indicates whether the video processing engine has generated suggestions that might improve YouTube's ability to process the the video, warnings that explain video processing problems, or errors that cause video processing problems. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
     #[serde(rename="processingIssuesAvailability")]
-    pub processing_issues_availability: String,
+    pub processing_issues_availability: Option<String>,
     /// The reason that YouTube failed to process the video. This property will only have a value if the processingStatus property's value is failed.
     #[serde(rename="processingFailureReason")]
-    pub processing_failure_reason: String,
+    pub processing_failure_reason: Option<String>,
     /// This value indicates whether thumbnail images have been generated for the video.
     #[serde(rename="thumbnailsAvailability")]
-    pub thumbnails_availability: String,
+    pub thumbnails_availability: Option<String>,
     /// The processingProgress object contains information about the progress YouTube has made in processing the video. The values are really only relevant if the video's processing status is processing.
     #[serde(rename="processingProgress")]
-    pub processing_progress: VideoProcessingDetailsProcessingProgress,
+    pub processing_progress: Option<VideoProcessingDetailsProcessingProgress>,
     /// This value indicates whether keyword (tag) suggestions are available for the video. Tags can be added to a video's metadata to make it easier for other users to find the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
     #[serde(rename="tagSuggestionsAvailability")]
-    pub tag_suggestions_availability: String,
+    pub tag_suggestions_availability: Option<String>,
 }
 
 impl Part for VideoProcessingDetails {}
+
+
+/// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChannelConversionPings {
+    /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
+    pub pings: Option<Vec<ChannelConversionPing>>,
+}
+
+impl Part for ChannelConversionPings {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VideoAbuseReportSecondaryReason {
+    /// The ID of this abuse report secondary reason.
+    pub id: Option<VideoAbuseReportReasonId>,
+    /// The localized label for this abuse report secondary reason.
+    pub label: Option<String>,
+}
+
+impl Part for VideoAbuseReportSecondaryReason {}
 
 
 /// Details about the content to witch a subscription refers.
@@ -1065,13 +1234,13 @@ impl Part for VideoProcessingDetails {}
 pub struct SubscriptionContentDetails {
     /// The number of new items in the subscription since its content was last read.
     #[serde(rename="newItemCount")]
-    pub new_item_count: u32,
+    pub new_item_count: Option<u32>,
     /// The type of activity this subscription is for (only uploads, everything).
     #[serde(rename="activityType")]
-    pub activity_type: String,
+    pub activity_type: Option<String>,
     /// The approximate number of items that the subscription points to.
     #[serde(rename="totalItemCount")]
-    pub total_item_count: u32,
+    pub total_item_count: Option<u32>,
 }
 
 impl Part for SubscriptionContentDetails {}
@@ -1090,19 +1259,47 @@ impl Part for SubscriptionContentDetails {}
 pub struct ChannelSectionListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// A list of ChannelSections that match the request criteria.
-    pub items: Vec<ChannelSection>,
+    pub items: Option<Vec<ChannelSection>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelSectionListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for ChannelSectionListResponse {}
+
+impl ToParts for ChannelSectionListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        r.pop();
+        r
+    }
+}
+
+/// Comments written in (direct or indirect) reply to the top level comment.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommentThreadReplies {
+    /// A limited number of replies. Unless the number of replies returned equals total_reply_count in the snippet the returned replies are only a subset of the total number of replies.
+    pub comments: Option<Vec<Comment>>,
+}
+
+impl Part for CommentThreadReplies {}
 
 
 /// DEPRECATED Region restriction of the video.
@@ -1112,9 +1309,9 @@ impl ResponseResult for ChannelSectionListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoContentDetailsRegionRestriction {
     /// A list of region codes that identify countries where the video is viewable. If this property is present and a country is not listed in its value, then the video is blocked from appearing in that country. If this property is present and contains an empty list, the video is blocked in all countries.
-    pub allowed: Vec<String>,
+    pub allowed: Option<Vec<String>>,
     /// A list of region codes that identify countries where the video is blocked. If this property is present and a country is not listed in its value, then the video is viewable in that country. If this property is present and contains an empty list, the video is viewable in all countries.
-    pub blocked: Vec<String>,
+    pub blocked: Option<Vec<String>>,
 }
 
 impl Part for VideoContentDetailsRegionRestriction {}
@@ -1127,23 +1324,23 @@ impl Part for VideoContentDetailsRegionRestriction {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionSnippet {
     /// The subscription's details.
-    pub description: String,
+    pub description: Option<String>,
     /// The subscription's title.
-    pub title: String,
+    pub title: Option<String>,
     /// The id object contains information about the channel that the user subscribed to.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
     /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-    pub thumbnails: ThumbnailDetails,
+    pub thumbnails: Option<ThumbnailDetails>,
     /// The ID that YouTube uses to uniquely identify the subscriber's channel.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The date and time that the subscription was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishedAt")]
-    pub published_at: String,
+    pub published_at: Option<String>,
     /// Channel title for the channel that the subscription belongs to.
     #[serde(rename="channelTitle")]
-    pub channel_title: String,
+    pub channel_title: Option<String>,
 }
 
 impl Part for SubscriptionSnippet {}
@@ -1156,41 +1353,41 @@ impl Part for SubscriptionSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CaptionSnippet {
     /// The caption track's status.
-    pub status: String,
+    pub status: Option<String>,
     /// Indicates whether the track contains closed captions for the deaf and hard of hearing. The default value is false.
     #[serde(rename="isCC")]
-    pub is_cc: bool,
+    pub is_cc: Option<bool>,
     /// The type of audio track associated with the caption track.
     #[serde(rename="audioTrackType")]
-    pub audio_track_type: String,
+    pub audio_track_type: Option<String>,
     /// The language of the caption track. The property value is a BCP-47 language tag.
-    pub language: String,
+    pub language: Option<String>,
     /// The ID that YouTube uses to uniquely identify the video associated with the caption track.
     #[serde(rename="videoId")]
-    pub video_id: String,
+    pub video_id: Option<String>,
     /// Indicates whether the caption track is a draft. If the value is true, then the track is not publicly visible. The default value is false.
     #[serde(rename="isDraft")]
-    pub is_draft: bool,
+    pub is_draft: Option<bool>,
     /// Indicates whether YouTube synchronized the caption track to the audio track in the video. The value will be true if a sync was explicitly requested when the caption track was uploaded. For example, when calling the captions.insert or captions.update methods, you can set the sync parameter to true to instruct YouTube to sync the uploaded track to the video. If the value is false, YouTube uses the time codes in the uploaded caption track to determine when to display captions.
     #[serde(rename="isAutoSynced")]
-    pub is_auto_synced: bool,
+    pub is_auto_synced: Option<bool>,
     /// The date and time when the caption track was last updated. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="lastUpdated")]
-    pub last_updated: String,
+    pub last_updated: Option<String>,
     /// The caption track's type.
     #[serde(rename="trackKind")]
-    pub track_kind: String,
+    pub track_kind: Option<String>,
     /// Indicates whether caption track is formatted for "easy reader," meaning it is at a third-grade level for language learners. The default value is false.
     #[serde(rename="isEasyReader")]
-    pub is_easy_reader: bool,
+    pub is_easy_reader: Option<bool>,
     /// Indicates whether the caption track uses large text for the vision-impaired. The default value is false.
     #[serde(rename="isLarge")]
-    pub is_large: bool,
+    pub is_large: Option<bool>,
     /// The reason that YouTube failed to process the caption track. This property is only present if the state property's value is failed.
     #[serde(rename="failureReason")]
-    pub failure_reason: String,
+    pub failure_reason: Option<String>,
     /// The name of the caption track. The name is intended to be visible to the user as an option during playback.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for CaptionSnippet {}
@@ -1203,9 +1400,9 @@ impl Part for CaptionSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct I18nRegionSnippet {
     /// The region code as a 2-letter ISO country code.
-    pub gl: String,
+    pub gl: Option<String>,
     /// The human-readable name of the region.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for I18nRegionSnippet {}
@@ -1219,13 +1416,13 @@ impl Part for I18nRegionSnippet {}
 pub struct ActivityContentDetailsPlaylistItem {
     /// The resourceId object contains information about the resource that was added to the playlist.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
     /// The value that YouTube uses to uniquely identify the playlist.
     #[serde(rename="playlistId")]
-    pub playlist_id: String,
+    pub playlist_id: Option<String>,
     /// ID of the item within the playlist.
     #[serde(rename="playlistItemId")]
-    pub playlist_item_id: String,
+    pub playlist_item_id: Option<String>,
 }
 
 impl Part for ActivityContentDetailsPlaylistItem {}
@@ -1239,7 +1436,7 @@ impl Part for ActivityContentDetailsPlaylistItem {}
 pub struct ActivityContentDetailsComment {
     /// The resourceId object contains information that identifies the resource associated with the comment.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsComment {}
@@ -1253,9 +1450,9 @@ impl Part for ActivityContentDetailsComment {}
 pub struct GuideCategorySnippet {
     /// no description provided
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// Description of the guide category.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for GuideCategorySnippet {}
@@ -1268,33 +1465,33 @@ impl Part for GuideCategorySnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoSnippet {
     /// The video's description.
-    pub description: String,
+    pub description: Option<String>,
     /// A list of keyword tags associated with the video. Tags may contain spaces. This field is only visible to the video's uploader.
-    pub tags: Vec<String>,
+    pub tags: Option<Vec<String>>,
     /// The ID that YouTube uses to uniquely identify the channel that the video was uploaded to.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The language of the videos's default snippet.
     #[serde(rename="defaultLanguage")]
-    pub default_language: String,
+    pub default_language: Option<String>,
     /// Indicates if the video is an upcoming/active live broadcast. Or it's "none" if the video is not an upcoming/active live broadcast.
     #[serde(rename="liveBroadcastContent")]
-    pub live_broadcast_content: String,
+    pub live_broadcast_content: Option<String>,
     /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishedAt")]
-    pub published_at: String,
+    pub published_at: Option<String>,
     /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-    pub thumbnails: ThumbnailDetails,
+    pub thumbnails: Option<ThumbnailDetails>,
     /// The video's title.
-    pub title: String,
+    pub title: Option<String>,
     /// The YouTube video category associated with the video.
     #[serde(rename="categoryId")]
-    pub category_id: String,
+    pub category_id: Option<String>,
     /// Localized snippet selected with the hl parameter. If no such localization exists, this field is populated with the default snippet. (Read-only)
-    pub localized: VideoLocalization,
+    pub localized: Option<VideoLocalization>,
     /// Channel title for the channel that the video belongs to.
     #[serde(rename="channelTitle")]
-    pub channel_title: String,
+    pub channel_title: Option<String>,
 }
 
 impl Part for VideoSnippet {}
@@ -1313,10 +1510,10 @@ pub struct LiveStreamContentDetails {
     /// - A non-reusable stream might be deleted by an automated process after the broadcast ends. 
     /// - The  liveStreams.list method does not list non-reusable streams if you call the method and set the mine parameter to true. The only way to use that method to retrieve the resource for a non-reusable stream is to use the id parameter to identify the stream.
     #[serde(rename="isReusable")]
-    pub is_reusable: bool,
+    pub is_reusable: Option<bool>,
     /// The ingestion URL where the closed captions of this stream are sent.
     #[serde(rename="closedCaptionsIngestionUrl")]
-    pub closed_captions_ingestion_url: String,
+    pub closed_captions_ingestion_url: Option<String>,
 }
 
 impl Part for LiveStreamContentDetails {}
@@ -1329,13 +1526,13 @@ impl Part for LiveStreamContentDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GuideCategory {
     /// The snippet object contains basic details about the category, such as its title.
-    pub snippet: GuideCategorySnippet,
+    pub snippet: Option<GuideCategorySnippet>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategory".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The ID that YouTube uses to uniquely identify the guide category.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for GuideCategory {}
@@ -1354,20 +1551,35 @@ impl Part for GuideCategory {}
 pub struct I18nLanguageListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// A list of supported i18n languages. In this map, the i18n language ID is the map key, and its value is the corresponding i18nLanguage resource.
-    pub items: Vec<I18nLanguage>,
+    pub items: Option<Vec<I18nLanguage>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nLanguageListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for I18nLanguageListResponse {}
 
+impl ToParts for I18nLanguageListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -1376,12 +1588,12 @@ impl ResponseResult for I18nLanguageListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedProperty {
     /// no description provided
-    pub default: String,
+    pub default: Option<String>,
     /// The language of the default property.
     #[serde(rename="defaultLanguage")]
-    pub default_language: LanguageTag,
+    pub default_language: Option<LanguageTag>,
     /// no description provided
-    pub localized: Vec<LocalizedString>,
+    pub localized: Option<Vec<LocalizedString>>,
 }
 
 impl Part for LocalizedProperty {}
@@ -1395,25 +1607,25 @@ impl Part for LocalizedProperty {}
 pub struct VideoFileDetailsVideoStream {
     /// The video stream's bitrate, in bits per second.
     #[serde(rename="bitrateBps")]
-    pub bitrate_bps: String,
+    pub bitrate_bps: Option<String>,
     /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
-    pub vendor: String,
+    pub vendor: Option<String>,
     /// The video codec that the stream uses.
-    pub codec: String,
+    pub codec: Option<String>,
     /// The encoded video content's width in pixels. You can calculate the video's encoding aspect ratio as width_pixels / height_pixels.
     #[serde(rename="widthPixels")]
-    pub width_pixels: u32,
+    pub width_pixels: Option<u32>,
     /// The encoded video content's height in pixels.
     #[serde(rename="heightPixels")]
-    pub height_pixels: u32,
+    pub height_pixels: Option<u32>,
     /// The video content's display aspect ratio, which specifies the aspect ratio in which the video should be displayed.
     #[serde(rename="aspectRatio")]
-    pub aspect_ratio: f64,
+    pub aspect_ratio: Option<f64>,
     /// The amount that YouTube needs to rotate the original source content to properly display the video.
-    pub rotation: String,
+    pub rotation: Option<String>,
     /// The video stream's frame rate, in frames per second.
     #[serde(rename="frameRateFps")]
-    pub frame_rate_fps: f64,
+    pub frame_rate_fps: Option<f64>,
 }
 
 impl Part for VideoFileDetailsVideoStream {}
@@ -1526,9 +1738,9 @@ impl ToParts for Channel {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelLocalization {
     /// The localized strings for channel's description.
-    pub description: String,
-    /// The localized strings for channel's title, read-only.
-    pub title: String,
+    pub description: Option<String>,
+    /// The localized strings for channel's title.
+    pub title: Option<String>,
 }
 
 impl Part for ChannelLocalization {}
@@ -1541,13 +1753,13 @@ impl Part for ChannelLocalization {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchResult {
     /// The snippet object contains basic details about a search result, such as its title or description. For example, if the search result is a video, then the title will be the video's title and the description will be the video's description.
-    pub snippet: SearchResultSnippet,
+    pub snippet: Option<SearchResultSnippet>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#searchResult".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The id object contains information that can be used to uniquely identify the resource that matches the search request.
-    pub id: ResourceId,
+    pub id: Option<ResourceId>,
 }
 
 impl Part for SearchResult {}
@@ -1566,32 +1778,51 @@ impl Part for SearchResult {}
 pub struct VideoCategoryListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategoryListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of video categories that can be associated with YouTube videos. In this map, the video category ID is the map key, and its value is the corresponding videoCategory resource.
-    pub items: Vec<VideoCategory>,
+    pub items: Option<Vec<VideoCategory>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for VideoCategoryListResponse {}
 
+impl ToParts for VideoCategoryListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Video processing progress and completion time estimate.
 /// 
@@ -1601,16 +1832,16 @@ impl ResponseResult for VideoCategoryListResponse {}
 pub struct VideoProcessingDetailsProcessingProgress {
     /// An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.
     #[serde(rename="timeLeftMs")]
-    pub time_left_ms: String,
+    pub time_left_ms: Option<String>,
     /// The number of parts of the video that YouTube has already processed. You can estimate the percentage of the video that YouTube has already processed by calculating:
     /// 100 * parts_processed / parts_total
     /// 
     /// Note that since the estimated number of parts could increase without a corresponding increase in the number of parts that have already been processed, it is possible that the calculated progress could periodically decrease while YouTube processes a video.
     #[serde(rename="partsProcessed")]
-    pub parts_processed: String,
+    pub parts_processed: Option<String>,
     /// An estimate of the total number of parts that need to be processed for the video. The number may be updated with more precise estimates while YouTube processes the video.
     #[serde(rename="partsTotal")]
-    pub parts_total: String,
+    pub parts_total: Option<String>,
 }
 
 impl Part for VideoProcessingDetailsProcessingProgress {}
@@ -1629,32 +1860,51 @@ impl Part for VideoProcessingDetailsProcessingProgress {}
 pub struct VideoListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of videos that match the request criteria.
-    pub items: Vec<Video>,
+    pub items: Option<Vec<Video>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for VideoListResponse {}
 
+impl ToParts for VideoListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -1663,7 +1913,7 @@ impl ResponseResult for VideoListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LanguageTag {
     /// no description provided
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for LanguageTag {}
@@ -1727,14 +1977,14 @@ impl ToParts for Subscription {
 pub struct LiveStreamSnippet {
     /// The ID that YouTube uses to uniquely identify the channel that is transmitting the stream.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The stream's description. The value cannot be longer than 10000 characters.
-    pub description: String,
+    pub description: Option<String>,
     /// The date and time that the stream was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishedAt")]
-    pub published_at: String,
+    pub published_at: Option<String>,
     /// The stream's title. The value must be between 1 and 128 characters long.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for LiveStreamSnippet {}
@@ -1748,13 +1998,13 @@ impl Part for LiveStreamSnippet {}
 pub struct ChannelStatus {
     /// Privacy status of the channel.
     #[serde(rename="privacyStatus")]
-    pub privacy_status: String,
+    pub privacy_status: Option<String>,
     /// If true, then the user is linked to either a YouTube username or G+ account. Otherwise, the user doesn't have a public YouTube identity.
     #[serde(rename="isLinked")]
-    pub is_linked: bool,
+    pub is_linked: Option<bool>,
     /// The long uploads status of this channel. See
     #[serde(rename="longUploadsStatus")]
-    pub long_uploads_status: String,
+    pub long_uploads_status: Option<String>,
 }
 
 impl Part for ChannelStatus {}
@@ -1773,32 +2023,51 @@ impl Part for ChannelStatus {}
 pub struct ChannelListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of channels that match the request criteria.
-    pub items: Vec<Channel>,
+    pub items: Option<Vec<Channel>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for ChannelListResponse {}
 
+impl ToParts for ChannelListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -1820,6 +2089,8 @@ pub struct ChannelSection {
     pub kind: Option<String>,
     /// Etag of this resource.
     pub etag: Option<String>,
+    /// The targeting object contains basic targeting settings about the channel section.
+    pub targeting: Option<ChannelSectionTargeting>,
     /// The contentDetails object contains details about the channel section content, such as a list of playlists or channels featured in the section.
     #[serde(rename="contentDetails")]
     pub content_details: Option<ChannelSectionContentDetails>,
@@ -1842,6 +2113,7 @@ impl ToParts for ChannelSection {
         if self.snippet.is_some() { r = r + "snippet,"; }
         if self.kind.is_some() { r = r + "kind,"; }
         if self.etag.is_some() { r = r + "etag,"; }
+        if self.targeting.is_some() { r = r + "targeting,"; }
         if self.content_details.is_some() { r = r + "contentDetails,"; }
         if self.id.is_some() { r = r + "id,"; }
         if self.localizations.is_some() { r = r + "localizations,"; }
@@ -1863,32 +2135,51 @@ impl ToParts for ChannelSection {
 pub struct LiveBroadcastListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcastListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of broadcasts that match the request criteria.
-    pub items: Vec<LiveBroadcast>,
+    pub items: Option<Vec<LiveBroadcast>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for LiveBroadcastListResponse {}
 
+impl ToParts for LiveBroadcastListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -1903,20 +2194,35 @@ impl ResponseResult for LiveBroadcastListResponse {}
 pub struct CaptionListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// A list of captions that match the request criteria.
-    pub items: Vec<Caption>,
+    pub items: Option<Vec<Caption>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#captionListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for CaptionListResponse {}
 
+impl ToParts for CaptionListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Brief description of the live stream status.
 /// 
@@ -1925,8 +2231,11 @@ impl ResponseResult for CaptionListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStreamStatus {
     /// no description provided
+    #[serde(rename="isDefaultStream")]
+    pub is_default_stream: Option<bool>,
+    /// no description provided
     #[serde(rename="streamStatus")]
-    pub stream_status: String,
+    pub stream_status: Option<String>,
 }
 
 impl Part for LiveStreamStatus {}
@@ -1940,199 +2249,258 @@ impl Part for LiveStreamStatus {}
 pub struct ContentRating {
     /// Internal YouTube rating.
     #[serde(rename="ytRating")]
-    pub yt_rating: String,
+    pub yt_rating: Option<String>,
     /// Rating system for French Canadian TV - Regie du cinema
     #[serde(rename="catvfrRating")]
-    pub catvfr_rating: String,
+    pub catvfr_rating: Option<String>,
     /// Rating system in India - Central Board of Film Certification
     #[serde(rename="cbfcRating")]
-    pub cbfc_rating: String,
+    pub cbfc_rating: Option<String>,
     /// Rating system for Thailand - Board of Filmand Video Censors
     #[serde(rename="bfvcRating")]
-    pub bfvc_rating: String,
+    pub bfvc_rating: Option<String>,
     /// Rating system for Austria - Bundesministeriums f�r Unterricht, Kunst und Kultur!
     #[serde(rename="bmukkRating")]
-    pub bmukk_rating: String,
+    pub bmukk_rating: Option<String>,
     /// Rating system for Switzerland - Switzerland Rating System
     #[serde(rename="chfilmRating")]
-    pub chfilm_rating: String,
+    pub chfilm_rating: Option<String>,
     /// Rating system for Taiwan - Ministry of Culture - Tawan
     #[serde(rename="moctwRating")]
-    pub moctw_rating: String,
+    pub moctw_rating: Option<String>,
     /// Rating system for Canadian TV - Canadian TV Classification System
     #[serde(rename="catvRating")]
-    pub catv_rating: String,
+    pub catv_rating: Option<String>,
     /// Rating system for Peru - Peru Rating System
     #[serde(rename="pefilmRating")]
-    pub pefilm_rating: String,
+    pub pefilm_rating: Option<String>,
     /// no description provided
     #[serde(rename="djctqRatingReasons")]
-    pub djctq_rating_reasons: Vec<String>,
+    pub djctq_rating_reasons: Option<Vec<String>>,
     /// Rating system for Argentina - Instituto Nacional de Cine y Artes Audiovisuales
     #[serde(rename="incaaRating")]
-    pub incaa_rating: String,
+    pub incaa_rating: Option<String>,
     /// Rating system for Israel - Israel Rating System
     #[serde(rename="ilfilmRating")]
-    pub ilfilm_rating: String,
+    pub ilfilm_rating: Option<String>,
     /// Rating system for Luxembourg - Commission de surveillance de la classification des films
     #[serde(rename="cscfRating")]
-    pub cscf_rating: String,
+    pub cscf_rating: Option<String>,
     /// Rating system in Germany - Voluntary Self Regulation of the Movie Industry
     #[serde(rename="fskRating")]
-    pub fsk_rating: String,
+    pub fsk_rating: Option<String>,
     /// Rating system in South Korea - Korea Media Rating Board
     #[serde(rename="kmrbRating")]
-    pub kmrb_rating: String,
+    pub kmrb_rating: Option<String>,
     /// Rating system in Brazil - Department of Justice, Rating, Titles and Qualification
     #[serde(rename="djctqRating")]
-    pub djctq_rating: String,
+    pub djctq_rating: Option<String>,
     /// Rating system for Hong kong - Office for Film, Newspaper and Article Administration
     #[serde(rename="fcoRating")]
-    pub fco_rating: String,
+    pub fco_rating: Option<String>,
     /// Rating system for Norway - Medietilsynet
     #[serde(rename="medietilsynetRating")]
-    pub medietilsynet_rating: String,
+    pub medietilsynet_rating: Option<String>,
     /// Rating system for Greece - Greece Rating System
     #[serde(rename="grfilmRating")]
-    pub grfilm_rating: String,
+    pub grfilm_rating: Option<String>,
     /// Rating system for Chile - Consejo de Calificaci�n Cinematogr�fica
     #[serde(rename="cccRating")]
-    pub ccc_rating: String,
+    pub ccc_rating: Option<String>,
     /// Rating system for Ireland - Raidi� Teilif�s �ireann
     #[serde(rename="rteRating")]
-    pub rte_rating: String,
+    pub rte_rating: Option<String>,
     /// Rating system in France - French Minister of Culture
     #[serde(rename="fmocRating")]
-    pub fmoc_rating: String,
+    pub fmoc_rating: Option<String>,
     /// Rating system in Japan - Eiga Rinri Kanri Iinkai
     #[serde(rename="eirinRating")]
-    pub eirin_rating: String,
+    pub eirin_rating: Option<String>,
     /// Rating system for Portugal - Comiss�o de Classifica��o de Espect�culos
     #[serde(rename="cceRating")]
-    pub cce_rating: String,
+    pub cce_rating: Option<String>,
     /// Rating system for Latvia - National Film Center of Latvia
     #[serde(rename="nkclvRating")]
-    pub nkclv_rating: String,
+    pub nkclv_rating: Option<String>,
     /// Rating system for South africa - Film & Publication Board
     #[serde(rename="fpbRating")]
-    pub fpb_rating: String,
+    pub fpb_rating: Option<String>,
     /// Rating system for Iceland - SMAIS
     #[serde(rename="smaisRating")]
-    pub smais_rating: String,
+    pub smais_rating: Option<String>,
     /// Canadian Home Video Rating System
     #[serde(rename="chvrsRating")]
-    pub chvrs_rating: String,
+    pub chvrs_rating: Option<String>,
     /// Rating system for Italy - Autorit� per le Garanzie nelle Comunicazioni
     #[serde(rename="agcomRating")]
-    pub agcom_rating: String,
+    pub agcom_rating: Option<String>,
     /// Rating system for Colombia - MoC
     #[serde(rename="mocRating")]
-    pub moc_rating: String,
+    pub moc_rating: Option<String>,
     /// Rating system for Hungary - Rating Committee of the National Office of Film
     #[serde(rename="rcnofRating")]
-    pub rcnof_rating: String,
+    pub rcnof_rating: Option<String>,
     /// Rating system for Malaysia - Film Censorship Board of Malaysia
     #[serde(rename="fcbmRating")]
-    pub fcbm_rating: String,
+    pub fcbm_rating: Option<String>,
     /// Rating system for Netherlands - Nederlands Instituut voor de Classificatie van Audiovisuele Media
     #[serde(rename="kijkwijzerRating")]
-    pub kijkwijzer_rating: String,
+    pub kijkwijzer_rating: Option<String>,
     /// Rating system for Singapore - Media Development Authority
     #[serde(rename="mdaRating")]
-    pub mda_rating: String,
+    pub mda_rating: Option<String>,
     /// Rating system for Nigeria - National Film and Video Censors Board
     #[serde(rename="nfvcbRating")]
-    pub nfvcb_rating: String,
+    pub nfvcb_rating: Option<String>,
     /// Rating system for Venezuela - SiBCI
     #[serde(rename="resorteviolenciaRating")]
-    pub resorteviolencia_rating: String,
+    pub resorteviolencia_rating: Option<String>,
     /// Rating system for France - Conseil sup�rieur de l?audiovisuel
     #[serde(rename="csaRating")]
-    pub csa_rating: String,
+    pub csa_rating: Option<String>,
     /// Rating system in New Zealand - Office of Film and Literature Classification
     #[serde(rename="oflcRating")]
-    pub oflc_rating: String,
+    pub oflc_rating: Option<String>,
     /// TV Parental Guidelines rating of the content.
     #[serde(rename="tvpgRating")]
-    pub tvpg_rating: String,
+    pub tvpg_rating: Option<String>,
     /// Rating system for Bulgaria - National Film Centre
     #[serde(rename="nfrcRating")]
-    pub nfrc_rating: String,
+    pub nfrc_rating: Option<String>,
     /// Rating system for Malta - Film Age-Classification Board
     #[serde(rename="mccaaRating")]
-    pub mccaa_rating: String,
+    pub mccaa_rating: Option<String>,
     /// Rating system in Mexico - General Directorate of Radio, Television and Cinematography
     #[serde(rename="rtcRating")]
-    pub rtc_rating: String,
+    pub rtc_rating: Option<String>,
     /// Rating system in Italy - Ministero dei Beni e delle Attivita Culturali e del Turismo
     #[serde(rename="mibacRating")]
-    pub mibac_rating: String,
+    pub mibac_rating: Option<String>,
     /// British Board of Film Classification
     #[serde(rename="bbfcRating")]
-    pub bbfc_rating: String,
+    pub bbfc_rating: Option<String>,
     /// Rating system for Egypt - Egypt Rating System
     #[serde(rename="egfilmRating")]
-    pub egfilm_rating: String,
+    pub egfilm_rating: Option<String>,
     /// Rating system for Belgium - Belgium Rating System
     #[serde(rename="cicfRating")]
-    pub cicf_rating: String,
+    pub cicf_rating: Option<String>,
     /// Rating system for Poland - National Broadcasting Council
     #[serde(rename="nbcplRating")]
-    pub nbcpl_rating: String,
+    pub nbcpl_rating: Option<String>,
     /// Rating system for Maldives - National Bureau of Classification
     #[serde(rename="nbcRating")]
-    pub nbc_rating: String,
+    pub nbc_rating: Option<String>,
     /// Motion Picture Association of America rating for the content.
     #[serde(rename="mpaaRating")]
-    pub mpaa_rating: String,
+    pub mpaa_rating: Option<String>,
     /// Rating system in Ireland - Irish Film Classification Office
     #[serde(rename="ifcoRating")]
-    pub ifco_rating: String,
+    pub ifco_rating: Option<String>,
     /// Rating system in Australia - Australian Classification Board
     #[serde(rename="acbRating")]
-    pub acb_rating: String,
+    pub acb_rating: Option<String>,
     /// Rating system for Estonia - Estonia Rating System
     #[serde(rename="eefilmRating")]
-    pub eefilm_rating: String,
+    pub eefilm_rating: Option<String>,
     /// Rating system for Czech republic - Czech republic Rating System
     #[serde(rename="czfilmRating")]
-    pub czfilm_rating: String,
+    pub czfilm_rating: Option<String>,
     /// Rating system for Indonesia - Lembaga Sensor Film
     #[serde(rename="lsfRating")]
-    pub lsf_rating: String,
+    pub lsf_rating: Option<String>,
     /// Rating system in Russia
     #[serde(rename="russiaRating")]
-    pub russia_rating: String,
+    pub russia_rating: Option<String>,
     /// Rating system for Kenya - Kenya Film Classification Board
     #[serde(rename="kfcbRating")]
-    pub kfcb_rating: String,
+    pub kfcb_rating: Option<String>,
     /// Rating system for Philippines - MOVIE AND TELEVISION REVIEW AND CLASSIFICATION BOARD
     #[serde(rename="mtrcbRating")]
-    pub mtrcb_rating: String,
+    pub mtrcb_rating: Option<String>,
     /// Rating system for Chile - Asociaci�n Nacional de Televisi�n
     #[serde(rename="anatelRating")]
-    pub anatel_rating: String,
+    pub anatel_rating: Option<String>,
     /// Rating system for Sweden - Statens medier�d (National Media Council)
     #[serde(rename="smsaRating")]
-    pub smsa_rating: String,
+    pub smsa_rating: Option<String>,
     /// Rating system for Romania - CONSILIUL NATIONAL AL AUDIOVIZUALULUI - CNA
     #[serde(rename="cnaRating")]
-    pub cna_rating: String,
+    pub cna_rating: Option<String>,
     /// Rating system in Spain - Instituto de Cinematografia y de las Artes Audiovisuales
     #[serde(rename="icaaRating")]
-    pub icaa_rating: String,
+    pub icaa_rating: Option<String>,
     /// Rating system for Denmark - The Media Council for Children and Young People
     #[serde(rename="mccypRating")]
-    pub mccyp_rating: String,
+    pub mccyp_rating: Option<String>,
     /// Rating system for Slovakia - Slovakia Rating System
     #[serde(rename="skfilmRating")]
-    pub skfilm_rating: String,
+    pub skfilm_rating: Option<String>,
     /// Rating system for Finland - Finnish Centre for Media Education and Audiovisual Media
     #[serde(rename="mekuRating")]
-    pub meku_rating: String,
+    pub meku_rating: Option<String>,
 }
 
 impl Part for ContentRating {}
+
+
+/// Basic details about a comment, such as its author and text.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommentSnippet {
+    /// Link to the author's YouTube channel, if any.
+    #[serde(rename="authorChannelUrl")]
+    pub author_channel_url: Option<String>,
+    /// The id of the corresponding YouTube channel. In case of a channel comment this is the channel the comment refers to. In case of a video comment it's the video's channel.
+    #[serde(rename="channelId")]
+    pub channel_id: Option<String>,
+    /// The ID of the video the comment refers to, if any.
+    #[serde(rename="videoId")]
+    pub video_id: Option<String>,
+    /// The date and time when the comment was orignally published. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
+    #[serde(rename="publishedAt")]
+    pub published_at: Option<String>,
+    /// The total number of likes this comment has received.
+    #[serde(rename="likeCount")]
+    pub like_count: Option<u32>,
+    /// Whether the current viewer can rate this comment.
+    #[serde(rename="canRate")]
+    pub can_rate: Option<bool>,
+    /// The date and time when was last updated . The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
+    #[serde(rename="updatedAt")]
+    pub updated_at: Option<String>,
+    /// The URL for the avatar of the user who posted the comment.
+    #[serde(rename="authorProfileImageUrl")]
+    pub author_profile_image_url: Option<String>,
+    /// Link to the author's Google+ profile, if any.
+    #[serde(rename="authorGoogleplusProfileUrl")]
+    pub author_googleplus_profile_url: Option<String>,
+    /// The comment's text. The format is either plain text or HTML dependent on what has been requested. Even the plain text representation may differ from the text originally posted in that it may replace video links with video titles etc.
+    #[serde(rename="textDisplay")]
+    pub text_display: Option<String>,
+    /// The name of the user who posted the comment.
+    #[serde(rename="authorDisplayName")]
+    pub author_display_name: Option<String>,
+    /// The rating the viewer has given to this comment. For the time being this will never return RATE_TYPE_DISLIKE and instead return RATE_TYPE_NONE. This may change in the future.
+    #[serde(rename="viewerRating")]
+    pub viewer_rating: Option<String>,
+    /// The comment's moderation status. Will not be set if the comments were requested through the id filter.
+    #[serde(rename="moderationStatus")]
+    pub moderation_status: Option<String>,
+    /// The id of the author's YouTube channel, if any.
+    #[serde(rename="authorChannelId")]
+    pub author_channel_id: Option<ChannelId>,
+    /// The unique id of the parent comment, only set for replies.
+    #[serde(rename="parentId")]
+    pub parent_id: Option<String>,
+    /// The comment's original raw text as initially posted or last updated. The original text will only be returned if it is accessible to the viewer, which is only guaranteed if the viewer is the comment's author.
+    #[serde(rename="textOriginal")]
+    pub text_original: Option<String>,
+}
+
+impl Part for CommentSnippet {}
 
 
 /// Branding properties for images associated with the channel.
@@ -2143,70 +2511,70 @@ impl Part for ContentRating {}
 pub struct ImageSettings {
     /// Banner image. TV size medium resolution (1280x720).
     #[serde(rename="bannerTvMediumImageUrl")]
-    pub banner_tv_medium_image_url: String,
+    pub banner_tv_medium_image_url: Option<String>,
     /// The image map script for the large banner image.
     #[serde(rename="largeBrandedBannerImageImapScript")]
-    pub large_branded_banner_image_imap_script: LocalizedProperty,
+    pub large_branded_banner_image_imap_script: Option<LocalizedProperty>,
     /// Banner image. Mobile size (640x175).
     #[serde(rename="bannerMobileImageUrl")]
-    pub banner_mobile_image_url: String,
+    pub banner_mobile_image_url: Option<String>,
     /// The URL for the 640px by 70px banner image that appears below the video player in the default view of the video watch page.
     #[serde(rename="smallBrandedBannerImageUrl")]
-    pub small_branded_banner_image_url: LocalizedProperty,
+    pub small_branded_banner_image_url: Option<LocalizedProperty>,
     /// Banner image. Tablet size high resolution (2276x377).
     #[serde(rename="bannerTabletHdImageUrl")]
-    pub banner_tablet_hd_image_url: String,
+    pub banner_tablet_hd_image_url: Option<String>,
     /// Banner image. Tablet size low resolution (1138x188).
     #[serde(rename="bannerTabletLowImageUrl")]
-    pub banner_tablet_low_image_url: String,
+    pub banner_tablet_low_image_url: Option<String>,
     /// Banner image. Mobile size medium/high resolution (960x263).
     #[serde(rename="bannerMobileMediumHdImageUrl")]
-    pub banner_mobile_medium_hd_image_url: String,
+    pub banner_mobile_medium_hd_image_url: Option<String>,
     /// The URL for a 1px by 1px tracking pixel that can be used to collect statistics for views of the channel or video pages.
     #[serde(rename="trackingImageUrl")]
-    pub tracking_image_url: String,
+    pub tracking_image_url: Option<String>,
     /// Banner image. Mobile size high resolution (1440x395).
     #[serde(rename="bannerMobileExtraHdImageUrl")]
-    pub banner_mobile_extra_hd_image_url: String,
+    pub banner_mobile_extra_hd_image_url: Option<String>,
     /// Banner image. Tablet size (1707x283).
     #[serde(rename="bannerTabletImageUrl")]
-    pub banner_tablet_image_url: String,
+    pub banner_tablet_image_url: Option<String>,
     /// Banner image. Mobile size low resolution (320x88).
     #[serde(rename="bannerMobileLowImageUrl")]
-    pub banner_mobile_low_image_url: String,
+    pub banner_mobile_low_image_url: Option<String>,
     /// Banner image. TV size extra high resolution (2120x1192).
     #[serde(rename="bannerTvImageUrl")]
-    pub banner_tv_image_url: String,
+    pub banner_tv_image_url: Option<String>,
     /// Banner image. TV size low resolution (854x480).
     #[serde(rename="bannerTvLowImageUrl")]
-    pub banner_tv_low_image_url: String,
+    pub banner_tv_low_image_url: Option<String>,
     /// Banner image. Tablet size extra high resolution (2560x424).
     #[serde(rename="bannerTabletExtraHdImageUrl")]
-    pub banner_tablet_extra_hd_image_url: String,
+    pub banner_tablet_extra_hd_image_url: Option<String>,
     /// The URL for the 854px by 70px image that appears below the video player in the expanded video view of the video watch page.
     #[serde(rename="largeBrandedBannerImageUrl")]
-    pub large_branded_banner_image_url: LocalizedProperty,
+    pub large_branded_banner_image_url: Option<LocalizedProperty>,
     /// Banner image. TV size high resolution (1920x1080).
     #[serde(rename="bannerTvHighImageUrl")]
-    pub banner_tv_high_image_url: String,
+    pub banner_tv_high_image_url: Option<String>,
     /// The URL for the background image shown on the video watch page. The image should be 1200px by 615px, with a maximum file size of 128k.
     #[serde(rename="backgroundImageUrl")]
-    pub background_image_url: LocalizedProperty,
+    pub background_image_url: Option<LocalizedProperty>,
     /// The image map script for the small banner image.
     #[serde(rename="smallBrandedBannerImageImapScript")]
-    pub small_branded_banner_image_imap_script: LocalizedProperty,
+    pub small_branded_banner_image_imap_script: Option<LocalizedProperty>,
     /// Banner image. Desktop size (1060x175).
     #[serde(rename="bannerImageUrl")]
-    pub banner_image_url: String,
+    pub banner_image_url: Option<String>,
     /// Banner image. Mobile size high resolution (1280x360).
     #[serde(rename="bannerMobileHdImageUrl")]
-    pub banner_mobile_hd_image_url: String,
+    pub banner_mobile_hd_image_url: Option<String>,
     /// This is used only in update requests; if it's set, we use this URL to generate all of the above banner URLs.
     #[serde(rename="bannerExternalUrl")]
-    pub banner_external_url: String,
+    pub banner_external_url: Option<String>,
     /// The URL for the image that appears above the top-left corner of the video player. This is a 25-pixel-high image with a flexible width that cannot exceed 170 pixels.
     #[serde(rename="watchIconImageUrl")]
-    pub watch_icon_image_url: String,
+    pub watch_icon_image_url: Option<String>,
 }
 
 impl Part for ImageSettings {}
@@ -2220,38 +2588,127 @@ impl Part for ImageSettings {}
 pub struct ActivityContentDetailsPromotedItem {
     /// The type of call-to-action, a message to the user indicating action that can be taken.
     #[serde(rename="ctaType")]
-    pub cta_type: String,
+    pub cta_type: Option<String>,
     /// The URL the client should fetch to request a promoted item.
     #[serde(rename="adTag")]
-    pub ad_tag: String,
+    pub ad_tag: Option<String>,
     /// The URL the client should direct the user to, if the user chooses to visit the advertiser's website.
     #[serde(rename="destinationUrl")]
-    pub destination_url: String,
+    pub destination_url: Option<String>,
     /// The list of forecasting URLs. The client should ping all of these URLs when a promoted item is not available, to indicate that a promoted item could have been shown.
     #[serde(rename="forecastingUrl")]
-    pub forecasting_url: Vec<String>,
+    pub forecasting_url: Option<Vec<String>>,
     /// The list of impression URLs. The client should ping all of these URLs to indicate that the user was shown this promoted item.
     #[serde(rename="impressionUrl")]
-    pub impression_url: Vec<String>,
+    pub impression_url: Option<Vec<String>>,
     /// The URL the client should ping to indicate that the user was shown this promoted item.
     #[serde(rename="creativeViewUrl")]
-    pub creative_view_url: String,
+    pub creative_view_url: Option<String>,
     /// The ID that YouTube uses to uniquely identify the promoted video.
     #[serde(rename="videoId")]
-    pub video_id: String,
+    pub video_id: Option<String>,
     /// The text description to accompany the promoted item.
     #[serde(rename="descriptionText")]
-    pub description_text: String,
+    pub description_text: Option<String>,
     /// The custom call-to-action button text. If specified, it will override the default button text for the cta_type.
     #[serde(rename="customCtaButtonText")]
-    pub custom_cta_button_text: String,
+    pub custom_cta_button_text: Option<String>,
     /// The URL the client should ping to indicate that the user clicked through on this promoted item.
     #[serde(rename="clickTrackingUrl")]
-    pub click_tracking_url: String,
+    pub click_tracking_url: Option<String>,
 }
 
 impl Part for ActivityContentDetailsPromotedItem {}
 
+
+/// A comment represents a single YouTube comment.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert comments](struct.CommentInsertCall.html) (request|response)
+/// * [set moderation status comments](struct.CommentSetModerationStatuCall.html) (none)
+/// * [update comments](struct.CommentUpdateCall.html) (request|response)
+/// * [delete comments](struct.CommentDeleteCall.html) (none)
+/// * [mark as spam comments](struct.CommentMarkAsSpamCall.html) (none)
+/// * [list comments](struct.CommentListCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Comment {
+    /// The snippet object contains basic details about the comment.
+    pub snippet: Option<CommentSnippet>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#comment".
+    pub kind: Option<String>,
+    /// Etag of this resource.
+    pub etag: Option<String>,
+    /// The ID that YouTube uses to uniquely identify the comment.
+    pub id: Option<String>,
+}
+
+impl RequestValue for Comment {}
+impl Resource for Comment {}
+impl ResponseResult for Comment {}
+
+impl ToParts for Comment {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.snippet.is_some() { r = r + "snippet,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.id.is_some() { r = r + "id,"; }
+        r.pop();
+        r
+    }
+}
+
+/// A caption resource represents a YouTube caption track. A caption track is associated with exactly one YouTube video.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [update captions](struct.CaptionUpdateCall.html) (request|response)
+/// * [list captions](struct.CaptionListCall.html) (none)
+/// * [delete captions](struct.CaptionDeleteCall.html) (none)
+/// * [insert captions](struct.CaptionInsertCall.html) (request|response)
+/// * [download captions](struct.CaptionDownloadCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Caption {
+    /// The snippet object contains basic details about the caption.
+    pub snippet: Option<CaptionSnippet>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#caption".
+    pub kind: Option<String>,
+    /// Etag of this resource.
+    pub etag: Option<String>,
+    /// The ID that YouTube uses to uniquely identify the caption track.
+    pub id: Option<String>,
+}
+
+impl RequestValue for Caption {}
+impl Resource for Caption {}
+impl ResponseResult for Caption {}
+
+impl ToParts for Caption {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.snippet.is_some() { r = r + "snippet,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.id.is_some() { r = r + "id,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about a channel bulletin post.
 /// 
@@ -2261,7 +2718,7 @@ impl Part for ActivityContentDetailsPromotedItem {}
 pub struct ActivityContentDetailsBulletin {
     /// The resourceId object contains information that identifies the resource associated with a bulletin post.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsBulletin {}
@@ -2274,9 +2731,9 @@ impl Part for ActivityContentDetailsBulletin {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedString {
     /// no description provided
-    pub language: String,
+    pub language: Option<String>,
     /// no description provided
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for LocalizedString {}
@@ -2290,14 +2747,14 @@ impl Part for LocalizedString {}
 pub struct VideoFileDetailsAudioStream {
     /// The audio stream's bitrate, in bits per second.
     #[serde(rename="bitrateBps")]
-    pub bitrate_bps: String,
+    pub bitrate_bps: Option<String>,
     /// The audio codec that the stream uses.
-    pub codec: String,
+    pub codec: Option<String>,
     /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
-    pub vendor: String,
+    pub vendor: Option<String>,
     /// The number of audio channels that the stream contains.
     #[serde(rename="channelCount")]
-    pub channel_count: u32,
+    pub channel_count: Option<u32>,
 }
 
 impl Part for VideoFileDetailsAudioStream {}
@@ -2311,17 +2768,17 @@ impl Part for VideoFileDetailsAudioStream {}
 pub struct IngestionInfo {
     /// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.
     #[serde(rename="backupIngestionAddress")]
-    pub backup_ingestion_address: String,
+    pub backup_ingestion_address: Option<String>,
     /// The HTTP or RTMP stream name that YouTube assigns to the video stream.
     #[serde(rename="streamName")]
-    pub stream_name: String,
+    pub stream_name: Option<String>,
     /// The primary ingestion URL that you should use to stream video to YouTube. You must stream video to this URL.
     /// 
     /// Depending on which application or tool you use to encode your video stream, you may need to enter the stream URL and stream name separately or you may need to concatenate them in the following format:
     /// 
     /// STREAM_URL/STREAM_NAME
     #[serde(rename="ingestionAddress")]
-    pub ingestion_address: String,
+    pub ingestion_address: Option<String>,
 }
 
 impl Part for IngestionInfo {}
@@ -2334,13 +2791,13 @@ impl Part for IngestionInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoCategory {
     /// The snippet object contains basic details about the video category, including its title.
-    pub snippet: VideoCategorySnippet,
+    pub snippet: Option<VideoCategorySnippet>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategory".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The ID that YouTube uses to uniquely identify the video category.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for VideoCategory {}
@@ -2354,27 +2811,27 @@ impl Part for VideoCategory {}
 pub struct PlaylistItemSnippet {
     /// The ID that YouTube uses to uniquely identify the user that added the item to the playlist.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The item's description.
-    pub description: String,
+    pub description: Option<String>,
     /// The item's title.
-    pub title: String,
+    pub title: Option<String>,
     /// The id object contains information that can be used to uniquely identify the resource that is included in the playlist as the playlist item.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
     /// The ID that YouTube uses to uniquely identify the playlist that the playlist item is in.
     #[serde(rename="playlistId")]
-    pub playlist_id: String,
+    pub playlist_id: Option<String>,
     /// The date and time that the item was added to the playlist. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishedAt")]
-    pub published_at: String,
+    pub published_at: Option<String>,
     /// Channel title for the channel that the playlist item belongs to.
     #[serde(rename="channelTitle")]
-    pub channel_title: String,
+    pub channel_title: Option<String>,
     /// The order in which the item appears in the playlist. The value uses a zero-based index, so the first item has a position of 0, the second item has a position of 1, and so forth.
-    pub position: u32,
+    pub position: Option<u32>,
     /// A map of thumbnail images associated with the playlist item. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-    pub thumbnails: ThumbnailDetails,
+    pub thumbnails: Option<ThumbnailDetails>,
 }
 
 impl Part for PlaylistItemSnippet {}
@@ -2388,7 +2845,7 @@ impl Part for PlaylistItemSnippet {}
 pub struct ActivityContentDetailsFavorite {
     /// The resourceId object contains information that identifies the resource that was marked as a favorite.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsFavorite {}
@@ -2402,9 +2859,9 @@ impl Part for ActivityContentDetailsFavorite {}
 pub struct VideoSuggestionsTagSuggestion {
     /// A set of video categories for which the tag is relevant. You can use this information to display appropriate tag suggestions based on the video category that the video uploader associates with the video. By default, tag suggestions are relevant for all categories if there are no restricts defined for the keyword.
     #[serde(rename="categoryRestricts")]
-    pub category_restricts: Vec<String>,
+    pub category_restricts: Option<Vec<String>>,
     /// The keyword tag suggested for the video.
-    pub tag: String,
+    pub tag: Option<String>,
 }
 
 impl Part for VideoSuggestionsTagSuggestion {}
@@ -2441,7 +2898,7 @@ impl ResponseResult for ChannelBannerResource {}
 pub struct PlaylistContentDetails {
     /// The number of videos in the playlist.
     #[serde(rename="itemCount")]
-    pub item_count: u32,
+    pub item_count: Option<u32>,
 }
 
 impl Part for PlaylistContentDetails {}
@@ -2455,10 +2912,10 @@ impl Part for PlaylistContentDetails {}
 pub struct PageInfo {
     /// The number of results included in the API response.
     #[serde(rename="resultsPerPage")]
-    pub results_per_page: i32,
+    pub results_per_page: Option<i32>,
     /// The total number of results in the result set.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl Part for PageInfo {}
@@ -2472,7 +2929,7 @@ impl Part for PageInfo {}
 pub struct ActivityContentDetailsLike {
     /// The resourceId object contains information that identifies the rated resource.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsLike {}
@@ -2556,32 +3013,51 @@ impl ToParts for Playlist {
 pub struct PlaylistItemListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistItemListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of playlist items that match the request criteria.
-    pub items: Vec<PlaylistItem>,
+    pub items: Option<Vec<PlaylistItem>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for PlaylistItemListResponse {}
 
+impl ToParts for PlaylistItemListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A pair Property / Value.
 /// 
@@ -2590,9 +3066,9 @@ impl ResponseResult for PlaylistItemListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PropertyValue {
     /// A property.
-    pub property: String,
+    pub property: Option<String>,
     /// The property's value.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for PropertyValue {}
@@ -2606,13 +3082,13 @@ impl Part for PropertyValue {}
 pub struct InvideoTiming {
     /// Defines the time at which the promotion will appear. Depending on the value of type the value of the offsetMs field will represent a time offset from the start or from the end of the video, expressed in milliseconds.
     #[serde(rename="offsetMs")]
-    pub offset_ms: String,
+    pub offset_ms: Option<String>,
     /// Describes a timing type. If the value is offsetFromStart, then the offsetMs field represents an offset from the start of the video. If the value is offsetFromEnd, then the offsetMs field represents an offset from the end of the video.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Defines the duration in milliseconds for which the promotion should be displayed. If missing, the client should use the default.
     #[serde(rename="durationMs")]
-    pub duration_ms: String,
+    pub duration_ms: Option<String>,
 }
 
 impl Part for InvideoTiming {}
@@ -2625,7 +3101,7 @@ impl Part for InvideoTiming {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionLocalization {
     /// The localized strings for channel section's title.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for ChannelSectionLocalization {}
@@ -2692,18 +3168,18 @@ impl ToParts for LiveStream {
 pub struct ActivityContentDetailsSocial {
     /// The resourceId object encapsulates information that identifies the resource associated with a social network post.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
     /// An image of the post's author.
     #[serde(rename="imageUrl")]
-    pub image_url: String,
+    pub image_url: Option<String>,
     /// The name of the social network.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The URL of the social network post.
     #[serde(rename="referenceUrl")]
-    pub reference_url: String,
+    pub reference_url: Option<String>,
     /// The author of the social network post.
-    pub author: String,
+    pub author: Option<String>,
 }
 
 impl Part for ActivityContentDetailsSocial {}
@@ -2716,29 +3192,46 @@ impl Part for ActivityContentDetailsSocial {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivitySnippet {
     /// A map of thumbnail images associated with the resource that is primarily associated with the activity. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-    pub thumbnails: ThumbnailDetails,
+    pub thumbnails: Option<ThumbnailDetails>,
     /// The title of the resource primarily associated with the activity.
-    pub title: String,
+    pub title: Option<String>,
     /// The ID that YouTube uses to uniquely identify the channel associated with the activity.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishedAt")]
-    pub published_at: String,
+    pub published_at: Option<String>,
     /// Channel title for the channel responsible for this activity
     #[serde(rename="channelTitle")]
-    pub channel_title: String,
+    pub channel_title: Option<String>,
     /// The type of activity that the resource describes.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The group ID associated with the activity. A group ID identifies user events that are associated with the same user and resource. For example, if a user rates a video and marks the same video as a favorite, the entries for those events would have the same group ID in the user's activity feed. In your user interface, you can avoid repetition by grouping events with the same groupId value.
     #[serde(rename="groupId")]
-    pub group_id: String,
+    pub group_id: Option<String>,
     /// The description of the resource primarily associated with the activity.
-    pub description: String,
+    pub description: Option<String>,
 }
 
 impl Part for ActivitySnippet {}
+
+
+/// ChannelSection targeting setting.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChannelSectionTargeting {
+    /// The language the channel section is targeting.
+    pub languages: Option<Vec<String>>,
+    /// The region the channel section is targeting.
+    pub regions: Option<Vec<String>>,
+    /// The country the channel section is targeting.
+    pub countries: Option<Vec<String>>,
+}
+
+impl Part for ChannelSectionTargeting {}
 
 
 /// Statistics about the video, such as the number of times the video was viewed or liked.
@@ -2749,22 +3242,35 @@ impl Part for ActivitySnippet {}
 pub struct VideoStatistics {
     /// The number of comments for the video.
     #[serde(rename="commentCount")]
-    pub comment_count: i64,
+    pub comment_count: Option<i64>,
     /// The number of times the video has been viewed.
     #[serde(rename="viewCount")]
-    pub view_count: i64,
+    pub view_count: Option<i64>,
     /// The number of users who currently have the video marked as a favorite video.
     #[serde(rename="favoriteCount")]
-    pub favorite_count: i64,
+    pub favorite_count: Option<i64>,
     /// The number of users who have indicated that they disliked the video by giving it a negative rating.
     #[serde(rename="dislikeCount")]
-    pub dislike_count: i64,
+    pub dislike_count: Option<i64>,
     /// The number of users who have indicated that they liked the video by giving it a positive rating.
     #[serde(rename="likeCount")]
-    pub like_count: i64,
+    pub like_count: Option<i64>,
 }
 
 impl Part for VideoStatistics {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChannelId {
+    /// no description provided
+    pub value: Option<String>,
+}
+
+impl Part for ChannelId {}
 
 
 /// Details about a channelsection, including playlists and channels.
@@ -2774,9 +3280,9 @@ impl Part for VideoStatistics {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionContentDetails {
     /// The channel ids for type multiple_channels.
-    pub channels: Vec<String>,
+    pub channels: Option<Vec<String>>,
     /// The playlist ids for type single_playlist and multiple_playlists. For singlePlaylist, only one playlistId is allowed.
-    pub playlists: Vec<String>,
+    pub playlists: Option<Vec<String>>,
 }
 
 impl Part for ChannelSectionContentDetails {}
@@ -2789,15 +3295,15 @@ impl Part for ChannelSectionContentDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotedItem {
     /// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.
-    pub timing: InvideoTiming,
+    pub timing: Option<InvideoTiming>,
     /// If true, the content owner's name will be used when displaying the promotion. This field can only be set when the update is made on behalf of the content owner.
     #[serde(rename="promotedByContentOwner")]
-    pub promoted_by_content_owner: bool,
+    pub promoted_by_content_owner: Option<bool>,
     /// A custom message to display for this promotion. This field is currently ignored unless the promoted item is a website.
     #[serde(rename="customMessage")]
-    pub custom_message: String,
+    pub custom_message: Option<String>,
     /// Identifies the promoted item.
-    pub id: PromotedItemId,
+    pub id: Option<PromotedItemId>,
 }
 
 impl Part for PromotedItem {}
@@ -2810,13 +3316,13 @@ impl Part for PromotedItem {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelBrandingSettings {
     /// Branding properties for branding images.
-    pub image: ImageSettings,
+    pub image: Option<ImageSettings>,
     /// Branding properties for the watch page.
-    pub watch: WatchSettings,
+    pub watch: Option<WatchSettings>,
     /// Branding properties for the channel view.
-    pub channel: ChannelSettings,
+    pub channel: Option<ChannelSettings>,
     /// Additional experimental branding properties.
-    pub hints: Vec<PropertyValue>,
+    pub hints: Option<Vec<PropertyValue>>,
 }
 
 impl Part for ChannelBrandingSettings {}
@@ -2851,6 +3357,61 @@ pub struct InvideoBranding {
 impl RequestValue for InvideoBranding {}
 
 
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list comments](struct.CommentListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommentListResponse {
+    /// Serialized EventId of the request which produced this response.
+    #[serde(rename="eventId")]
+    pub event_id: Option<String>,
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#commentListResponse".
+    pub kind: Option<String>,
+    /// The visitorId identifies the visitor.
+    #[serde(rename="visitorId")]
+    pub visitor_id: Option<String>,
+    /// A list of comments that match the request criteria.
+    pub items: Option<Vec<Comment>>,
+    /// no description provided
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// Etag of this resource.
+    pub etag: Option<String>,
+    /// no description provided
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+}
+
+impl ResponseResult for CommentListResponse {}
+
+impl ToParts for CommentListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
+
 /// Information about the playlist item's privacy status.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2859,7 +3420,7 @@ impl RequestValue for InvideoBranding {}
 pub struct PlaylistItemStatus {
     /// This resource's privacy status.
     #[serde(rename="privacyStatus")]
-    pub privacy_status: String,
+    pub privacy_status: Option<String>,
 }
 
 impl Part for PlaylistItemStatus {}
@@ -2878,32 +3439,51 @@ impl Part for PlaylistItemStatus {}
 pub struct GuideCategoryListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategoryListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of categories that can be associated with YouTube channels. In this map, the category ID is the map key, and its value is the corresponding guideCategory resource.
-    pub items: Vec<GuideCategory>,
+    pub items: Option<Vec<GuideCategory>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for GuideCategoryListResponse {}
 
+impl ToParts for GuideCategoryListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Basic details about a channel section, including title, style and position.
 /// 
@@ -2912,22 +3492,22 @@ impl ResponseResult for GuideCategoryListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionSnippet {
     /// The style of the channel section.
-    pub style: String,
+    pub style: Option<String>,
     /// Localized title, read-only.
-    pub localized: ChannelSectionLocalization,
+    pub localized: Option<ChannelSectionLocalization>,
     /// The channel section's title for multiple_playlists and multiple_channels.
-    pub title: String,
+    pub title: Option<String>,
     /// The position of the channel section in the channel.
-    pub position: u32,
+    pub position: Option<u32>,
     /// The ID that YouTube uses to uniquely identify the channel that published the channel section.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The type of the channel section.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The language of the channel section's default title and description.
     #[serde(rename="defaultLanguage")]
-    pub default_language: String,
+    pub default_language: Option<String>,
 }
 
 impl Part for ChannelSectionSnippet {}
@@ -2941,10 +3521,10 @@ impl Part for ChannelSectionSnippet {}
 pub struct ChannelContentDetails {
     /// no description provided
     #[serde(rename="relatedPlaylists")]
-    pub related_playlists: ChannelContentDetailsRelatedPlaylists,
+    pub related_playlists: Option<ChannelContentDetailsRelatedPlaylists>,
     /// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.
     #[serde(rename="googlePlusUserId")]
-    pub google_plus_user_id: String,
+    pub google_plus_user_id: Option<String>,
 }
 
 impl Part for ChannelContentDetails {}
@@ -2967,12 +3547,41 @@ impl Part for TokenPagination {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessPolicy {
     /// A list of region codes that identify countries where the default policy do not apply.
-    pub exception: Vec<String>,
+    pub exception: Option<Vec<String>>,
     /// The value of allowed indicates whether the access to the policy is allowed or denied by default.
-    pub allowed: bool,
+    pub allowed: Option<bool>,
 }
 
 impl Part for AccessPolicy {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [report abuse videos](struct.VideoReportAbuseCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize)]
+pub struct VideoAbuseReport {
+    /// The specific, or secondary, reason that this content is abusive (if available). The value is an abuse report reason ID that is a valid secondary reason for the primary reason.
+    #[serde(rename="secondaryReasonId")]
+    pub secondary_reason_id: Option<String>,
+    /// The high-level, or primary, reason that the content is abusive. The value is an abuse report reason ID.
+    #[serde(rename="reasonId")]
+    pub reason_id: Option<String>,
+    /// Additional comments regarding the abuse report.
+    pub comments: Option<String>,
+    /// The language that the content was viewed in.
+    pub language: Option<String>,
+    /// The ID that YouTube uses to uniquely identify the video.
+    #[serde(rename="videoId")]
+    pub video_id: Option<String>,
+}
+
+impl RequestValue for VideoAbuseReport {}
 
 
 /// Information that identifies the recommended resource.
@@ -2983,12 +3592,12 @@ impl Part for AccessPolicy {}
 pub struct ActivityContentDetailsRecommendation {
     /// The resourceId object contains information that identifies the recommended resource.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
     /// The reason that the resource is recommended to the user.
-    pub reason: String,
+    pub reason: Option<String>,
     /// The seedResourceId object contains information about the resource that caused the recommendation.
     #[serde(rename="seedResourceId")]
-    pub seed_resource_id: ResourceId,
+    pub seed_resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsRecommendation {}
@@ -3001,30 +3610,30 @@ impl Part for ActivityContentDetailsRecommendation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetails {
     /// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.
-    pub comment: ActivityContentDetailsComment,
+    pub comment: Option<ActivityContentDetailsComment>,
     /// The playlistItem object contains information about a new playlist item. This property is only present if the snippet.type is playlistItem.
     #[serde(rename="playlistItem")]
-    pub playlist_item: ActivityContentDetailsPlaylistItem,
+    pub playlist_item: Option<ActivityContentDetailsPlaylistItem>,
     /// The like object contains information about a resource that received a positive (like) rating. This property is only present if the snippet.type is like.
-    pub like: ActivityContentDetailsLike,
+    pub like: Option<ActivityContentDetailsLike>,
     /// The promotedItem object contains details about a resource which is being promoted. This property is only present if the snippet.type is promotedItem.
     #[serde(rename="promotedItem")]
-    pub promoted_item: ActivityContentDetailsPromotedItem,
+    pub promoted_item: Option<ActivityContentDetailsPromotedItem>,
     /// The recommendation object contains information about a recommended resource. This property is only present if the snippet.type is recommendation.
-    pub recommendation: ActivityContentDetailsRecommendation,
+    pub recommendation: Option<ActivityContentDetailsRecommendation>,
     /// The favorite object contains information about a video that was marked as a favorite video. This property is only present if the snippet.type is favorite.
-    pub favorite: ActivityContentDetailsFavorite,
+    pub favorite: Option<ActivityContentDetailsFavorite>,
     /// The upload object contains information about the uploaded video. This property is only present if the snippet.type is upload.
-    pub upload: ActivityContentDetailsUpload,
+    pub upload: Option<ActivityContentDetailsUpload>,
     /// The social object contains details about a social network post. This property is only present if the snippet.type is social.
-    pub social: ActivityContentDetailsSocial,
+    pub social: Option<ActivityContentDetailsSocial>,
     /// The channelItem object contains details about a resource which was added to a channel. This property is only present if the snippet.type is channelItem.
     #[serde(rename="channelItem")]
-    pub channel_item: ActivityContentDetailsChannelItem,
+    pub channel_item: Option<ActivityContentDetailsChannelItem>,
     /// The bulletin object contains details about a channel bulletin post. This object is only present if the snippet.type is bulletin.
-    pub bulletin: ActivityContentDetailsBulletin,
+    pub bulletin: Option<ActivityContentDetailsBulletin>,
     /// The subscription object contains information about a channel that a user subscribed to. This property is only present if the snippet.type is subscription.
-    pub subscription: ActivityContentDetailsSubscription,
+    pub subscription: Option<ActivityContentDetailsSubscription>,
 }
 
 impl Part for ActivityContentDetails {}
@@ -3076,10 +3685,10 @@ impl ToParts for I18nRegion {
 pub struct ChannelContentOwnerDetails {
     /// The ID of the content owner linked to the channel.
     #[serde(rename="contentOwner")]
-    pub content_owner: String,
+    pub content_owner: Option<String>,
     /// The date and time of when the channel was linked to the content owner. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="timeLinked")]
-    pub time_linked: String,
+    pub time_linked: Option<String>,
 }
 
 impl Part for ChannelContentOwnerDetails {}
@@ -3093,19 +3702,35 @@ impl Part for ChannelContentOwnerDetails {}
 pub struct LiveBroadcastStatus {
     /// The broadcast's recording status.
     #[serde(rename="recordingStatus")]
-    pub recording_status: String,
+    pub recording_status: Option<String>,
     /// The broadcast's privacy status. Note that the broadcast represents exactly one YouTube video, so the privacy settings are identical to those supported for videos. In addition, you can set this field by modifying the broadcast resource or by setting the privacyStatus field of the corresponding video resource.
     #[serde(rename="privacyStatus")]
-    pub privacy_status: String,
+    pub privacy_status: Option<String>,
     /// The broadcast's status. The status can be updated using the API's liveBroadcasts.transition method.
     #[serde(rename="lifeCycleStatus")]
-    pub life_cycle_status: String,
+    pub life_cycle_status: Option<String>,
+    /// Whether or not this broadcast is the default broadcast
+    #[serde(rename="isDefaultBroadcast")]
+    pub is_default_broadcast: Option<bool>,
     /// Priority of the live broadcast event (internal state).
     #[serde(rename="liveBroadcastPriority")]
-    pub live_broadcast_priority: String,
+    pub live_broadcast_priority: Option<String>,
 }
 
 impl Part for LiveBroadcastStatus {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VideoAbuseReportReasonId {
+    /// no description provided
+    pub value: Option<String>,
+}
+
+impl Part for VideoAbuseReportReasonId {}
 
 
 /// Geographical coordinates of a point, in WGS84.
@@ -3115,11 +3740,11 @@ impl Part for LiveBroadcastStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoPoint {
     /// Latitude in degrees.
-    pub latitude: f64,
+    pub latitude: Option<f64>,
     /// Altitude above the reference ellipsoid, in meters.
-    pub altitude: f64,
+    pub altitude: Option<f64>,
     /// Longitude in degrees.
-    pub longitude: f64,
+    pub longitude: Option<f64>,
 }
 
 impl Part for GeoPoint {}
@@ -3132,13 +3757,13 @@ impl Part for GeoPoint {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoAgeGating {
     /// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.
-    pub restricted: bool,
+    pub restricted: Option<bool>,
     /// Indicates whether or not the video has alcoholic beverage content. Only users of legal purchasing age in a particular country, as identified by ICAP, can view the content.
     #[serde(rename="alcoholContent")]
-    pub alcohol_content: bool,
+    pub alcohol_content: Option<bool>,
     /// Video game rating, if any.
     #[serde(rename="videoGameRating")]
-    pub video_game_rating: String,
+    pub video_game_rating: Option<String>,
 }
 
 impl Part for VideoAgeGating {}
@@ -3152,7 +3777,7 @@ impl Part for VideoAgeGating {}
 pub struct VideoPlayer {
     /// An <iframe> tag that embeds a player that will play the video.
     #[serde(rename="embedHtml")]
-    pub embed_html: String,
+    pub embed_html: Option<String>,
 }
 
 impl Part for VideoPlayer {}
@@ -3166,18 +3791,20 @@ impl Part for VideoPlayer {}
 pub struct ChannelSnippet {
     /// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishedAt")]
-    pub published_at: String,
-    /// The description of the channel.
-    pub description: String,
+    pub published_at: Option<String>,
+    /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
+    pub thumbnails: Option<ThumbnailDetails>,
     /// The channel's title.
-    pub title: String,
+    pub title: Option<String>,
+    /// The country of the channel.
+    pub country: Option<String>,
     /// Localized title and description, read-only.
-    pub localized: ChannelLocalization,
+    pub localized: Option<ChannelLocalization>,
     /// The language of the channel's default title and description.
     #[serde(rename="defaultLanguage")]
-    pub default_language: String,
-    /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-    pub thumbnails: ThumbnailDetails,
+    pub default_language: Option<String>,
+    /// The description of the channel.
+    pub description: Option<String>,
 }
 
 impl Part for ChannelSnippet {}
@@ -3191,13 +3818,13 @@ impl Part for ChannelSnippet {}
 pub struct WatchSettings {
     /// The background color for the video watch page's branded area.
     #[serde(rename="textColor")]
-    pub text_color: String,
+    pub text_color: Option<String>,
     /// An ID that uniquely identifies a playlist that displays next to the video player.
     #[serde(rename="featuredPlaylistId")]
-    pub featured_playlist_id: String,
+    pub featured_playlist_id: Option<String>,
     /// The text color for the video watch page's branded area.
     #[serde(rename="backgroundColor")]
-    pub background_color: String,
+    pub background_color: Option<String>,
 }
 
 impl Part for WatchSettings {}
@@ -3211,6 +3838,7 @@ impl Part for WatchSettings {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [rate videos](struct.VideoRateCall.html) (none)
+/// * [report abuse videos](struct.VideoReportAbuseCall.html) (none)
 /// * [get rating videos](struct.VideoGetRatingCall.html) (none)
 /// * [list videos](struct.VideoListCall.html) (none)
 /// * [insert videos](struct.VideoInsertCall.html) (request|response)
@@ -3312,29 +3940,74 @@ impl ToParts for Video {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoContentDetails {
     /// The value of definition indicates whether the video is available in high definition or only in standard definition.
-    pub definition: String,
+    pub definition: Option<String>,
     /// The countryRestriction object contains information about the countries where a video is (or is not) viewable.
     #[serde(rename="countryRestriction")]
-    pub country_restriction: AccessPolicy,
+    pub country_restriction: Option<AccessPolicy>,
     /// Specifies the ratings that the video received under various rating schemes.
     #[serde(rename="contentRating")]
-    pub content_rating: ContentRating,
+    pub content_rating: Option<ContentRating>,
     /// The value of captions indicates whether the video has captions or not.
-    pub caption: String,
+    pub caption: Option<String>,
     /// The regionRestriction object contains information about the countries where a video is (or is not) viewable. The object will contain either the contentDetails.regionRestriction.allowed property or the contentDetails.regionRestriction.blocked property.
     #[serde(rename="regionRestriction")]
-    pub region_restriction: VideoContentDetailsRegionRestriction,
+    pub region_restriction: Option<VideoContentDetailsRegionRestriction>,
     /// The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.
-    pub duration: String,
+    pub duration: Option<String>,
     /// The value of is_license_content indicates whether the video is licensed content.
     #[serde(rename="licensedContent")]
-    pub licensed_content: bool,
+    pub licensed_content: Option<bool>,
     /// The value of dimension indicates whether the video is available in 3D or in 2D.
-    pub dimension: String,
+    pub dimension: Option<String>,
 }
 
 impl Part for VideoContentDetails {}
 
+
+/// A comment thread represents information that applies to a top level comment and all its replies. It can also include the top level comment itself and some of the replies.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [update comment threads](struct.CommentThreadUpdateCall.html) (request|response)
+/// * [list comment threads](struct.CommentThreadListCall.html) (none)
+/// * [insert comment threads](struct.CommentThreadInsertCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommentThread {
+    /// The snippet object contains basic details about the comment thread and also the top level comment.
+    pub snippet: Option<CommentThreadSnippet>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#commentThread".
+    pub kind: Option<String>,
+    /// Etag of this resource.
+    pub etag: Option<String>,
+    /// The ID that YouTube uses to uniquely identify the comment thread.
+    pub id: Option<String>,
+    /// The replies object contains a limited number of replies (if any) to the top level comment found in the snippet.
+    pub replies: Option<CommentThreadReplies>,
+}
+
+impl RequestValue for CommentThread {}
+impl Resource for CommentThread {}
+impl ResponseResult for CommentThread {}
+
+impl ToParts for CommentThread {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.snippet.is_some() { r = r + "snippet,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.id.is_some() { r = r + "id,"; }
+        if self.replies.is_some() { r = r + "replies,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Describes a single promoted item id. It is a union of various possible types.
 /// 
@@ -3344,16 +4017,16 @@ impl Part for VideoContentDetails {}
 pub struct PromotedItemId {
     /// If the promoted item represents a website, this field represents the url pointing to the website. This field will be present only if type has the value website.
     #[serde(rename="websiteUrl")]
-    pub website_url: String,
+    pub website_url: Option<String>,
     /// If type is recentUpload, this field identifies the channel from which to take the recent upload. If missing, the channel is assumed to be the same channel for which the invideoPromotion is set.
     #[serde(rename="recentlyUploadedBy")]
-    pub recently_uploaded_by: String,
+    pub recently_uploaded_by: Option<String>,
     /// Describes the type of the promoted item.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// If the promoted item represents a video, this field represents the unique YouTube ID identifying it. This field will be present only if type has the value video.
     #[serde(rename="videoId")]
-    pub video_id: String,
+    pub video_id: Option<String>,
 }
 
 impl Part for PromotedItemId {}
@@ -3367,36 +4040,36 @@ impl Part for PromotedItemId {}
 pub struct VideoFileDetails {
     /// The uploaded video file's combined (video and audio) bitrate in bits per second.
     #[serde(rename="bitrateBps")]
-    pub bitrate_bps: String,
+    pub bitrate_bps: Option<String>,
     /// The uploaded video file's container format.
-    pub container: String,
+    pub container: Option<String>,
     /// Geographic coordinates that identify the place where the uploaded video was recorded. Coordinates are defined using WGS 84.
     #[serde(rename="recordingLocation")]
-    pub recording_location: GeoPoint,
+    pub recording_location: Option<GeoPoint>,
     /// The uploaded file's type as detected by YouTube's video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.
     #[serde(rename="fileType")]
-    pub file_type: String,
+    pub file_type: Option<String>,
     /// The date and time when the uploaded video file was created. The value is specified in ISO 8601 format. Currently, the following ISO 8601 formats are supported:  
     /// - Date only: YYYY-MM-DD 
     /// - Naive time: YYYY-MM-DDTHH:MM:SS 
     /// - Time with timezone: YYYY-MM-DDTHH:MM:SS+HH:MM
     #[serde(rename="creationTime")]
-    pub creation_time: String,
+    pub creation_time: Option<String>,
     /// The length of the uploaded video in milliseconds.
     #[serde(rename="durationMs")]
-    pub duration_ms: String,
+    pub duration_ms: Option<String>,
     /// The uploaded file's name. This field is present whether a video file or another type of file was uploaded.
     #[serde(rename="fileName")]
-    pub file_name: String,
+    pub file_name: Option<String>,
     /// The uploaded file's size in bytes. This field is present whether a video file or another type of file was uploaded.
     #[serde(rename="fileSize")]
-    pub file_size: String,
+    pub file_size: Option<String>,
     /// A list of video streams contained in the uploaded video file. Each item in the list contains detailed metadata about a video stream.
     #[serde(rename="videoStreams")]
-    pub video_streams: Vec<VideoFileDetailsVideoStream>,
+    pub video_streams: Option<Vec<VideoFileDetailsVideoStream>>,
     /// A list of audio streams contained in the uploaded video file. Each item in the list contains detailed metadata about an audio stream.
     #[serde(rename="audioStreams")]
-    pub audio_streams: Vec<VideoFileDetailsAudioStream>,
+    pub audio_streams: Option<Vec<VideoFileDetailsAudioStream>>,
 }
 
 impl Part for VideoFileDetails {}
@@ -3410,10 +4083,10 @@ impl Part for VideoFileDetails {}
 pub struct InvideoPosition {
     /// Describes in which corner of the video the visual widget will appear.
     #[serde(rename="cornerPosition")]
-    pub corner_position: String,
+    pub corner_position: Option<String>,
     /// Defines the position type.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl Part for InvideoPosition {}
@@ -3426,7 +4099,7 @@ impl Part for InvideoPosition {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoProjectDetails {
     /// A list of project tags associated with the video during the upload.
-    pub tags: Vec<String>,
+    pub tags: Option<Vec<String>>,
 }
 
 impl Part for VideoProjectDetails {}
@@ -3439,27 +4112,27 @@ impl Part for VideoProjectDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoStatus {
     /// The video's license.
-    pub license: String,
+    pub license: Option<String>,
     /// This value indicates if the video can be embedded on another website.
-    pub embeddable: bool,
+    pub embeddable: Option<bool>,
     /// The video's privacy status.
     #[serde(rename="privacyStatus")]
-    pub privacy_status: String,
+    pub privacy_status: Option<String>,
     /// The date and time when the video is scheduled to publish. It can be set only if the privacy status of the video is private. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishAt")]
-    pub publish_at: String,
+    pub publish_at: Option<String>,
     /// This value indicates if the extended video statistics on the watch page can be viewed by everyone. Note that the view count, likes, etc will still be visible if this is disabled.
     #[serde(rename="publicStatsViewable")]
-    pub public_stats_viewable: bool,
+    pub public_stats_viewable: Option<bool>,
     /// The status of the uploaded video.
     #[serde(rename="uploadStatus")]
-    pub upload_status: String,
+    pub upload_status: Option<String>,
     /// This value explains why YouTube rejected an uploaded video. This property is only present if the uploadStatus property indicates that the upload was rejected.
     #[serde(rename="rejectionReason")]
-    pub rejection_reason: String,
+    pub rejection_reason: Option<String>,
     /// This value explains why a video failed to upload. This property is only present if the uploadStatus property indicates that the upload failed.
     #[serde(rename="failureReason")]
-    pub failure_reason: String,
+    pub failure_reason: Option<String>,
 }
 
 impl Part for VideoStatus {}
@@ -3472,9 +4145,9 @@ impl Part for VideoStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoLocalization {
     /// Localized version of the video's description.
-    pub description: String,
+    pub description: Option<String>,
     /// Localized version of the video's title.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for VideoLocalization {}
@@ -3488,7 +4161,7 @@ impl Part for VideoLocalization {}
 pub struct ActivityContentDetailsSubscription {
     /// The resourceId object contains information that identifies the resource that the user subscribed to.
     #[serde(rename="resourceId")]
-    pub resource_id: ResourceId,
+    pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsSubscription {}
@@ -3555,19 +4228,19 @@ impl ToParts for LiveBroadcast {
 pub struct ChannelStatistics {
     /// The number of comments for the channel.
     #[serde(rename="commentCount")]
-    pub comment_count: i64,
+    pub comment_count: Option<i64>,
     /// The number of subscribers that the channel has.
     #[serde(rename="subscriberCount")]
-    pub subscriber_count: i64,
+    pub subscriber_count: Option<i64>,
     /// The number of videos uploaded to the channel.
     #[serde(rename="videoCount")]
-    pub video_count: i64,
+    pub video_count: Option<i64>,
     /// Whether or not the number of subscribers is shown for this user.
     #[serde(rename="hiddenSubscriberCount")]
-    pub hidden_subscriber_count: bool,
+    pub hidden_subscriber_count: Option<bool>,
     /// The number of times the channel has been viewed.
     #[serde(rename="viewCount")]
-    pub view_count: i64,
+    pub view_count: Option<i64>,
 }
 
 impl Part for ChannelStatistics {}
@@ -3580,16 +4253,16 @@ impl Part for ChannelStatistics {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceId {
     /// The type of the API resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a channel. This property is only present if the resourceId.kind value is youtube#channel.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a playlist. This property is only present if the resourceId.kind value is youtube#playlist.
     #[serde(rename="playlistId")]
-    pub playlist_id: String,
+    pub playlist_id: Option<String>,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a video. This property is only present if the resourceId.kind value is youtube#video.
     #[serde(rename="videoId")]
-    pub video_id: String,
+    pub video_id: Option<String>,
 }
 
 impl Part for ResourceId {}
@@ -3603,7 +4276,7 @@ impl Part for ResourceId {}
 pub struct ActivityContentDetailsUpload {
     /// The ID that YouTube uses to uniquely identify the uploaded video.
     #[serde(rename="videoId")]
-    pub video_id: String,
+    pub video_id: Option<String>,
 }
 
 impl Part for ActivityContentDetailsUpload {}
@@ -3622,32 +4295,51 @@ impl Part for ActivityContentDetailsUpload {}
 pub struct ActivityListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#activityListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of activities, or events, that match the request criteria.
-    pub items: Vec<Activity>,
+    pub items: Option<Vec<Activity>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for ActivityListResponse {}
 
+impl ToParts for ActivityListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -3657,7 +4349,7 @@ impl ResponseResult for ActivityListResponse {}
 pub struct PlaylistPlayer {
     /// An <iframe> tag that embeds a player that will play the playlist.
     #[serde(rename="embedHtml")]
-    pub embed_html: String,
+    pub embed_html: Option<String>,
 }
 
 impl Part for PlaylistPlayer {}
@@ -3671,7 +4363,7 @@ impl Part for PlaylistPlayer {}
 pub struct ChannelTopicDetails {
     /// A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.
     #[serde(rename="topicIds")]
-    pub topic_ids: Vec<String>,
+    pub topic_ids: Option<Vec<String>>,
 }
 
 impl Part for ChannelTopicDetails {}
@@ -3685,12 +4377,12 @@ impl Part for ChannelTopicDetails {}
 pub struct VideoRecordingDetails {
     /// The date and time when the video was recorded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.
     #[serde(rename="recordingDate")]
-    pub recording_date: String,
+    pub recording_date: Option<String>,
     /// The text description of the location where the video was recorded.
     #[serde(rename="locationDescription")]
-    pub location_description: String,
+    pub location_description: Option<String>,
     /// The geolocation information associated with the video.
-    pub location: GeoPoint,
+    pub location: Option<GeoPoint>,
 }
 
 impl Part for VideoRecordingDetails {}
@@ -3704,7 +4396,7 @@ impl Part for VideoRecordingDetails {}
 pub struct PlaylistStatus {
     /// The playlist's privacy status.
     #[serde(rename="privacyStatus")]
-    pub privacy_status: String,
+    pub privacy_status: Option<String>,
 }
 
 impl Part for PlaylistStatus {}
@@ -3718,17 +4410,17 @@ impl Part for PlaylistStatus {}
 pub struct MonitorStreamInfo {
     /// If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.
     #[serde(rename="broadcastStreamDelayMs")]
-    pub broadcast_stream_delay_ms: u32,
+    pub broadcast_stream_delay_ms: Option<u32>,
     /// HTML code that embeds a player that plays the monitor stream.
     #[serde(rename="embedHtml")]
-    pub embed_html: String,
+    pub embed_html: Option<String>,
     /// This value determines whether the monitor stream is enabled for the broadcast. If the monitor stream is enabled, then YouTube will broadcast the event content on a special stream intended only for the broadcaster's consumption. The broadcaster can use the stream to review the event content and also to identify the optimal times to insert cuepoints.
     /// 
     /// You need to set this value to true if you intend to have a broadcast delay for your event.
     /// 
     /// Note: This property cannot be updated once the broadcast is in the testing or live state.
     #[serde(rename="enableMonitorStream")]
-    pub enable_monitor_stream: bool,
+    pub enable_monitor_stream: Option<bool>,
 }
 
 impl Part for MonitorStreamInfo {}
@@ -3742,19 +4434,19 @@ impl Part for MonitorStreamInfo {}
 pub struct VideoLiveStreamingDetails {
     /// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.
     #[serde(rename="concurrentViewers")]
-    pub concurrent_viewers: String,
+    pub concurrent_viewers: Option<String>,
     /// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="scheduledStartTime")]
-    pub scheduled_start_time: String,
+    pub scheduled_start_time: Option<String>,
     /// The time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. If the value is empty or the property is not present, then the broadcast is scheduled to continue indefinitely.
     #[serde(rename="scheduledEndTime")]
-    pub scheduled_end_time: String,
+    pub scheduled_end_time: Option<String>,
     /// The time that the broadcast actually started. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast begins.
     #[serde(rename="actualStartTime")]
-    pub actual_start_time: String,
+    pub actual_start_time: Option<String>,
     /// The time that the broadcast actually ended. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast is over.
     #[serde(rename="actualEndTime")]
-    pub actual_end_time: String,
+    pub actual_end_time: Option<String>,
 }
 
 impl Part for VideoLiveStreamingDetails {}
@@ -3768,45 +4460,39 @@ impl Part for VideoLiveStreamingDetails {}
 pub struct VideoTopicDetails {
     /// A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the Freebase Topic API.
     #[serde(rename="topicIds")]
-    pub topic_ids: Vec<String>,
+    pub topic_ids: Option<Vec<String>>,
     /// Similar to topic_id, except that these topics are merely relevant to the video. These are topics that may be mentioned in, or appear in the video. You can retrieve information about each topic using Freebase Topic API.
     #[serde(rename="relevantTopicIds")]
-    pub relevant_topic_ids: Vec<String>,
+    pub relevant_topic_ids: Option<Vec<String>>,
 }
 
 impl Part for VideoTopicDetails {}
 
 
-/// A caption resource represents a YouTube caption track. A caption track is associated with exactly one YouTube video.
+/// A videoAbuseReportReason resource identifies a reason that a video could be reported as abusive. Video abuse report reasons are used with video.ReportAbuse.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [update captions](struct.CaptionUpdateCall.html) (request|response)
-/// * [list captions](struct.CaptionListCall.html) (none)
-/// * [delete captions](struct.CaptionDeleteCall.html) (none)
-/// * [insert captions](struct.CaptionInsertCall.html) (request|response)
-/// * [download captions](struct.CaptionDownloadCall.html) (none)
+/// * [list video abuse report reasons](struct.VideoAbuseReportReasonListCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Caption {
-    /// The snippet object contains basic details about the caption.
-    pub snippet: Option<CaptionSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#caption".
+pub struct VideoAbuseReportReason {
+    /// The snippet object contains basic details about the abuse report reason.
+    pub snippet: Option<VideoAbuseReportReasonSnippet>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoAbuseReportReason".
     pub kind: Option<String>,
     /// Etag of this resource.
     pub etag: Option<String>,
-    /// The ID that YouTube uses to uniquely identify the caption track.
+    /// The ID of this abuse report reason.
     pub id: Option<String>,
 }
 
-impl RequestValue for Caption {}
-impl Resource for Caption {}
-impl ResponseResult for Caption {}
+impl Resource for VideoAbuseReportReason {}
 
-impl ToParts for Caption {
+impl ToParts for VideoAbuseReportReason {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -3872,17 +4558,72 @@ impl ToParts for Activity {
 pub struct SubscriptionSubscriberSnippet {
     /// The channel ID of the subscriber.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The description of the subscriber.
-    pub description: String,
+    pub description: Option<String>,
     /// Thumbnails for this subscriber.
-    pub thumbnails: ThumbnailDetails,
+    pub thumbnails: Option<ThumbnailDetails>,
     /// The title of the subscriber.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for SubscriptionSubscriberSnippet {}
 
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list comment threads](struct.CommentThreadListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommentThreadListResponse {
+    /// Serialized EventId of the request which produced this response.
+    #[serde(rename="eventId")]
+    pub event_id: Option<String>,
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#commentThreadListResponse".
+    pub kind: Option<String>,
+    /// The visitorId identifies the visitor.
+    #[serde(rename="visitorId")]
+    pub visitor_id: Option<String>,
+    /// A list of comment threads that match the request criteria.
+    pub items: Option<Vec<CommentThread>>,
+    /// no description provided
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// Etag of this resource.
+    pub etag: Option<String>,
+    /// no description provided
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+}
+
+impl ResponseResult for CommentThreadListResponse {}
+
+impl ToParts for CommentThreadListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Playlist localization setting
 /// 
@@ -3891,9 +4632,9 @@ impl Part for SubscriptionSubscriberSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistLocalization {
     /// The localized strings for playlist's description.
-    pub description: String,
+    pub description: Option<String>,
     /// The localized strings for playlist's title.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for PlaylistLocalization {}
@@ -3906,7 +4647,7 @@ impl Part for PlaylistLocalization {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoConversionPings {
     /// Pings that the app shall fire for a video (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
-    pub pings: Vec<VideoConversionPing>,
+    pub pings: Option<Vec<VideoConversionPing>>,
 }
 
 impl Part for VideoConversionPings {}
@@ -3958,31 +4699,60 @@ impl ToParts for I18nLanguage {
 pub struct LiveBroadcastSnippet {
     /// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="actualEndTime")]
-    pub actual_end_time: String,
+    pub actual_end_time: Option<String>,
     /// The broadcast's description. As with the title, you can set this field by modifying the broadcast resource or by setting the description field of the corresponding video resource.
-    pub description: String,
+    pub description: Option<String>,
     /// The broadcast's title. Note that the broadcast represents exactly one YouTube video. You can set this field by modifying the broadcast resource or by setting the title field of the corresponding video resource.
-    pub title: String,
+    pub title: Option<String>,
     /// The ID that YouTube uses to uniquely identify the channel that is publishing the broadcast.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The date and time that the broadcast was added to YouTube's live broadcast schedule. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishedAt")]
-    pub published_at: String,
+    pub published_at: Option<String>,
     /// The date and time that the broadcast is scheduled to start. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="scheduledStartTime")]
-    pub scheduled_start_time: String,
+    pub scheduled_start_time: Option<String>,
     /// The date and time that the broadcast actually started. This information is only available once the broadcast's state is live. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="actualStartTime")]
-    pub actual_start_time: String,
+    pub actual_start_time: Option<String>,
     /// The date and time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="scheduledEndTime")]
-    pub scheduled_end_time: String,
+    pub scheduled_end_time: Option<String>,
     /// A map of thumbnail images associated with the broadcast. For each nested object in this object, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-    pub thumbnails: ThumbnailDetails,
+    pub thumbnails: Option<ThumbnailDetails>,
 }
 
 impl Part for LiveBroadcastSnippet {}
+
+
+/// Basic details about a comment thread.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommentThreadSnippet {
+    /// The top level comment of this thread.
+    #[serde(rename="topLevelComment")]
+    pub top_level_comment: Option<Comment>,
+    /// Whether the current viewer of the thread can reply to it. This is viewer specific - other viewers may see a different value for this field.
+    #[serde(rename="canReply")]
+    pub can_reply: Option<bool>,
+    /// The YouTube channel the comments in the thread refer to or the channel with the video the comments refer to. If video_id isn't set the comments refer to the channel itself.
+    #[serde(rename="channelId")]
+    pub channel_id: Option<String>,
+    /// The total number of replies (not including the top level comment).
+    #[serde(rename="totalReplyCount")]
+    pub total_reply_count: Option<u32>,
+    /// Whether the thread (and therefore all its comments) is visible to all YouTube users.
+    #[serde(rename="isPublic")]
+    pub is_public: Option<bool>,
+    /// The ID of the video the comments refer to, if any. No video_id implies a channel discussion comment.
+    #[serde(rename="videoId")]
+    pub video_id: Option<String>,
+}
+
+impl Part for CommentThreadSnippet {}
 
 
 /// Detailed settings of a broadcast.
@@ -3993,36 +4763,36 @@ impl Part for LiveBroadcastSnippet {}
 pub struct LiveBroadcastContentDetails {
     /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
     #[serde(rename="startWithSlate")]
-    pub start_with_slate: bool,
+    pub start_with_slate: Option<bool>,
     /// This value uniquely identifies the live stream bound to the broadcast.
     #[serde(rename="boundStreamId")]
-    pub bound_stream_id: String,
+    pub bound_stream_id: Option<String>,
     /// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.
     #[serde(rename="enableEmbed")]
-    pub enable_embed: bool,
+    pub enable_embed: Option<bool>,
     /// This setting indicates whether closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API.
     #[serde(rename="enableClosedCaptions")]
-    pub enable_closed_captions: bool,
+    pub enable_closed_captions: Option<bool>,
     /// This setting indicates whether YouTube should enable content encryption for the broadcast.
     #[serde(rename="enableContentEncryption")]
-    pub enable_content_encryption: bool,
+    pub enable_content_encryption: Option<bool>,
     /// Automatically start recording after the event goes live. The default value for this property is true.
     /// 
     /// 
     /// 
     /// Important: You must also set the enableDvr property's value to true if you want the playback to be available immediately after the broadcast ends. If you set this property's value to true but do not also set the enableDvr property to true, there may be a delay of around one day before the archived video will be available for playback.
     #[serde(rename="recordFromStart")]
-    pub record_from_start: bool,
+    pub record_from_start: Option<bool>,
     /// This setting determines whether viewers can access DVR controls while watching the video. DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content. The default value for this property is true.
     /// 
     /// 
     /// 
     /// Important: You must set the value to true and also set the enableArchive property's value to true if you want to make playback available immediately after the broadcast ends.
     #[serde(rename="enableDvr")]
-    pub enable_dvr: bool,
+    pub enable_dvr: Option<bool>,
     /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.
     #[serde(rename="monitorStream")]
-    pub monitor_stream: MonitorStreamInfo,
+    pub monitor_stream: Option<MonitorStreamInfo>,
 }
 
 impl Part for LiveBroadcastContentDetails {}
@@ -4035,10 +4805,10 @@ impl Part for LiveBroadcastContentDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoConversionPing {
     /// Defines the context of the ping.
-    pub context: String,
+    pub context: Option<String>,
     /// The url (without the schema) that the app shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D like%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA%3Bytvid%3DUrIaJUvIQDg&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.
     #[serde(rename="conversionUrl")]
-    pub conversion_url: String,
+    pub conversion_url: Option<String>,
 }
 
 impl Part for VideoConversionPing {}
@@ -4051,12 +4821,12 @@ impl Part for VideoConversionPing {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoCategorySnippet {
     /// no description provided
-    pub assignable: bool,
+    pub assignable: Option<bool>,
     /// The YouTube channel that created the video category.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The video category's title.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for VideoCategorySnippet {}
@@ -4075,32 +4845,51 @@ impl Part for VideoCategorySnippet {}
 pub struct SearchListResponse {
     /// Serialized EventId of the request which produced this response.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#searchListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The visitorId identifies the visitor.
     #[serde(rename="visitorId")]
-    pub visitor_id: String,
+    pub visitor_id: Option<String>,
     /// A list of results that match the search criteria.
-    pub items: Vec<SearchResult>,
+    pub items: Option<Vec<SearchResult>>,
     /// no description provided
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// no description provided
     #[serde(rename="pageInfo")]
-    pub page_info: PageInfo,
+    pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for SearchListResponse {}
 
+impl ToParts for SearchListResponse {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.event_id.is_some() { r = r + "eventId,"; }
+        if self.next_page_token.is_some() { r = r + "nextPageToken,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.visitor_id.is_some() { r = r + "visitorId,"; }
+        if self.items.is_some() { r = r + "items,"; }
+        if self.token_pagination.is_some() { r = r + "tokenPagination,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.prev_page_token.is_some() { r = r + "prevPageToken,"; }
+        if self.page_info.is_some() { r = r + "pageInfo,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Specifies suggestions on how to improve video content, including encoding hints, tag suggestions, and editor suggestions.
 /// 
@@ -4110,19 +4899,19 @@ impl ResponseResult for SearchListResponse {}
 pub struct VideoSuggestions {
     /// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.
     #[serde(rename="processingErrors")]
-    pub processing_errors: Vec<String>,
+    pub processing_errors: Option<Vec<String>>,
     /// A list of keyword tags that could be added to the video's metadata to increase the likelihood that users will locate your video when searching or browsing on YouTube.
     #[serde(rename="tagSuggestions")]
-    pub tag_suggestions: Vec<VideoSuggestionsTagSuggestion>,
+    pub tag_suggestions: Option<Vec<VideoSuggestionsTagSuggestion>>,
     /// A list of video editing operations that might improve the video quality or playback experience of the uploaded video.
     #[serde(rename="editorSuggestions")]
-    pub editor_suggestions: Vec<String>,
+    pub editor_suggestions: Option<Vec<String>>,
     /// A list of reasons why YouTube may have difficulty transcoding the uploaded video or that might result in an erroneous transcoding. These warnings are generated before YouTube actually processes the uploaded video file. In addition, they identify issues that are unlikely to cause the video processing to fail but that might cause problems such as sync issues, video artifacts, or a missing audio track.
     #[serde(rename="processingWarnings")]
-    pub processing_warnings: Vec<String>,
+    pub processing_warnings: Option<Vec<String>>,
     /// A list of suggestions that may improve YouTube's ability to process the video.
     #[serde(rename="processingHints")]
-    pub processing_hints: Vec<String>,
+    pub processing_hints: Option<Vec<String>>,
 }
 
 impl Part for VideoSuggestions {}
@@ -4136,22 +4925,22 @@ impl Part for VideoSuggestions {}
 pub struct SearchResultSnippet {
     /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.
     #[serde(rename="liveBroadcastContent")]
-    pub live_broadcast_content: String,
+    pub live_broadcast_content: Option<String>,
     /// A description of the search result.
-    pub description: String,
+    pub description: Option<String>,
     /// The title of the search result.
-    pub title: String,
+    pub title: Option<String>,
     /// A map of thumbnail images associated with the search result. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-    pub thumbnails: ThumbnailDetails,
+    pub thumbnails: Option<ThumbnailDetails>,
     /// The value that YouTube uses to uniquely identify the channel that published the resource that the search result identifies.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The creation date and time of the resource that the search result identifies. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishedAt")]
-    pub published_at: String,
+    pub published_at: Option<String>,
     /// The title of the channel that published the resource that the search result identifies.
     #[serde(rename="channelTitle")]
-    pub channel_title: String,
+    pub channel_title: Option<String>,
 }
 
 impl Part for SearchResultSnippet {}
@@ -4673,7 +5462,7 @@ impl<'a, C, A> ThumbnailMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get_rating(...)`, `insert(...)`, `list(...)`, `rate(...)` and `update(...)`
+/// // like `delete(...)`, `get_rating(...)`, `insert(...)`, `list(...)`, `rate(...)`, `report_abuse(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.videos();
 /// # }
@@ -4687,6 +5476,24 @@ pub struct VideoMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for VideoMethods<'a, C, A> {}
 
 impl<'a, C, A> VideoMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Report abuse for a video.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn report_abuse(&self, request: &VideoAbuseReport) -> VideoReportAbuseCall<'a, C, A> {
+        VideoReportAbuseCall {
+            hub: self.hub,
+            _request: request.clone(),
+            _on_behalf_of_content_owner: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5069,6 +5876,110 @@ impl<'a, C, A> I18nRegionMethods<'a, C, A> {
 
 
 
+/// A builder providing access to all methods supported on *commentThread* resources.
+/// It is not used directly, but through the `YouTube` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_youtube3 as youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `insert(...)`, `list(...)` and `update(...)`
+/// // to build up your call.
+/// let rb = hub.comment_threads();
+/// # }
+/// ```
+pub struct CommentThreadMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for CommentThreadMethods<'a, C, A> {}
+
+impl<'a, C, A> CommentThreadMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of comment threads that match the API request parameters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies the commentThread resource parts that the API response will include. Supported values are id, snippet and replies.
+    pub fn list(&self, part: &str) -> CommentThreadListCall<'a, C, A> {
+        CommentThreadListCall {
+            hub: self.hub,
+            _part: part.to_string(),
+            _video_id: Default::default(),
+            _text_format: Default::default(),
+            _search_terms: Default::default(),
+            _page_token: Default::default(),
+            _moderation_status: Default::default(),
+            _max_results: Default::default(),
+            _id: Default::default(),
+            _channel_id: Default::default(),
+            _all_threads_related_to_channel_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Modifies an existing comment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn update(&self, request: &CommentThread) -> CommentThreadUpdateCall<'a, C, A> {
+        CommentThreadUpdateCall {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new comment thread and top level comment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn insert(&self, request: &CommentThread) -> CommentThreadInsertCall<'a, C, A> {
+        CommentThreadInsertCall {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _share_on_google_plus: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
 /// A builder providing access to all methods supported on *liveStream* resources.
 /// It is not used directly, but through the `YouTube` hub.
 ///
@@ -5192,6 +6103,161 @@ impl<'a, C, A> LiveStreamMethods<'a, C, A> {
 
 
 
+/// A builder providing access to all methods supported on *comment* resources.
+/// It is not used directly, but through the `YouTube` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_youtube3 as youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `delete(...)`, `insert(...)`, `list(...)`, `mark_as_spam(...)`, `set_moderation_status(...)` and `update(...)`
+/// // to build up your call.
+/// let rb = hub.comments();
+/// # }
+/// ```
+pub struct CommentMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for CommentMethods<'a, C, A> {}
+
+impl<'a, C, A> CommentMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new comment.
+    /// 
+    /// Note: to create a top level comment it is also necessary to create a comment thread. Both are accomplished through the commentThreads resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn insert(&self, request: &Comment) -> CommentInsertCall<'a, C, A> {
+        CommentInsertCall {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the moderation status of one or more comments.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies a comma-separated list of IDs of comments whose moderation status should be updated.
+    /// * `moderationStatus` - Determines the new moderation status of the specified comments.
+    pub fn set_moderation_status(&self, id: &str, moderation_status: &str) -> CommentSetModerationStatuCall<'a, C, A> {
+        CommentSetModerationStatuCall {
+            hub: self.hub,
+            _id: id.to_string(),
+            _moderation_status: moderation_status.to_string(),
+            _ban_author: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a comment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the comment ID for the resource that should be deleted.
+    pub fn delete(&self, id: &str) -> CommentDeleteCall<'a, C, A> {
+        CommentDeleteCall {
+            hub: self.hub,
+            _id: id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of comments that match the API request parameters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies the comment resource parts that the API response will include. Supported values are id and snippet.
+    pub fn list(&self, part: &str) -> CommentListCall<'a, C, A> {
+        CommentListCall {
+            hub: self.hub,
+            _part: part.to_string(),
+            _text_format: Default::default(),
+            _parent_id: Default::default(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
+            _id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Modifies an existing comment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn update(&self, request: &Comment) -> CommentUpdateCall<'a, C, A> {
+        CommentUpdateCall {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Expresses the caller's opinion that a comment is spam.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies a comma-separated list of IDs of comments which should get flagged as spam.
+    pub fn mark_as_spam(&self, id: &str) -> CommentMarkAsSpamCall<'a, C, A> {
+        CommentMarkAsSpamCall {
+            hub: self.hub,
+            _id: id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
 /// A builder providing access to all methods supported on *channel* resources.
 /// It is not used directly, but through the `YouTube` hub.
 ///
@@ -5271,6 +6337,65 @@ impl<'a, C, A> ChannelMethods<'a, C, A> {
             _hl: Default::default(),
             _for_username: Default::default(),
             _category_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *videoAbuseReportReason* resources.
+/// It is not used directly, but through the `YouTube` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_youtube3 as youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `list(...)`
+/// // to build up your call.
+/// let rb = hub.video_abuse_report_reasons();
+/// # }
+/// ```
+pub struct VideoAbuseReportReasonMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for VideoAbuseReportReasonMethods<'a, C, A> {}
+
+impl<'a, C, A> VideoAbuseReportReasonMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of abuse reasons that can be used for reporting abusive videos.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.
+    pub fn list(&self, part: &str) -> VideoAbuseReportReasonListCall<'a, C, A> {
+        VideoAbuseReportReasonListCall {
+            hub: self.hub,
+            _part: part.to_string(),
+            _hl: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5582,28 +6707,6 @@ impl<'a, C, A> LiveBroadcastMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.
-    /// 
-    /// # Arguments
-    ///
-    /// * `id` - The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.
-    /// * `part` - The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
-    pub fn bind(&self, id: &str, part: &str) -> LiveBroadcastBindCall<'a, C, A> {
-        LiveBroadcastBindCall {
-            hub: self.hub,
-            _id: id.to_string(),
-            _part: part.to_string(),
-            _stream_id: Default::default(),
-            _on_behalf_of_content_owner_channel: Default::default(),
-            _on_behalf_of_content_owner: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Returns a list of YouTube broadcasts that match the API request parameters.
     /// 
     /// # Arguments
@@ -5660,6 +6763,28 @@ impl<'a, C, A> LiveBroadcastMethods<'a, C, A> {
             _broadcast_status: broadcast_status.to_string(),
             _id: id.to_string(),
             _part: part.to_string(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.
+    /// * `part` - The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+    pub fn bind(&self, id: &str, part: &str) -> LiveBroadcastBindCall<'a, C, A> {
+        LiveBroadcastBindCall {
+            hub: self.hub,
+            _id: id.to_string(),
+            _part: part.to_string(),
+            _stream_id: Default::default(),
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
@@ -5755,7 +6880,7 @@ impl<'a, C, A> CaptionMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `part` - The part parameter specifies the caption resource parts that the API response will include.
+    /// * `part` - The part parameter specifies a comma-separated list of one or more caption resource parts that the API response will include. The part names that you can include in the parameter value are id and snippet.
     /// * `videoId` - The videoId parameter specifies the YouTube video ID of the video for which the API should return caption tracks.
     pub fn list(&self, part: &str, video_id: &str) -> CaptionListCall<'a, C, A> {
         CaptionListCall {
@@ -6013,7 +7138,7 @@ impl<'a, C, A> ActivityMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_languages().list("part")
-///              .hl("diam")
+///              .hl("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -6075,16 +7200,20 @@ impl<'a, C, A> I18nLanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6241,13 +7370,13 @@ impl<'a, C, A> I18nLanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ChannelBannerResource = Default::default();
+/// let mut req = ChannelBannerResource::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_banners().insert(&req)
-///              .on_behalf_of_content_owner("ipsum")
+///              .on_behalf_of_content_owner("sadipscing")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -6323,16 +7452,20 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         let mut upload_url: Option<String> = None;
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
@@ -6604,11 +7737,11 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().list("part")
-///              .on_behalf_of_content_owner("et")
-///              .mine(false)
-///              .id("aliquyam")
-///              .hl("sea")
-///              .channel_id("Lorem")
+///              .on_behalf_of_content_owner("eirmod")
+///              .mine(true)
+///              .id("amet")
+///              .hl("no")
+///              .channel_id("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -6686,16 +7819,20 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6895,7 +8032,7 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ChannelSection = Default::default();
+/// let mut req = ChannelSection::default();
 /// req.snippet = Default::default(); // is ChannelSectionSnippet
 /// req.content_details = Default::default(); // is ChannelSectionContentDetails
 /// 
@@ -6903,8 +8040,8 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().insert(&req)
-///              .on_behalf_of_content_owner_channel("eos")
-///              .on_behalf_of_content_owner("erat")
+///              .on_behalf_of_content_owner_channel("eirmod")
+///              .on_behalf_of_content_owner("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -6978,16 +8115,20 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7175,7 +8316,7 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().delete("id")
-///              .on_behalf_of_content_owner("dolor")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -7236,16 +8377,20 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -7399,7 +8544,7 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ChannelSection = Default::default();
+/// let mut req = ChannelSection::default();
 /// req.snippet = Default::default(); // is ChannelSectionSnippet
 /// req.content_details = Default::default(); // is ChannelSectionContentDetails
 /// 
@@ -7407,7 +8552,7 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().update(&req)
-///              .on_behalf_of_content_owner("eirmod")
+///              .on_behalf_of_content_owner("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -7477,16 +8622,20 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7679,9 +8828,9 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guide_categories().list("part")
-///              .region_code("amet")
-///              .id("no")
-///              .hl("labore")
+///              .region_code("sea")
+///              .id("et")
+///              .hl("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -7751,16 +8900,20 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7943,7 +9096,7 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Playlist = Default::default();
+/// let mut req = Playlist::default();
 /// req.status = Default::default(); // is PlaylistStatus
 /// req.snippet = Default::default(); // is PlaylistSnippet
 /// 
@@ -7951,8 +9104,8 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().insert(&req)
-///              .on_behalf_of_content_owner_channel("eirmod")
-///              .on_behalf_of_content_owner("dolore")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -8026,16 +9179,20 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8241,14 +9398,14 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().list("part")
-///              .page_token("aliquyam")
-///              .on_behalf_of_content_owner_channel("accusam")
-///              .on_behalf_of_content_owner("Lorem")
+///              .page_token("et")
+///              .on_behalf_of_content_owner_channel("amet")
+///              .on_behalf_of_content_owner("et")
 ///              .mine(true)
-///              .max_results(80)
-///              .id("duo")
-///              .hl("et")
-///              .channel_id("eirmod")
+///              .max_results(65)
+///              .id("ea")
+///              .hl("sed")
+///              .channel_id("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -8338,16 +9495,20 @@ impl<'a, C, A> PlaylistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8558,7 +9719,7 @@ impl<'a, C, A> PlaylistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().delete("id")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -8619,16 +9780,20 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -8782,7 +9947,7 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Playlist = Default::default();
+/// let mut req = Playlist::default();
 /// req.status = Default::default(); // is PlaylistStatus
 /// req.snippet = Default::default(); // is PlaylistSnippet
 /// 
@@ -8790,7 +9955,7 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().update(&req)
-///              .on_behalf_of_content_owner("amet")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// # }
 /// ```
@@ -8860,16 +10025,20 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -9049,7 +10218,7 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnails().set("videoId")
-///              .on_behalf_of_content_owner("consetetur")
+///              .on_behalf_of_content_owner("amet.")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -9122,16 +10291,20 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         let mut upload_url: Option<String> = None;
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
@@ -9349,6 +10522,231 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
+/// Report abuse for a video.
+///
+/// A builder for the *reportAbuse* method supported by a *video* resource.
+/// It is not used directly, but through a `VideoMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// use youtube3::VideoAbuseReport;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = VideoAbuseReport::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.videos().report_abuse(&req)
+///              .on_behalf_of_content_owner("voluptua.")
+///              .doit();
+/// # }
+/// ```
+pub struct VideoReportAbuseCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _request: VideoAbuseReport,
+    _on_behalf_of_content_owner: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for VideoReportAbuseCall<'a, C, A> {}
+
+impl<'a, C, A> VideoReportAbuseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.videos.reportAbuse", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
+        }
+        for &field in ["onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = "https://www.googleapis.com/youtube/v3/videos/reportAbuse".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: &VideoAbuseReport) -> VideoReportAbuseCall<'a, C, A> {
+        self._request = new_value.clone();
+        self
+    }
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoReportAbuseCall<'a, C, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoReportAbuseCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> VideoReportAbuseCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> VideoReportAbuseCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Returns a list of videos that match the API request parameters.
 ///
 /// A builder for the *list* method supported by a *video* resource.
@@ -9403,16 +10801,16 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().list("part")
-///              .video_category_id("ea")
-///              .region_code("sed")
-///              .page_token("dolor")
-///              .on_behalf_of_content_owner("dolor")
-///              .my_rating("dolor")
-///              .max_results(78)
+///              .video_category_id("gubergren")
+///              .region_code("justo")
+///              .page_token("sit")
+///              .on_behalf_of_content_owner("vero")
+///              .my_rating("diam")
+///              .max_results(35)
 ///              .locale("consetetur")
-///              .id("amet.")
-///              .hl("voluptua.")
-///              .chart("Lorem")
+///              .id("sadipscing")
+///              .hl("vero")
+///              .chart("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -9510,16 +10908,20 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9753,7 +11155,7 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().rate("id", "rating")
-///              .on_behalf_of_content_owner("sit")
+///              .on_behalf_of_content_owner("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -9816,16 +11218,20 @@ impl<'a, C, A> VideoRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -9974,7 +11380,7 @@ impl<'a, C, A> VideoRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().get_rating("id")
-///              .on_behalf_of_content_owner("diam")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -10036,16 +11442,20 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -10194,7 +11604,7 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().delete("id")
-///              .on_behalf_of_content_owner("consetetur")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// # }
 /// ```
@@ -10255,16 +11665,20 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -10428,7 +11842,7 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Video = Default::default();
+/// let mut req = Video::default();
 /// req.status = Default::default(); // is VideoStatus
 /// req.topic_details = Default::default(); // is VideoTopicDetails
 /// req.suggestions = Default::default(); // is VideoSuggestions
@@ -10446,7 +11860,7 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().update(&req)
-///              .on_behalf_of_content_owner("sadipscing")
+///              .on_behalf_of_content_owner("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -10516,16 +11930,20 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10753,7 +12171,7 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Video = Default::default();
+/// let mut req = Video::default();
 /// req.status = Default::default(); // is VideoStatus
 /// req.topic_details = Default::default(); // is VideoTopicDetails
 /// req.suggestions = Default::default(); // is VideoSuggestions
@@ -10771,11 +12189,11 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().insert(&req)
-///              .stabilize(false)
-///              .on_behalf_of_content_owner_channel("sadipscing")
-///              .on_behalf_of_content_owner("invidunt")
-///              .notify_subscribers(false)
-///              .auto_levels(false)
+///              .stabilize(true)
+///              .on_behalf_of_content_owner_channel("takimata")
+///              .on_behalf_of_content_owner("nonumy")
+///              .notify_subscribers(true)
+///              .auto_levels(true)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -10872,16 +12290,20 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         let mut upload_url: Option<String> = None;
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
@@ -11228,7 +12650,7 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Subscription = Default::default();
+/// let mut req = Subscription::default();
 /// req.snippet = Default::default(); // is SubscriptionSnippet
 /// req.content_details = Default::default(); // is SubscriptionContentDetails
 /// 
@@ -11301,16 +12723,20 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -11495,16 +12921,16 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().list("part")
-///              .page_token("aliquyam")
-///              .order("Lorem")
-///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("clita")
-///              .my_subscribers(true)
+///              .page_token("At")
+///              .order("labore")
+///              .on_behalf_of_content_owner_channel("invidunt")
+///              .on_behalf_of_content_owner("ea")
+///              .my_subscribers(false)
 ///              .mine(false)
-///              .max_results(61)
-///              .id("kasd")
-///              .for_channel_id("sanctus")
-///              .channel_id("takimata")
+///              .max_results(68)
+///              .id("nonumy")
+///              .for_channel_id("sed")
+///              .channel_id("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -11602,16 +13028,20 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11891,16 +13321,20 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -12046,36 +13480,36 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.search().list("part")
-///              .video_type("invidunt")
-///              .video_syndicated("ea")
-///              .video_license("sadipscing")
-///              .video_embeddable("rebum.")
-///              .video_duration("dolore")
-///              .video_dimension("nonumy")
-///              .video_definition("sed")
-///              .video_category_id("aliquyam")
-///              .video_caption("sit")
-///              .type_("eirmod")
-///              .topic_id("consetetur")
-///              .safe_search("labore")
-///              .relevance_language("sed")
-///              .related_to_video_id("ea")
-///              .region_code("gubergren")
-///              .q("aliquyam")
-///              .published_before("eos")
-///              .published_after("tempor")
-///              .page_token("sea")
-///              .order("labore")
-///              .on_behalf_of_content_owner("ipsum")
-///              .max_results(70)
-///              .location_radius("dolores")
-///              .location("sit")
-///              .for_mine(true)
+///              .video_type("consetetur")
+///              .video_syndicated("labore")
+///              .video_license("sed")
+///              .video_embeddable("ea")
+///              .video_duration("gubergren")
+///              .video_dimension("aliquyam")
+///              .video_definition("eos")
+///              .video_category_id("tempor")
+///              .video_caption("sea")
+///              .type_("labore")
+///              .topic_id("ipsum")
+///              .safe_search("aliquyam")
+///              .relevance_language("dolores")
+///              .related_to_video_id("sit")
+///              .region_code("diam")
+///              .q("ut")
+///              .published_before("justo")
+///              .published_after("est")
+///              .page_token("amet")
+///              .order("accusam")
+///              .on_behalf_of_content_owner("clita")
+///              .max_results(22)
+///              .location_radius("justo")
+///              .location("est")
+///              .for_mine(false)
 ///              .for_developer(true)
 ///              .for_content_owner(false)
-///              .event_type("est")
-///              .channel_type("amet")
-///              .channel_id("accusam")
+///              .event_type("dolores")
+///              .channel_type("eos")
+///              .channel_id("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -12253,16 +13687,20 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -12639,7 +14077,7 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_regions().list("part")
-///              .hl("diam")
+///              .hl("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -12701,16 +14139,20 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -12835,6 +14277,896 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
+/// Returns a list of comment threads that match the API request parameters.
+///
+/// A builder for the *list* method supported by a *commentThread* resource.
+/// It is not used directly, but through a `CommentThreadMethods` instance.
+///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *replies*
+///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube.force-ssl* scope to make a valid call.
+/// 
+/// The default scope will be `Scope::ForceSsl`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.comment_threads().list("part")
+///              .video_id("ea")
+///              .text_format("ea")
+///              .search_terms("et")
+///              .page_token("dolor")
+///              .moderation_status("diam")
+///              .max_results(39)
+///              .id("invidunt")
+///              .channel_id("rebum.")
+///              .all_threads_related_to_channel_id("Lorem")
+///              .doit();
+/// # }
+/// ```
+pub struct CommentThreadListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _part: String,
+    _video_id: Option<String>,
+    _text_format: Option<String>,
+    _search_terms: Option<String>,
+    _page_token: Option<String>,
+    _moderation_status: Option<String>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
+    _channel_id: Option<String>,
+    _all_threads_related_to_channel_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CommentThreadListCall<'a, C, A> {}
+
+impl<'a, C, A> CommentThreadListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CommentThreadListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.commentThreads.list", 
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
+        params.push(("part", self._part.to_string()));
+        if let Some(value) = self._video_id {
+            params.push(("videoId", value.to_string()));
+        }
+        if let Some(value) = self._text_format {
+            params.push(("textFormat", value.to_string()));
+        }
+        if let Some(value) = self._search_terms {
+            params.push(("searchTerms", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._moderation_status {
+            params.push(("moderationStatus", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
+        }
+        if let Some(value) = self._channel_id {
+            params.push(("channelId", value.to_string()));
+        }
+        if let Some(value) = self._all_threads_related_to_channel_id {
+            params.push(("allThreadsRelatedToChannelId", value.to_string()));
+        }
+        for &field in ["alt", "part", "videoId", "textFormat", "searchTerms", "pageToken", "moderationStatus", "maxResults", "id", "channelId", "allThreadsRelatedToChannelId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/youtube/v3/commentThreads".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The part parameter specifies the commentThread resource parts that the API response will include. Supported values are id, snippet and replies.
+    ///
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *replies*
+    pub fn part(mut self, new_value: &str) -> CommentThreadListCall<'a, C, A> {
+        self._part = new_value.to_string();
+        self
+    }
+    /// The videoId parameter instructs the API to return the comment threads for the video specified by the video id.
+    ///
+    /// Sets the *video id* query property to the given value.
+    pub fn video_id(mut self, new_value: &str) -> CommentThreadListCall<'a, C, A> {
+        self._video_id = Some(new_value.to_string());
+        self
+    }
+    /// Set this parameter's value to html or plainText to instruct the API to return the comments left by users in html formatted or in plain text.
+    ///
+    /// Sets the *text format* query property to the given value.
+    pub fn text_format(mut self, new_value: &str) -> CommentThreadListCall<'a, C, A> {
+        self._text_format = Some(new_value.to_string());
+        self
+    }
+    /// The searchTerms parameter instructs the API to limit the returned comments to those which contain the specified search terms.
+    /// 
+    /// Note: This parameter is not supported for use in conjunction with the id parameter.
+    ///
+    /// Sets the *search terms* query property to the given value.
+    pub fn search_terms(mut self, new_value: &str) -> CommentThreadListCall<'a, C, A> {
+        self._search_terms = Some(new_value.to_string());
+        self
+    }
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken property identifies the next page of the result that can be retrieved.
+    /// 
+    /// Note: This parameter is not supported for use in conjunction with the id parameter.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CommentThreadListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Set this parameter to limit the returned comment threads to a particular moderation state.
+    /// 
+    /// Note: This parameter is not supported for use in conjunction with the id parameter.
+    ///
+    /// Sets the *moderation status* query property to the given value.
+    pub fn moderation_status(mut self, new_value: &str) -> CommentThreadListCall<'a, C, A> {
+        self._moderation_status = Some(new_value.to_string());
+        self
+    }
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
+    /// 
+    /// Note: This parameter is not supported for use in conjunction with the id parameter.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: u32) -> CommentThreadListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The id parameter specifies a comma-separated list of comment thread IDs for the resources that should be retrieved.
+    ///
+    /// Sets the *id* query property to the given value.
+    pub fn id(mut self, new_value: &str) -> CommentThreadListCall<'a, C, A> {
+        self._id = Some(new_value.to_string());
+        self
+    }
+    /// The channelId parameter instructs the API to return the comment threads for all the channel comments (not including comments left on videos).
+    ///
+    /// Sets the *channel id* query property to the given value.
+    pub fn channel_id(mut self, new_value: &str) -> CommentThreadListCall<'a, C, A> {
+        self._channel_id = Some(new_value.to_string());
+        self
+    }
+    /// The allThreadsRelatedToChannelId parameter instructs the API to return the comment threads of all videos of the channel and the channel comments as well.
+    ///
+    /// Sets the *all threads related to channel id* query property to the given value.
+    pub fn all_threads_related_to_channel_id(mut self, new_value: &str) -> CommentThreadListCall<'a, C, A> {
+        self._all_threads_related_to_channel_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentThreadListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> CommentThreadListCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Modifies an existing comment.
+///
+/// A builder for the *update* method supported by a *commentThread* resource.
+/// It is not used directly, but through a `CommentThreadMethods` instance.
+///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *replies*
+///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube.force-ssl* scope to make a valid call.
+/// 
+/// The default scope will be `Scope::ForceSsl`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// use youtube3::CommentThread;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CommentThread::default();
+/// req.snippet = Default::default(); // is CommentThreadSnippet
+/// req.id = Some("clita".to_string());
+/// req.replies = Default::default(); // is CommentThreadReplies
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.comment_threads().update(&req)
+///              .doit();
+/// # }
+/// ```
+pub struct CommentThreadUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _request: CommentThread,
+    _part: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CommentThreadUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> CommentThreadUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CommentThread)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.commentThreads.update", 
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        for &field in ["alt", "part"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/youtube/v3/commentThreads".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *replies*
+    pub fn request(mut self, new_value: &CommentThread) -> CommentThreadUpdateCall<'a, C, A> {
+        self._request = new_value.clone();
+        self
+    }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are id, snippet and replies. However only snippet contains properties that can be updated.
+    ///
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *replies*
+    pub fn part(mut self, new_value: &str) -> CommentThreadUpdateCall<'a, C, A> {
+        self._part = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentThreadUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> CommentThreadUpdateCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Creates a new comment thread and top level comment.
+///
+/// A builder for the *insert* method supported by a *commentThread* resource.
+/// It is not used directly, but through a `CommentThreadMethods` instance.
+///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube.force-ssl* scope to make a valid call.
+/// 
+/// The default scope will be `Scope::ForceSsl`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// use youtube3::CommentThread;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CommentThread::default();
+/// req.snippet = Default::default(); // is CommentThreadSnippet
+/// req.id = Some("invidunt".to_string());
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.comment_threads().insert(&req)
+///              .share_on_google_plus(false)
+///              .doit();
+/// # }
+/// ```
+pub struct CommentThreadInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _request: CommentThread,
+    _part: String,
+    _share_on_google_plus: Option<bool>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CommentThreadInsertCall<'a, C, A> {}
+
+impl<'a, C, A> CommentThreadInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CommentThread)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.commentThreads.insert", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if let Some(value) = self._share_on_google_plus {
+            params.push(("shareOnGooglePlus", value.to_string()));
+        }
+        for &field in ["alt", "part", "shareOnGooglePlus"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/youtube/v3/commentThreads".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    pub fn request(mut self, new_value: &CommentThread) -> CommentThreadInsertCall<'a, C, A> {
+        self._request = new_value.clone();
+        self
+    }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are id and snippet. However only snippet contains properties that can be set.
+    ///
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    pub fn part(mut self, new_value: &str) -> CommentThreadInsertCall<'a, C, A> {
+        self._part = new_value.to_string();
+        self
+    }
+    /// The shareOnGooglePlus determines whether this thread should also be posted on Google+.
+    ///
+    /// Sets the *share on google plus* query property to the given value.
+    pub fn share_on_google_plus(mut self, new_value: bool) -> CommentThreadInsertCall<'a, C, A> {
+        self._share_on_google_plus = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentThreadInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> CommentThreadInsertCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.
 ///
 /// A builder for the *update* method supported by a *liveStream* resource.
@@ -12878,18 +15210,18 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LiveStream = Default::default();
+/// let mut req = LiveStream::default();
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("justo".to_string());
+/// req.id = Some("At".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().update(&req)
-///              .on_behalf_of_content_owner_channel("est")
-///              .on_behalf_of_content_owner("clita")
+///              .on_behalf_of_content_owner_channel("consetetur")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// # }
 /// ```
@@ -12963,16 +15295,20 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13166,8 +15502,8 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().delete("id")
-///              .on_behalf_of_content_owner_channel("ut")
-///              .on_behalf_of_content_owner("dolores")
+///              .on_behalf_of_content_owner_channel("sit")
+///              .on_behalf_of_content_owner("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -13232,16 +15568,20 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -13408,12 +15748,12 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().list("part")
-///              .page_token("voluptua.")
-///              .on_behalf_of_content_owner_channel("duo")
-///              .on_behalf_of_content_owner("sed")
+///              .page_token("nonumy")
+///              .on_behalf_of_content_owner_channel("rebum.")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .mine(true)
-///              .max_results(34)
-///              .id("ea")
+///              .max_results(59)
+///              .id("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -13495,16 +15835,20 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -13715,18 +16059,18 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LiveStream = Default::default();
+/// let mut req = LiveStream::default();
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("et".to_string());
+/// req.id = Some("ut".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().insert(&req)
-///              .on_behalf_of_content_owner_channel("dolor")
-///              .on_behalf_of_content_owner("diam")
+///              .on_behalf_of_content_owner_channel("amet.")
+///              .on_behalf_of_content_owner("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -13800,16 +16144,20 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13974,6 +16322,1453 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
+/// Creates a new comment.
+/// 
+/// Note: to create a top level comment it is also necessary to create a comment thread. Both are accomplished through the commentThreads resource.
+///
+/// A builder for the *insert* method supported by a *comment* resource.
+/// It is not used directly, but through a `CommentMethods` instance.
+///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube.force-ssl* scope to make a valid call.
+/// 
+/// The default scope will be `Scope::ForceSsl`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// use youtube3::Comment;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Comment::default();
+/// req.snippet = Default::default(); // is CommentSnippet
+/// req.id = Some("ut".to_string());
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.comments().insert(&req)
+///              .doit();
+/// # }
+/// ```
+pub struct CommentInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _request: Comment,
+    _part: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CommentInsertCall<'a, C, A> {}
+
+impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Comment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.comments.insert", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        for &field in ["alt", "part"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/youtube/v3/comments".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    pub fn request(mut self, new_value: &Comment) -> CommentInsertCall<'a, C, A> {
+        self._request = new_value.clone();
+        self
+    }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are id and snippet. However only snippet contains properties that can be set.
+    ///
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    pub fn part(mut self, new_value: &str) -> CommentInsertCall<'a, C, A> {
+        self._part = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> CommentInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> CommentInsertCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Sets the moderation status of one or more comments.
+///
+/// A builder for the *setModerationStatus* method supported by a *comment* resource.
+/// It is not used directly, but through a `CommentMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.comments().set_moderation_status("id", "moderationStatus")
+///              .ban_author(true)
+///              .doit();
+/// # }
+/// ```
+pub struct CommentSetModerationStatuCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _id: String,
+    _moderation_status: String,
+    _ban_author: Option<bool>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CommentSetModerationStatuCall<'a, C, A> {}
+
+impl<'a, C, A> CommentSetModerationStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.comments.setModerationStatus", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("id", self._id.to_string()));
+        params.push(("moderationStatus", self._moderation_status.to_string()));
+        if let Some(value) = self._ban_author {
+            params.push(("banAuthor", value.to_string()));
+        }
+        for &field in ["id", "moderationStatus", "banAuthor"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = "https://www.googleapis.com/youtube/v3/comments/setModerationStatus".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The id parameter specifies a comma-separated list of IDs of comments whose moderation status should be updated.
+    ///
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// Determines the new moderation status of the specified comments.
+    ///
+    /// Sets the *moderation status* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn moderation_status(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a, C, A> {
+        self._moderation_status = new_value.to_string();
+        self
+    }
+    /// The banAuthor paramter, if set to true, adds the author of the comment to the ban list. This means all future comments of the author will autmomatically be rejected.
+    /// 
+    /// Note: This parameter is only valid in combination with moderationStatus 'rejected'.
+    ///
+    /// Sets the *ban author* query property to the given value.
+    pub fn ban_author(mut self, new_value: bool) -> CommentSetModerationStatuCall<'a, C, A> {
+        self._ban_author = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentSetModerationStatuCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> CommentSetModerationStatuCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> CommentSetModerationStatuCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Deletes a comment.
+///
+/// A builder for the *delete* method supported by a *comment* resource.
+/// It is not used directly, but through a `CommentMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.comments().delete("id")
+///              .doit();
+/// # }
+/// ```
+pub struct CommentDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CommentDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.comments.delete", 
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        params.push(("id", self._id.to_string()));
+        for &field in ["id"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = "https://www.googleapis.com/youtube/v3/comments".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The id parameter specifies the comment ID for the resource that should be deleted.
+    ///
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> CommentDeleteCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Returns a list of comments that match the API request parameters.
+///
+/// A builder for the *list* method supported by a *comment* resource.
+/// It is not used directly, but through a `CommentMethods` instance.
+///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube.force-ssl* scope to make a valid call.
+/// 
+/// The default scope will be `Scope::ForceSsl`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.comments().list("part")
+///              .text_format("voluptua.")
+///              .parent_id("dolor")
+///              .page_token("et")
+///              .max_results(16)
+///              .id("vero")
+///              .doit();
+/// # }
+/// ```
+pub struct CommentListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _part: String,
+    _text_format: Option<String>,
+    _parent_id: Option<String>,
+    _page_token: Option<String>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CommentListCall<'a, C, A> {}
+
+impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CommentListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.comments.list", 
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        params.push(("part", self._part.to_string()));
+        if let Some(value) = self._text_format {
+            params.push(("textFormat", value.to_string()));
+        }
+        if let Some(value) = self._parent_id {
+            params.push(("parentId", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
+        }
+        for &field in ["alt", "part", "textFormat", "parentId", "pageToken", "maxResults", "id"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/youtube/v3/comments".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The part parameter specifies the comment resource parts that the API response will include. Supported values are id and snippet.
+    ///
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    pub fn part(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
+        self._part = new_value.to_string();
+        self
+    }
+    /// Set this parameter's value to html or plainText to instruct the API to return the comments left by users formatted as HTML or as plain text.
+    ///
+    /// Sets the *text format* query property to the given value.
+    pub fn text_format(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
+        self._text_format = Some(new_value.to_string());
+        self
+    }
+    /// The parentId parameter specifies the ID of the comment for which replies should be retrieved.
+    /// 
+    /// Note: Currently YouTube features only one level of replies (ie replies to top level comments). However replies to replies may be supported in the future.
+    ///
+    /// Sets the *parent id* query property to the given value.
+    pub fn parent_id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
+        self._parent_id = Some(new_value.to_string());
+        self
+    }
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken property identifies the next page of the result that can be retrieved.
+    /// 
+    /// Note: This parameter is not supported for use in conjunction with the id parameter.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
+    /// 
+    /// Note: This parameter is not supported for use in conjunction with the id parameter.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The id parameter specifies a comma-separated list of comment IDs for the resources that should be retrieved.
+    ///
+    /// Sets the *id* query property to the given value.
+    pub fn id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
+        self._id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> CommentListCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Modifies an existing comment.
+///
+/// A builder for the *update* method supported by a *comment* resource.
+/// It is not used directly, but through a `CommentMethods` instance.
+///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube.force-ssl* scope to make a valid call.
+/// 
+/// The default scope will be `Scope::ForceSsl`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// use youtube3::Comment;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Comment::default();
+/// req.snippet = Default::default(); // is CommentSnippet
+/// req.id = Some("ut".to_string());
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.comments().update(&req)
+///              .doit();
+/// # }
+/// ```
+pub struct CommentUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _request: Comment,
+    _part: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CommentUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Comment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.comments.update", 
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        for &field in ["alt", "part"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/youtube/v3/comments".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    pub fn request(mut self, new_value: &Comment) -> CommentUpdateCall<'a, C, A> {
+        self._request = new_value.clone();
+        self
+    }
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are id and snippet. However only snippet contains properties that can be updated.
+    ///
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    pub fn part(mut self, new_value: &str) -> CommentUpdateCall<'a, C, A> {
+        self._part = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> CommentUpdateCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Expresses the caller's opinion that a comment is spam.
+///
+/// A builder for the *markAsSpam* method supported by a *comment* resource.
+/// It is not used directly, but through a `CommentMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.comments().mark_as_spam("id")
+///              .doit();
+/// # }
+/// ```
+pub struct CommentMarkAsSpamCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CommentMarkAsSpamCall<'a, C, A> {}
+
+impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.comments.markAsSpam", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        params.push(("id", self._id.to_string()));
+        for &field in ["id"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = "https://www.googleapis.com/youtube/v3/comments/markAsSpam".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ForceSsl.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The id parameter specifies a comma-separated list of IDs of comments which should get flagged as spam.
+    ///
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentMarkAsSpamCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> CommentMarkAsSpamCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ForceSsl`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> CommentMarkAsSpamCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Updates a channel's metadata.
 ///
 /// A builder for the *update* method supported by a *channel* resource.
@@ -14016,15 +17811,15 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Channel = Default::default();
+/// let mut req = Channel::default();
 /// req.invideo_promotion = Default::default(); // is InvideoPromotion
-/// req.id = Some("kasd".to_string());
+/// req.id = Some("et".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().update(&req)
-///              .on_behalf_of_content_owner("invidunt")
+///              .on_behalf_of_content_owner("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -14094,16 +17889,20 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -14301,16 +18100,16 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().list("part")
-///              .page_token("Lorem")
-///              .on_behalf_of_content_owner("clita")
-///              .my_subscribers(true)
+///              .page_token("dolore")
+///              .on_behalf_of_content_owner("vero")
+///              .my_subscribers(false)
 ///              .mine(false)
-///              .max_results(24)
+///              .max_results(80)
 ///              .managed_by_me(false)
 ///              .id("et")
 ///              .hl("sed")
-///              .for_username("sit")
-///              .category_id("takimata")
+///              .for_username("no")
+///              .category_id("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -14408,16 +18207,20 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -14611,6 +18414,248 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
+/// Returns a list of abuse reasons that can be used for reporting abusive videos.
+///
+/// A builder for the *list* method supported by a *videoAbuseReportReason* resource.
+/// It is not used directly, but through a `VideoAbuseReportReasonMethods` instance.
+///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// 
+/// The default scope will be `Scope::Readonly`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.video_abuse_report_reasons().list("part")
+///              .hl("labore")
+///              .doit();
+/// # }
+/// ```
+pub struct VideoAbuseReportReasonListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _part: String,
+    _hl: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for VideoAbuseReportReasonListCall<'a, C, A> {}
+
+impl<'a, C, A> VideoAbuseReportReasonListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, VideoAbuseReportReasonListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.videoAbuseReportReasons.list", 
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("part", self._part.to_string()));
+        if let Some(value) = self._hl {
+            params.push(("hl", value.to_string()));
+        }
+        for &field in ["alt", "part", "hl"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/youtube/v3/videoAbuseReportReasons".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.
+    ///
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    pub fn part(mut self, new_value: &str) -> VideoAbuseReportReasonListCall<'a, C, A> {
+        self._part = new_value.to_string();
+        self
+    }
+    /// The hl parameter specifies the language that should be used for text values in the API response.
+    ///
+    /// Sets the *hl* query property to the given value.
+    pub fn hl(mut self, new_value: &str) -> VideoAbuseReportReasonListCall<'a, C, A> {
+        self._hl = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoAbuseReportReasonListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> VideoAbuseReportReasonListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> VideoAbuseReportReasonListCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Adds a resource to a playlist.
 ///
 /// A builder for the *insert* method supported by a *playlistItem* resource.
@@ -14654,7 +18699,7 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PlaylistItem = Default::default();
+/// let mut req = PlaylistItem::default();
 /// req.status = Default::default(); // is PlaylistItemStatus
 /// req.snippet = Default::default(); // is PlaylistItemSnippet
 /// req.content_details = Default::default(); // is PlaylistItemContentDetails
@@ -14663,7 +18708,7 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().insert(&req)
-///              .on_behalf_of_content_owner("elitr")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -14733,16 +18778,20 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -14977,16 +19026,20 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -15134,12 +19187,12 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().list("part")
-///              .video_id("Lorem")
-///              .playlist_id("Lorem")
-///              .page_token("diam")
-///              .on_behalf_of_content_owner("ut")
-///              .max_results(64)
-///              .id("amet.")
+///              .video_id("sea")
+///              .playlist_id("elitr")
+///              .page_token("At")
+///              .on_behalf_of_content_owner("sea")
+///              .max_results(5)
+///              .id("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -15221,16 +19274,20 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -15439,7 +19496,7 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PlaylistItem = Default::default();
+/// let mut req = PlaylistItem::default();
 /// req.status = Default::default(); // is PlaylistItemStatus
 /// req.snippet = Default::default(); // is PlaylistItemSnippet
 /// req.content_details = Default::default(); // is PlaylistItemContentDetails
@@ -15513,16 +19570,20 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -15695,13 +19756,13 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InvideoBranding = Default::default();
+/// let mut req = InvideoBranding::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().set(&req, "channelId")
-///              .on_behalf_of_content_owner("ut")
+///              .on_behalf_of_content_owner("dolores")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -15778,16 +19839,20 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         let mut upload_url: Option<String> = None;
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
@@ -16040,7 +20105,7 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().unset("channelId")
-///              .on_behalf_of_content_owner("sea")
+///              .on_behalf_of_content_owner("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -16101,16 +20166,20 @@ impl<'a, C, A> WatermarkUnsetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -16263,10 +20332,10 @@ impl<'a, C, A> WatermarkUnsetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().control("id", "part")
-///              .walltime("sanctus")
-///              .on_behalf_of_content_owner_channel("voluptua.")
-///              .on_behalf_of_content_owner("dolor")
-///              .offset_time_ms("et")
+///              .walltime("ea")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("Stet")
+///              .offset_time_ms("sed")
 ///              .display_slate(false)
 ///              .doit();
 /// # }
@@ -16347,16 +20416,20 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -16574,18 +20647,18 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LiveBroadcast = Default::default();
+/// let mut req = LiveBroadcast::default();
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("vero".to_string());
+/// req.id = Some("sanctus".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().update(&req)
-///              .on_behalf_of_content_owner_channel("ut")
-///              .on_behalf_of_content_owner("sed")
+///              .on_behalf_of_content_owner_channel("dolore")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -16659,16 +20732,20 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -16878,18 +20955,18 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LiveBroadcast = Default::default();
+/// let mut req = LiveBroadcast::default();
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("et".to_string());
+/// req.id = Some("consetetur".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().insert(&req)
-///              .on_behalf_of_content_owner_channel("ipsum")
-///              .on_behalf_of_content_owner("justo")
+///              .on_behalf_of_content_owner_channel("consetetur")
+///              .on_behalf_of_content_owner("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -16963,16 +21040,20 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -17137,289 +21218,6 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.
-///
-/// A builder for the *bind* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethods` instance.
-///
-/// **Settable Parts**
-/// 
-/// * *id*
-/// * *snippet*
-/// * *contentDetails*
-/// * *status*
-///
-/// # Scopes
-///
-/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
-/// 
-/// * *https://www.googleapis.com/auth/youtube*
-/// * *https://www.googleapis.com/auth/youtube.force-ssl*
-/// 
-/// The default scope will be `Scope::Full`.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_youtube3 as youtube3;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().bind("id", "part")
-///              .stream_id("dolor")
-///              .on_behalf_of_content_owner_channel("takimata")
-///              .on_behalf_of_content_owner("et")
-///              .doit();
-/// # }
-/// ```
-pub struct LiveBroadcastBindCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a YouTube<C, A>,
-    _id: String,
-    _part: String,
-    _stream_id: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for LiveBroadcastBindCall<'a, C, A> {}
-
-impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "youtube.liveBroadcasts.bind", 
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
-        params.push(("id", self._id.to_string()));
-        params.push(("part", self._part.to_string()));
-        if let Some(value) = self._stream_id {
-            params.push(("streamId", value.to_string()));
-        }
-        if let Some(value) = self._on_behalf_of_content_owner_channel {
-            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
-        }
-        if let Some(value) = self._on_behalf_of_content_owner {
-            params.push(("onBehalfOfContentOwner", value.to_string()));
-        }
-        for &field in ["alt", "id", "part", "streamId", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts/bind".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
-        }
-
-
-
-        loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return Err(Error::Failure(res))
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.
-    ///
-    /// Sets the *id* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
-        self._id = new_value.to_string();
-        self
-    }
-    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
-    ///
-    /// Sets the *part* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    ///
-    /// **Settable Parts**
-    /// 
-    /// * *id*
-    /// * *snippet*
-    /// * *contentDetails*
-    /// * *status*
-    pub fn part(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
-        self._part = new_value.to_string();
-        self
-    }
-    /// The streamId parameter specifies the unique ID of the video stream that is being bound to a broadcast. If this parameter is omitted, the API will remove any existing binding between the broadcast and a video stream.
-    ///
-    /// Sets the *stream id* query property to the given value.
-    pub fn stream_id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
-        self._stream_id = Some(new_value.to_string());
-        self
-    }
-    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
-    /// 
-    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
-    /// 
-    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    ///
-    /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
-        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-        self
-    }
-    /// Note: This parameter is intended exclusively for YouTube content partners.
-    /// 
-    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    ///
-    /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
-        self._on_behalf_of_content_owner = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastBindCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastBindCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastBindCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Returns a list of YouTube broadcasts that match the API request parameters.
 ///
 /// A builder for the *list* method supported by a *liveBroadcast* resource.
@@ -17464,13 +21262,13 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().list("part")
-///              .page_token("et")
-///              .on_behalf_of_content_owner_channel("sed")
-///              .on_behalf_of_content_owner("no")
-///              .mine(true)
-///              .max_results(86)
-///              .id("labore")
-///              .broadcast_status("aliquyam")
+///              .page_token("gubergren")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("sadipscing")
+///              .mine(false)
+///              .max_results(69)
+///              .id("Lorem")
+///              .broadcast_status("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -17556,16 +21354,20 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -17767,8 +21569,8 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().delete("id")
-///              .on_behalf_of_content_owner_channel("consetetur")
-///              .on_behalf_of_content_owner("sea")
+///              .on_behalf_of_content_owner_channel("clita")
+///              .on_behalf_of_content_owner("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -17833,16 +21635,20 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -18008,8 +21814,8 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
-///              .on_behalf_of_content_owner_channel("consetetur")
-///              .on_behalf_of_content_owner("diam")
+///              .on_behalf_of_content_owner_channel("vero")
+///              .on_behalf_of_content_owner("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -18079,16 +21885,20 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -18248,6 +22058,293 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
+/// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.
+///
+/// A builder for the *bind* method supported by a *liveBroadcast* resource.
+/// It is not used directly, but through a `LiveBroadcastMethods` instance.
+///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
+/// 
+/// The default scope will be `Scope::Full`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtube3 as youtube3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.live_broadcasts().bind("id", "part")
+///              .stream_id("tempor")
+///              .on_behalf_of_content_owner_channel("gubergren")
+///              .on_behalf_of_content_owner("dolore")
+///              .doit();
+/// # }
+/// ```
+pub struct LiveBroadcastBindCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a YouTube<C, A>,
+    _id: String,
+    _part: String,
+    _stream_id: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for LiveBroadcastBindCall<'a, C, A> {}
+
+impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveBroadcasts.bind", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        params.push(("id", self._id.to_string()));
+        params.push(("part", self._part.to_string()));
+        if let Some(value) = self._stream_id {
+            params.push(("streamId", value.to_string()));
+        }
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
+        }
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
+        }
+        for &field in ["alt", "id", "part", "streamId", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts/bind".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.
+    ///
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+    ///
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
+    pub fn part(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
+        self._part = new_value.to_string();
+        self
+    }
+    /// The streamId parameter specifies the unique ID of the video stream that is being bound to a broadcast. If this parameter is omitted, the API will remove any existing binding between the broadcast and a video stream.
+    ///
+    /// Sets the *stream id* query property to the given value.
+    pub fn stream_id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
+        self._stream_id = Some(new_value.to_string());
+        self
+    }
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+    ///
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        self
+    }
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+    ///
+    /// Sets the *on behalf of content owner* query property to the given value.
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastBindCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastBindCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastBindCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Deletes a specified caption track.
 ///
 /// A builder for the *delete* method supported by a *caption* resource.
@@ -18275,8 +22372,8 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().delete("id")
-///              .on_behalf_of("dolores")
-///              .debug_project_id_override("consetetur")
+///              .on_behalf_of("dolore")
+///              .debug_project_id_override("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -18341,16 +22438,20 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -18495,15 +22596,15 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Caption = Default::default();
+/// let mut req = Caption::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().insert(&req)
 ///              .sync(false)
-///              .on_behalf_of("aliquyam")
-///              .debug_project_id_override("elitr")
+///              .on_behalf_of("magna")
+///              .debug_project_id_override("ipsum")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -18592,16 +22693,20 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         let mut upload_url: Option<String> = None;
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
@@ -18861,6 +22966,17 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// A builder for the *list* method supported by a *caption* resource.
 /// It is not used directly, but through a `CaptionMethods` instance.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube.force-ssl* scope to make a valid call.
+/// 
+/// The default scope will be `Scope::ForceSsl`.
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -18883,9 +22999,9 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().list("part", "videoId")
-///              .on_behalf_of("Stet")
-///              .id("sed")
-///              .debug_project_id_override("dolor")
+///              .on_behalf_of("labore")
+///              .id("diam")
+///              .debug_project_id_override("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -18957,16 +23073,20 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -19017,12 +23137,17 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// The part parameter specifies the caption resource parts that the API response will include.
+    /// The part parameter specifies a comma-separated list of one or more caption resource parts that the API response will include. The part names that you can include in the parameter value are id and snippet.
     ///
     /// Sets the *part* query property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    ///
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
     pub fn part(mut self, new_value: &str) -> CaptionListCall<'a, C, A> {
         self._part = new_value.to_string();
         self
@@ -19140,10 +23265,10 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().download("id")
-///              .tlang("dolore")
-///              .tfmt("Lorem")
-///              .on_behalf_of("consetetur")
-///              .debug_project_id_override("consetetur")
+///              .tlang("diam")
+///              .tfmt("magna")
+///              .on_behalf_of("dolor")
+///              .debug_project_id_override("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -19240,16 +23365,20 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -19408,15 +23537,15 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Caption = Default::default();
+/// let mut req = Caption::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().update(&req)
-///              .sync(false)
-///              .on_behalf_of("labore")
-///              .debug_project_id_override("gubergren")
+///              .sync(true)
+///              .on_behalf_of("vero")
+///              .debug_project_id_override("nonumy")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -19505,16 +23634,20 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         let mut upload_url: Option<String> = None;
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
@@ -19812,9 +23945,9 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video_categories().list("part")
-///              .region_code("sadipscing")
-///              .id("accusam")
-///              .hl("magna")
+///              .region_code("dolores")
+///              .id("consetetur")
+///              .hl("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -19884,16 +24017,20 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -20075,14 +24212,14 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().list("part")
-///              .region_code("rebum.")
-///              .published_before("et")
-///              .published_after("clita")
-///              .page_token("eos")
+///              .region_code("dolores")
+///              .published_before("dolores")
+///              .published_after("et")
+///              .page_token("sed")
 ///              .mine(false)
-///              .max_results(76)
+///              .max_results(70)
 ///              .home(false)
-///              .channel_id("vero")
+///              .channel_id("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -20172,16 +24309,20 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -20401,7 +24542,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Activity = Default::default();
+/// let mut req = Activity::default();
 /// req.snippet = Default::default(); // is ActivitySnippet
 /// req.content_details = Default::default(); // is ActivityContentDetails
 /// 
@@ -20474,16 +24615,20 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

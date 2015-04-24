@@ -4,8 +4,8 @@
 [package]
 
 name = "google-container1_beta1"
-version = "0.1.5+20150318"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+version = "0.1.5+20150420"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with container (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/container1_beta1"
 homepage = "https://cloud.google.com/container-engine/docs/v1beta1/"

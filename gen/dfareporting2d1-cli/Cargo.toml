@@ -1,0 +1,31 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-dfareporting2d1-cli"
+version = "0.0.1+20150326"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with dfareporting (protocol v2.1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting2d1-cli"
+homepage = "https://developers.google.com/doubleclick-advertisers/reporting/"
+documentation = "http://byron.github.io/google-apis-rs/google_dfareporting2d1_cli"
+license = "MIT"
+keywords = ["dfareporting", "google", "cli"]
+
+[[bin]]
+name = "dfareporting2d1"
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+docopt = "*"
+docopt_macros = "*"
+rustc-serialize = "*"
+yup-hyper-mock = "*"
+serde = ">= 0.3.0"
+serde_macros = "*"
+
+[dependencies.google-dfareporting2d1]
+path = "../dfareporting2d1"

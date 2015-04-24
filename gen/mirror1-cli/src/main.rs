@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -55,6 +56,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -76,10 +83,10 @@ struct Engine {
 impl Engine {
     fn _accounts_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Account = Default::default();
+        let mut request = api::Account::default();
         let mut call = self.hub.accounts().insert(&request, &self.opt.arg_user_token, &self.opt.arg_account_type, &self.opt.arg_account_name);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -99,9 +106,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -111,9 +119,9 @@ impl Engine {
                     },
                 "features" => {
                         if request.features.is_none() {
-                            request.features = Some(Default::default());
+                           request.features = Some(Default::default());
                         }
-                        request.features.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.features.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -132,8 +140,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -144,7 +151,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.contacts().delete(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -175,7 +182,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -186,7 +192,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.contacts().get(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -218,8 +224,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -228,10 +233,10 @@ impl Engine {
 
     fn _contacts_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Contact = Default::default();
+        let mut request = api::Contact::default();
         let mut call = self.hub.contacts().insert(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -251,9 +256,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -266,15 +272,15 @@ impl Engine {
                     },
                 "accept-types" => {
                         if request.accept_types.is_none() {
-                            request.accept_types = Some(Default::default());
+                           request.accept_types = Some(Default::default());
                         }
-                        request.accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "image-urls" => {
                         if request.image_urls.is_none() {
-                            request.image_urls = Some(Default::default());
+                           request.image_urls = Some(Default::default());
                         }
-                        request.image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "priority" => {
                         request.priority = Some(arg_from_str(value.unwrap_or("-0"), err, "priority", "integer"));
@@ -287,9 +293,9 @@ impl Engine {
                     },
                 "sharing-features" => {
                         if request.sharing_features.is_none() {
-                            request.sharing_features = Some(Default::default());
+                           request.sharing_features = Some(Default::default());
                         }
-                        request.sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request.type_ = Some(value.unwrap_or("").to_string());
@@ -317,8 +323,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -329,7 +334,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.contacts().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -361,8 +366,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -371,10 +375,10 @@ impl Engine {
 
     fn _contacts_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Contact = Default::default();
+        let mut request = api::Contact::default();
         let mut call = self.hub.contacts().patch(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -394,9 +398,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -409,15 +414,15 @@ impl Engine {
                     },
                 "accept-types" => {
                         if request.accept_types.is_none() {
-                            request.accept_types = Some(Default::default());
+                           request.accept_types = Some(Default::default());
                         }
-                        request.accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "image-urls" => {
                         if request.image_urls.is_none() {
-                            request.image_urls = Some(Default::default());
+                           request.image_urls = Some(Default::default());
                         }
-                        request.image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "priority" => {
                         request.priority = Some(arg_from_str(value.unwrap_or("-0"), err, "priority", "integer"));
@@ -430,9 +435,9 @@ impl Engine {
                     },
                 "sharing-features" => {
                         if request.sharing_features.is_none() {
-                            request.sharing_features = Some(Default::default());
+                           request.sharing_features = Some(Default::default());
                         }
-                        request.sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request.type_ = Some(value.unwrap_or("").to_string());
@@ -460,8 +465,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -470,10 +474,10 @@ impl Engine {
 
     fn _contacts_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Contact = Default::default();
+        let mut request = api::Contact::default();
         let mut call = self.hub.contacts().update(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -493,9 +497,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -508,15 +513,15 @@ impl Engine {
                     },
                 "accept-types" => {
                         if request.accept_types.is_none() {
-                            request.accept_types = Some(Default::default());
+                           request.accept_types = Some(Default::default());
                         }
-                        request.accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "image-urls" => {
                         if request.image_urls.is_none() {
-                            request.image_urls = Some(Default::default());
+                           request.image_urls = Some(Default::default());
                         }
-                        request.image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "priority" => {
                         request.priority = Some(arg_from_str(value.unwrap_or("-0"), err, "priority", "integer"));
@@ -529,9 +534,9 @@ impl Engine {
                     },
                 "sharing-features" => {
                         if request.sharing_features.is_none() {
-                            request.sharing_features = Some(Default::default());
+                           request.sharing_features = Some(Default::default());
                         }
-                        request.sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request.type_ = Some(value.unwrap_or("").to_string());
@@ -559,8 +564,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -571,7 +575,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.locations().get(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -603,8 +607,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -615,7 +618,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.locations().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -647,8 +650,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -659,7 +661,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.settings().get(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -691,8 +693,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -703,7 +704,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.subscriptions().delete(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -734,7 +735,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -743,10 +743,10 @@ impl Engine {
 
     fn _subscriptions_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Subscription = Default::default();
+        let mut request = api::Subscription::default();
         let mut call = self.hub.subscriptions().insert(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -766,9 +766,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -784,23 +785,23 @@ impl Engine {
                     },
                 "notification.item-id" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().item_id = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().item_id = Some(value.unwrap_or("").to_string());
                     },
                 "notification.user-token" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().user_token = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().user_token = Some(value.unwrap_or("").to_string());
                     },
                 "notification.operation" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().operation = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().operation = Some(value.unwrap_or("").to_string());
                     },
                 "notification.verify-token" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().verify_token = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().verify_token = Some(value.unwrap_or("").to_string());
                     },
                 "notification.collection" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().collection = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().collection = Some(value.unwrap_or("").to_string());
                     },
                 "updated" => {
                         request_notification_init(&mut request);
@@ -821,9 +822,9 @@ impl Engine {
                 "operation" => {
                         request_notification_init(&mut request);
                         if request.operation.is_none() {
-                            request.operation = Some(Default::default());
+                           request.operation = Some(Default::default());
                         }
-                        request.operation.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.operation.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_notification_init(&mut request);
@@ -850,8 +851,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -862,7 +862,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.subscriptions().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -894,8 +894,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -904,10 +903,10 @@ impl Engine {
 
     fn _subscriptions_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Subscription = Default::default();
+        let mut request = api::Subscription::default();
         let mut call = self.hub.subscriptions().update(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -927,9 +926,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -945,23 +945,23 @@ impl Engine {
                     },
                 "notification.item-id" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().item_id = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().item_id = Some(value.unwrap_or("").to_string());
                     },
                 "notification.user-token" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().user_token = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().user_token = Some(value.unwrap_or("").to_string());
                     },
                 "notification.operation" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().operation = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().operation = Some(value.unwrap_or("").to_string());
                     },
                 "notification.verify-token" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().verify_token = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().verify_token = Some(value.unwrap_or("").to_string());
                     },
                 "notification.collection" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().collection = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().collection = Some(value.unwrap_or("").to_string());
                     },
                 "updated" => {
                         request_notification_init(&mut request);
@@ -982,9 +982,9 @@ impl Engine {
                 "operation" => {
                         request_notification_init(&mut request);
                         if request.operation.is_none() {
-                            request.operation = Some(Default::default());
+                           request.operation = Some(Default::default());
                         }
-                        request.operation.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.operation.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_notification_init(&mut request);
@@ -1011,8 +1011,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1023,7 +1022,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.timeline().attachments_delete(&self.opt.arg_item_id, &self.opt.arg_attachment_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1054,7 +1053,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1066,7 +1064,7 @@ impl Engine {
         let mut download_mode = false;
         let mut call = self.hub.timeline().attachments_get(&self.opt.arg_item_id, &self.opt.arg_attachment_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1101,9 +1099,8 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     if !download_mode {
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
@@ -1117,7 +1114,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.timeline().attachments_insert(&self.opt.arg_item_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1159,8 +1156,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1171,7 +1167,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.timeline().attachments_list(&self.opt.arg_item_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1203,8 +1199,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1215,7 +1210,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.timeline().delete(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1246,7 +1241,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1257,7 +1251,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.timeline().get(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1289,8 +1283,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1299,10 +1292,10 @@ impl Engine {
 
     fn _timeline_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::TimelineItem = Default::default();
+        let mut request = api::TimelineItem::default();
         let mut call = self.hub.timeline().insert(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1322,9 +1315,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1361,16 +1355,16 @@ impl Engine {
                 "creator.accept-types" => {
                         request_creator_init(&mut request);
                         if request.creator.as_mut().unwrap().accept_types.is_none() {
-                            request.creator.as_mut().unwrap().accept_types = Some(Default::default());
+                           request.creator.as_mut().unwrap().accept_types = Some(Default::default());
                         }
-                        request.creator.as_mut().unwrap().accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.creator.as_mut().unwrap().accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creator.image-urls" => {
                         request_creator_init(&mut request);
                         if request.creator.as_mut().unwrap().image_urls.is_none() {
-                            request.creator.as_mut().unwrap().image_urls = Some(Default::default());
+                           request.creator.as_mut().unwrap().image_urls = Some(Default::default());
                         }
-                        request.creator.as_mut().unwrap().image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.creator.as_mut().unwrap().image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creator.priority" => {
                         request_creator_init(&mut request);
@@ -1387,9 +1381,9 @@ impl Engine {
                 "creator.sharing-features" => {
                         request_creator_init(&mut request);
                         if request.creator.as_mut().unwrap().sharing_features.is_none() {
-                            request.creator.as_mut().unwrap().sharing_features = Some(Default::default());
+                           request.creator.as_mut().unwrap().sharing_features = Some(Default::default());
                         }
-                        request.creator.as_mut().unwrap().sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.creator.as_mut().unwrap().sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creator.type" => {
                         request_creator_init(&mut request);
@@ -1449,35 +1443,35 @@ impl Engine {
                     },
                 "location.kind" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "location.display-name" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "location.timestamp" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().timestamp = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().timestamp = Some(value.unwrap_or("").to_string());
                     },
                 "location.longitude" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().longitude = arg_from_str(value.unwrap_or("0.0"), err, "location.longitude", "number");
+                        request.location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.longitude", "number"));
                     },
                 "location.address" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().address = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().address = Some(value.unwrap_or("").to_string());
                     },
                 "location.latitude" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().latitude = arg_from_str(value.unwrap_or("0.0"), err, "location.latitude", "number");
+                        request.location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.latitude", "number"));
                     },
                 "location.id" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "location.accuracy" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().accuracy = arg_from_str(value.unwrap_or("0.0"), err, "location.accuracy", "number");
+                        request.location.as_mut().unwrap().accuracy = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.accuracy", "number"));
                     },
                 "source-item-id" => {
                         request_location_init(&mut request);
@@ -1505,11 +1499,11 @@ impl Engine {
                     },
                 "notification.level" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().level = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().level = Some(value.unwrap_or("").to_string());
                     },
                 "notification.delivery-time" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().delivery_time = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().delivery_time = Some(value.unwrap_or("").to_string());
                     },
                 "speakable-type" => {
                         request_notification_init(&mut request);
@@ -1546,8 +1540,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1558,7 +1551,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.timeline().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source-item-id" => {
                     call = call.source_item_id(value.unwrap_or(""));
@@ -1611,8 +1604,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1621,10 +1613,10 @@ impl Engine {
 
     fn _timeline_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::TimelineItem = Default::default();
+        let mut request = api::TimelineItem::default();
         let mut call = self.hub.timeline().patch(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1644,9 +1636,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1683,16 +1676,16 @@ impl Engine {
                 "creator.accept-types" => {
                         request_creator_init(&mut request);
                         if request.creator.as_mut().unwrap().accept_types.is_none() {
-                            request.creator.as_mut().unwrap().accept_types = Some(Default::default());
+                           request.creator.as_mut().unwrap().accept_types = Some(Default::default());
                         }
-                        request.creator.as_mut().unwrap().accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.creator.as_mut().unwrap().accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creator.image-urls" => {
                         request_creator_init(&mut request);
                         if request.creator.as_mut().unwrap().image_urls.is_none() {
-                            request.creator.as_mut().unwrap().image_urls = Some(Default::default());
+                           request.creator.as_mut().unwrap().image_urls = Some(Default::default());
                         }
-                        request.creator.as_mut().unwrap().image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.creator.as_mut().unwrap().image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creator.priority" => {
                         request_creator_init(&mut request);
@@ -1709,9 +1702,9 @@ impl Engine {
                 "creator.sharing-features" => {
                         request_creator_init(&mut request);
                         if request.creator.as_mut().unwrap().sharing_features.is_none() {
-                            request.creator.as_mut().unwrap().sharing_features = Some(Default::default());
+                           request.creator.as_mut().unwrap().sharing_features = Some(Default::default());
                         }
-                        request.creator.as_mut().unwrap().sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.creator.as_mut().unwrap().sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creator.type" => {
                         request_creator_init(&mut request);
@@ -1771,35 +1764,35 @@ impl Engine {
                     },
                 "location.kind" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "location.display-name" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "location.timestamp" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().timestamp = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().timestamp = Some(value.unwrap_or("").to_string());
                     },
                 "location.longitude" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().longitude = arg_from_str(value.unwrap_or("0.0"), err, "location.longitude", "number");
+                        request.location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.longitude", "number"));
                     },
                 "location.address" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().address = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().address = Some(value.unwrap_or("").to_string());
                     },
                 "location.latitude" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().latitude = arg_from_str(value.unwrap_or("0.0"), err, "location.latitude", "number");
+                        request.location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.latitude", "number"));
                     },
                 "location.id" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "location.accuracy" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().accuracy = arg_from_str(value.unwrap_or("0.0"), err, "location.accuracy", "number");
+                        request.location.as_mut().unwrap().accuracy = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.accuracy", "number"));
                     },
                 "source-item-id" => {
                         request_location_init(&mut request);
@@ -1827,11 +1820,11 @@ impl Engine {
                     },
                 "notification.level" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().level = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().level = Some(value.unwrap_or("").to_string());
                     },
                 "notification.delivery-time" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().delivery_time = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().delivery_time = Some(value.unwrap_or("").to_string());
                     },
                 "speakable-type" => {
                         request_notification_init(&mut request);
@@ -1858,8 +1851,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1868,10 +1860,10 @@ impl Engine {
 
     fn _timeline_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::TimelineItem = Default::default();
+        let mut request = api::TimelineItem::default();
         let mut call = self.hub.timeline().update(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1891,9 +1883,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1930,16 +1923,16 @@ impl Engine {
                 "creator.accept-types" => {
                         request_creator_init(&mut request);
                         if request.creator.as_mut().unwrap().accept_types.is_none() {
-                            request.creator.as_mut().unwrap().accept_types = Some(Default::default());
+                           request.creator.as_mut().unwrap().accept_types = Some(Default::default());
                         }
-                        request.creator.as_mut().unwrap().accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.creator.as_mut().unwrap().accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creator.image-urls" => {
                         request_creator_init(&mut request);
                         if request.creator.as_mut().unwrap().image_urls.is_none() {
-                            request.creator.as_mut().unwrap().image_urls = Some(Default::default());
+                           request.creator.as_mut().unwrap().image_urls = Some(Default::default());
                         }
-                        request.creator.as_mut().unwrap().image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.creator.as_mut().unwrap().image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creator.priority" => {
                         request_creator_init(&mut request);
@@ -1956,9 +1949,9 @@ impl Engine {
                 "creator.sharing-features" => {
                         request_creator_init(&mut request);
                         if request.creator.as_mut().unwrap().sharing_features.is_none() {
-                            request.creator.as_mut().unwrap().sharing_features = Some(Default::default());
+                           request.creator.as_mut().unwrap().sharing_features = Some(Default::default());
                         }
-                        request.creator.as_mut().unwrap().sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.creator.as_mut().unwrap().sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creator.type" => {
                         request_creator_init(&mut request);
@@ -2018,35 +2011,35 @@ impl Engine {
                     },
                 "location.kind" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "location.display-name" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "location.timestamp" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().timestamp = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().timestamp = Some(value.unwrap_or("").to_string());
                     },
                 "location.longitude" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().longitude = arg_from_str(value.unwrap_or("0.0"), err, "location.longitude", "number");
+                        request.location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.longitude", "number"));
                     },
                 "location.address" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().address = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().address = Some(value.unwrap_or("").to_string());
                     },
                 "location.latitude" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().latitude = arg_from_str(value.unwrap_or("0.0"), err, "location.latitude", "number");
+                        request.location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.latitude", "number"));
                     },
                 "location.id" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.location.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "location.accuracy" => {
                         request_location_init(&mut request);
-                        request.location.as_mut().unwrap().accuracy = arg_from_str(value.unwrap_or("0.0"), err, "location.accuracy", "number");
+                        request.location.as_mut().unwrap().accuracy = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.accuracy", "number"));
                     },
                 "source-item-id" => {
                         request_location_init(&mut request);
@@ -2074,11 +2067,11 @@ impl Engine {
                     },
                 "notification.level" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().level = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().level = Some(value.unwrap_or("").to_string());
                     },
                 "notification.delivery-time" => {
                         request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().delivery_time = value.unwrap_or("").to_string();
+                        request.notification.as_mut().unwrap().delivery_time = Some(value.unwrap_or("").to_string());
                     },
                 "speakable-type" => {
                         request_notification_init(&mut request);
@@ -2115,8 +2108,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2134,7 +2126,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_contacts {
+        }
+ else if self.opt.cmd_contacts {
             if self.opt.cmd_delete {
                 call_result = self._contacts_delete(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -2150,7 +2143,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_locations {
+        }
+ else if self.opt.cmd_locations {
             if self.opt.cmd_get {
                 call_result = self._locations_get(dry_run, &mut err);
             } else if self.opt.cmd_list {
@@ -2158,13 +2152,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_settings {
+        }
+ else if self.opt.cmd_settings {
             if self.opt.cmd_get {
                 call_result = self._settings_get(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_subscriptions {
+        }
+ else if self.opt.cmd_subscriptions {
             if self.opt.cmd_delete {
                 call_result = self._subscriptions_delete(dry_run, &mut err);
             } else if self.opt.cmd_insert {
@@ -2176,7 +2172,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_timeline {
+        }
+ else if self.opt.cmd_timeline {
             if self.opt.cmd_attachments_delete {
                 call_result = self._timeline_attachments_delete(dry_run, &mut err);
             } else if self.opt.cmd_attachments_get {
@@ -2220,21 +2217,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "mirror1-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "mirror1-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "mirror1",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "mirror1",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::Mirror::new(hyper::Client::new(), auth),
+            hub: api::Mirror::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -2254,12 +2267,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

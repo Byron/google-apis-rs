@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -28,6 +29,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -49,10 +56,10 @@ struct Engine {
 impl Engine {
     fn _trips_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::TripsSearchRequest = Default::default();
+        let mut request = api::TripsSearchRequest::default();
         let mut call = self.hub.trips().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -72,9 +79,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -84,46 +92,53 @@ impl Engine {
                 }
             }
             
+            fn request_request_passengers_init(request: &mut api::TripsSearchRequest) {
+                request_request_init(request);
+                if request.request.as_mut().unwrap().passengers.is_none() {
+                    request.request.as_mut().unwrap().passengers = Some(Default::default());
+                }
+            }
+            
             match &field_name.to_string()[..] {
                 "request.refundable" => {
                         request_request_init(&mut request);
-                        request.request.as_mut().unwrap().refundable = arg_from_str(value.unwrap_or("false"), err, "request.refundable", "boolean");
+                        request.request.as_mut().unwrap().refundable = Some(arg_from_str(value.unwrap_or("false"), err, "request.refundable", "boolean"));
                     },
                 "request.passengers.kind" => {
-                        request_request_init(&mut request);
-                        request.request.as_mut().unwrap().passengers.kind = value.unwrap_or("").to_string();
+                        request_request_passengers_init(&mut request);
+                        request.request.as_mut().unwrap().passengers.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "request.passengers.infant-in-lap-count" => {
-                        request_request_init(&mut request);
-                        request.request.as_mut().unwrap().passengers.infant_in_lap_count = arg_from_str(value.unwrap_or("-0"), err, "request.passengers.infant-in-lap-count", "integer");
+                        request_request_passengers_init(&mut request);
+                        request.request.as_mut().unwrap().passengers.as_mut().unwrap().infant_in_lap_count = Some(arg_from_str(value.unwrap_or("-0"), err, "request.passengers.infant-in-lap-count", "integer"));
                     },
                 "request.passengers.senior-count" => {
-                        request_request_init(&mut request);
-                        request.request.as_mut().unwrap().passengers.senior_count = arg_from_str(value.unwrap_or("-0"), err, "request.passengers.senior-count", "integer");
+                        request_request_passengers_init(&mut request);
+                        request.request.as_mut().unwrap().passengers.as_mut().unwrap().senior_count = Some(arg_from_str(value.unwrap_or("-0"), err, "request.passengers.senior-count", "integer"));
                     },
                 "request.passengers.infant-in-seat-count" => {
-                        request_request_init(&mut request);
-                        request.request.as_mut().unwrap().passengers.infant_in_seat_count = arg_from_str(value.unwrap_or("-0"), err, "request.passengers.infant-in-seat-count", "integer");
+                        request_request_passengers_init(&mut request);
+                        request.request.as_mut().unwrap().passengers.as_mut().unwrap().infant_in_seat_count = Some(arg_from_str(value.unwrap_or("-0"), err, "request.passengers.infant-in-seat-count", "integer"));
                     },
                 "request.passengers.child-count" => {
-                        request_request_init(&mut request);
-                        request.request.as_mut().unwrap().passengers.child_count = arg_from_str(value.unwrap_or("-0"), err, "request.passengers.child-count", "integer");
+                        request_request_passengers_init(&mut request);
+                        request.request.as_mut().unwrap().passengers.as_mut().unwrap().child_count = Some(arg_from_str(value.unwrap_or("-0"), err, "request.passengers.child-count", "integer"));
                     },
                 "request.passengers.adult-count" => {
-                        request_request_init(&mut request);
-                        request.request.as_mut().unwrap().passengers.adult_count = arg_from_str(value.unwrap_or("-0"), err, "request.passengers.adult-count", "integer");
+                        request_request_passengers_init(&mut request);
+                        request.request.as_mut().unwrap().passengers.as_mut().unwrap().adult_count = Some(arg_from_str(value.unwrap_or("-0"), err, "request.passengers.adult-count", "integer"));
                     },
                 "request.sale-country" => {
-                        request_request_init(&mut request);
-                        request.request.as_mut().unwrap().sale_country = arg_from_str(value.unwrap_or("-0"), err, "request.sale-country", "int64");
+                        request_request_passengers_init(&mut request);
+                        request.request.as_mut().unwrap().sale_country = Some(arg_from_str(value.unwrap_or("-0"), err, "request.sale-country", "int64"));
                     },
                 "request.solutions" => {
-                        request_request_init(&mut request);
-                        request.request.as_mut().unwrap().solutions = arg_from_str(value.unwrap_or("-0"), err, "request.solutions", "integer");
+                        request_request_passengers_init(&mut request);
+                        request.request.as_mut().unwrap().solutions = Some(arg_from_str(value.unwrap_or("-0"), err, "request.solutions", "integer"));
                     },
                 "request.max-price" => {
-                        request_request_init(&mut request);
-                        request.request.as_mut().unwrap().max_price = value.unwrap_or("").to_string();
+                        request_request_passengers_init(&mut request);
+                        request.request.as_mut().unwrap().max_price = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -142,8 +157,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -181,21 +195,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "qpxexpress1-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "qpxexpress1-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "qpxexpress1",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "qpxexpress1",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::QPXExpress::new(hyper::Client::new(), auth),
+            hub: api::QPXExpress::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -215,12 +245,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

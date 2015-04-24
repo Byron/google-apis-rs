@@ -338,10 +338,10 @@ impl<'a, C, A> GroupsMigration<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Groups {
     /// The kind of insert resource this is.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The status of the insert request.
     #[serde(rename="responseCode")]
-    pub response_code: String,
+    pub response_code: Option<String>,
 }
 
 impl ResponseResult for Groups {}
@@ -536,16 +536,20 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         let mut upload_url: Option<String> = None;
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;

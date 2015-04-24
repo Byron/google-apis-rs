@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *audit* crate version *0.1.5+20130108*, where *20130108* is the exact revision of the *audit:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *audit* crate version *0.1.5+20150419*, where *20150419* is the exact revision of the *audit:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *audit* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/admin-audit/get_started).
@@ -328,11 +328,11 @@ impl<'a, C, A> Audit<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activities {
     /// Each record in read response.
-    pub items: Vec<Activity>,
+    pub items: Option<Vec<Activity>>,
     /// Kind of list response this is.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Next page URL.
-    pub next: String,
+    pub next: Option<String>,
 }
 
 impl ResponseResult for Activities {}
@@ -346,14 +346,14 @@ impl ResponseResult for Activities {}
 pub struct ActivityActor {
     /// ID of application which interacted on behalf of the user.
     #[serde(rename="applicationId")]
-    pub application_id: String,
+    pub application_id: Option<String>,
     /// Email address of the user.
-    pub email: String,
+    pub email: Option<String>,
     /// For OAuth 2LO API requests, consumer_key of the requestor.
-    pub key: String,
+    pub key: Option<String>,
     /// User or OAuth 2LO request.
     #[serde(rename="callerType")]
-    pub caller_type: String,
+    pub caller_type: Option<String>,
 }
 
 impl NestedType for ActivityActor {}
@@ -368,15 +368,15 @@ impl Part for ActivityActor {}
 pub struct ActivityId {
     /// Unique qualifier if multiple events have the same time.
     #[serde(rename="uniqQualifier")]
-    pub uniq_qualifier: String,
+    pub uniq_qualifier: Option<String>,
     /// Application ID of the source application.
     #[serde(rename="applicationId")]
-    pub application_id: String,
+    pub application_id: Option<String>,
     /// Obfuscated customer ID of the source customer.
     #[serde(rename="customerId")]
-    pub customer_id: String,
+    pub customer_id: Option<String>,
     /// Time of occurrence of the activity.
-    pub time: String,
+    pub time: Option<String>,
 }
 
 impl NestedType for ActivityId {}
@@ -390,19 +390,19 @@ impl Part for ActivityId {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activity {
     /// Kind of resource this is.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Activity events.
-    pub events: Vec<ActivityEvents>,
+    pub events: Option<Vec<ActivityEvents>>,
     /// IP Address of the user doing the action.
     #[serde(rename="ipAddress")]
-    pub ip_address: String,
+    pub ip_address: Option<String>,
     /// Domain of source customer.
     #[serde(rename="ownerDomain")]
-    pub owner_domain: String,
+    pub owner_domain: Option<String>,
     /// User doing the action.
-    pub actor: ActivityActor,
+    pub actor: Option<ActivityActor>,
     /// Unique identifier for each activity record.
-    pub id: ActivityId,
+    pub id: Option<ActivityId>,
 }
 
 impl Part for Activity {}
@@ -415,9 +415,9 @@ impl Part for Activity {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityEventsParameters {
     /// Name of the parameter.
-    pub name: String,
+    pub name: Option<String>,
     /// Value of the parameter.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for ActivityEventsParameters {}
@@ -432,11 +432,11 @@ impl Part for ActivityEventsParameters {}
 pub struct ActivityEvents {
     /// Type of event.
     #[serde(rename="eventType")]
-    pub event_type: String,
+    pub event_type: Option<String>,
     /// Name of event.
-    pub name: String,
+    pub name: Option<String>,
     /// Event parameters.
-    pub parameters: Vec<ActivityEventsParameters>,
+    pub parameters: Option<Vec<ActivityEventsParameters>>,
 }
 
 impl NestedType for ActivityEvents {}

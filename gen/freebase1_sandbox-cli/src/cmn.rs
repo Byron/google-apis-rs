@@ -93,10 +93,10 @@ impl FieldCursor {
     }
 }
 
-pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError)
+pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError, for_hashmap: bool)
                                                         -> (&'a str, Option<&'a str>) {
-    let mut add_err = || err.issues.push(CLIError::InvalidKeyValueSyntax(kv.to_string()));
-    match kv.rfind('=') {
+    let mut add_err = || err.issues.push(CLIError::InvalidKeyValueSyntax(kv.to_string(),for_hashmap));
+    match kv.find('=') {
         None => {
             add_err();
             return (kv, None)
@@ -171,25 +171,52 @@ impl JsonTokenStorage {
 }
 
 impl TokenStorage for JsonTokenStorage {
-    // NOTE: logging might be interesting, currently we swallow all errors
-    fn set(&mut self, scope_hash: u64, token: Option<Token>) {
-        let json_token = json::encode(&token).unwrap();
-        let res = fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash));
-        if let Ok(mut f) = res {
-            f.write(json_token.as_bytes()).ok();
-        }
-    }
+    type Error = io::Error;
 
-    fn get(&self, scope_hash: u64) -> Option<Token> {
-        if let Ok(mut f) = fs::File::open(&self.path(scope_hash)) {
-            let mut json_string = String::new();
-            if let Ok(_) = f.read_to_string(&mut json_string) {
-                if let Ok(token) = json::decode::<Token>(&json_string) {
-                    return Some(token)
+    // NOTE: logging might be interesting, currently we swallow all errors
+    fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Option<io::Error> {
+        match token {
+            None => {
+                match fs::remove_file(self.path(scope_hash)) {
+                    Err(err) => 
+                        match err.kind() {
+                            io::ErrorKind::NotFound => None,
+                            _ => Some(err)
+                        },
+                    Ok(_) => None
+                }
+            }
+            Some(token) => {
+                let json_token = json::encode(&token).unwrap();
+                match fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash)) {
+                    Ok(mut f) => {
+                        match f.write(json_token.as_bytes()) {
+                            Ok(_) => None,
+                            Err(io_err) => Some(io_err),
+                        }
+                    },
+                    Err(io_err) => Some(io_err)
                 }
             }
         }
-        None
+    }
+
+    fn get(&self, scope_hash: u64, _: &Vec<&str>) -> Result<Option<Token>, io::Error> {
+        match fs::File::open(&self.path(scope_hash)) {
+            Ok(mut f) => {
+                let mut json_string = String::new();
+                match f.read_to_string(&mut json_string) {
+                    Ok(_) => Ok(Some(json::decode::<Token>(&json_string).unwrap())),
+                    Err(io_err) => Err(io_err),
+                }
+            },
+            Err(io_err) => {
+                match io_err.kind() {
+                    io::ErrorKind::NotFound => Ok(None),
+                    _ => Err(io_err)
+                }
+            }
+        }
     }
 }
 
@@ -286,7 +313,7 @@ pub enum CLIError {
     Configuration(ConfigurationError),
     ParseError((&'static str, &'static str, String, String)),
     UnknownParameter(String),
-    InvalidKeyValueSyntax(String),
+    InvalidKeyValueSyntax(String, bool),
     Input(InputError),
     Field(FieldError),
 }
@@ -302,9 +329,10 @@ impl fmt::Display for CLIError {
                             arg_name, value, type_name, err_desc),
             CLIError::UnknownParameter(ref param_name) 
                 => writeln!(f, "Parameter '{}' is unknown.", param_name),
-            CLIError::InvalidKeyValueSyntax(ref kv)
-                => writeln!(f, "'{}' does not match pattern <key>=<value>", kv),
-
+            CLIError::InvalidKeyValueSyntax(ref kv, is_hashmap) => {
+                let hashmap_info = if is_hashmap { "hashmap " } else { "" };
+                writeln!(f, "'{}' does not match {}pattern <key>=<value>", kv, hashmap_info)
+            },
         }
     }
 }
@@ -369,7 +397,10 @@ pub fn assure_config_dir_exists(dir: &str) -> Result<String, CLIError> {
     Ok(expanded_config_dir)
 }
 
-pub fn application_secret_from_directory(dir: &str, secret_basename: &str) -> Result<ApplicationSecret, CLIError> {
+pub fn application_secret_from_directory(dir: &str, 
+                                         secret_basename: &str, 
+                                         json_app_secret: &str)
+                                                        -> Result<ApplicationSecret, CLIError> {
     let secret_path = Path::new(dir).join(secret_basename);
     let secret_str = || secret_path.as_path().to_str().unwrap().to_string();
     let secret_io_error = |io_err: io::Error| {
@@ -383,27 +414,11 @@ pub fn application_secret_from_directory(dir: &str, secret_basename: &str) -> Re
             Err(mut err) => {
                 if err.kind() == io::ErrorKind::NotFound {
                     // Write our built-in one - user may adjust the written file at will
-                    let secret = ApplicationSecret {
-                        client_id: "14070749909-vgip2f1okm7bkvajhi9jugan6126io9v.apps.googleusercontent.com".to_string(),
-                        client_secret: "UqkDJd5RFwnHoiG5x5Rub8SI".to_string(),
-                        token_uri: "https://accounts.google.com/o/oauth2/token".to_string(),
-                        auth_uri: Default::default(),
-                        redirect_uris: Default::default(),
-                        client_email: None,
-                        auth_provider_x509_cert_url: None,
-                        client_x509_cert_url: Some("https://www.googleapis.com/oauth2/v1/certs".to_string())
-                    };
 
-                    let app_secret = ConsoleApplicationSecret {
-                        installed: Some(secret),
-                        web: None,
-                    };
-
-                    let json_enocded_secret = json::encode(&app_secret).unwrap();
                     err = match fs::OpenOptions::new().create(true).write(true).open(&secret_path) {
                         Err(cfe) => cfe,
                         Ok(mut f) => {
-                            match f.write(json_enocded_secret.as_bytes()) {
+                            match f.write(json_app_secret.as_bytes()) {
                                 Err(io_err) => io_err,
                                 Ok(_) => continue,
                             }

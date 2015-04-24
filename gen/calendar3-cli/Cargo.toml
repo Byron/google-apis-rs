@@ -4,8 +4,8 @@
 [package]
 
 name = "google-calendar3-cli"
-version = "0.0.1+20150303"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+version = "0.0.1+20150326"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with calendar (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/calendar3-cli"
 homepage = "https://developers.google.com/google-apps/calendar/firstapp"
@@ -23,6 +23,7 @@ yup-oauth2 = "*"
 docopt = "*"
 docopt_macros = "*"
 rustc-serialize = "*"
+yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
 

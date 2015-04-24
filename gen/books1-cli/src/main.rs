@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -32,14 +33,14 @@ Usage:
   books1 [options] layers volume-annotations-get <volume-id> <layer-id> <annotation-id> [-p <v>]... [-o <out>]
   books1 [options] layers volume-annotations-list <volume-id> <layer-id> <content-version> [-p <v>]... [-o <out>]
   books1 [options] myconfig get-user-settings [-p <v>]... [-o <out>]
-  books1 [options] myconfig release-download-access <volume-ids> <cpksver> [-p <v>]... [-o <out>]
+  books1 [options] myconfig release-download-access <volume-ids>... <cpksver> [-p <v>]... [-o <out>]
   books1 [options] myconfig request-access <source> <volume-id> <nonce> <cpksver> [-p <v>]... [-o <out>]
   books1 [options] myconfig sync-volume-licenses <source> <nonce> <cpksver> [-p <v>]... [-o <out>]
   books1 [options] myconfig update-user-settings -r <kv>... [-p <v>]... [-o <out>]
   books1 [options] mylibrary annotations-delete <annotation-id> [-p <v>]...
   books1 [options] mylibrary annotations-insert -r <kv>... [-p <v>]... [-o <out>]
   books1 [options] mylibrary annotations-list [-p <v>]... [-o <out>]
-  books1 [options] mylibrary annotations-summary <layer-ids> <volume-id> [-p <v>]... [-o <out>]
+  books1 [options] mylibrary annotations-summary <layer-ids>... <volume-id> [-p <v>]... [-o <out>]
   books1 [options] mylibrary annotations-update <annotation-id> -r <kv>... [-p <v>]... [-o <out>]
   books1 [options] mylibrary bookshelves-add-volume <shelf> <volume-id> [-p <v>]...
   books1 [options] mylibrary bookshelves-clear-volumes <shelf> [-p <v>]...
@@ -75,6 +76,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -98,7 +105,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.bookshelves().get(&self.opt.arg_user_id, &self.opt.arg_shelf);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -133,8 +140,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -145,7 +151,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.bookshelves().list(&self.opt.arg_user_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -180,8 +186,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -192,7 +197,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.bookshelves().volumes_list(&self.opt.arg_user_id, &self.opt.arg_shelf);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -236,8 +241,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -248,7 +252,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.cloudloading().add_book();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "upload-client-token" => {
                     call = call.upload_client_token(value.unwrap_or(""));
@@ -292,8 +296,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -304,7 +307,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.cloudloading().delete_book(&self.opt.arg_volume_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -335,7 +338,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -344,10 +346,10 @@ impl Engine {
 
     fn _cloudloading_update_book(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::BooksCloudloadingResource = Default::default();
+        let mut request = api::BooksCloudloadingResource::default();
         let mut call = self.hub.cloudloading().update_book(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -367,9 +369,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -403,8 +406,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -415,7 +417,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.dictionary().list_offline_metadata(&self.opt.arg_cpksver);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -447,8 +449,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -459,7 +460,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().annotation_data_get(&self.opt.arg_volume_id, &self.opt.arg_layer_id, &self.opt.arg_annotation_data_id, &self.opt.arg_content_version);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "w" => {
                     call = call.w(arg_from_str(value.unwrap_or("-0"), err, "w", "integer"));
@@ -509,8 +510,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -521,7 +521,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().annotation_data_list(&self.opt.arg_volume_id, &self.opt.arg_layer_id, &self.opt.arg_content_version);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "w" => {
                     call = call.w(arg_from_str(value.unwrap_or("-0"), err, "w", "integer"));
@@ -583,8 +583,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -595,7 +594,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().get(&self.opt.arg_volume_id, &self.opt.arg_summary_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -633,8 +632,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -645,7 +643,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().list(&self.opt.arg_volume_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -689,8 +687,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -701,7 +698,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().volume_annotations_get(&self.opt.arg_volume_id, &self.opt.arg_layer_id, &self.opt.arg_annotation_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -739,8 +736,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -751,7 +747,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().volume_annotations_list(&self.opt.arg_volume_id, &self.opt.arg_layer_id, &self.opt.arg_content_version);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "volume-annotations-version" => {
                     call = call.volume_annotations_version(value.unwrap_or(""));
@@ -819,8 +815,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -831,7 +826,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.myconfig().get_user_settings();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -863,8 +858,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -875,7 +869,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.myconfig().release_download_access(&self.opt.arg_volume_ids, &self.opt.arg_cpksver);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -913,8 +907,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -925,7 +918,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.myconfig().request_access(&self.opt.arg_source, &self.opt.arg_volume_id, &self.opt.arg_nonce, &self.opt.arg_cpksver);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -963,8 +956,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -975,7 +967,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.myconfig().sync_volume_licenses(&self.opt.arg_source, &self.opt.arg_nonce, &self.opt.arg_cpksver);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "volume-ids" => {
                     call = call.add_volume_ids(value.unwrap_or(""));
@@ -1019,8 +1011,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1029,10 +1020,10 @@ impl Engine {
 
     fn _myconfig_update_user_settings(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Usersettings = Default::default();
+        let mut request = api::Usersettings::default();
         let mut call = self.hub.myconfig().update_user_settings(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1052,9 +1043,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1070,11 +1062,11 @@ impl Engine {
                     },
                 "notes-export.is-enabled" => {
                         request_notes_export_init(&mut request);
-                        request.notes_export.as_mut().unwrap().is_enabled = arg_from_str(value.unwrap_or("false"), err, "notes-export.is-enabled", "boolean");
+                        request.notes_export.as_mut().unwrap().is_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "notes-export.is-enabled", "boolean"));
                     },
                 "notes-export.folder-name" => {
                         request_notes_export_init(&mut request);
-                        request.notes_export.as_mut().unwrap().folder_name = value.unwrap_or("").to_string();
+                        request.notes_export.as_mut().unwrap().folder_name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -1093,8 +1085,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1105,7 +1096,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().annotations_delete(&self.opt.arg_annotation_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -1139,7 +1130,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1148,10 +1138,10 @@ impl Engine {
 
     fn _mylibrary_annotations_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Annotation = Default::default();
+        let mut request = api::Annotation::default();
         let mut call = self.hub.mylibrary().annotations_insert(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -1180,15 +1170,72 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_client_version_ranges_cfi_range_init(request: &mut api::Annotation) {
+                request_client_version_ranges_init(request);
+                if request.client_version_ranges.as_mut().unwrap().cfi_range.is_none() {
+                    request.client_version_ranges.as_mut().unwrap().cfi_range = Some(Default::default());
+                }
+            }
+            
+            fn request_client_version_ranges_gb_image_range_init(request: &mut api::Annotation) {
+                request_client_version_ranges_init(request);
+                if request.client_version_ranges.as_mut().unwrap().gb_image_range.is_none() {
+                    request.client_version_ranges.as_mut().unwrap().gb_image_range = Some(Default::default());
+                }
+            }
+            
+            fn request_client_version_ranges_gb_text_range_init(request: &mut api::Annotation) {
+                request_client_version_ranges_init(request);
+                if request.client_version_ranges.as_mut().unwrap().gb_text_range.is_none() {
+                    request.client_version_ranges.as_mut().unwrap().gb_text_range = Some(Default::default());
+                }
+            }
+            
+            fn request_client_version_ranges_image_cfi_range_init(request: &mut api::Annotation) {
+                request_client_version_ranges_init(request);
+                if request.client_version_ranges.as_mut().unwrap().image_cfi_range.is_none() {
+                    request.client_version_ranges.as_mut().unwrap().image_cfi_range = Some(Default::default());
+                }
+            }
+            
             fn request_client_version_ranges_init(request: &mut api::Annotation) {
                 if request.client_version_ranges.is_none() {
                     request.client_version_ranges = Some(Default::default());
+                }
+            }
+            
+            fn request_current_version_ranges_cfi_range_init(request: &mut api::Annotation) {
+                request_current_version_ranges_init(request);
+                if request.current_version_ranges.as_mut().unwrap().cfi_range.is_none() {
+                    request.current_version_ranges.as_mut().unwrap().cfi_range = Some(Default::default());
+                }
+            }
+            
+            fn request_current_version_ranges_gb_image_range_init(request: &mut api::Annotation) {
+                request_current_version_ranges_init(request);
+                if request.current_version_ranges.as_mut().unwrap().gb_image_range.is_none() {
+                    request.current_version_ranges.as_mut().unwrap().gb_image_range = Some(Default::default());
+                }
+            }
+            
+            fn request_current_version_ranges_gb_text_range_init(request: &mut api::Annotation) {
+                request_current_version_ranges_init(request);
+                if request.current_version_ranges.as_mut().unwrap().gb_text_range.is_none() {
+                    request.current_version_ranges.as_mut().unwrap().gb_text_range = Some(Default::default());
+                }
+            }
+            
+            fn request_current_version_ranges_image_cfi_range_init(request: &mut api::Annotation) {
+                request_current_version_ranges_init(request);
+                if request.current_version_ranges.as_mut().unwrap().image_cfi_range.is_none() {
+                    request.current_version_ranges.as_mut().unwrap().image_cfi_range = Some(Default::default());
                 }
             }
             
@@ -1210,9 +1257,9 @@ impl Engine {
                     },
                 "page-ids" => {
                         if request.page_ids.is_none() {
-                            request.page_ids = Some(Default::default());
+                           request.page_ids = Some(Default::default());
                         }
-                        request.page_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.page_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "created" => {
                         request.created = Some(value.unwrap_or("").to_string());
@@ -1224,72 +1271,72 @@ impl Engine {
                         request.before_selected_text = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.image-cfi-range.start-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.start_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_image_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.image-cfi-range.end-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.end_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_image_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.image-cfi-range.start-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.start_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_image_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.image-cfi-range.end-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.end_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_image_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-text-range.start-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_text_range.start_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_text_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-text-range.end-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_text_range.end_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_text_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-text-range.start-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_text_range.start_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_text_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-text-range.end-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_text_range.end_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_text_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.content-version" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().content_version = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_text_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().content_version = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.cfi-range.start-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().cfi_range.start_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.cfi-range.end-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().cfi_range.end_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.cfi-range.start-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().cfi_range.start_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.cfi-range.end-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().cfi_range.end_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-image-range.start-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_image_range.start_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_image_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-image-range.end-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_image_range.end_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_image_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-image-range.start-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_image_range.start_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_image_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-image-range.end-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_image_range.end_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_image_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "after-selected-text" => {
                         request_current_version_ranges_init(&mut request);
@@ -1305,87 +1352,87 @@ impl Engine {
                     },
                 "layer-summary.limit-type" => {
                         request_layer_summary_init(&mut request);
-                        request.layer_summary.as_mut().unwrap().limit_type = value.unwrap_or("").to_string();
+                        request.layer_summary.as_mut().unwrap().limit_type = Some(value.unwrap_or("").to_string());
                     },
                 "layer-summary.remaining-character-count" => {
                         request_layer_summary_init(&mut request);
-                        request.layer_summary.as_mut().unwrap().remaining_character_count = arg_from_str(value.unwrap_or("-0"), err, "layer-summary.remaining-character-count", "integer");
+                        request.layer_summary.as_mut().unwrap().remaining_character_count = Some(arg_from_str(value.unwrap_or("-0"), err, "layer-summary.remaining-character-count", "integer"));
                     },
                 "layer-summary.allowed-character-count" => {
                         request_layer_summary_init(&mut request);
-                        request.layer_summary.as_mut().unwrap().allowed_character_count = arg_from_str(value.unwrap_or("-0"), err, "layer-summary.allowed-character-count", "integer");
+                        request.layer_summary.as_mut().unwrap().allowed_character_count = Some(arg_from_str(value.unwrap_or("-0"), err, "layer-summary.allowed-character-count", "integer"));
                     },
                 "selected-text" => {
                         request_layer_summary_init(&mut request);
                         request.selected_text = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.image-cfi-range.start-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.start_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_image_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.image-cfi-range.end-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.end_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_image_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.image-cfi-range.start-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.start_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_image_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.image-cfi-range.end-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.end_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_image_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-text-range.start-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_text_range.start_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_text_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-text-range.end-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_text_range.end_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_text_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-text-range.start-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_text_range.start_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_text_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-text-range.end-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_text_range.end_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_text_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.content-version" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().content_version = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_text_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().content_version = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.cfi-range.start-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().cfi_range.start_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.cfi-range.end-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().cfi_range.end_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.cfi-range.start-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().cfi_range.start_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.cfi-range.end-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().cfi_range.end_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-image-range.start-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_image_range.start_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_image_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-image-range.end-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_image_range.end_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_image_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-image-range.start-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_image_range.start_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_image_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-image-range.end-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_image_range.end_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_image_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "layer-id" => {
                         request_client_version_ranges_init(&mut request);
@@ -1424,8 +1471,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1436,7 +1482,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().annotations_list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "volume-id" => {
                     call = call.volume_id(value.unwrap_or(""));
@@ -1498,8 +1544,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1510,7 +1555,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().annotations_summary(&self.opt.arg_layer_ids, &self.opt.arg_volume_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1542,8 +1587,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1552,10 +1596,10 @@ impl Engine {
 
     fn _mylibrary_annotations_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Annotation = Default::default();
+        let mut request = api::Annotation::default();
         let mut call = self.hub.mylibrary().annotations_update(&request, &self.opt.arg_annotation_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -1578,15 +1622,72 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_client_version_ranges_cfi_range_init(request: &mut api::Annotation) {
+                request_client_version_ranges_init(request);
+                if request.client_version_ranges.as_mut().unwrap().cfi_range.is_none() {
+                    request.client_version_ranges.as_mut().unwrap().cfi_range = Some(Default::default());
+                }
+            }
+            
+            fn request_client_version_ranges_gb_image_range_init(request: &mut api::Annotation) {
+                request_client_version_ranges_init(request);
+                if request.client_version_ranges.as_mut().unwrap().gb_image_range.is_none() {
+                    request.client_version_ranges.as_mut().unwrap().gb_image_range = Some(Default::default());
+                }
+            }
+            
+            fn request_client_version_ranges_gb_text_range_init(request: &mut api::Annotation) {
+                request_client_version_ranges_init(request);
+                if request.client_version_ranges.as_mut().unwrap().gb_text_range.is_none() {
+                    request.client_version_ranges.as_mut().unwrap().gb_text_range = Some(Default::default());
+                }
+            }
+            
+            fn request_client_version_ranges_image_cfi_range_init(request: &mut api::Annotation) {
+                request_client_version_ranges_init(request);
+                if request.client_version_ranges.as_mut().unwrap().image_cfi_range.is_none() {
+                    request.client_version_ranges.as_mut().unwrap().image_cfi_range = Some(Default::default());
+                }
+            }
+            
             fn request_client_version_ranges_init(request: &mut api::Annotation) {
                 if request.client_version_ranges.is_none() {
                     request.client_version_ranges = Some(Default::default());
+                }
+            }
+            
+            fn request_current_version_ranges_cfi_range_init(request: &mut api::Annotation) {
+                request_current_version_ranges_init(request);
+                if request.current_version_ranges.as_mut().unwrap().cfi_range.is_none() {
+                    request.current_version_ranges.as_mut().unwrap().cfi_range = Some(Default::default());
+                }
+            }
+            
+            fn request_current_version_ranges_gb_image_range_init(request: &mut api::Annotation) {
+                request_current_version_ranges_init(request);
+                if request.current_version_ranges.as_mut().unwrap().gb_image_range.is_none() {
+                    request.current_version_ranges.as_mut().unwrap().gb_image_range = Some(Default::default());
+                }
+            }
+            
+            fn request_current_version_ranges_gb_text_range_init(request: &mut api::Annotation) {
+                request_current_version_ranges_init(request);
+                if request.current_version_ranges.as_mut().unwrap().gb_text_range.is_none() {
+                    request.current_version_ranges.as_mut().unwrap().gb_text_range = Some(Default::default());
+                }
+            }
+            
+            fn request_current_version_ranges_image_cfi_range_init(request: &mut api::Annotation) {
+                request_current_version_ranges_init(request);
+                if request.current_version_ranges.as_mut().unwrap().image_cfi_range.is_none() {
+                    request.current_version_ranges.as_mut().unwrap().image_cfi_range = Some(Default::default());
                 }
             }
             
@@ -1608,9 +1709,9 @@ impl Engine {
                     },
                 "page-ids" => {
                         if request.page_ids.is_none() {
-                            request.page_ids = Some(Default::default());
+                           request.page_ids = Some(Default::default());
                         }
-                        request.page_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.page_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "created" => {
                         request.created = Some(value.unwrap_or("").to_string());
@@ -1622,72 +1723,72 @@ impl Engine {
                         request.before_selected_text = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.image-cfi-range.start-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.start_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_image_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.image-cfi-range.end-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.end_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_image_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.image-cfi-range.start-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.start_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_image_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.image-cfi-range.end-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.end_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_image_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-text-range.start-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_text_range.start_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_text_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-text-range.end-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_text_range.end_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_text_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-text-range.start-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_text_range.start_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_text_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-text-range.end-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_text_range.end_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_text_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.content-version" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().content_version = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_text_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().content_version = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.cfi-range.start-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().cfi_range.start_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.cfi-range.end-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().cfi_range.end_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.cfi-range.start-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().cfi_range.start_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.cfi-range.end-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().cfi_range.end_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_cfi_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-image-range.start-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_image_range.start_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_image_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-image-range.end-position" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_image_range.end_position = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_image_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-image-range.start-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_image_range.start_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_image_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "current-version-ranges.gb-image-range.end-offset" => {
-                        request_current_version_ranges_init(&mut request);
-                        request.current_version_ranges.as_mut().unwrap().gb_image_range.end_offset = value.unwrap_or("").to_string();
+                        request_current_version_ranges_gb_image_range_init(&mut request);
+                        request.current_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "after-selected-text" => {
                         request_current_version_ranges_init(&mut request);
@@ -1703,87 +1804,87 @@ impl Engine {
                     },
                 "layer-summary.limit-type" => {
                         request_layer_summary_init(&mut request);
-                        request.layer_summary.as_mut().unwrap().limit_type = value.unwrap_or("").to_string();
+                        request.layer_summary.as_mut().unwrap().limit_type = Some(value.unwrap_or("").to_string());
                     },
                 "layer-summary.remaining-character-count" => {
                         request_layer_summary_init(&mut request);
-                        request.layer_summary.as_mut().unwrap().remaining_character_count = arg_from_str(value.unwrap_or("-0"), err, "layer-summary.remaining-character-count", "integer");
+                        request.layer_summary.as_mut().unwrap().remaining_character_count = Some(arg_from_str(value.unwrap_or("-0"), err, "layer-summary.remaining-character-count", "integer"));
                     },
                 "layer-summary.allowed-character-count" => {
                         request_layer_summary_init(&mut request);
-                        request.layer_summary.as_mut().unwrap().allowed_character_count = arg_from_str(value.unwrap_or("-0"), err, "layer-summary.allowed-character-count", "integer");
+                        request.layer_summary.as_mut().unwrap().allowed_character_count = Some(arg_from_str(value.unwrap_or("-0"), err, "layer-summary.allowed-character-count", "integer"));
                     },
                 "selected-text" => {
                         request_layer_summary_init(&mut request);
                         request.selected_text = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.image-cfi-range.start-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.start_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_image_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.image-cfi-range.end-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.end_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_image_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.image-cfi-range.start-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.start_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_image_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.image-cfi-range.end-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.end_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_image_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().image_cfi_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-text-range.start-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_text_range.start_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_text_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-text-range.end-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_text_range.end_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_text_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-text-range.start-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_text_range.start_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_text_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-text-range.end-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_text_range.end_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_text_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_text_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.content-version" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().content_version = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_text_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().content_version = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.cfi-range.start-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().cfi_range.start_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.cfi-range.end-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().cfi_range.end_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.cfi-range.start-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().cfi_range.start_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.cfi-range.end-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().cfi_range.end_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_cfi_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().cfi_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-image-range.start-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_image_range.start_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_image_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().start_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-image-range.end-position" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_image_range.end_position = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_image_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().end_position = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-image-range.start-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_image_range.start_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_image_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().start_offset = Some(value.unwrap_or("").to_string());
                     },
                 "client-version-ranges.gb-image-range.end-offset" => {
-                        request_client_version_ranges_init(&mut request);
-                        request.client_version_ranges.as_mut().unwrap().gb_image_range.end_offset = value.unwrap_or("").to_string();
+                        request_client_version_ranges_gb_image_range_init(&mut request);
+                        request.client_version_ranges.as_mut().unwrap().gb_image_range.as_mut().unwrap().end_offset = Some(value.unwrap_or("").to_string());
                     },
                 "layer-id" => {
                         request_client_version_ranges_init(&mut request);
@@ -1822,8 +1923,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1834,7 +1934,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().bookshelves_add_volume(&self.opt.arg_shelf, &self.opt.arg_volume_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -1871,7 +1971,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1882,7 +1981,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().bookshelves_clear_volumes(&self.opt.arg_shelf);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -1916,7 +2015,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1927,7 +2025,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().bookshelves_get(&self.opt.arg_shelf);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -1962,8 +2060,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1974,7 +2071,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().bookshelves_list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -2009,8 +2106,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2022,7 +2118,7 @@ impl Engine {
         let volume_position: i32 = arg_from_str(&self.opt.arg_volume_position, err, "<volume-position>", "integer");
         let mut call = self.hub.mylibrary().bookshelves_move_volume(&self.opt.arg_shelf, &self.opt.arg_volume_id, volume_position);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -2056,7 +2152,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2067,7 +2162,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().bookshelves_remove_volume(&self.opt.arg_shelf, &self.opt.arg_volume_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -2104,7 +2199,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2115,7 +2209,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().bookshelves_volumes_list(&self.opt.arg_shelf);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -2168,8 +2262,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2180,7 +2273,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().readingpositions_get(&self.opt.arg_volume_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -2218,8 +2311,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2230,7 +2322,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.mylibrary().readingpositions_set_position(&self.opt.arg_volume_id, &self.opt.arg_timestamp, &self.opt.arg_position);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -2273,7 +2365,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2284,7 +2375,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.onboarding().list_categories();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -2319,8 +2410,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2331,7 +2421,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.onboarding().list_category_volumes();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -2375,8 +2465,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2387,7 +2476,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.promooffer().accept();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "volume-id" => {
                     call = call.volume_id(value.unwrap_or(""));
@@ -2442,7 +2531,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2453,7 +2541,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.promooffer().dismiss();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "serial" => {
                     call = call.serial(value.unwrap_or(""));
@@ -2505,7 +2593,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2516,7 +2603,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.promooffer().get();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "serial" => {
                     call = call.serial(value.unwrap_or(""));
@@ -2566,8 +2653,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2578,7 +2664,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.volumes().associated_list(&self.opt.arg_volume_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -2619,8 +2705,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2631,7 +2716,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.volumes().get(&self.opt.arg_volume_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "user-library-consistent-read" => {
                     call = call.user_library_consistent_read(arg_from_str(value.unwrap_or("false"), err, "user-library-consistent-read", "boolean"));
@@ -2678,8 +2763,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2690,7 +2774,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.volumes().list(&self.opt.arg_q);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -2758,8 +2842,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2770,7 +2853,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.volumes().mybooks_list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -2820,8 +2903,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2832,7 +2914,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.volumes().recommended_list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -2870,8 +2952,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2882,7 +2963,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.volumes().recommended_rate(&self.opt.arg_rating, &self.opt.arg_volume_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
@@ -2920,8 +3001,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2932,7 +3012,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.volumes().useruploaded_list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "volume-id" => {
                     call = call.add_volume_id(value.unwrap_or(""));
@@ -2982,8 +3062,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3005,7 +3084,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_cloudloading {
+        }
+ else if self.opt.cmd_cloudloading {
             if self.opt.cmd_add_book {
                 call_result = self._cloudloading_add_book(dry_run, &mut err);
             } else if self.opt.cmd_delete_book {
@@ -3015,13 +3095,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_dictionary {
+        }
+ else if self.opt.cmd_dictionary {
             if self.opt.cmd_list_offline_metadata {
                 call_result = self._dictionary_list_offline_metadata(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_layers {
+        }
+ else if self.opt.cmd_layers {
             if self.opt.cmd_annotation_data_get {
                 call_result = self._layers_annotation_data_get(dry_run, &mut err);
             } else if self.opt.cmd_annotation_data_list {
@@ -3037,7 +3119,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_myconfig {
+        }
+ else if self.opt.cmd_myconfig {
             if self.opt.cmd_get_user_settings {
                 call_result = self._myconfig_get_user_settings(dry_run, &mut err);
             } else if self.opt.cmd_release_download_access {
@@ -3051,7 +3134,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_mylibrary {
+        }
+ else if self.opt.cmd_mylibrary {
             if self.opt.cmd_annotations_delete {
                 call_result = self._mylibrary_annotations_delete(dry_run, &mut err);
             } else if self.opt.cmd_annotations_insert {
@@ -3083,7 +3167,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_onboarding {
+        }
+ else if self.opt.cmd_onboarding {
             if self.opt.cmd_list_categories {
                 call_result = self._onboarding_list_categories(dry_run, &mut err);
             } else if self.opt.cmd_list_category_volumes {
@@ -3091,7 +3176,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_promooffer {
+        }
+ else if self.opt.cmd_promooffer {
             if self.opt.cmd_accept {
                 call_result = self._promooffer_accept(dry_run, &mut err);
             } else if self.opt.cmd_dismiss {
@@ -3101,7 +3187,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_volumes {
+        }
+ else if self.opt.cmd_volumes {
             if self.opt.cmd_associated_list {
                 call_result = self._volumes_associated_list(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -3139,21 +3226,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "books1-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "books1-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "books1",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "books1",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::Books::new(hyper::Client::new(), auth),
+            hub: api::Books::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -3173,12 +3276,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

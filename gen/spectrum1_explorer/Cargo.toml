@@ -5,7 +5,7 @@
 
 name = "google-spectrum1_explorer"
 version = "0.1.5+20150112"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with spectrum (protocol v1explorer)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/spectrum1_explorer"
 homepage = "http://developers.google.com/spectrum"

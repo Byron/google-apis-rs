@@ -352,15 +352,15 @@ impl<'a, C, A> AutoscalerHub<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeprecationStatus {
     /// no description provided
-    pub deleted: String,
+    pub deleted: Option<String>,
     /// no description provided
-    pub deprecated: String,
+    pub deprecated: Option<String>,
     /// no description provided
-    pub state: String,
+    pub state: Option<String>,
     /// no description provided
-    pub obsolete: String,
+    pub obsolete: Option<String>,
     /// no description provided
-    pub replacement: String,
+    pub replacement: Option<String>,
 }
 
 impl Part for DeprecationStatus {}
@@ -373,9 +373,9 @@ impl Part for DeprecationStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarningsData {
     /// no description provided
-    pub key: String,
+    pub key: Option<String>,
     /// no description provided
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for OperationWarningsData {}
@@ -428,11 +428,11 @@ impl Resource for Zone {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarnings {
     /// no description provided
-    pub message: String,
+    pub message: Option<String>,
     /// no description provided
-    pub code: String,
+    pub code: Option<String>,
     /// no description provided
-    pub data: Vec<OperationWarningsData>,
+    pub data: Option<Vec<OperationWarningsData>>,
 }
 
 impl NestedType for OperationWarnings {}
@@ -452,16 +452,16 @@ impl Part for OperationWarnings {}
 pub struct OperationList {
     /// no description provided
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// no description provided
-    pub items: Vec<Operation>,
+    pub items: Option<Vec<Operation>>,
     /// Type of resource. Always compute#operations for Operations resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub id: String,
+    pub id: Option<String>,
     /// no description provided
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for OperationList {}
@@ -475,14 +475,14 @@ impl ResponseResult for OperationList {}
 pub struct ZoneMaintenanceWindows {
     /// no description provided
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// no description provided
-    pub description: String,
+    pub description: Option<String>,
     /// no description provided
     #[serde(rename="beginTime")]
-    pub begin_time: String,
+    pub begin_time: Option<String>,
     /// no description provided
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for ZoneMaintenanceWindows {}
@@ -496,13 +496,13 @@ impl Part for ZoneMaintenanceWindows {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingPolicyCustomMetricUtilization {
     /// Identifier of the metric. It should be a Cloud Monitoring metric. The metric can not have negative values. The metric should be an utilization metric (increasing number of VMs handling requests x times should reduce average value of the metric roughly x times). For example you could use: compute.googleapis.com/instance/network/received_bytes_count.
-    pub metric: String,
+    pub metric: Option<String>,
     /// Defines type in which utilization_target is expressed.
     #[serde(rename="utilizationTargetType")]
-    pub utilization_target_type: String,
+    pub utilization_target_type: Option<String>,
     /// Target value of the metric which Autoscaler should maintain. Must be a positive value.
     #[serde(rename="utilizationTarget")]
-    pub utilization_target: f64,
+    pub utilization_target: Option<f64>,
 }
 
 impl Part for AutoscalingPolicyCustomMetricUtilization {}
@@ -515,11 +515,11 @@ impl Part for AutoscalingPolicyCustomMetricUtilization {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationErrorErrors {
     /// no description provided
-    pub message: String,
+    pub message: Option<String>,
     /// no description provided
-    pub code: String,
+    pub code: Option<String>,
     /// no description provided
-    pub location: String,
+    pub location: Option<String>,
 }
 
 impl NestedType for OperationErrorErrors {}
@@ -534,22 +534,22 @@ impl Part for OperationErrorErrors {}
 pub struct AutoscalingPolicy {
     /// Configuration parameters of autoscaling based on custom metric.
     #[serde(rename="customMetricUtilizations")]
-    pub custom_metric_utilizations: Vec<AutoscalingPolicyCustomMetricUtilization>,
+    pub custom_metric_utilizations: Option<Vec<AutoscalingPolicyCustomMetricUtilization>>,
     /// The maximum number of replicas that the Autoscaler can scale up to.
     #[serde(rename="maxNumReplicas")]
-    pub max_num_replicas: i32,
+    pub max_num_replicas: Option<i32>,
     /// Exactly one utilization policy should be provided. Configuration parameters of CPU based autoscaling policy.
     #[serde(rename="cpuUtilization")]
-    pub cpu_utilization: AutoscalingPolicyCpuUtilization,
+    pub cpu_utilization: Option<AutoscalingPolicyCpuUtilization>,
     /// The minimum number of replicas that the Autoscaler can scale down to.
     #[serde(rename="minNumReplicas")]
-    pub min_num_replicas: i32,
+    pub min_num_replicas: Option<i32>,
     /// The number of seconds that the Autoscaler should wait between two succeeding changes to the number of virtual machines. You should define an interval that is at least as long as the initialization time of a virtual machine and the time it may take for replica pool to create the virtual machine. The default is 60 seconds.
     #[serde(rename="coolDownPeriodSec")]
-    pub cool_down_period_sec: i32,
+    pub cool_down_period_sec: Option<i32>,
     /// Configuration parameters of autoscaling based on load balancer.
     #[serde(rename="loadBalancingUtilization")]
-    pub load_balancing_utilization: AutoscalingPolicyLoadBalancingUtilization,
+    pub load_balancing_utilization: Option<AutoscalingPolicyLoadBalancingUtilization>,
 }
 
 impl Part for AutoscalingPolicy {}
@@ -562,7 +562,7 @@ impl Part for AutoscalingPolicy {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationError {
     /// no description provided
-    pub errors: Vec<OperationErrorErrors>,
+    pub errors: Option<Vec<OperationErrorErrors>>,
 }
 
 impl NestedType for OperationError {}
@@ -577,7 +577,7 @@ impl Part for OperationError {}
 pub struct AutoscalingPolicyCpuUtilization {
     /// The target utilization that the Autoscaler should maintain. It is represented as a fraction of used cores. For example: 6 cores used in 8-core VM are represented here as 0.75. Must be a float value between (0, 1]. If not defined, the default is 0.8.
     #[serde(rename="utilizationTarget")]
-    pub utilization_target: f64,
+    pub utilization_target: Option<f64>,
 }
 
 impl Part for AutoscalingPolicyCpuUtilization {}
@@ -591,7 +591,7 @@ impl Part for AutoscalingPolicyCpuUtilization {}
 pub struct AutoscalingPolicyLoadBalancingUtilization {
     /// Fraction of backend capacity utilization (set in HTTP load balancing configuration) that Autoscaler should maintain. Must be a positive float value. If not defined, the default is 0.8. For example if your maxRatePerInstance capacity (in HTTP Load Balancing configuration) is set at 10 and you would like to keep number of instances such that each instance receives 7 QPS on average, set this to 0.7.
     #[serde(rename="utilizationTarget")]
-    pub utilization_target: f64,
+    pub utilization_target: Option<f64>,
 }
 
 impl Part for AutoscalingPolicyLoadBalancingUtilization {}
@@ -610,11 +610,11 @@ impl Part for AutoscalingPolicyLoadBalancingUtilization {}
 pub struct AutoscalerListResponse {
     /// [Output only] A token used to continue a truncated list request.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Autoscaler resources.
-    pub items: Vec<Autoscaler>,
+    pub items: Option<Vec<Autoscaler>>,
     /// Type of resource.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for AutoscalerListResponse {}
@@ -636,61 +636,61 @@ impl ResponseResult for AutoscalerListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// no description provided
-    pub status: String,
+    pub status: Option<String>,
     /// no description provided
     #[serde(rename="insertTime")]
-    pub insert_time: String,
+    pub insert_time: Option<String>,
     /// no description provided
-    pub warnings: Vec<OperationWarnings>,
+    pub warnings: Option<Vec<OperationWarnings>>,
     /// no description provided
-    pub error: OperationError,
+    pub error: Option<OperationError>,
     /// no description provided
     #[serde(rename="targetId")]
-    pub target_id: String,
+    pub target_id: Option<String>,
     /// no description provided
     #[serde(rename="targetLink")]
-    pub target_link: String,
+    pub target_link: Option<String>,
     /// no description provided
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
     /// no description provided
     #[serde(rename="clientOperationId")]
-    pub client_operation_id: String,
+    pub client_operation_id: Option<String>,
     /// no description provided
     #[serde(rename="creationTimestamp")]
-    pub creation_timestamp: String,
+    pub creation_timestamp: Option<String>,
     /// no description provided
-    pub id: String,
+    pub id: Option<String>,
     /// [Output Only] Type of the resource. Always kind#operation for Operation resources.
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub name: String,
+    pub name: Option<String>,
     /// no description provided
-    pub zone: String,
+    pub zone: Option<String>,
     /// no description provided
-    pub region: String,
+    pub region: Option<String>,
     /// no description provided
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// no description provided
     #[serde(rename="operationType")]
-    pub operation_type: String,
+    pub operation_type: Option<String>,
     /// no description provided
     #[serde(rename="httpErrorMessage")]
-    pub http_error_message: String,
+    pub http_error_message: Option<String>,
     /// no description provided
-    pub progress: i32,
+    pub progress: Option<i32>,
     /// no description provided
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// no description provided
     #[serde(rename="httpErrorStatusCode")]
-    pub http_error_status_code: i32,
+    pub http_error_status_code: Option<i32>,
     /// no description provided
     #[serde(rename="statusMessage")]
-    pub status_message: String,
+    pub status_message: Option<String>,
     /// no description provided
-    pub user: String,
+    pub user: Option<String>,
 }
 
 impl ResponseResult for Operation {}
@@ -709,16 +709,16 @@ impl ResponseResult for Operation {}
 pub struct ZoneList {
     /// no description provided
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// no description provided
-    pub items: Vec<Zone>,
+    pub items: Option<Vec<Zone>>,
     /// Type of resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub id: String,
+    pub id: Option<String>,
     /// Server defined URL for this resource (output only).
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for ZoneList {}
@@ -1238,16 +1238,20 @@ impl<'a, C, A> ZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1502,16 +1506,20 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1761,16 +1769,20 @@ impl<'a, C, A> ZoneOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2002,16 +2014,20 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2266,16 +2282,20 @@ impl<'a, C, A> AutoscalerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2443,7 +2463,7 @@ impl<'a, C, A> AutoscalerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Autoscaler = Default::default();
+/// let mut req = Autoscaler::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2539,16 +2559,20 @@ impl<'a, C, A> AutoscalerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2721,7 +2745,7 @@ impl<'a, C, A> AutoscalerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Autoscaler = Default::default();
+/// let mut req = Autoscaler::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2817,16 +2841,20 @@ impl<'a, C, A> AutoscalerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3084,16 +3112,20 @@ impl<'a, C, A> AutoscalerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -3253,7 +3285,7 @@ impl<'a, C, A> AutoscalerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Autoscaler = Default::default();
+/// let mut req = Autoscaler::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3347,16 +3379,20 @@ impl<'a, C, A> AutoscalerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3604,16 +3640,20 @@ impl<'a, C, A> AutoscalerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

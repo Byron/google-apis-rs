@@ -360,24 +360,24 @@ impl<'a, C, A> Manager<C, A>
 pub struct AutoscalingModule {
     /// no description provided
     #[serde(rename="maxNumReplicas")]
-    pub max_num_replicas: i32,
+    pub max_num_replicas: Option<i32>,
     /// no description provided
-    pub description: String,
+    pub description: Option<String>,
     /// no description provided
     #[serde(rename="targetModule")]
-    pub target_module: String,
+    pub target_module: Option<String>,
     /// target_utilization should be in range [0,1].
     #[serde(rename="targetUtilization")]
-    pub target_utilization: f64,
+    pub target_utilization: Option<f64>,
     /// no description provided
     #[serde(rename="signalType")]
-    pub signal_type: String,
+    pub signal_type: Option<String>,
     /// no description provided
     #[serde(rename="minNumReplicas")]
-    pub min_num_replicas: i32,
+    pub min_num_replicas: Option<i32>,
     /// no description provided
     #[serde(rename="coolDownPeriodSec")]
-    pub cool_down_period_sec: i32,
+    pub cool_down_period_sec: Option<i32>,
 }
 
 impl Part for AutoscalingModule {}
@@ -390,20 +390,20 @@ impl Part for AutoscalingModule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FirewallModule {
     /// The description of the firewall (optional)
-    pub description: String,
+    pub description: Option<String>,
     /// Target Tags to apply this firewall to, see the GCE Spec for details on syntax
     #[serde(rename="targetTags")]
-    pub target_tags: Vec<String>,
+    pub target_tags: Option<Vec<String>>,
     /// The allowed ports or port ranges.
-    pub allowed: Vec<AllowedRule>,
+    pub allowed: Option<Vec<AllowedRule>>,
     /// Source Tags to apply this firewall to, see the GCE Spec for details on syntax
     #[serde(rename="sourceTags")]
-    pub source_tags: Vec<String>,
+    pub source_tags: Option<Vec<String>>,
     /// Source IP ranges to apply this firewall to, see the GCE Spec for details on syntax
     #[serde(rename="sourceRanges")]
-    pub source_ranges: Vec<String>,
+    pub source_ranges: Option<Vec<String>>,
     /// The NetworkModule to which this firewall should apply. If not specified, or if specified as 'default', this firewall will be applied to the 'default' network.
-    pub network: String,
+    pub network: Option<String>,
 }
 
 impl Part for FirewallModule {}
@@ -417,12 +417,12 @@ impl Part for FirewallModule {}
 pub struct AccessConfig {
     /// Type of this access configuration file. (Currently only ONE_TO_ONE_NAT is legal.)
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Name of this access configuration.
-    pub name: String,
+    pub name: Option<String>,
     /// An external IP address associated with this instance.
     #[serde(rename="natIp")]
-    pub nat_ip: String,
+    pub nat_ip: Option<String>,
 }
 
 impl Part for AccessConfig {}
@@ -436,25 +436,25 @@ impl Part for AccessConfig {}
 pub struct Module {
     /// no description provided
     #[serde(rename="lbModule")]
-    pub lb_module: LbModule,
+    pub lb_module: Option<LbModule>,
     /// no description provided
     #[serde(rename="replicaPoolModule")]
-    pub replica_pool_module: ReplicaPoolModule,
+    pub replica_pool_module: Option<ReplicaPoolModule>,
     /// no description provided
     #[serde(rename="firewallModule")]
-    pub firewall_module: FirewallModule,
+    pub firewall_module: Option<FirewallModule>,
     /// no description provided
     #[serde(rename="healthCheckModule")]
-    pub health_check_module: HealthCheckModule,
+    pub health_check_module: Option<HealthCheckModule>,
     /// no description provided
     #[serde(rename="autoscalingModule")]
-    pub autoscaling_module: AutoscalingModule,
+    pub autoscaling_module: Option<AutoscalingModule>,
     /// no description provided
     #[serde(rename="networkModule")]
-    pub network_module: NetworkModule,
+    pub network_module: Option<NetworkModule>,
     /// The type of this module. Valid values ("AUTOSCALING", "FIREWALL", "HEALTH_CHECK", "LOAD_BALANCING", "NETWORK", "REPLICA_POOL")
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl Part for Module {}
@@ -503,9 +503,9 @@ pub struct DeployState {
     /// - DELETING
     /// - DELETED
     /// - DELETE_FAILED
-    pub status: String,
+    pub status: Option<String>,
     /// [Output Only] Human readable details about the current state.
-    pub details: String,
+    pub details: Option<String>,
 }
 
 impl Part for DeployState {}
@@ -519,7 +519,7 @@ impl Part for DeployState {}
 pub struct FirewallModuleStatus {
     /// [Output Only] The URL of the corresponding Firewall resource.
     #[serde(rename="firewallUrl")]
-    pub firewall_url: String,
+    pub firewall_url: Option<String>,
 }
 
 impl Part for FirewallModuleStatus {}
@@ -532,10 +532,10 @@ impl Part for FirewallModuleStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
     /// A list of metadata items.
-    pub items: Vec<MetadataItem>,
+    pub items: Option<Vec<MetadataItem>>,
     /// The fingerprint of the metadata.
     #[serde(rename="fingerPrint")]
-    pub finger_print: String,
+    pub finger_print: Option<String>,
 }
 
 impl Part for Metadata {}
@@ -549,27 +549,27 @@ impl Part for Metadata {}
 pub struct ModuleStatus {
     /// [Output Only] The status of the HealthCheckModule, set for type HEALTH_CHECK.
     #[serde(rename="healthCheckModuleStatus")]
-    pub health_check_module_status: HealthCheckModuleStatus,
+    pub health_check_module_status: Option<HealthCheckModuleStatus>,
     /// [Output Only] The status of the NetworkModule, set for type NETWORK.
     #[serde(rename="networkModuleStatus")]
-    pub network_module_status: NetworkModuleStatus,
+    pub network_module_status: Option<NetworkModuleStatus>,
     /// [Output Only] The status of the ReplicaPoolModule, set for type VM.
     #[serde(rename="replicaPoolModuleStatus")]
-    pub replica_pool_module_status: ReplicaPoolModuleStatus,
+    pub replica_pool_module_status: Option<ReplicaPoolModuleStatus>,
     /// [Output Only] The current state of the module.
-    pub state: DeployState,
+    pub state: Option<DeployState>,
     /// [Output Only] The status of the AutoscalingModule, set for type AUTOSCALING.
     #[serde(rename="autoscalingModuleStatus")]
-    pub autoscaling_module_status: AutoscalingModuleStatus,
+    pub autoscaling_module_status: Option<AutoscalingModuleStatus>,
     /// [Output Only] The status of the FirewallModule, set for type FIREWALL.
     #[serde(rename="firewallModuleStatus")]
-    pub firewall_module_status: FirewallModuleStatus,
+    pub firewall_module_status: Option<FirewallModuleStatus>,
     /// [Output Only] The type of the module.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// [Output Only] The status of the LbModule, set for type LOAD_BALANCING.
     #[serde(rename="lbModuleStatus")]
-    pub lb_module_status: LbModuleStatus,
+    pub lb_module_status: Option<LbModuleStatus>,
 }
 
 impl Part for ModuleStatus {}
@@ -583,7 +583,7 @@ impl Part for ModuleStatus {}
 pub struct NetworkModuleStatus {
     /// [Output Only] The URL of the corresponding Network resource.
     #[serde(rename="networkUrl")]
-    pub network_url: String,
+    pub network_url: Option<String>,
 }
 
 impl Part for NetworkModuleStatus {}
@@ -596,9 +596,9 @@ impl Part for NetworkModuleStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnvVariable {
     /// Whether this variable is hidden or visible.
-    pub hidden: bool,
+    pub hidden: Option<bool>,
     /// Value of the environment variable.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for EnvVariable {}
@@ -611,9 +611,9 @@ impl Part for EnvVariable {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExistingDisk {
     /// The fully-qualified URL of the Persistent Disk resource. It must be in the same zone as the Pool.
-    pub source: String,
+    pub source: Option<String>,
     /// Optional. How the disk will be attached to the Replica.
-    pub attachment: DiskAttachment,
+    pub attachment: Option<DiskAttachment>,
 }
 
 impl Part for ExistingDisk {}
@@ -626,7 +626,7 @@ impl Part for ExistingDisk {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaPoolParams {
     /// ReplicaPoolParams specifications for use with ReplicaPools v1beta1.
-    pub v1beta1: ReplicaPoolParamsV1Beta1,
+    pub v1beta1: Option<ReplicaPoolParamsV1Beta1>,
 }
 
 impl Part for ReplicaPoolParams {}
@@ -645,9 +645,9 @@ impl Part for ReplicaPoolParams {}
 pub struct TemplatesListResponse {
     /// no description provided
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// no description provided
-    pub resources: Vec<Template>,
+    pub resources: Option<Vec<Template>>,
 }
 
 impl ResponseResult for TemplatesListResponse {}
@@ -666,9 +666,9 @@ impl ResponseResult for TemplatesListResponse {}
 pub struct DeploymentsListResponse {
     /// no description provided
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// no description provided
-    pub resources: Vec<Deployment>,
+    pub resources: Option<Vec<Deployment>>,
 }
 
 impl ResponseResult for DeploymentsListResponse {}
@@ -719,13 +719,13 @@ impl ResponseResult for Deployment {}
 pub struct NewDiskInitializeParams {
     /// The size of the created disk in gigabytes.
     #[serde(rename="diskSizeGb")]
-    pub disk_size_gb: String,
+    pub disk_size_gb: Option<String>,
     /// The fully-qualified URL of a source image to use to create this disk.
     #[serde(rename="sourceImage")]
-    pub source_image: String,
+    pub source_image: Option<String>,
     /// Name of the disk type resource describing which disk type to use to create the disk. For example 'pd-ssd' or 'pd-standard'. Default is 'pd-standard'
     #[serde(rename="diskType")]
-    pub disk_type: String,
+    pub disk_type: Option<String>,
 }
 
 impl Part for NewDiskInitializeParams {}
@@ -739,12 +739,12 @@ impl Part for NewDiskInitializeParams {}
 pub struct NetworkModule {
     /// Required; The range of internal addresses that are legal on this network. This range is a CIDR specification, for example: 192.168.0.0/16.
     #[serde(rename="IPv4Range")]
-    pub i_pv4_range: String,
+    pub i_pv4_range: Option<String>,
     /// An optional address that is used for default routing to other networks. This must be within the range specified by IPv4Range, and is typicall the first usable address in that range. If not specified, the default value is the first usable address in IPv4Range.
     #[serde(rename="gatewayIPv4")]
-    pub gateway_i_pv4: String,
+    pub gateway_i_pv4: Option<String>,
     /// The description of the network.
-    pub description: String,
+    pub description: Option<String>,
 }
 
 impl Part for NetworkModule {}
@@ -758,42 +758,42 @@ impl Part for NetworkModule {}
 pub struct ReplicaPoolParamsV1Beta1 {
     /// A list of Disk resources to create and attach to each Replica in the Pool. Currently, you can only define one disk and it must be a root persistent disk. Note that Replica Pool will create a root persistent disk for each replica.
     #[serde(rename="disksToCreate")]
-    pub disks_to_create: Vec<NewDisk>,
+    pub disks_to_create: Option<Vec<NewDisk>>,
     /// Whether these replicas should be restarted if they experience a failure. The default value is true.
     #[serde(rename="autoRestart")]
-    pub auto_restart: bool,
+    pub auto_restart: Option<bool>,
     /// Enables IP Forwarding
     #[serde(rename="canIpForward")]
-    pub can_ip_forward: bool,
+    pub can_ip_forward: Option<bool>,
     /// An optional textual description of the resource.
-    pub description: String,
+    pub description: Option<String>,
     /// The zone for this ReplicaPool.
-    pub zone: String,
+    pub zone: Option<String>,
     /// A list of tags to apply to the Google Compute Engine instance to identify resources.
-    pub tags: Tag,
+    pub tags: Option<Tag>,
     /// no description provided
     #[serde(rename="onHostMaintenance")]
-    pub on_host_maintenance: String,
+    pub on_host_maintenance: Option<String>,
     /// A list of existing Persistent Disk resources to attach to each replica in the pool. Each disk will be attached in read-only mode to every replica.
     #[serde(rename="disksToAttach")]
-    pub disks_to_attach: Vec<ExistingDisk>,
+    pub disks_to_attach: Option<Vec<ExistingDisk>>,
     /// The machine type for this instance. Either a complete URL, or the resource name (e.g. n1-standard-1).
     #[serde(rename="machineType")]
-    pub machine_type: String,
+    pub machine_type: Option<String>,
     /// The base name for instances within this ReplicaPool.
     #[serde(rename="baseInstanceName")]
-    pub base_instance_name: String,
+    pub base_instance_name: Option<String>,
     /// Name of the Action to be run during initialization of a ReplicaPoolModule.
     #[serde(rename="initAction")]
-    pub init_action: String,
+    pub init_action: Option<String>,
     /// The metadata key/value pairs assigned to this instance.
-    pub metadata: Metadata,
+    pub metadata: Option<Metadata>,
     /// A list of Service Accounts to enable for this instance.
     #[serde(rename="serviceAccounts")]
-    pub service_accounts: Vec<ServiceAccount>,
+    pub service_accounts: Option<Vec<ServiceAccount>>,
     /// A list of network interfaces for the instance. Currently only one interface is supported by Google Compute Engine.
     #[serde(rename="networkInterfaces")]
-    pub network_interfaces: Vec<NetworkInterface>,
+    pub network_interfaces: Option<Vec<NetworkInterface>>,
 }
 
 impl Part for ReplicaPoolParamsV1Beta1 {}
@@ -806,9 +806,9 @@ impl Part for ReplicaPoolParamsV1Beta1 {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ParamOverride {
     /// A JSON Path expression that specifies which parameter should be overridden.
-    pub path: String,
+    pub path: Option<String>,
     /// The new value to assign to the overridden parameter.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for ParamOverride {}
@@ -822,10 +822,10 @@ impl Part for ParamOverride {}
 pub struct ReplicaPoolModuleStatus {
     /// [Output Only] The URL of the Resource Group associated with this ReplicaPool.
     #[serde(rename="resourceViewUrl")]
-    pub resource_view_url: String,
+    pub resource_view_url: Option<String>,
     /// [Output Only] The URL of the associated ReplicaPool resource.
     #[serde(rename="replicaPoolUrl")]
-    pub replica_pool_url: String,
+    pub replica_pool_url: Option<String>,
 }
 
 impl Part for ReplicaPoolModuleStatus {}
@@ -838,9 +838,9 @@ impl Part for ReplicaPoolModuleStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccount {
     /// List of OAuth2 scopes to obtain for the service account.
-    pub scopes: Vec<String>,
+    pub scopes: Option<Vec<String>>,
     /// Service account email address.
-    pub email: String,
+    pub email: Option<String>,
 }
 
 impl Part for ServiceAccount {}
@@ -854,14 +854,14 @@ impl Part for ServiceAccount {}
 pub struct NetworkInterface {
     /// An array of configurations for this interface. This specifies how this interface is configured to interact with other network services
     #[serde(rename="accessConfigs")]
-    pub access_configs: Vec<AccessConfig>,
+    pub access_configs: Option<Vec<AccessConfig>>,
     /// An optional IPV4 internal network address to assign to the instance for this network interface.
     #[serde(rename="networkIp")]
-    pub network_ip: String,
+    pub network_ip: Option<String>,
     /// Name of the interface.
-    pub name: String,
+    pub name: Option<String>,
     /// The name of the NetworkModule to which this interface applies. If not specified, or specified as 'default', this will use the 'default' network.
-    pub network: String,
+    pub network: Option<String>,
 }
 
 impl Part for NetworkInterface {}
@@ -875,9 +875,9 @@ impl Part for NetworkInterface {}
 pub struct Action {
     /// The timeout in milliseconds for this action to run.
     #[serde(rename="timeoutMs")]
-    pub timeout_ms: i32,
+    pub timeout_ms: Option<i32>,
     /// A list of commands to run sequentially for this action.
-    pub commands: Vec<String>,
+    pub commands: Option<Vec<String>>,
 }
 
 impl Part for Action {}
@@ -891,7 +891,7 @@ impl Part for Action {}
 pub struct AutoscalingModuleStatus {
     /// [Output Only] The URL of the corresponding Autoscaling configuration.
     #[serde(rename="autoscalingConfigUrl")]
-    pub autoscaling_config_url: String,
+    pub autoscaling_config_url: Option<String>,
 }
 
 impl Part for AutoscalingModuleStatus {}
@@ -905,10 +905,10 @@ impl Part for AutoscalingModuleStatus {}
 pub struct LbModuleStatus {
     /// [Output Only] The URL of the corresponding ForwardingRule in GCE.
     #[serde(rename="forwardingRuleUrl")]
-    pub forwarding_rule_url: String,
+    pub forwarding_rule_url: Option<String>,
     /// [Output Only] The URL of the corresponding TargetPool resource in GCE.
     #[serde(rename="targetPoolUrl")]
-    pub target_pool_url: String,
+    pub target_pool_url: Option<String>,
 }
 
 impl Part for LbModuleStatus {}
@@ -921,25 +921,25 @@ impl Part for LbModuleStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LbModule {
     /// no description provided
-    pub description: String,
+    pub description: Option<String>,
     /// no description provided
     #[serde(rename="healthChecks")]
-    pub health_checks: Vec<String>,
+    pub health_checks: Option<Vec<String>>,
     /// no description provided
     #[serde(rename="portRange")]
-    pub port_range: String,
+    pub port_range: Option<String>,
     /// no description provided
     #[serde(rename="targetModules")]
-    pub target_modules: Vec<String>,
+    pub target_modules: Option<Vec<String>>,
     /// no description provided
     #[serde(rename="ipAddress")]
-    pub ip_address: String,
+    pub ip_address: Option<String>,
     /// no description provided
     #[serde(rename="ipProtocol")]
-    pub ip_protocol: String,
+    pub ip_protocol: Option<String>,
     /// no description provided
     #[serde(rename="sessionAffinity")]
-    pub session_affinity: String,
+    pub session_affinity: Option<String>,
 }
 
 impl Part for LbModule {}
@@ -953,7 +953,7 @@ impl Part for LbModule {}
 pub struct HealthCheckModuleStatus {
     /// [Output Only] The HealthCheck URL.
     #[serde(rename="healthCheckUrl")]
-    pub health_check_url: String,
+    pub health_check_url: Option<String>,
 }
 
 impl Part for HealthCheckModuleStatus {}
@@ -966,25 +966,25 @@ impl Part for HealthCheckModuleStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HealthCheckModule {
     /// no description provided
-    pub description: String,
+    pub description: Option<String>,
     /// no description provided
     #[serde(rename="timeoutSec")]
-    pub timeout_sec: i32,
+    pub timeout_sec: Option<i32>,
     /// no description provided
     #[serde(rename="checkIntervalSec")]
-    pub check_interval_sec: i32,
+    pub check_interval_sec: Option<i32>,
     /// no description provided
     #[serde(rename="unhealthyThreshold")]
-    pub unhealthy_threshold: i32,
+    pub unhealthy_threshold: Option<i32>,
     /// no description provided
     #[serde(rename="healthyThreshold")]
-    pub healthy_threshold: i32,
+    pub healthy_threshold: Option<i32>,
     /// no description provided
-    pub host: String,
+    pub host: Option<String>,
     /// no description provided
-    pub path: String,
+    pub path: Option<String>,
     /// no description provided
-    pub port: i32,
+    pub port: Option<i32>,
 }
 
 impl Part for HealthCheckModule {}
@@ -997,15 +997,15 @@ impl Part for HealthCheckModule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NewDisk {
     /// If true, indicates that this is the root persistent disk.
-    pub boot: bool,
+    pub boot: Option<bool>,
     /// Create the new disk using these parameters. The name of the disk will be <instance_name>-<five_random_charactersgt;.
     #[serde(rename="initializeParams")]
-    pub initialize_params: NewDiskInitializeParams,
+    pub initialize_params: Option<NewDiskInitializeParams>,
     /// How the disk will be attached to the Replica.
-    pub attachment: DiskAttachment,
+    pub attachment: Option<DiskAttachment>,
     /// If true, then this disk will be deleted when the instance is deleted.
     #[serde(rename="autoDelete")]
-    pub auto_delete: bool,
+    pub auto_delete: Option<bool>,
 }
 
 impl Part for NewDisk {}
@@ -1019,9 +1019,9 @@ impl Part for NewDisk {}
 pub struct AllowedRule {
     /// ?tcp?, ?udp? or ?icmp?
     #[serde(rename="IPProtocol")]
-    pub ip_protocol: String,
+    pub ip_protocol: Option<String>,
     /// List of ports or port ranges (Example inputs include: ["22"], [?33?, "12345-12349"].
-    pub ports: Vec<String>,
+    pub ports: Option<Vec<String>>,
 }
 
 impl Part for AllowedRule {}
@@ -1034,10 +1034,10 @@ impl Part for AllowedRule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tag {
     /// Items contained in this tag.
-    pub items: Vec<String>,
+    pub items: Option<Vec<String>>,
     /// The fingerprint of the tag.
     #[serde(rename="fingerPrint")]
-    pub finger_print: String,
+    pub finger_print: Option<String>,
 }
 
 impl Part for Tag {}
@@ -1051,19 +1051,19 @@ impl Part for Tag {}
 pub struct ReplicaPoolModule {
     /// The Health Checks to configure for the ReplicaPoolModule
     #[serde(rename="healthChecks")]
-    pub health_checks: Vec<String>,
+    pub health_checks: Option<Vec<String>>,
     /// Information for a ReplicaPoolModule.
     #[serde(rename="replicaPoolParams")]
-    pub replica_pool_params: ReplicaPoolParams,
+    pub replica_pool_params: Option<ReplicaPoolParams>,
     /// [Output Only] The name of the Resource View associated with a ReplicaPoolModule. This field will be generated by the service.
     #[serde(rename="resourceView")]
-    pub resource_view: String,
+    pub resource_view: Option<String>,
     /// Number of replicas in this module.
     #[serde(rename="numReplicas")]
-    pub num_replicas: i32,
+    pub num_replicas: Option<i32>,
     /// A list of environment variables.
     #[serde(rename="envVariables")]
-    pub env_variables: HashMap<String, EnvVariable>,
+    pub env_variables: Option<HashMap<String, EnvVariable>>,
 }
 
 impl Part for ReplicaPoolModule {}
@@ -1076,9 +1076,9 @@ impl Part for ReplicaPoolModule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetadataItem {
     /// A metadata key.
-    pub key: String,
+    pub key: Option<String>,
     /// A metadata value.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for MetadataItem {}
@@ -1092,9 +1092,9 @@ impl Part for MetadataItem {}
 pub struct DiskAttachment {
     /// The device name of this disk.
     #[serde(rename="deviceName")]
-    pub device_name: String,
+    pub device_name: Option<String>,
     /// A zero-based index to assign to this disk, where 0 is reserved for the boot disk. If not specified, this is assigned by the server.
-    pub index: u32,
+    pub index: Option<u32>,
 }
 
 impl Part for DiskAttachment {}
@@ -1471,16 +1471,20 @@ impl<'a, C, A> TemplateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1715,16 +1719,20 @@ impl<'a, C, A> TemplateDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -1862,7 +1870,7 @@ impl<'a, C, A> TemplateDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Template = Default::default();
+/// let mut req = Template::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1954,16 +1962,20 @@ impl<'a, C, A> TemplateInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2198,16 +2210,20 @@ impl<'a, C, A> TemplateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2355,7 +2371,7 @@ impl<'a, C, A> TemplateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Deployment = Default::default();
+/// let mut req = Deployment::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2449,16 +2465,20 @@ impl<'a, C, A> DeploymentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2704,16 +2724,20 @@ impl<'a, C, A> DeploymentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2963,16 +2987,20 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3218,16 +3246,20 @@ impl<'a, C, A> DeploymentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())

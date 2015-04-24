@@ -4,8 +4,8 @@
 [package]
 
 name = "google-blogger3-cli"
-version = "0.0.1+20150208"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+version = "0.0.1+20150422"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with blogger (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/blogger3-cli"
 homepage = "https://developers.google.com/blogger/docs/3.0/getting_started"
@@ -23,6 +23,7 @@ yup-oauth2 = "*"
 docopt = "*"
 docopt_macros = "*"
 rustc-serialize = "*"
+yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
 

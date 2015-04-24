@@ -354,10 +354,10 @@ impl<'a, C, A> Appsactivity<C, A>
 pub struct Rename {
     /// The new title.
     #[serde(rename="newTitle")]
-    pub new_title: String,
+    pub new_title: Option<String>,
     /// The old title.
     #[serde(rename="oldTitle")]
-    pub old_title: String,
+    pub old_title: Option<String>,
 }
 
 impl Part for Rename {}
@@ -371,10 +371,10 @@ impl Part for Rename {}
 pub struct PermissionChange {
     /// Lists all Permission objects removed.
     #[serde(rename="removedPermissions")]
-    pub removed_permissions: Vec<Permission>,
+    pub removed_permissions: Option<Vec<Permission>>,
     /// Lists all Permission objects added.
     #[serde(rename="addedPermissions")]
-    pub added_permissions: Vec<Permission>,
+    pub added_permissions: Option<Vec<Permission>>,
 }
 
 impl Part for PermissionChange {}
@@ -388,11 +388,11 @@ impl Part for PermissionChange {}
 pub struct Target {
     /// The MIME type of the target.
     #[serde(rename="mimeType")]
-    pub mime_type: String,
+    pub mime_type: Option<String>,
     /// The ID of the target. For example, in Google Drive, this is the file or folder ID.
-    pub id: String,
+    pub id: Option<String>,
     /// The name of the target. For example, in Google Drive, this is the title of the file.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for Target {}
@@ -405,12 +405,12 @@ impl Part for Target {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Parent {
     /// The parent's ID.
-    pub id: String,
+    pub id: Option<String>,
     /// Whether this is the root folder.
     #[serde(rename="isRoot")]
-    pub is_root: bool,
+    pub is_root: Option<bool>,
     /// The parent's title.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for Parent {}
@@ -424,19 +424,19 @@ impl Part for Parent {}
 pub struct Permission {
     /// Whether the permission requires a link to the file.
     #[serde(rename="withLink")]
-    pub with_link: bool,
+    pub with_link: Option<bool>,
     /// The ID for this permission. Corresponds to the Drive API's permission ID returned as part of the Drive Permissions resource.
     #[serde(rename="permissionId")]
-    pub permission_id: String,
+    pub permission_id: Option<String>,
     /// Indicates the Google Drive permissions role. The role determines a user's ability to read, write, or comment on the file.
-    pub role: String,
+    pub role: Option<String>,
     /// The name of the user or group the permission applies to.
-    pub name: String,
+    pub name: Option<String>,
     /// Indicates how widely permissions are granted.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The user's information if the type is USER.
-    pub user: User,
+    pub user: Option<User>,
 }
 
 impl Part for Permission {}
@@ -449,7 +449,7 @@ impl Part for Permission {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Photo {
     /// The URL of the photo.
-    pub url: String,
+    pub url: Option<String>,
 }
 
 impl Part for Photo {}
@@ -463,10 +463,10 @@ impl Part for Photo {}
 pub struct Move {
     /// The removed parent(s).
     #[serde(rename="removedParents")]
-    pub removed_parents: Vec<Parent>,
+    pub removed_parents: Option<Vec<Parent>>,
     /// The added parent(s).
     #[serde(rename="addedParents")]
-    pub added_parents: Vec<Parent>,
+    pub added_parents: Option<Vec<Parent>>,
 }
 
 impl Part for Move {}
@@ -485,9 +485,9 @@ impl Part for Move {}
 pub struct ListActivitiesResponse {
     /// Token for the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// List of activities.
-    pub activities: Vec<Activity>,
+    pub activities: Option<Vec<Activity>>,
 }
 
 impl ResponseResult for ListActivitiesResponse {}
@@ -500,9 +500,9 @@ impl ResponseResult for ListActivitiesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     /// The profile photo of the user.
-    pub photo: Photo,
+    pub photo: Option<Photo>,
     /// The displayable name of the user.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for User {}
@@ -516,10 +516,10 @@ impl Part for User {}
 pub struct Activity {
     /// The fields common to all of the singleEvents that make up the Activity.
     #[serde(rename="combinedEvent")]
-    pub combined_event: Event,
+    pub combined_event: Option<Event>,
     /// A list of all the Events that make up the Activity.
     #[serde(rename="singleEvents")]
-    pub single_events: Vec<Event>,
+    pub single_events: Option<Vec<Event>>,
 }
 
 impl Part for Activity {}
@@ -532,29 +532,29 @@ impl Part for Activity {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
     /// Extra information for rename type events, such as the old and new names.
-    pub rename: Rename,
+    pub rename: Option<Rename>,
     /// Information specific to the Target object modified by the event.
-    pub target: Target,
+    pub target: Option<Target>,
     /// Additional event types. Some events may have multiple types when multiple actions are part of a single event. For example, creating a document, renaming it, and sharing it may be part of a single file-creation event.
     #[serde(rename="additionalEventTypes")]
-    pub additional_event_types: Vec<String>,
+    pub additional_event_types: Option<Vec<String>>,
     /// Extra information for move type events, such as changes in an object's parents.
     #[serde(rename="move")]
-    pub move_: Move,
+    pub move_: Option<Move>,
     /// Extra information for permissionChange type events, such as the user or group the new permission applies to.
     #[serde(rename="permissionChanges")]
-    pub permission_changes: Vec<PermissionChange>,
+    pub permission_changes: Option<Vec<PermissionChange>>,
     /// Represents the user responsible for the event.
-    pub user: User,
+    pub user: Option<User>,
     /// The time at which the event occurred formatted as Unix time in milliseconds.
     #[serde(rename="eventTimeMillis")]
-    pub event_time_millis: String,
+    pub event_time_millis: Option<String>,
     /// The main type of event that occurred.
     #[serde(rename="primaryEventType")]
-    pub primary_event_type: String,
+    pub primary_event_type: Option<String>,
     /// Whether this event is caused by a user being deleted.
     #[serde(rename="fromUserDeletion")]
-    pub from_user_deletion: bool,
+    pub from_user_deletion: Option<bool>,
 }
 
 impl Part for Event {}
@@ -748,16 +748,20 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

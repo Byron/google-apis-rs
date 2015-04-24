@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/VRpa8Bw34Om-F9MZNGivJ1l0EOs\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/meEPSemq72cDd2uWQHra_UPM5hU\"",
  "discoveryVersion": "v1",
  "id": "sqladmin:v1beta4",
  "name": "sqladmin",
@@ -802,17 +802,7 @@
      "format": "date-time"
     },
     "error": {
-     "type": "object",
-     "description": "If errors occurred during processing of this operation, this field will be populated.",
-     "properties": {
-      "errors": {
-       "type": "array",
-       "description": "The list of errors encountered while processing this operation.",
-       "items": {
-        "$ref": "OperationError"
-       }
-      }
-     }
+     "$ref": "OperationErrors"
     },
     "exportContext": {
      "$ref": "ExportContext",
@@ -891,6 +881,25 @@
     }
    }
   },
+  "OperationErrors": {
+   "id": "OperationErrors",
+   "type": "object",
+   "description": "Database instance operation errors list wrapper.",
+   "properties": {
+    "errors": {
+     "type": "array",
+     "description": "The list of errors encountered while processing this operation.",
+     "items": {
+      "$ref": "OperationError"
+     }
+    },
+    "kind": {
+     "type": "string",
+     "description": "This is always sql#operationErrors.",
+     "default": "sql#operationErrors"
+    }
+   }
+  },
   "OperationsListResponse": {
    "id": "OperationsListResponse",
    "type": "object",
@@ -926,7 +935,7 @@
     },
     "mysqlReplicaConfiguration": {
      "$ref": "MySqlReplicaConfiguration",
-     "description": "MySQL specific configuration when replicating from a MySQL on-premises master."
+     "description": "MySQL specific configuration when replicating from a MySQL on-premises master. Replication configuration information such as the username, password, certificates, and keys are not stored in the instance metadata. The configuration information is used only to set up the replication connection and is stored by MySQL in a file named master.info in the data directory."
     }
    }
   },
@@ -973,7 +982,8 @@
      "description": "The daily backup configuration for the instance."
     },
     "crashSafeReplicationEnabled": {
-     "type": "boolean"
+     "type": "boolean",
+     "description": "Configuration specific to read replica instances. Indicates whether database flags for crash-safe replication are enabled."
     },
     "databaseFlags": {
      "type": "array",

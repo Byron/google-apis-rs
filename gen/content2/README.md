@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-content2` library allows access to all features of the *Google Shopping Content* service.
 
-This documentation was generated from *Shopping Content* crate version *0.1.5+20150317*, where *20150317* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *Shopping Content* crate version *0.1.5+20150421*, where *20150421* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 
 Everything else about the *Shopping Content* *v2* API can be found at the
 [official documentation site](https://developers.google.com/shopping-content/v2/).
@@ -116,7 +116,7 @@ let mut hub = ShoppingContent::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req: Account = Default::default();
+let mut req = Account::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.

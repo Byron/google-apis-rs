@@ -101,7 +101,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: ZoneViewsRemoveResourcesRequest = Default::default();
+//! let mut req = ZoneViewsRemoveResourcesRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -292,7 +292,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ZoneViewsRemoveResourcesRequest = Default::default();
+/// let mut req = ZoneViewsRemoveResourcesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -371,11 +371,11 @@ impl<'a, C, A> Resourceviews<C, A>
 pub struct ZoneViewsListResourcesResponse {
     /// A token used for pagination.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The formatted JSON that is requested by the user.
-    pub items: Vec<ListResourceResponseItem>,
+    pub items: Option<Vec<ListResourceResponseItem>>,
     /// The URL of a Compute Engine network to which the resources in the view belong.
-    pub network: String,
+    pub network: Option<String>,
 }
 
 impl ResponseResult for ZoneViewsListResourcesResponse {}
@@ -394,14 +394,14 @@ impl ResponseResult for ZoneViewsListResourcesResponse {}
 pub struct ZoneViewsList {
     /// A token used for pagination.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The result that contains all resource views that meet the criteria.
-    pub items: Vec<ResourceView>,
+    pub items: Option<Vec<ResourceView>>,
     /// Type of resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Server defined URL for this resource (output only).
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for ZoneViewsList {}
@@ -450,11 +450,11 @@ impl RequestValue for ZoneViewsAddResourcesRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarnings {
     /// [Output only] Optional human-readable details for this warning.
-    pub message: String,
+    pub message: Option<String>,
     /// [Output only] The warning type identifier for this warning.
-    pub code: String,
+    pub code: Option<String>,
     /// [Output only] Metadata for this warning in key:value format.
-    pub data: Vec<OperationWarningsData>,
+    pub data: Option<Vec<OperationWarningsData>>,
 }
 
 impl NestedType for OperationWarnings {}
@@ -474,16 +474,16 @@ impl Part for OperationWarnings {}
 pub struct OperationList {
     /// A token used to continue a truncated list request (output only).
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The operation resources.
-    pub items: Vec<Operation>,
+    pub items: Option<Vec<Operation>>,
     /// Type of resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
-    pub id: String,
+    pub id: Option<String>,
     /// Server defined URL for this resource (output only).
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for OperationList {}
@@ -540,9 +540,9 @@ impl ResponseResult for ResourceView {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListResourceResponseItem {
     /// The list of service end points on the resource.
-    pub endpoints: HashMap<String, Vec<i32>>,
+    pub endpoints: Option<HashMap<String, Vec<i32>>>,
     /// The full URL of the resource.
-    pub resource: String,
+    pub resource: Option<String>,
 }
 
 impl Part for ListResourceResponseItem {}
@@ -555,11 +555,11 @@ impl Part for ListResourceResponseItem {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationErrorErrors {
     /// [Output Only] An optional, human-readable error message.
-    pub message: String,
+    pub message: Option<String>,
     /// [Output Only] The error type identifier for this error.
-    pub code: String,
+    pub code: Option<String>,
     /// [Output Only] Indicates the field in the request which caused the error. This property is optional.
-    pub location: String,
+    pub location: Option<String>,
 }
 
 impl NestedType for OperationErrorErrors {}
@@ -573,9 +573,9 @@ impl Part for OperationErrorErrors {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Label {
     /// Key of the label.
-    pub key: String,
+    pub key: Option<String>,
     /// Value of the label.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for Label {}
@@ -588,7 +588,7 @@ impl Part for Label {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationError {
     /// [Output Only] The array of errors encountered while processing this operation.
-    pub errors: Vec<OperationErrorErrors>,
+    pub errors: Option<Vec<OperationErrorErrors>>,
 }
 
 impl NestedType for OperationError {}
@@ -630,9 +630,9 @@ impl RequestValue for ZoneViewsSetServiceRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ZoneViewsGetServiceResponse {
     /// The service information.
-    pub endpoints: Vec<ServiceEndpoint>,
+    pub endpoints: Option<Vec<ServiceEndpoint>>,
     /// The fingerprint of the service information.
-    pub fingerprint: String,
+    pub fingerprint: Option<String>,
 }
 
 impl ResponseResult for ZoneViewsGetServiceResponse {}
@@ -655,61 +655,61 @@ impl ResponseResult for ZoneViewsGetServiceResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// [Output Only] Status of the operation.
-    pub status: String,
+    pub status: Option<String>,
     /// [Output Only] The time that this operation was requested, in RFC3339 text format.
     #[serde(rename="insertTime")]
-    pub insert_time: String,
+    pub insert_time: Option<String>,
     /// [Output Only] If there are issues with this operation, a warning is returned.
-    pub warnings: Vec<OperationWarnings>,
+    pub warnings: Option<Vec<OperationWarnings>>,
     /// [Output Only] If errors occurred during processing of this operation, this field will be populated.
-    pub error: OperationError,
+    pub error: Option<OperationError>,
     /// [Output Only] Unique target ID which identifies a particular incarnation of the target.
     #[serde(rename="targetId")]
-    pub target_id: String,
+    pub target_id: Option<String>,
     /// [Output only] URL of the resource the operation is mutating.
     #[serde(rename="targetLink")]
-    pub target_link: String,
+    pub target_link: Option<String>,
     /// [Output Only] The time that this operation was started by the server, in RFC3339 text format.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
     /// [Output only] An optional identifier specified by the client when the mutation was initiated. Must be unique for all operation resources in the project.
     #[serde(rename="clientOperationId")]
-    pub client_operation_id: String,
+    pub client_operation_id: Option<String>,
     /// [Output Only] The time that this operation was requested, in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
-    pub creation_timestamp: String,
+    pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource, generated by the server.
-    pub id: String,
+    pub id: Option<String>,
     /// [Output only] Type of the resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// [Output Only] Name of the resource.
-    pub name: String,
+    pub name: Option<String>,
     /// [Output Only] URL of the zone where the operation resides. Only available when performing per-zone operations.
-    pub zone: String,
+    pub zone: Option<String>,
     /// [Output Only] URL of the region where the operation resides. Only available when performing regional operations.
-    pub region: String,
+    pub region: Option<String>,
     /// [Output Only] Server-defined fully-qualified URL for this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// [Output only] Type of the operation. Operations include insert, update, and delete.
     #[serde(rename="operationType")]
-    pub operation_type: String,
+    pub operation_type: Option<String>,
     /// [Output only] If operation fails, the HTTP error message returned.
     #[serde(rename="httpErrorMessage")]
-    pub http_error_message: String,
+    pub http_error_message: Option<String>,
     /// [Output only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses.
-    pub progress: i32,
+    pub progress: Option<i32>,
     /// [Output Only] The time that this operation was completed, in RFC3339 text format.
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// [Output only] If operation fails, the HTTP error status code returned.
     #[serde(rename="httpErrorStatusCode")]
-    pub http_error_status_code: i32,
+    pub http_error_status_code: Option<i32>,
     /// [Output Only] An optional textual description of the current status of the operation.
     #[serde(rename="statusMessage")]
-    pub status_message: String,
+    pub status_message: Option<String>,
     /// [Output Only] User who requested the operation, for example: user@example.com.
-    pub user: String,
+    pub user: Option<String>,
 }
 
 impl ResponseResult for Operation {}
@@ -722,9 +722,9 @@ impl ResponseResult for Operation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceEndpoint {
     /// The name of the service endpoint.
-    pub name: String,
+    pub name: Option<String>,
     /// The port of the service endpoint.
-    pub port: i32,
+    pub port: Option<i32>,
 }
 
 impl Part for ServiceEndpoint {}
@@ -737,9 +737,9 @@ impl Part for ServiceEndpoint {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarningsData {
     /// [Output Only] Metadata key for this warning.
-    pub key: String,
+    pub key: Option<String>,
     /// [Output Only] Metadata value for this warning.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for OperationWarningsData {}
@@ -1110,7 +1110,7 @@ impl<'a, C, A> ZoneOperationMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ZoneViewsRemoveResourcesRequest = Default::default();
+/// let mut req = ZoneViewsRemoveResourcesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1206,16 +1206,20 @@ impl<'a, C, A> ZoneViewRemoveResourceCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1388,7 +1392,7 @@ impl<'a, C, A> ZoneViewRemoveResourceCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ZoneViewsAddResourcesRequest = Default::default();
+/// let mut req = ZoneViewsAddResourcesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1484,16 +1488,20 @@ impl<'a, C, A> ZoneViewAddResourceCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1776,16 +1784,20 @@ impl<'a, C, A> ZoneViewListResourceCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2065,16 +2077,20 @@ impl<'a, C, A> ZoneViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2327,16 +2343,20 @@ impl<'a, C, A> ZoneViewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2500,7 +2520,7 @@ impl<'a, C, A> ZoneViewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ResourceView = Default::default();
+/// let mut req = ResourceView::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2594,16 +2614,20 @@ impl<'a, C, A> ZoneViewInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2851,16 +2875,20 @@ impl<'a, C, A> ZoneViewDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -3020,7 +3048,7 @@ impl<'a, C, A> ZoneViewDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ZoneViewsSetServiceRequest = Default::default();
+/// let mut req = ZoneViewsSetServiceRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3116,16 +3144,20 @@ impl<'a, C, A> ZoneViewSetServiceCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3388,16 +3420,20 @@ impl<'a, C, A> ZoneViewGetServiceCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -3649,16 +3685,20 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3916,16 +3956,20 @@ impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

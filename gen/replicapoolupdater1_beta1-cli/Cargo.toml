@@ -4,8 +4,8 @@
 [package]
 
 name = "google-replicapoolupdater1_beta1-cli"
-version = "0.0.1+20150129"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+version = "0.0.1+20150326"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with replicapoolupdater (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/replicapoolupdater1_beta1-cli"
 homepage = "https://cloud.google.com/compute/docs/instance-groups/manager/#applying_rolling_updates_using_the_updater_service"
@@ -23,6 +23,7 @@ yup-oauth2 = "*"
 docopt = "*"
 docopt_macros = "*"
 rustc-serialize = "*"
+yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
 

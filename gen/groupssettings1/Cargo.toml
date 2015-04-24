@@ -5,7 +5,7 @@
 
 name = "google-groupssettings1"
 version = "0.1.5+20140428"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with groupssettings (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupssettings1"
 homepage = "https://developers.google.com/google-apps/groups-settings/get_started"

@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -68,6 +69,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -91,7 +98,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.acl().delete(&self.opt.arg_calendar_id, &self.opt.arg_rule_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -122,7 +129,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -133,7 +139,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.acl().get(&self.opt.arg_calendar_id, &self.opt.arg_rule_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -165,8 +171,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -175,10 +180,10 @@ impl Engine {
 
     fn _acl_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AclRule = Default::default();
+        let mut request = api::AclRule::default();
         let mut call = self.hub.acl().insert(&request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -198,9 +203,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -213,11 +219,11 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "scope.type" => {
                         request_scope_init(&mut request);
-                        request.scope.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.scope.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "scope.value" => {
                         request_scope_init(&mut request);
-                        request.scope.as_mut().unwrap().value = value.unwrap_or("").to_string();
+                        request.scope.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
                     },
                 "kind" => {
                         request_scope_init(&mut request);
@@ -252,8 +258,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -264,7 +269,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.acl().list(&self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
                     call = call.sync_token(value.unwrap_or(""));
@@ -308,8 +313,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -318,10 +322,10 @@ impl Engine {
 
     fn _acl_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AclRule = Default::default();
+        let mut request = api::AclRule::default();
         let mut call = self.hub.acl().patch(&request, &self.opt.arg_calendar_id, &self.opt.arg_rule_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -341,9 +345,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -356,11 +361,11 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "scope.type" => {
                         request_scope_init(&mut request);
-                        request.scope.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.scope.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "scope.value" => {
                         request_scope_init(&mut request);
-                        request.scope.as_mut().unwrap().value = value.unwrap_or("").to_string();
+                        request.scope.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
                     },
                 "kind" => {
                         request_scope_init(&mut request);
@@ -395,8 +400,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -405,10 +409,10 @@ impl Engine {
 
     fn _acl_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AclRule = Default::default();
+        let mut request = api::AclRule::default();
         let mut call = self.hub.acl().update(&request, &self.opt.arg_calendar_id, &self.opt.arg_rule_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -428,9 +432,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -443,11 +448,11 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "scope.type" => {
                         request_scope_init(&mut request);
-                        request.scope.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.scope.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "scope.value" => {
                         request_scope_init(&mut request);
-                        request.scope.as_mut().unwrap().value = value.unwrap_or("").to_string();
+                        request.scope.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
                     },
                 "kind" => {
                         request_scope_init(&mut request);
@@ -482,8 +487,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -492,10 +496,10 @@ impl Engine {
 
     fn _acl_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Channel = Default::default();
+        let mut request = api::Channel::default();
         let mut call = self.hub.acl().watch(&request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
                     call = call.sync_token(value.unwrap_or(""));
@@ -527,9 +531,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -551,9 +556,10 @@ impl Engine {
                     },
                 "params" => {
                         if request.params.is_none() {
-                            request.params = Some(Default::default());
+                           request.params = Some(Default::default());
                         }
-                        request.params.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.params.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "expiration" => {
                         request.expiration = Some(value.unwrap_or("").to_string());
@@ -584,8 +590,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -596,7 +601,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.calendar_list().delete(&self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -627,7 +632,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -638,7 +642,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.calendar_list().get(&self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -670,8 +674,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -680,10 +683,10 @@ impl Engine {
 
     fn _calendar_list_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CalendarListEntry = Default::default();
+        let mut request = api::CalendarListEntry::default();
         let mut call = self.hub.calendar_list().insert(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "color-rgb-format" => {
                     call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
@@ -706,9 +709,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -778,8 +782,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -790,7 +793,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.calendar_list().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
                     call = call.sync_token(value.unwrap_or(""));
@@ -840,8 +843,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -850,10 +852,10 @@ impl Engine {
 
     fn _calendar_list_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CalendarListEntry = Default::default();
+        let mut request = api::CalendarListEntry::default();
         let mut call = self.hub.calendar_list().patch(&request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "color-rgb-format" => {
                     call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
@@ -876,9 +878,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -948,8 +951,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -958,10 +960,10 @@ impl Engine {
 
     fn _calendar_list_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CalendarListEntry = Default::default();
+        let mut request = api::CalendarListEntry::default();
         let mut call = self.hub.calendar_list().update(&request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "color-rgb-format" => {
                     call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
@@ -984,9 +986,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1056,8 +1059,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1066,10 +1068,10 @@ impl Engine {
 
     fn _calendar_list_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Channel = Default::default();
+        let mut request = api::Channel::default();
         let mut call = self.hub.calendar_list().watch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
                     call = call.sync_token(value.unwrap_or(""));
@@ -1107,9 +1109,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1131,9 +1134,10 @@ impl Engine {
                     },
                 "params" => {
                         if request.params.is_none() {
-                            request.params = Some(Default::default());
+                           request.params = Some(Default::default());
                         }
-                        request.params.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.params.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "expiration" => {
                         request.expiration = Some(value.unwrap_or("").to_string());
@@ -1164,8 +1168,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1176,7 +1179,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.calendars().clear(&self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1207,7 +1210,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1218,7 +1220,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.calendars().delete(&self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1249,7 +1251,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1260,7 +1261,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.calendars().get(&self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1292,8 +1293,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1302,10 +1302,10 @@ impl Engine {
 
     fn _calendars_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Calendar = Default::default();
+        let mut request = api::Calendar::default();
         let mut call = self.hub.calendars().insert(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1325,9 +1325,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1370,8 +1371,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1380,10 +1380,10 @@ impl Engine {
 
     fn _calendars_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Calendar = Default::default();
+        let mut request = api::Calendar::default();
         let mut call = self.hub.calendars().patch(&request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1403,9 +1403,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1448,8 +1449,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1458,10 +1458,10 @@ impl Engine {
 
     fn _calendars_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Calendar = Default::default();
+        let mut request = api::Calendar::default();
         let mut call = self.hub.calendars().update(&request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1481,9 +1481,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1526,8 +1527,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1536,10 +1536,10 @@ impl Engine {
 
     fn _channels_stop(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Channel = Default::default();
+        let mut request = api::Channel::default();
         let mut call = self.hub.channels().stop(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1559,9 +1559,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1583,9 +1584,10 @@ impl Engine {
                     },
                 "params" => {
                         if request.params.is_none() {
-                            request.params = Some(Default::default());
+                           request.params = Some(Default::default());
                         }
-                        request.params.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.params.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "expiration" => {
                         request.expiration = Some(value.unwrap_or("").to_string());
@@ -1615,7 +1617,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1626,7 +1627,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.colors().get();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1658,8 +1659,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1670,7 +1670,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.events().delete(&self.opt.arg_calendar_id, &self.opt.arg_event_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
@@ -1704,7 +1704,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1715,7 +1714,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.events().get(&self.opt.arg_calendar_id, &self.opt.arg_event_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "time-zone" => {
                     call = call.time_zone(value.unwrap_or(""));
@@ -1756,8 +1755,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1766,10 +1764,10 @@ impl Engine {
 
     fn _events_import(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Event = Default::default();
+        let mut request = api::Event::default();
         let mut call = self.hub.events().import(&request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1789,9 +1787,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1852,43 +1851,51 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "extended-properties.shared" => {
                         request_extended_properties_init(&mut request);
-                        request.extended_properties.as_mut().unwrap().shared.push(value.unwrap_or("").to_string());
+                        if request.extended_properties.as_mut().unwrap().shared.is_none() {
+                           request.extended_properties.as_mut().unwrap().shared = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.extended_properties.as_mut().unwrap().shared.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "extended-properties.private" => {
                         request_extended_properties_init(&mut request);
-                        request.extended_properties.as_mut().unwrap().private.push(value.unwrap_or("").to_string());
+                        if request.extended_properties.as_mut().unwrap().private.is_none() {
+                           request.extended_properties.as_mut().unwrap().private = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.extended_properties.as_mut().unwrap().private.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "creator.self" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().self_ = arg_from_str(value.unwrap_or("false"), err, "creator.self", "boolean");
+                        request.creator.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "creator.self", "boolean"));
                     },
                 "creator.display-name" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "creator.email" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "creator.id" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.self" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().self_ = arg_from_str(value.unwrap_or("false"), err, "organizer.self", "boolean");
+                        request.organizer.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "organizer.self", "boolean"));
                     },
                 "organizer.display-name" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.email" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.id" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_organizer_init(&mut request);
@@ -1900,23 +1907,23 @@ impl Engine {
                     },
                 "end.date" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "end.time-zone" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "end.date-time" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "source.url" => {
                         request_source_init(&mut request);
-                        request.source.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.source.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "source.title" => {
                         request_source_init(&mut request);
-                        request.source.as_mut().unwrap().title = value.unwrap_or("").to_string();
+                        request.source.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
                     },
                 "html-link" => {
                         request_source_init(&mut request);
@@ -1925,21 +1932,21 @@ impl Engine {
                 "recurrence" => {
                         request_source_init(&mut request);
                         if request.recurrence.is_none() {
-                            request.recurrence = Some(Default::default());
+                           request.recurrence = Some(Default::default());
                         }
-                        request.recurrence.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.recurrence.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "start.date" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "start.time-zone" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "start.date-time" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "etag" => {
                         request_start_init(&mut request);
@@ -1955,15 +1962,15 @@ impl Engine {
                     },
                 "original-start-time.date" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "original-start-time.time-zone" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "original-start-time.date-time" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "status" => {
                         request_original_start_time_init(&mut request);
@@ -1983,35 +1990,39 @@ impl Engine {
                     },
                 "gadget.preferences" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().preferences.push(value.unwrap_or("").to_string());
+                        if request.gadget.as_mut().unwrap().preferences.is_none() {
+                           request.gadget.as_mut().unwrap().preferences = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.gadget.as_mut().unwrap().preferences.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "gadget.title" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().title = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.height" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().height = arg_from_str(value.unwrap_or("-0"), err, "gadget.height", "integer");
+                        request.gadget.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.height", "integer"));
                     },
                 "gadget.width" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().width = arg_from_str(value.unwrap_or("-0"), err, "gadget.width", "integer");
+                        request.gadget.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.width", "integer"));
                     },
                 "gadget.link" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().link = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().link = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.type" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.display" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().display = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().display = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.icon-link" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().icon_link = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().icon_link = Some(value.unwrap_or("").to_string());
                     },
                 "end-time-unspecified" => {
                         request_gadget_init(&mut request);
@@ -2055,7 +2066,7 @@ impl Engine {
                     },
                 "reminders.use-default" => {
                         request_reminders_init(&mut request);
-                        request.reminders.as_mut().unwrap().use_default = arg_from_str(value.unwrap_or("false"), err, "reminders.use-default", "boolean");
+                        request.reminders.as_mut().unwrap().use_default = Some(arg_from_str(value.unwrap_or("false"), err, "reminders.use-default", "boolean"));
                     },
                 "guests-can-see-other-guests" => {
                         request_reminders_init(&mut request);
@@ -2094,8 +2105,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2104,10 +2114,10 @@ impl Engine {
 
     fn _events_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Event = Default::default();
+        let mut request = api::Event::default();
         let mut call = self.hub.events().insert(&request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
@@ -2133,9 +2143,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2196,43 +2207,51 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "extended-properties.shared" => {
                         request_extended_properties_init(&mut request);
-                        request.extended_properties.as_mut().unwrap().shared.push(value.unwrap_or("").to_string());
+                        if request.extended_properties.as_mut().unwrap().shared.is_none() {
+                           request.extended_properties.as_mut().unwrap().shared = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.extended_properties.as_mut().unwrap().shared.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "extended-properties.private" => {
                         request_extended_properties_init(&mut request);
-                        request.extended_properties.as_mut().unwrap().private.push(value.unwrap_or("").to_string());
+                        if request.extended_properties.as_mut().unwrap().private.is_none() {
+                           request.extended_properties.as_mut().unwrap().private = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.extended_properties.as_mut().unwrap().private.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "creator.self" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().self_ = arg_from_str(value.unwrap_or("false"), err, "creator.self", "boolean");
+                        request.creator.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "creator.self", "boolean"));
                     },
                 "creator.display-name" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "creator.email" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "creator.id" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.self" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().self_ = arg_from_str(value.unwrap_or("false"), err, "organizer.self", "boolean");
+                        request.organizer.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "organizer.self", "boolean"));
                     },
                 "organizer.display-name" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.email" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.id" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_organizer_init(&mut request);
@@ -2244,23 +2263,23 @@ impl Engine {
                     },
                 "end.date" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "end.time-zone" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "end.date-time" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "source.url" => {
                         request_source_init(&mut request);
-                        request.source.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.source.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "source.title" => {
                         request_source_init(&mut request);
-                        request.source.as_mut().unwrap().title = value.unwrap_or("").to_string();
+                        request.source.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
                     },
                 "html-link" => {
                         request_source_init(&mut request);
@@ -2269,21 +2288,21 @@ impl Engine {
                 "recurrence" => {
                         request_source_init(&mut request);
                         if request.recurrence.is_none() {
-                            request.recurrence = Some(Default::default());
+                           request.recurrence = Some(Default::default());
                         }
-                        request.recurrence.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.recurrence.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "start.date" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "start.time-zone" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "start.date-time" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "etag" => {
                         request_start_init(&mut request);
@@ -2299,15 +2318,15 @@ impl Engine {
                     },
                 "original-start-time.date" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "original-start-time.time-zone" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "original-start-time.date-time" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "status" => {
                         request_original_start_time_init(&mut request);
@@ -2327,35 +2346,39 @@ impl Engine {
                     },
                 "gadget.preferences" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().preferences.push(value.unwrap_or("").to_string());
+                        if request.gadget.as_mut().unwrap().preferences.is_none() {
+                           request.gadget.as_mut().unwrap().preferences = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.gadget.as_mut().unwrap().preferences.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "gadget.title" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().title = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.height" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().height = arg_from_str(value.unwrap_or("-0"), err, "gadget.height", "integer");
+                        request.gadget.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.height", "integer"));
                     },
                 "gadget.width" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().width = arg_from_str(value.unwrap_or("-0"), err, "gadget.width", "integer");
+                        request.gadget.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.width", "integer"));
                     },
                 "gadget.link" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().link = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().link = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.type" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.display" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().display = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().display = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.icon-link" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().icon_link = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().icon_link = Some(value.unwrap_or("").to_string());
                     },
                 "end-time-unspecified" => {
                         request_gadget_init(&mut request);
@@ -2399,7 +2422,7 @@ impl Engine {
                     },
                 "reminders.use-default" => {
                         request_reminders_init(&mut request);
-                        request.reminders.as_mut().unwrap().use_default = arg_from_str(value.unwrap_or("false"), err, "reminders.use-default", "boolean");
+                        request.reminders.as_mut().unwrap().use_default = Some(arg_from_str(value.unwrap_or("false"), err, "reminders.use-default", "boolean"));
                     },
                 "guests-can-see-other-guests" => {
                         request_reminders_init(&mut request);
@@ -2438,8 +2461,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2450,7 +2472,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.events().instances(&self.opt.arg_calendar_id, &self.opt.arg_event_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "time-zone" => {
                     call = call.time_zone(value.unwrap_or(""));
@@ -2509,8 +2531,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2521,7 +2542,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.events().list(&self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "updated-min" => {
                     call = call.updated_min(value.unwrap_or(""));
@@ -2604,8 +2625,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2616,7 +2636,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.events().move_(&self.opt.arg_calendar_id, &self.opt.arg_event_id, &self.opt.arg_destination);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
@@ -2651,8 +2671,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2661,10 +2680,10 @@ impl Engine {
 
     fn _events_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Event = Default::default();
+        let mut request = api::Event::default();
         let mut call = self.hub.events().patch(&request, &self.opt.arg_calendar_id, &self.opt.arg_event_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
@@ -2693,9 +2712,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2756,43 +2776,51 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "extended-properties.shared" => {
                         request_extended_properties_init(&mut request);
-                        request.extended_properties.as_mut().unwrap().shared.push(value.unwrap_or("").to_string());
+                        if request.extended_properties.as_mut().unwrap().shared.is_none() {
+                           request.extended_properties.as_mut().unwrap().shared = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.extended_properties.as_mut().unwrap().shared.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "extended-properties.private" => {
                         request_extended_properties_init(&mut request);
-                        request.extended_properties.as_mut().unwrap().private.push(value.unwrap_or("").to_string());
+                        if request.extended_properties.as_mut().unwrap().private.is_none() {
+                           request.extended_properties.as_mut().unwrap().private = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.extended_properties.as_mut().unwrap().private.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "creator.self" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().self_ = arg_from_str(value.unwrap_or("false"), err, "creator.self", "boolean");
+                        request.creator.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "creator.self", "boolean"));
                     },
                 "creator.display-name" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "creator.email" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "creator.id" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.self" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().self_ = arg_from_str(value.unwrap_or("false"), err, "organizer.self", "boolean");
+                        request.organizer.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "organizer.self", "boolean"));
                     },
                 "organizer.display-name" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.email" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.id" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_organizer_init(&mut request);
@@ -2804,23 +2832,23 @@ impl Engine {
                     },
                 "end.date" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "end.time-zone" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "end.date-time" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "source.url" => {
                         request_source_init(&mut request);
-                        request.source.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.source.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "source.title" => {
                         request_source_init(&mut request);
-                        request.source.as_mut().unwrap().title = value.unwrap_or("").to_string();
+                        request.source.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
                     },
                 "html-link" => {
                         request_source_init(&mut request);
@@ -2829,21 +2857,21 @@ impl Engine {
                 "recurrence" => {
                         request_source_init(&mut request);
                         if request.recurrence.is_none() {
-                            request.recurrence = Some(Default::default());
+                           request.recurrence = Some(Default::default());
                         }
-                        request.recurrence.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.recurrence.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "start.date" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "start.time-zone" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "start.date-time" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "etag" => {
                         request_start_init(&mut request);
@@ -2859,15 +2887,15 @@ impl Engine {
                     },
                 "original-start-time.date" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "original-start-time.time-zone" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "original-start-time.date-time" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "status" => {
                         request_original_start_time_init(&mut request);
@@ -2887,35 +2915,39 @@ impl Engine {
                     },
                 "gadget.preferences" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().preferences.push(value.unwrap_or("").to_string());
+                        if request.gadget.as_mut().unwrap().preferences.is_none() {
+                           request.gadget.as_mut().unwrap().preferences = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.gadget.as_mut().unwrap().preferences.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "gadget.title" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().title = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.height" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().height = arg_from_str(value.unwrap_or("-0"), err, "gadget.height", "integer");
+                        request.gadget.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.height", "integer"));
                     },
                 "gadget.width" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().width = arg_from_str(value.unwrap_or("-0"), err, "gadget.width", "integer");
+                        request.gadget.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.width", "integer"));
                     },
                 "gadget.link" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().link = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().link = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.type" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.display" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().display = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().display = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.icon-link" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().icon_link = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().icon_link = Some(value.unwrap_or("").to_string());
                     },
                 "end-time-unspecified" => {
                         request_gadget_init(&mut request);
@@ -2959,7 +2991,7 @@ impl Engine {
                     },
                 "reminders.use-default" => {
                         request_reminders_init(&mut request);
-                        request.reminders.as_mut().unwrap().use_default = arg_from_str(value.unwrap_or("false"), err, "reminders.use-default", "boolean");
+                        request.reminders.as_mut().unwrap().use_default = Some(arg_from_str(value.unwrap_or("false"), err, "reminders.use-default", "boolean"));
                     },
                 "guests-can-see-other-guests" => {
                         request_reminders_init(&mut request);
@@ -2998,8 +3030,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3010,7 +3041,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.events().quick_add(&self.opt.arg_calendar_id, &self.opt.arg_text);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
@@ -3045,8 +3076,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3055,10 +3085,10 @@ impl Engine {
 
     fn _events_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Event = Default::default();
+        let mut request = api::Event::default();
         let mut call = self.hub.events().update(&request, &self.opt.arg_calendar_id, &self.opt.arg_event_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
@@ -3087,9 +3117,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3150,43 +3181,51 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "extended-properties.shared" => {
                         request_extended_properties_init(&mut request);
-                        request.extended_properties.as_mut().unwrap().shared.push(value.unwrap_or("").to_string());
+                        if request.extended_properties.as_mut().unwrap().shared.is_none() {
+                           request.extended_properties.as_mut().unwrap().shared = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.extended_properties.as_mut().unwrap().shared.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "extended-properties.private" => {
                         request_extended_properties_init(&mut request);
-                        request.extended_properties.as_mut().unwrap().private.push(value.unwrap_or("").to_string());
+                        if request.extended_properties.as_mut().unwrap().private.is_none() {
+                           request.extended_properties.as_mut().unwrap().private = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.extended_properties.as_mut().unwrap().private.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "creator.self" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().self_ = arg_from_str(value.unwrap_or("false"), err, "creator.self", "boolean");
+                        request.creator.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "creator.self", "boolean"));
                     },
                 "creator.display-name" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "creator.email" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "creator.id" => {
                         request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.creator.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.self" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().self_ = arg_from_str(value.unwrap_or("false"), err, "organizer.self", "boolean");
+                        request.organizer.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "organizer.self", "boolean"));
                     },
                 "organizer.display-name" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().display_name = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.email" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().email = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
                     },
                 "organizer.id" => {
                         request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().id = value.unwrap_or("").to_string();
+                        request.organizer.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_organizer_init(&mut request);
@@ -3198,23 +3237,23 @@ impl Engine {
                     },
                 "end.date" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "end.time-zone" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "end.date-time" => {
                         request_end_init(&mut request);
-                        request.end.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.end.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "source.url" => {
                         request_source_init(&mut request);
-                        request.source.as_mut().unwrap().url = value.unwrap_or("").to_string();
+                        request.source.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
                     },
                 "source.title" => {
                         request_source_init(&mut request);
-                        request.source.as_mut().unwrap().title = value.unwrap_or("").to_string();
+                        request.source.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
                     },
                 "html-link" => {
                         request_source_init(&mut request);
@@ -3223,21 +3262,21 @@ impl Engine {
                 "recurrence" => {
                         request_source_init(&mut request);
                         if request.recurrence.is_none() {
-                            request.recurrence = Some(Default::default());
+                           request.recurrence = Some(Default::default());
                         }
-                        request.recurrence.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.recurrence.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "start.date" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "start.time-zone" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "start.date-time" => {
                         request_start_init(&mut request);
-                        request.start.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.start.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "etag" => {
                         request_start_init(&mut request);
@@ -3253,15 +3292,15 @@ impl Engine {
                     },
                 "original-start-time.date" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().date = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
                     },
                 "original-start-time.time-zone" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "original-start-time.date-time" => {
                         request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().date_time = value.unwrap_or("").to_string();
+                        request.original_start_time.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
                     },
                 "status" => {
                         request_original_start_time_init(&mut request);
@@ -3281,35 +3320,39 @@ impl Engine {
                     },
                 "gadget.preferences" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().preferences.push(value.unwrap_or("").to_string());
+                        if request.gadget.as_mut().unwrap().preferences.is_none() {
+                           request.gadget.as_mut().unwrap().preferences = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.gadget.as_mut().unwrap().preferences.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "gadget.title" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().title = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.height" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().height = arg_from_str(value.unwrap_or("-0"), err, "gadget.height", "integer");
+                        request.gadget.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.height", "integer"));
                     },
                 "gadget.width" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().width = arg_from_str(value.unwrap_or("-0"), err, "gadget.width", "integer");
+                        request.gadget.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.width", "integer"));
                     },
                 "gadget.link" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().link = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().link = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.type" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.display" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().display = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().display = Some(value.unwrap_or("").to_string());
                     },
                 "gadget.icon-link" => {
                         request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().icon_link = value.unwrap_or("").to_string();
+                        request.gadget.as_mut().unwrap().icon_link = Some(value.unwrap_or("").to_string());
                     },
                 "end-time-unspecified" => {
                         request_gadget_init(&mut request);
@@ -3353,7 +3396,7 @@ impl Engine {
                     },
                 "reminders.use-default" => {
                         request_reminders_init(&mut request);
-                        request.reminders.as_mut().unwrap().use_default = arg_from_str(value.unwrap_or("false"), err, "reminders.use-default", "boolean");
+                        request.reminders.as_mut().unwrap().use_default = Some(arg_from_str(value.unwrap_or("false"), err, "reminders.use-default", "boolean"));
                     },
                 "guests-can-see-other-guests" => {
                         request_reminders_init(&mut request);
@@ -3392,8 +3435,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3402,10 +3444,10 @@ impl Engine {
 
     fn _events_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Channel = Default::default();
+        let mut request = api::Channel::default();
         let mut call = self.hub.events().watch(&request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "updated-min" => {
                     call = call.updated_min(value.unwrap_or(""));
@@ -3476,9 +3518,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3500,9 +3543,10 @@ impl Engine {
                     },
                 "params" => {
                         if request.params.is_none() {
-                            request.params = Some(Default::default());
+                           request.params = Some(Default::default());
                         }
-                        request.params.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.params.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "expiration" => {
                         request.expiration = Some(value.unwrap_or("").to_string());
@@ -3533,8 +3577,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3543,10 +3586,10 @@ impl Engine {
 
     fn _freebusy_query(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::FreeBusyRequest = Default::default();
+        let mut request = api::FreeBusyRequest::default();
         let mut call = self.hub.freebusy().query(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3566,9 +3609,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3605,8 +3649,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3617,7 +3660,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.settings().get(&self.opt.arg_setting);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3649,8 +3692,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3661,7 +3703,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.settings().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
                     call = call.sync_token(value.unwrap_or(""));
@@ -3702,8 +3744,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3712,10 +3753,10 @@ impl Engine {
 
     fn _settings_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Channel = Default::default();
+        let mut request = api::Channel::default();
         let mut call = self.hub.settings().watch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
                     call = call.sync_token(value.unwrap_or(""));
@@ -3744,9 +3785,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3768,9 +3810,10 @@ impl Engine {
                     },
                 "params" => {
                         if request.params.is_none() {
-                            request.params = Some(Default::default());
+                           request.params = Some(Default::default());
                         }
-                        request.params.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.params.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 "expiration" => {
                         request.expiration = Some(value.unwrap_or("").to_string());
@@ -3801,8 +3844,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3832,7 +3874,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_calendar_list {
+        }
+ else if self.opt.cmd_calendar_list {
             if self.opt.cmd_delete {
                 call_result = self._calendar_list_delete(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -3850,7 +3893,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_calendars {
+        }
+ else if self.opt.cmd_calendars {
             if self.opt.cmd_clear {
                 call_result = self._calendars_clear(dry_run, &mut err);
             } else if self.opt.cmd_delete {
@@ -3866,19 +3910,22 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_channels {
+        }
+ else if self.opt.cmd_channels {
             if self.opt.cmd_stop {
                 call_result = self._channels_stop(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_colors {
+        }
+ else if self.opt.cmd_colors {
             if self.opt.cmd_get {
                 call_result = self._colors_get(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_events {
+        }
+ else if self.opt.cmd_events {
             if self.opt.cmd_delete {
                 call_result = self._events_delete(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -3904,13 +3951,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_freebusy {
+        }
+ else if self.opt.cmd_freebusy {
             if self.opt.cmd_query {
                 call_result = self._freebusy_query(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_settings {
+        }
+ else if self.opt.cmd_settings {
             if self.opt.cmd_get {
                 call_result = self._settings_get(dry_run, &mut err);
             } else if self.opt.cmd_list {
@@ -3940,21 +3989,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "calendar3-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "calendar3-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "calendar3",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "calendar3",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::CalendarHub::new(hyper::Client::new(), auth),
+            hub: api::CalendarHub::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -3974,12 +4039,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

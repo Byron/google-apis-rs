@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *0.1.5+20150309*, where *20150309* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *books* crate version *0.1.5+20150401*, where *20150401* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -403,9 +403,9 @@ impl<'a, C, A> Books<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Category {
     /// A list of onboarding categories.
-    pub items: Vec<CategoryItems>,
+    pub items: Option<Vec<CategoryItems>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Category {}
@@ -419,12 +419,12 @@ impl ResponseResult for Category {}
 pub struct CategoryItems {
     /// no description provided
     #[serde(rename="badgeUrl")]
-    pub badge_url: String,
+    pub badge_url: Option<String>,
     /// no description provided
     #[serde(rename="categoryId")]
-    pub category_id: String,
+    pub category_id: Option<String>,
     /// no description provided
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for CategoryItems {}
@@ -438,32 +438,32 @@ impl Part for CategoryItems {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConcurrentAccessRestriction {
     /// Client nonce for verification. Download access and client-validation only.
-    pub nonce: String,
+    pub nonce: Option<String>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Whether this volume has any concurrent access restrictions.
-    pub restricted: bool,
+    pub restricted: Option<bool>,
     /// Identifies the volume for which this entry applies.
     #[serde(rename="volumeId")]
-    pub volume_id: String,
+    pub volume_id: Option<String>,
     /// The maximum number of concurrent access licenses for this volume.
     #[serde(rename="maxConcurrentDevices")]
-    pub max_concurrent_devices: i32,
+    pub max_concurrent_devices: Option<i32>,
     /// Whether access is granted for this (user, device, volume).
     #[serde(rename="deviceAllowed")]
-    pub device_allowed: bool,
+    pub device_allowed: Option<bool>,
     /// Client app identifier for verification. Download access and client-validation only.
-    pub source: String,
+    pub source: Option<String>,
     /// Time in seconds for license auto-expiration.
     #[serde(rename="timeWindowSeconds")]
-    pub time_window_seconds: i32,
+    pub time_window_seconds: Option<i32>,
     /// Response signature.
-    pub signature: String,
+    pub signature: Option<String>,
     /// Error/warning reason code.
     #[serde(rename="reasonCode")]
-    pub reason_code: String,
+    pub reason_code: Option<String>,
     /// Error/warning message.
-    pub message: String,
+    pub message: Option<String>,
 }
 
 impl Part for ConcurrentAccessRestriction {}
@@ -476,11 +476,11 @@ impl Part for ConcurrentAccessRestriction {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoDimensions {
     /// Width of this volume (in cm).
-    pub width: String,
+    pub width: Option<String>,
     /// Height or length of this volume (in cm).
-    pub height: String,
+    pub height: Option<String>,
     /// Thickness of this volume (in cm).
-    pub thickness: String,
+    pub thickness: Option<String>,
 }
 
 impl NestedType for VolumeVolumeInfoDimensions {}
@@ -494,66 +494,69 @@ impl Part for VolumeVolumeInfoDimensions {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfo {
     /// Volume subtitle. (In LITE projection.)
-    pub subtitle: String,
+    pub subtitle: Option<String>,
     /// A synopsis of the volume. The text of the description is formatted in HTML and includes simple formatting elements, such as b, i, and br tags. (In LITE projection.)
-    pub description: String,
+    pub description: Option<String>,
     /// Total number of pages as per publisher metadata.
     #[serde(rename="pageCount")]
-    pub page_count: i32,
+    pub page_count: Option<i32>,
     /// A list of image links for all the sizes that are available. (In LITE projection.)
     #[serde(rename="imageLinks")]
-    pub image_links: VolumeVolumeInfoImageLinks,
+    pub image_links: Option<VolumeVolumeInfoImageLinks>,
     /// The number of review ratings for this volume.
     #[serde(rename="ratingsCount")]
-    pub ratings_count: i32,
+    pub ratings_count: Option<i32>,
     /// The main category to which this volume belongs. It will be the category from the categories list returned below that has the highest weight.
     #[serde(rename="mainCategory")]
-    pub main_category: String,
+    pub main_category: Option<String>,
     /// The names of the authors and/or editors for this volume. (In LITE projection)
-    pub authors: Vec<String>,
+    pub authors: Option<Vec<String>>,
     /// A list of subject categories, such as "Fiction", "Suspense", etc.
-    pub categories: Vec<String>,
+    pub categories: Option<Vec<String>>,
     /// Publisher of this volume. (In LITE projection.)
-    pub publisher: String,
+    pub publisher: Option<String>,
     /// Physical dimensions of this volume.
-    pub dimensions: VolumeVolumeInfoDimensions,
+    pub dimensions: Option<VolumeVolumeInfoDimensions>,
     /// Best language for this volume (based on content). It is the two-letter ISO 639-1 code such as 'fr', 'en', etc.
-    pub language: String,
+    pub language: Option<String>,
     /// URL to preview this volume on the Google Books site.
     #[serde(rename="previewLink")]
-    pub preview_link: String,
-    /// The reading modes available for this volume.
-    #[serde(rename="readingModes")]
-    pub reading_modes: String,
+    pub preview_link: Option<String>,
+    /// no description provided
+    #[serde(rename="maturityRating")]
+    pub maturity_rating: Option<String>,
     /// Date of publication. (In LITE projection.)
     #[serde(rename="publishedDate")]
-    pub published_date: String,
+    pub published_date: Option<String>,
     /// Type of publication of this volume. Possible values are BOOK or MAGAZINE.
     #[serde(rename="printType")]
-    pub print_type: String,
+    pub print_type: Option<String>,
     /// Total number of sample pages as per publisher metadata.
     #[serde(rename="samplePageCount")]
-    pub sample_page_count: i32,
+    pub sample_page_count: Option<i32>,
+    /// The reading modes available for this volume.
+    #[serde(rename="readingModes")]
+    pub reading_modes: Option<String>,
     /// An identifier for the version of the volume content (text & images). (In LITE projection)
     #[serde(rename="contentVersion")]
-    pub content_version: String,
+    pub content_version: Option<String>,
     /// Total number of printed pages in generated pdf representation.
     #[serde(rename="printedPageCount")]
-    pub printed_page_count: i32,
+    pub printed_page_count: Option<i32>,
     /// Industry standard identifiers for this volume.
     #[serde(rename="industryIdentifiers")]
-    pub industry_identifiers: Vec<VolumeVolumeInfoIndustryIdentifiers>,
+    pub industry_identifiers: Option<Vec<VolumeVolumeInfoIndustryIdentifiers>>,
     /// Volume title. (In LITE projection.)
-    pub title: String,
+    pub title: Option<String>,
     /// The mean review rating for this volume. (min = 1.0, max = 5.0)
     #[serde(rename="averageRating")]
-    pub average_rating: f64,
+    pub average_rating: Option<f64>,
     /// URL to view information about this volume on the Google Books site. (In LITE projection)
     #[serde(rename="infoLink")]
-    pub info_link: String,
+    pub info_link: Option<String>,
     /// Canonical URL for a volume. (In LITE projection.)
     #[serde(rename="canonicalVolumeLink")]
-    pub canonical_volume_link: String,
+    pub canonical_volume_link: Option<String>,
 }
 
 impl NestedType for VolumeVolumeInfo {}
@@ -568,19 +571,19 @@ impl Part for VolumeVolumeInfo {}
 pub struct AnnotationClientVersionRanges {
     /// Range in image CFI format for this annotation sent by client.
     #[serde(rename="imageCfiRange")]
-    pub image_cfi_range: BooksAnnotationsRange,
+    pub image_cfi_range: Option<BooksAnnotationsRange>,
     /// Range in GB text format for this annotation sent by client.
     #[serde(rename="gbTextRange")]
-    pub gb_text_range: BooksAnnotationsRange,
+    pub gb_text_range: Option<BooksAnnotationsRange>,
     /// Content version the client sent in.
     #[serde(rename="contentVersion")]
-    pub content_version: String,
+    pub content_version: Option<String>,
     /// Range in CFI format for this annotation sent by client.
     #[serde(rename="cfiRange")]
-    pub cfi_range: BooksAnnotationsRange,
+    pub cfi_range: Option<BooksAnnotationsRange>,
     /// Range in GB image format for this annotation sent by client.
     #[serde(rename="gbImageRange")]
-    pub gb_image_range: BooksAnnotationsRange,
+    pub gb_image_range: Option<BooksAnnotationsRange>,
 }
 
 impl NestedType for AnnotationClientVersionRanges {}
@@ -600,12 +603,12 @@ impl Part for AnnotationClientVersionRanges {}
 pub struct RequestAccess {
     /// A download access response.
     #[serde(rename="downloadAccess")]
-    pub download_access: DownloadAccessRestriction,
+    pub download_access: Option<DownloadAccessRestriction>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A concurrent access response.
     #[serde(rename="concurrentAccess")]
-    pub concurrent_access: ConcurrentAccessRestriction,
+    pub concurrent_access: Option<ConcurrentAccessRestriction>,
 }
 
 impl ResponseResult for RequestAccess {}
@@ -618,20 +621,20 @@ impl ResponseResult for RequestAccess {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OffersItemsItems {
     /// no description provided
-    pub description: String,
+    pub description: Option<String>,
     /// no description provided
-    pub author: String,
+    pub author: Option<String>,
     /// no description provided
-    pub title: String,
+    pub title: Option<String>,
     /// no description provided
     #[serde(rename="coverUrl")]
-    pub cover_url: String,
+    pub cover_url: Option<String>,
     /// no description provided
     #[serde(rename="volumeId")]
-    pub volume_id: String,
+    pub volume_id: Option<String>,
     /// no description provided
     #[serde(rename="canonicalVolumeLink")]
-    pub canonical_volume_link: String,
+    pub canonical_volume_link: Option<String>,
 }
 
 impl NestedType for OffersItemsItems {}
@@ -651,14 +654,14 @@ impl Part for OffersItemsItems {}
 pub struct Annotations {
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of annotations.
-    pub items: Vec<Annotation>,
+    pub items: Option<Vec<Annotation>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Total number of annotations found. This may be greater than the number of notes returned in this response if results have been paginated.
     #[serde(rename="totalItems")]
-    pub total_items: i32,
+    pub total_items: Option<i32>,
 }
 
 impl ResponseResult for Annotations {}
@@ -672,16 +675,16 @@ impl ResponseResult for Annotations {}
 pub struct VolumeSaleInfoOffers {
     /// The rental duration (for rental offers only).
     #[serde(rename="rentalDuration")]
-    pub rental_duration: VolumeSaleInfoOffersRentalDuration,
+    pub rental_duration: Option<VolumeSaleInfoOffersRentalDuration>,
     /// Offer retail (=discounted) price in Micros
     #[serde(rename="retailPrice")]
-    pub retail_price: VolumeSaleInfoOffersRetailPrice,
+    pub retail_price: Option<VolumeSaleInfoOffersRetailPrice>,
     /// Offer list (=undiscounted) price in Micros.
     #[serde(rename="listPrice")]
-    pub list_price: VolumeSaleInfoOffersListPrice,
+    pub list_price: Option<VolumeSaleInfoOffersListPrice>,
     /// The finsky offer type (e.g., PURCHASE=0 RENTAL=3)
     #[serde(rename="finskyOfferType")]
-    pub finsky_offer_type: i32,
+    pub finsky_offer_type: Option<i32>,
 }
 
 impl NestedType for VolumeSaleInfoOffers {}
@@ -700,9 +703,9 @@ impl Part for VolumeSaleInfoOffers {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
     /// A list of offline dictionary metadata.
-    pub items: Vec<MetadataItems>,
+    pub items: Option<Vec<MetadataItems>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Metadata {}
@@ -726,35 +729,35 @@ impl ResponseResult for Metadata {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volume {
     /// Resource type for a volume. (In LITE projection.)
-    pub kind: String,
+    pub kind: Option<String>,
     /// Any information about a volume related to reading or obtaining that volume text. This information can depend on country (books may be public domain in one country but not in another, e.g.).
     #[serde(rename="accessInfo")]
-    pub access_info: VolumeAccessInfo,
+    pub access_info: Option<VolumeAccessInfo>,
     /// Search result information related to this volume.
     #[serde(rename="searchInfo")]
-    pub search_info: VolumeSearchInfo,
+    pub search_info: Option<VolumeSearchInfo>,
     /// Any information about a volume related to the eBookstore and/or purchaseability. This information can depend on the country where the request originates from (i.e. books may not be for sale in certain countries).
     #[serde(rename="saleInfo")]
-    pub sale_info: VolumeSaleInfo,
+    pub sale_info: Option<VolumeSaleInfo>,
     /// Opaque identifier for a specific version of a volume resource. (In LITE projection)
-    pub etag: String,
+    pub etag: Option<String>,
     /// What layers exist in this volume and high level information about them.
     #[serde(rename="layerInfo")]
-    pub layer_info: VolumeLayerInfo,
+    pub layer_info: Option<VolumeLayerInfo>,
     /// General volume information.
     #[serde(rename="volumeInfo")]
-    pub volume_info: VolumeVolumeInfo,
+    pub volume_info: Option<VolumeVolumeInfo>,
     /// Recommendation related information for this volume.
     #[serde(rename="recommendedInfo")]
-    pub recommended_info: VolumeRecommendedInfo,
+    pub recommended_info: Option<VolumeRecommendedInfo>,
     /// Unique identifier for a volume. (In LITE projection.)
-    pub id: String,
+    pub id: Option<String>,
     /// URL to this resource. (In LITE projection.)
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// User specific information related to this volume. (e.g. page this user last read or whether they purchased this book)
     #[serde(rename="userInfo")]
-    pub user_info: VolumeUserInfo,
+    pub user_info: Option<VolumeUserInfo>,
 }
 
 impl Resource for Volume {}
@@ -768,7 +771,7 @@ impl ResponseResult for Volume {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeLayerInfo {
     /// A layer should appear here if and only if the layer exists for this book.
-    pub layers: Vec<VolumeLayerInfoLayers>,
+    pub layers: Option<Vec<VolumeLayerInfoLayers>>,
 }
 
 impl NestedType for VolumeLayerInfo {}
@@ -805,7 +808,7 @@ impl ResponseResult for Usersettings {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeRecommendedInfo {
     /// A text explaining why this volume is recommended.
-    pub explanation: String,
+    pub explanation: Option<String>,
 }
 
 impl NestedType for VolumeRecommendedInfo {}
@@ -819,15 +822,15 @@ impl Part for VolumeRecommendedInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetadataItems {
     /// no description provided
-    pub encrypted_key: String,
+    pub encrypted_key: Option<String>,
     /// no description provided
-    pub version: String,
+    pub version: Option<String>,
     /// no description provided
-    pub download_url: String,
+    pub download_url: Option<String>,
     /// no description provided
-    pub language: String,
+    pub language: Option<String>,
     /// no description provided
-    pub size: String,
+    pub size: Option<String>,
 }
 
 impl NestedType for MetadataItems {}
@@ -842,7 +845,7 @@ impl Part for MetadataItems {}
 pub struct ReviewAuthor {
     /// Name of this person.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
 }
 
 impl NestedType for ReviewAuthor {}
@@ -862,28 +865,28 @@ impl Part for ReviewAuthor {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bookshelf {
     /// Resource type for bookshelf metadata.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Description of this bookshelf.
-    pub description: String,
+    pub description: Option<String>,
     /// Title of this bookshelf.
-    pub title: String,
+    pub title: Option<String>,
     /// Number of volumes in this bookshelf.
     #[serde(rename="volumeCount")]
-    pub volume_count: i32,
+    pub volume_count: Option<i32>,
     /// Created time for this bookshelf (formatted UTC timestamp with millisecond resolution).
-    pub created: String,
+    pub created: Option<String>,
     /// Last modified time of this bookshelf (formatted UTC timestamp with millisecond resolution).
-    pub updated: String,
+    pub updated: Option<String>,
     /// Whether this bookshelf is PUBLIC or PRIVATE.
-    pub access: String,
+    pub access: Option<String>,
     /// Last time a volume was added or removed from this bookshelf (formatted UTC timestamp with millisecond resolution).
     #[serde(rename="volumesLastUpdated")]
-    pub volumes_last_updated: String,
+    pub volumes_last_updated: Option<String>,
     /// Id of this bookshelf, only unique by user.
-    pub id: i32,
+    pub id: Option<i32>,
     /// URL to this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for Bookshelf {}
@@ -897,10 +900,10 @@ impl ResponseResult for Bookshelf {}
 pub struct UsersettingsNotesExport {
     /// no description provided
     #[serde(rename="isEnabled")]
-    pub is_enabled: bool,
+    pub is_enabled: Option<bool>,
     /// no description provided
     #[serde(rename="folderName")]
-    pub folder_name: String,
+    pub folder_name: Option<String>,
 }
 
 impl NestedType for UsersettingsNotesExport {}
@@ -977,28 +980,28 @@ impl ResponseResult for Annotation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Review {
     /// Star rating for this review. Possible values are ONE, TWO, THREE, FOUR, FIVE or NOT_RATED.
-    pub rating: String,
+    pub rating: Option<String>,
     /// Resource type for a review.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Title for this review.
-    pub title: String,
+    pub title: Option<String>,
     /// Author of this review.
-    pub author: ReviewAuthor,
+    pub author: Option<ReviewAuthor>,
     /// Volume that this review is for.
     #[serde(rename="volumeId")]
-    pub volume_id: String,
+    pub volume_id: Option<String>,
     /// Review text.
-    pub content: String,
+    pub content: Option<String>,
     /// Information regarding the source of this review, when the review is not from a Google Books user.
-    pub source: ReviewSource,
+    pub source: Option<ReviewSource>,
     /// Date of this review.
-    pub date: String,
+    pub date: Option<String>,
     /// Source type for this review. Possible values are EDITORIAL, WEB_USER or GOOGLE_USER.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// URL for the full review text, for reviews gathered from the web.
     #[serde(rename="fullTextUrl")]
-    pub full_text_url: String,
+    pub full_text_url: Option<String>,
 }
 
 impl Part for Review {}
@@ -1011,35 +1014,35 @@ impl Part for Review {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DownloadAccessRestriction {
     /// Client nonce for verification. Download access and client-validation only.
-    pub nonce: String,
+    pub nonce: Option<String>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// If deviceAllowed, whether access was just acquired with this request.
     #[serde(rename="justAcquired")]
-    pub just_acquired: bool,
+    pub just_acquired: Option<bool>,
     /// If restricted, the maximum number of content download licenses for this volume.
     #[serde(rename="maxDownloadDevices")]
-    pub max_download_devices: i32,
+    pub max_download_devices: Option<i32>,
     /// If restricted, the number of content download licenses already acquired (including the requesting client, if licensed).
     #[serde(rename="downloadsAcquired")]
-    pub downloads_acquired: i32,
+    pub downloads_acquired: Option<i32>,
     /// Identifies the volume for which this entry applies.
     #[serde(rename="volumeId")]
-    pub volume_id: String,
+    pub volume_id: Option<String>,
     /// If restricted, whether access is granted for this (user, device, volume).
     #[serde(rename="deviceAllowed")]
-    pub device_allowed: bool,
+    pub device_allowed: Option<bool>,
     /// Client app identifier for verification. Download access and client-validation only.
-    pub source: String,
+    pub source: Option<String>,
     /// Response signature.
-    pub signature: String,
+    pub signature: Option<String>,
     /// Error/warning reason code. Additional codes may be added in the future. 0 OK 100 ACCESS_DENIED_PUBLISHER_LIMIT 101 ACCESS_DENIED_LIMIT 200 WARNING_USED_LAST_ACCESS
     #[serde(rename="reasonCode")]
-    pub reason_code: String,
+    pub reason_code: Option<String>,
     /// Error/warning message.
-    pub message: String,
+    pub message: Option<String>,
     /// Whether this volume has any download access restrictions.
-    pub restricted: bool,
+    pub restricted: Option<bool>,
 }
 
 impl Part for DownloadAccessRestriction {}
@@ -1058,9 +1061,9 @@ impl Part for DownloadAccessRestriction {}
 pub struct DownloadAccesses {
     /// A list of download access responses.
     #[serde(rename="downloadAccessList")]
-    pub download_access_list: Vec<DownloadAccessRestriction>,
+    pub download_access_list: Option<Vec<DownloadAccessRestriction>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for DownloadAccesses {}
@@ -1074,11 +1077,11 @@ impl ResponseResult for DownloadAccesses {}
 pub struct ReviewSource {
     /// Extra text about the source of the review.
     #[serde(rename="extraDescription")]
-    pub extra_description: String,
+    pub extra_description: Option<String>,
     /// URL of the source of the review.
-    pub url: String,
+    pub url: Option<String>,
     /// Name of the source.
-    pub description: String,
+    pub description: Option<String>,
 }
 
 impl NestedType for ReviewSource {}
@@ -1098,23 +1101,23 @@ impl Part for ReviewSource {}
 pub struct ReadingPosition {
     /// Position in a PDF file.
     #[serde(rename="pdfPosition")]
-    pub pdf_position: String,
+    pub pdf_position: Option<String>,
     /// Resource type for a reading position.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Position in a volume for image-based content.
     #[serde(rename="gbImagePosition")]
-    pub gb_image_position: String,
+    pub gb_image_position: Option<String>,
     /// Position in a volume for text-based content.
     #[serde(rename="gbTextPosition")]
-    pub gb_text_position: String,
+    pub gb_text_position: Option<String>,
     /// Position in an EPUB as a CFI.
     #[serde(rename="epubCfiPosition")]
-    pub epub_cfi_position: String,
+    pub epub_cfi_position: Option<String>,
     /// Timestamp when this reading position was last updated (formatted UTC timestamp with millisecond resolution).
-    pub updated: String,
+    pub updated: Option<String>,
     /// Volume id associated with this reading position.
     #[serde(rename="volumeId")]
-    pub volume_id: String,
+    pub volume_id: Option<String>,
 }
 
 impl ResponseResult for ReadingPosition {}
@@ -1128,10 +1131,10 @@ impl ResponseResult for ReadingPosition {}
 pub struct VolumeSaleInfoOffersRetailPrice {
     /// no description provided
     #[serde(rename="currencyCode")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
     /// no description provided
     #[serde(rename="amountInMicros")]
-    pub amount_in_micros: f64,
+    pub amount_in_micros: Option<f64>,
 }
 
 impl NestedType for VolumeSaleInfoOffersRetailPrice {}
@@ -1146,7 +1149,7 @@ impl Part for VolumeSaleInfoOffersRetailPrice {}
 pub struct VolumeSearchInfo {
     /// A text snippet containing the search query.
     #[serde(rename="textSnippet")]
-    pub text_snippet: String,
+    pub text_snippet: Option<String>,
 }
 
 impl NestedType for VolumeSearchInfo {}
@@ -1161,18 +1164,18 @@ impl Part for VolumeSearchInfo {}
 pub struct AnnotationsSummaryLayers {
     /// no description provided
     #[serde(rename="limitType")]
-    pub limit_type: String,
+    pub limit_type: Option<String>,
     /// no description provided
     #[serde(rename="remainingCharacterCount")]
-    pub remaining_character_count: i32,
+    pub remaining_character_count: Option<i32>,
     /// no description provided
-    pub updated: String,
+    pub updated: Option<String>,
     /// no description provided
     #[serde(rename="allowedCharacterCount")]
-    pub allowed_character_count: i32,
+    pub allowed_character_count: Option<i32>,
     /// no description provided
     #[serde(rename="layerId")]
-    pub layer_id: String,
+    pub layer_id: Option<String>,
 }
 
 impl NestedType for AnnotationsSummaryLayers {}
@@ -1192,26 +1195,26 @@ impl Part for AnnotationsSummaryLayers {}
 pub struct Annotationdata {
     /// The type of annotation this data is for.
     #[serde(rename="annotationType")]
-    pub annotation_type: String,
+    pub annotation_type: Option<String>,
     /// Resource Type
-    pub kind: String,
+    pub kind: Option<String>,
     /// Timestamp for the last time this data was updated. (RFC 3339 UTC date-time format).
-    pub updated: String,
+    pub updated: Option<String>,
     /// The volume id for this data. *
     #[serde(rename="volumeId")]
-    pub volume_id: String,
+    pub volume_id: Option<String>,
     /// Base64 encoded data for this annotation data.
-    pub encoded_data: String,
+    pub encoded_data: Option<String>,
     /// The Layer id for this data. *
     #[serde(rename="layerId")]
-    pub layer_id: String,
+    pub layer_id: Option<String>,
     /// no description provided
-    pub data: String,
+    pub data: Option<String>,
     /// Unique id for this annotation data.
-    pub id: String,
+    pub id: Option<String>,
     /// URL for this resource. *
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for Annotationdata {}
@@ -1224,19 +1227,19 @@ impl ResponseResult for Annotationdata {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoImageLinks {
     /// Image link for large size (width of ~800 pixels). (In LITE projection)
-    pub large: String,
+    pub large: Option<String>,
     /// Image link for extra large size (width of ~1280 pixels). (In LITE projection)
     #[serde(rename="extraLarge")]
-    pub extra_large: String,
+    pub extra_large: Option<String>,
     /// Image link for medium size (width of ~575 pixels). (In LITE projection)
-    pub medium: String,
+    pub medium: Option<String>,
     /// Image link for small thumbnail size (width of ~80 pixels). (In LITE projection)
     #[serde(rename="smallThumbnail")]
-    pub small_thumbnail: String,
+    pub small_thumbnail: Option<String>,
     /// Image link for small size (width of ~300 pixels). (In LITE projection)
-    pub small: String,
+    pub small: Option<String>,
     /// Image link for thumbnail size (width of ~128 pixels). (In LITE projection)
-    pub thumbnail: String,
+    pub thumbnail: Option<String>,
 }
 
 impl NestedType for VolumeVolumeInfoImageLinks {}
@@ -1250,10 +1253,10 @@ impl Part for VolumeVolumeInfoImageLinks {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoRetailPrice {
     /// Amount in the currency listed below. (In LITE projection.)
-    pub amount: f64,
+    pub amount: Option<f64>,
     /// An ISO 4217, three-letter currency code. (In LITE projection.)
     #[serde(rename="currencyCode")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
 }
 
 impl NestedType for VolumeSaleInfoRetailPrice {}
@@ -1272,41 +1275,41 @@ impl Part for VolumeSaleInfoRetailPrice {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Layersummary {
     /// Resource Type
-    pub kind: String,
+    pub kind: Option<String>,
     /// The number of annotations for this layer.
     #[serde(rename="annotationCount")]
-    pub annotation_count: i32,
+    pub annotation_count: Option<i32>,
     /// The number of data items for this layer.
     #[serde(rename="dataCount")]
-    pub data_count: i32,
+    pub data_count: Option<i32>,
     /// The list of annotation types contained for this layer.
     #[serde(rename="annotationTypes")]
-    pub annotation_types: Vec<String>,
+    pub annotation_types: Option<Vec<String>>,
     /// Timestamp for the last time an item in this layer was updated. (RFC 3339 UTC date-time format).
-    pub updated: String,
+    pub updated: Option<String>,
     /// The volume id this resource is for.
     #[serde(rename="volumeId")]
-    pub volume_id: String,
+    pub volume_id: Option<String>,
     /// Link to get data for this annotation.
     #[serde(rename="annotationsDataLink")]
-    pub annotations_data_link: String,
+    pub annotations_data_link: Option<String>,
     /// The link to get the annotations for this layer.
     #[serde(rename="annotationsLink")]
-    pub annotations_link: String,
+    pub annotations_link: Option<String>,
     /// The content version this resource is for.
     #[serde(rename="contentVersion")]
-    pub content_version: String,
+    pub content_version: Option<String>,
     /// The layer id for this summary.
     #[serde(rename="layerId")]
-    pub layer_id: String,
+    pub layer_id: Option<String>,
     /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.
     #[serde(rename="volumeAnnotationsVersion")]
-    pub volume_annotations_version: String,
+    pub volume_annotations_version: Option<String>,
     /// Unique id of this layer summary.
-    pub id: String,
+    pub id: Option<String>,
     /// URL to this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for Layersummary {}
@@ -1320,10 +1323,10 @@ impl ResponseResult for Layersummary {}
 pub struct VolumeSaleInfoOffersListPrice {
     /// no description provided
     #[serde(rename="currencyCode")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
     /// no description provided
     #[serde(rename="amountInMicros")]
-    pub amount_in_micros: f64,
+    pub amount_in_micros: Option<f64>,
 }
 
 impl NestedType for VolumeSaleInfoOffersListPrice {}
@@ -1343,41 +1346,41 @@ impl Part for VolumeSaleInfoOffersListPrice {}
 pub struct Volumeannotation {
     /// The type of annotation this is.
     #[serde(rename="annotationType")]
-    pub annotation_type: String,
+    pub annotation_type: Option<String>,
     /// Resource Type
-    pub kind: String,
+    pub kind: Option<String>,
     /// Indicates that this annotation is deleted.
-    pub deleted: bool,
+    pub deleted: Option<bool>,
     /// The content ranges to identify the selected text.
     #[serde(rename="contentRanges")]
-    pub content_ranges: VolumeannotationContentRanges,
+    pub content_ranges: Option<VolumeannotationContentRanges>,
     /// Timestamp for the last time this anntoation was updated. (RFC 3339 UTC date-time format).
-    pub updated: String,
+    pub updated: Option<String>,
     /// The Volume this annotation is for.
     #[serde(rename="volumeId")]
-    pub volume_id: String,
+    pub volume_id: Option<String>,
     /// The annotation data id for this volume annotation.
     #[serde(rename="annotationDataId")]
-    pub annotation_data_id: String,
+    pub annotation_data_id: Option<String>,
     /// Link to get data for this annotation.
     #[serde(rename="annotationDataLink")]
-    pub annotation_data_link: String,
+    pub annotation_data_link: Option<String>,
     /// Pages the annotation spans.
     #[serde(rename="pageIds")]
-    pub page_ids: Vec<String>,
+    pub page_ids: Option<Vec<String>>,
     /// The Layer this annotation is for.
     #[serde(rename="layerId")]
-    pub layer_id: String,
+    pub layer_id: Option<String>,
     /// Excerpt from the volume.
     #[serde(rename="selectedText")]
-    pub selected_text: String,
+    pub selected_text: Option<String>,
     /// Data for this annotation.
-    pub data: String,
+    pub data: Option<String>,
     /// Unique id of this volume annotation.
-    pub id: String,
+    pub id: Option<String>,
     /// URL to this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for Volumeannotation {}
@@ -1396,16 +1399,16 @@ impl ResponseResult for Volumeannotation {}
 pub struct Volumeannotations {
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of volume annotations.
-    pub items: Vec<Volumeannotation>,
+    pub items: Option<Vec<Volumeannotation>>,
     /// Resource type
-    pub kind: String,
+    pub kind: Option<String>,
     /// The version string for all of the volume annotations in this layer (not just the ones in this response). Note: the version string doesn't apply to the annotation data, just the information in this response (e.g. the location of annotations in the book).
-    pub version: String,
+    pub version: Option<String>,
     /// The total number of volume annotations found.
     #[serde(rename="totalItems")]
-    pub total_items: i32,
+    pub total_items: Option<i32>,
 }
 
 impl ResponseResult for Volumeannotations {}
@@ -1424,14 +1427,14 @@ impl ResponseResult for Volumeannotations {}
 pub struct Annotationsdata {
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of Annotation Data.
-    pub items: Vec<Annotationdata>,
+    pub items: Option<Vec<Annotationdata>>,
     /// Resource type
-    pub kind: String,
+    pub kind: Option<String>,
     /// The total number of volume annotations found.
     #[serde(rename="totalItems")]
-    pub total_items: i32,
+    pub total_items: Option<i32>,
 }
 
 impl ResponseResult for Annotationsdata {}
@@ -1444,10 +1447,10 @@ impl ResponseResult for Annotationsdata {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeVolumeInfoIndustryIdentifiers {
     /// Industry specific volume identifier.
-    pub identifier: String,
+    pub identifier: Option<String>,
     /// Identifier type. Possible values are ISBN_10, ISBN_13, ISSN and OTHER.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for VolumeVolumeInfoIndustryIdentifiers {}
@@ -1462,13 +1465,13 @@ impl Part for VolumeVolumeInfoIndustryIdentifiers {}
 pub struct AnnotationLayerSummary {
     /// Type of limitation on this layer. "limited" or "unlimited" for the "copy" layer.
     #[serde(rename="limitType")]
-    pub limit_type: String,
+    pub limit_type: Option<String>,
     /// Remaining allowed characters on this layer, especially for the "copy" layer.
     #[serde(rename="remainingCharacterCount")]
-    pub remaining_character_count: i32,
+    pub remaining_character_count: Option<i32>,
     /// Maximum allowed characters on this layer, especially for the "copy" layer.
     #[serde(rename="allowedCharacterCount")]
-    pub allowed_character_count: i32,
+    pub allowed_character_count: Option<i32>,
 }
 
 impl NestedType for AnnotationLayerSummary {}
@@ -1487,9 +1490,9 @@ impl Part for AnnotationLayerSummary {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Offers {
     /// A list of offers.
-    pub items: Vec<OffersItems>,
+    pub items: Option<Vec<OffersItems>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Offers {}
@@ -1503,13 +1506,13 @@ impl ResponseResult for Offers {}
 pub struct VolumeAccessInfoEpub {
     /// Is a flowing text epub available either as public domain or for purchase. (In LITE projection.)
     #[serde(rename="isAvailable")]
-    pub is_available: bool,
+    pub is_available: Option<bool>,
     /// URL to download epub. (In LITE projection.)
     #[serde(rename="downloadLink")]
-    pub download_link: String,
+    pub download_link: Option<String>,
     /// URL to retrieve ACS token for epub download. (In LITE projection.)
     #[serde(rename="acsTokenLink")]
-    pub acs_token_link: String,
+    pub acs_token_link: Option<String>,
 }
 
 impl NestedType for VolumeAccessInfoEpub {}
@@ -1529,11 +1532,11 @@ impl Part for VolumeAccessInfoEpub {}
 pub struct Volume2 {
     /// no description provided
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of volumes.
-    pub items: Vec<Volume>,
+    pub items: Option<Vec<Volume>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Volume2 {}
@@ -1547,13 +1550,13 @@ impl ResponseResult for Volume2 {}
 pub struct VolumeAccessInfoPdf {
     /// Is a scanned image pdf available either as public domain or for purchase. (In LITE projection.)
     #[serde(rename="isAvailable")]
-    pub is_available: bool,
+    pub is_available: Option<bool>,
     /// URL to download pdf. (In LITE projection.)
     #[serde(rename="downloadLink")]
-    pub download_link: String,
+    pub download_link: Option<String>,
     /// URL to retrieve ACS token for pdf download. (In LITE projection.)
     #[serde(rename="acsTokenLink")]
-    pub acs_token_link: String,
+    pub acs_token_link: Option<String>,
 }
 
 impl NestedType for VolumeAccessInfoPdf {}
@@ -1572,9 +1575,9 @@ impl Part for VolumeAccessInfoPdf {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationsSummary {
     /// no description provided
-    pub layers: Vec<AnnotationsSummaryLayers>,
+    pub layers: Option<Vec<AnnotationsSummaryLayers>>,
     /// no description provided
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for AnnotationsSummary {}
@@ -1593,9 +1596,9 @@ impl ResponseResult for AnnotationsSummary {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bookshelves {
     /// A list of bookshelves.
-    pub items: Vec<Bookshelf>,
+    pub items: Option<Vec<Bookshelf>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Bookshelves {}
@@ -1609,10 +1612,10 @@ impl ResponseResult for Bookshelves {}
 pub struct VolumeLayerInfoLayers {
     /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.
     #[serde(rename="volumeAnnotationsVersion")]
-    pub volume_annotations_version: String,
+    pub volume_annotations_version: Option<String>,
     /// The layer id of this layer (e.g. "geo").
     #[serde(rename="layerId")]
-    pub layer_id: String,
+    pub layer_id: Option<String>,
 }
 
 impl NestedType for VolumeLayerInfoLayers {}
@@ -1632,11 +1635,11 @@ impl Part for VolumeLayerInfoLayers {}
 pub struct Layersummaries {
     /// The total number of layer summaries found.
     #[serde(rename="totalItems")]
-    pub total_items: i32,
+    pub total_items: Option<i32>,
     /// A list of layer summary items.
-    pub items: Vec<Layersummary>,
+    pub items: Option<Vec<Layersummary>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Layersummaries {}
@@ -1650,14 +1653,14 @@ impl ResponseResult for Layersummaries {}
 pub struct OffersItems {
     /// no description provided
     #[serde(rename="gservicesKey")]
-    pub gservices_key: String,
+    pub gservices_key: Option<String>,
     /// no description provided
-    pub items: Vec<OffersItemsItems>,
+    pub items: Option<Vec<OffersItemsItems>>,
     /// no description provided
     #[serde(rename="artUrl")]
-    pub art_url: String,
+    pub art_url: Option<String>,
     /// no description provided
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl NestedType for OffersItems {}
@@ -1672,15 +1675,15 @@ impl Part for OffersItems {}
 pub struct VolumeUserInfoCopy {
     /// no description provided
     #[serde(rename="limitType")]
-    pub limit_type: String,
+    pub limit_type: Option<String>,
     /// no description provided
     #[serde(rename="remainingCharacterCount")]
-    pub remaining_character_count: i32,
+    pub remaining_character_count: Option<i32>,
     /// no description provided
-    pub updated: String,
+    pub updated: Option<String>,
     /// no description provided
     #[serde(rename="allowedCharacterCount")]
-    pub allowed_character_count: i32,
+    pub allowed_character_count: Option<i32>,
 }
 
 impl NestedType for VolumeUserInfoCopy {}
@@ -1699,7 +1702,7 @@ impl Part for VolumeUserInfoCopy {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BooksVolumesRecommendedRateResponse {
     /// no description provided
-    pub consistency_token: String,
+    pub consistency_token: Option<String>,
 }
 
 impl ResponseResult for BooksVolumesRecommendedRateResponse {}
@@ -1713,34 +1716,34 @@ impl ResponseResult for BooksVolumesRecommendedRateResponse {}
 pub struct VolumeUserInfo {
     /// Whether or not this volume is currently in "my books."
     #[serde(rename="isInMyBooks")]
-    pub is_in_my_books: bool,
+    pub is_in_my_books: Option<bool>,
     /// Period during this book is/was a valid rental.
     #[serde(rename="rentalPeriod")]
-    pub rental_period: VolumeUserInfoRentalPeriod,
+    pub rental_period: Option<VolumeUserInfoRentalPeriod>,
     /// Timestamp when this volume was last modified by a user action, such as a reading position update, volume purchase or writing a review. (RFC 3339 UTC date-time format).
-    pub updated: String,
+    pub updated: Option<String>,
     /// no description provided
     #[serde(rename="userUploadedVolumeInfo")]
-    pub user_uploaded_volume_info: VolumeUserInfoUserUploadedVolumeInfo,
+    pub user_uploaded_volume_info: Option<VolumeUserInfoUserUploadedVolumeInfo>,
     /// Whether this book is an active or an expired rental.
     #[serde(rename="rentalState")]
-    pub rental_state: String,
+    pub rental_state: Option<String>,
     /// Whether or not this volume was purchased by the authenticated user making the request. (In LITE projection.)
     #[serde(rename="isPurchased")]
-    pub is_purchased: bool,
+    pub is_purchased: Option<bool>,
     /// The user's current reading position in the volume, if one is available. (In LITE projection.)
     #[serde(rename="readingPosition")]
-    pub reading_position: ReadingPosition,
+    pub reading_position: Option<ReadingPosition>,
     /// Whether or not this volume was pre-ordered by the authenticated user making the request. (In LITE projection.)
     #[serde(rename="isPreordered")]
-    pub is_preordered: bool,
+    pub is_preordered: Option<bool>,
     /// Copy/Paste accounting information.
-    pub copy: VolumeUserInfoCopy,
+    pub copy: Option<VolumeUserInfoCopy>,
     /// This user's review of this volume, if one exists.
-    pub review: Review,
+    pub review: Option<Review>,
     /// Whether or not this volume was user uploaded.
     #[serde(rename="isUploaded")]
-    pub is_uploaded: bool,
+    pub is_uploaded: Option<bool>,
 }
 
 impl NestedType for VolumeUserInfo {}
@@ -1783,7 +1786,7 @@ impl ResponseResult for BooksCloudloadingResource {}
 pub struct VolumeUserInfoUserUploadedVolumeInfo {
     /// no description provided
     #[serde(rename="processingState")]
-    pub processing_state: String,
+    pub processing_state: Option<String>,
 }
 
 impl NestedType for VolumeUserInfoUserUploadedVolumeInfo {}
@@ -1797,10 +1800,10 @@ impl Part for VolumeUserInfoUserUploadedVolumeInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoListPrice {
     /// Amount in the currency listed below. (In LITE projection.)
-    pub amount: f64,
+    pub amount: Option<f64>,
     /// An ISO 4217, three-letter currency code. (In LITE projection.)
     #[serde(rename="currencyCode")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
 }
 
 impl NestedType for VolumeSaleInfoListPrice {}
@@ -1815,16 +1818,16 @@ impl Part for VolumeSaleInfoListPrice {}
 pub struct BooksAnnotationsRange {
     /// The starting position for the range.
     #[serde(rename="startPosition")]
-    pub start_position: String,
+    pub start_position: Option<String>,
     /// The ending position for the range.
     #[serde(rename="endPosition")]
-    pub end_position: String,
+    pub end_position: Option<String>,
     /// The offset from the starting position.
     #[serde(rename="startOffset")]
-    pub start_offset: String,
+    pub start_offset: Option<String>,
     /// The offset from the ending position.
     #[serde(rename="endOffset")]
-    pub end_offset: String,
+    pub end_offset: Option<String>,
 }
 
 impl Part for BooksAnnotationsRange {}
@@ -1838,41 +1841,41 @@ impl Part for BooksAnnotationsRange {}
 pub struct VolumeAccessInfo {
     /// URL to read this volume on the Google Books site. Link will not allow users to read non-viewable volumes.
     #[serde(rename="webReaderLink")]
-    pub web_reader_link: String,
+    pub web_reader_link: Option<String>,
     /// Whether or not this book is public domain in the country listed above.
     #[serde(rename="publicDomain")]
-    pub public_domain: bool,
+    pub public_domain: Option<bool>,
     /// Whether this volume requires that the client explicitly request offline download license rather than have it done automatically when loading the content, if the client supports it.
     #[serde(rename="explicitOfflineLicenseManagement")]
-    pub explicit_offline_license_management: bool,
+    pub explicit_offline_license_management: Option<bool>,
     /// Whether this volume can be embedded in a viewport using the Embedded Viewer API.
-    pub embeddable: bool,
+    pub embeddable: Option<bool>,
     /// Information about a volume's download license access restrictions.
     #[serde(rename="downloadAccess")]
-    pub download_access: DownloadAccessRestriction,
+    pub download_access: Option<DownloadAccessRestriction>,
     /// The two-letter ISO_3166-1 country code for which this access information is valid. (In LITE projection.)
-    pub country: String,
+    pub country: Option<String>,
     /// For ordered but not yet processed orders, we give a URL that can be used to go to the appropriate Google Wallet page.
     #[serde(rename="viewOrderUrl")]
-    pub view_order_url: String,
+    pub view_order_url: Option<String>,
     /// Whether text-to-speech is permitted for this volume. Values can be ALLOWED, ALLOWED_FOR_ACCESSIBILITY, or NOT_ALLOWED.
     #[serde(rename="textToSpeechPermission")]
-    pub text_to_speech_permission: String,
+    pub text_to_speech_permission: Option<String>,
     /// URL to the Google Drive viewer if this volume is uploaded by the user by selecting the file from Google Drive.
     #[serde(rename="driveImportedContentLink")]
-    pub drive_imported_content_link: String,
+    pub drive_imported_content_link: Option<String>,
     /// Information about pdf content. (In LITE projection.)
-    pub pdf: VolumeAccessInfoPdf,
+    pub pdf: Option<VolumeAccessInfoPdf>,
     /// Whether quote sharing is allowed for this volume.
     #[serde(rename="quoteSharingAllowed")]
-    pub quote_sharing_allowed: bool,
+    pub quote_sharing_allowed: Option<bool>,
     /// The read access of a volume. Possible values are PARTIAL, ALL_PAGES, NO_PAGES or UNKNOWN. This value depends on the country listed above. A value of PARTIAL means that the publisher has allowed some portion of the volume to be viewed publicly, without purchase. This can apply to eBooks as well as non-eBooks. Public domain books will always have a value of ALL_PAGES.
-    pub viewability: String,
+    pub viewability: Option<String>,
     /// Information about epub content. (In LITE projection.)
-    pub epub: VolumeAccessInfoEpub,
+    pub epub: Option<VolumeAccessInfoEpub>,
     /// Combines the access and viewability of this volume into a single status field for this user. Values can be FULL_PURCHASED, FULL_PUBLIC_DOMAIN, SAMPLE or NONE. (In LITE projection.)
     #[serde(rename="accessViewStatus")]
-    pub access_view_status: String,
+    pub access_view_status: Option<String>,
 }
 
 impl NestedType for VolumeAccessInfo {}
@@ -1887,19 +1890,19 @@ impl Part for VolumeAccessInfo {}
 pub struct AnnotationCurrentVersionRanges {
     /// Range in image CFI format for this annotation for version above.
     #[serde(rename="imageCfiRange")]
-    pub image_cfi_range: BooksAnnotationsRange,
+    pub image_cfi_range: Option<BooksAnnotationsRange>,
     /// Range in GB text format for this annotation for version above.
     #[serde(rename="gbTextRange")]
-    pub gb_text_range: BooksAnnotationsRange,
+    pub gb_text_range: Option<BooksAnnotationsRange>,
     /// Content version applicable to ranges below.
     #[serde(rename="contentVersion")]
-    pub content_version: String,
+    pub content_version: Option<String>,
     /// Range in CFI format for this annotation for version above.
     #[serde(rename="cfiRange")]
-    pub cfi_range: BooksAnnotationsRange,
+    pub cfi_range: Option<BooksAnnotationsRange>,
     /// Range in GB image format for this annotation for version above.
     #[serde(rename="gbImageRange")]
-    pub gb_image_range: BooksAnnotationsRange,
+    pub gb_image_range: Option<BooksAnnotationsRange>,
 }
 
 impl NestedType for AnnotationCurrentVersionRanges {}
@@ -1913,26 +1916,26 @@ impl Part for AnnotationCurrentVersionRanges {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfo {
     /// The two-letter ISO_3166-1 country code for which this sale information is valid. (In LITE projection.)
-    pub country: String,
+    pub country: Option<String>,
     /// The actual selling price of the book. This is the same as the suggested retail or list price unless there are offers or discounts on this volume. (In LITE projection.)
     #[serde(rename="retailPrice")]
-    pub retail_price: VolumeSaleInfoRetailPrice,
+    pub retail_price: Option<VolumeSaleInfoRetailPrice>,
     /// Whether or not this volume is an eBook (can be added to the My eBooks shelf).
     #[serde(rename="isEbook")]
-    pub is_ebook: bool,
+    pub is_ebook: Option<bool>,
     /// Offers available for this volume (sales and rentals).
-    pub offers: Vec<VolumeSaleInfoOffers>,
+    pub offers: Option<Vec<VolumeSaleInfoOffers>>,
     /// Whether or not this book is available for sale or offered for free in the Google eBookstore for the country listed above. Possible values are FOR_SALE, FOR_RENTAL_ONLY, FOR_SALE_AND_RENTAL, FREE, NOT_FOR_SALE, or FOR_PREORDER.
-    pub saleability: String,
+    pub saleability: Option<String>,
     /// URL to purchase this volume on the Google Books site. (In LITE projection)
     #[serde(rename="buyLink")]
-    pub buy_link: String,
+    pub buy_link: Option<String>,
     /// The date on which this book is available for sale.
     #[serde(rename="onSaleDate")]
-    pub on_sale_date: String,
+    pub on_sale_date: Option<String>,
     /// Suggested retail price. (In LITE projection.)
     #[serde(rename="listPrice")]
-    pub list_price: VolumeSaleInfoListPrice,
+    pub list_price: Option<VolumeSaleInfoListPrice>,
 }
 
 impl NestedType for VolumeSaleInfo {}
@@ -1959,11 +1962,11 @@ impl Part for VolumeSaleInfo {}
 pub struct Volumes {
     /// Total number of volumes found. This might be greater than the number of volumes returned in this response if results have been paginated.
     #[serde(rename="totalItems")]
-    pub total_items: i32,
+    pub total_items: Option<i32>,
     /// A list of volumes.
-    pub items: Vec<Volume>,
+    pub items: Option<Vec<Volume>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Volumes {}
@@ -1977,10 +1980,10 @@ impl ResponseResult for Volumes {}
 pub struct VolumeUserInfoRentalPeriod {
     /// no description provided
     #[serde(rename="startUtcSec")]
-    pub start_utc_sec: String,
+    pub start_utc_sec: Option<String>,
     /// no description provided
     #[serde(rename="endUtcSec")]
-    pub end_utc_sec: String,
+    pub end_utc_sec: Option<String>,
 }
 
 impl NestedType for VolumeUserInfoRentalPeriod {}
@@ -1995,16 +1998,16 @@ impl Part for VolumeUserInfoRentalPeriod {}
 pub struct VolumeannotationContentRanges {
     /// Range in GB image format for this annotation for version above.
     #[serde(rename="gbImageRange")]
-    pub gb_image_range: BooksAnnotationsRange,
+    pub gb_image_range: Option<BooksAnnotationsRange>,
     /// Range in GB text format for this annotation for version above.
     #[serde(rename="gbTextRange")]
-    pub gb_text_range: BooksAnnotationsRange,
+    pub gb_text_range: Option<BooksAnnotationsRange>,
     /// Content version applicable to ranges below.
     #[serde(rename="contentVersion")]
-    pub content_version: String,
+    pub content_version: Option<String>,
     /// Range in CFI format for this annotation for version above.
     #[serde(rename="cfiRange")]
-    pub cfi_range: BooksAnnotationsRange,
+    pub cfi_range: Option<BooksAnnotationsRange>,
 }
 
 impl NestedType for VolumeannotationContentRanges {}
@@ -2018,9 +2021,9 @@ impl Part for VolumeannotationContentRanges {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeSaleInfoOffersRentalDuration {
     /// no description provided
-    pub count: f64,
+    pub count: Option<f64>,
     /// no description provided
-    pub unit: String,
+    pub unit: Option<String>,
 }
 
 impl NestedType for VolumeSaleInfoOffersRentalDuration {}
@@ -2865,7 +2868,7 @@ impl<'a, C, A> MyconfigMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the settings for the user. Unspecified sub-objects will retain the existing value.
+    /// Sets the settings for the user. If a sub-object is specified, it will overwrite the existing sub-object stored in the server. Unspecified sub-objects will retain the existing value.
     /// 
     /// # Arguments
     ///
@@ -3445,16 +3448,20 @@ impl<'a, C, A> LayerAnnotationDataGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3761,16 +3768,20 @@ impl<'a, C, A> LayerVolumeAnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4045,16 +4056,20 @@ impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4315,16 +4330,20 @@ impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4633,16 +4652,20 @@ impl<'a, C, A> LayerVolumeAnnotationListCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5025,16 +5048,20 @@ impl<'a, C, A> LayerAnnotationDataListCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5334,16 +5361,20 @@ impl<'a, C, A> VolumeRecommendedRateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -5600,16 +5631,20 @@ impl<'a, C, A> VolumeMybookListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5900,16 +5935,20 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6226,16 +6265,20 @@ impl<'a, C, A> VolumeUseruploadedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6505,16 +6548,20 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6781,16 +6828,20 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7029,16 +7080,20 @@ impl<'a, C, A> VolumeRecommendedListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7239,16 +7294,20 @@ impl<'a, C, A> DictionaryListOfflineMetadataCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7491,16 +7550,20 @@ impl<'a, C, A> BookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7764,16 +7827,20 @@ impl<'a, C, A> BookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8008,16 +8075,20 @@ impl<'a, C, A> BookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8268,16 +8339,20 @@ impl<'a, C, A> PromoofferAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -8541,16 +8616,20 @@ impl<'a, C, A> PromoofferDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -8804,16 +8883,20 @@ impl<'a, C, A> PromoofferGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9045,16 +9128,20 @@ impl<'a, C, A> OnboardingListCategoryCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9270,16 +9357,20 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9511,16 +9602,20 @@ impl<'a, C, A> MyconfigRequestAccesCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -9779,16 +9874,20 @@ impl<'a, C, A> MyconfigReleaseDownloadAccesCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -10042,16 +10141,20 @@ impl<'a, C, A> MyconfigSyncVolumeLicenseCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -10296,16 +10399,20 @@ impl<'a, C, A> MyconfigGetUserSettingCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -10408,7 +10515,7 @@ impl<'a, C, A> MyconfigGetUserSettingCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Sets the settings for the user. Unspecified sub-objects will retain the existing value.
+/// Sets the settings for the user. If a sub-object is specified, it will overwrite the existing sub-object stored in the server. Unspecified sub-objects will retain the existing value.
 ///
 /// A builder for the *updateUserSettings* method supported by a *myconfig* resource.
 /// It is not used directly, but through a `MyconfigMethods` instance.
@@ -10435,7 +10542,7 @@ impl<'a, C, A> MyconfigGetUserSettingCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Usersettings = Default::default();
+/// let mut req = Usersettings::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -10501,16 +10608,20 @@ impl<'a, C, A> MyconfigUpdateUserSettingCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10738,16 +10849,20 @@ impl<'a, C, A> MylibraryBookshelveClearVolumeCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -10973,16 +11088,20 @@ impl<'a, C, A> MylibraryBookshelveMoveVolumeCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -11255,16 +11374,20 @@ impl<'a, C, A> MylibraryBookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11518,16 +11641,20 @@ impl<'a, C, A> MylibraryAnnotationSummaryCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -11763,16 +11890,20 @@ impl<'a, C, A> MylibraryAnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -12001,16 +12132,20 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -12164,7 +12299,7 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Annotation = Default::default();
+/// let mut req = Annotation::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -12245,16 +12380,20 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12510,16 +12649,20 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -12782,16 +12925,20 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -12992,7 +13139,7 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Annotation = Default::default();
+/// let mut req = Annotation::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -13089,16 +13236,20 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13362,16 +13513,20 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -13635,16 +13790,20 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -13851,16 +14010,20 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -14088,16 +14251,20 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -14326,16 +14493,20 @@ impl<'a, C, A> CloudloadingAddBookCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -14492,7 +14663,7 @@ impl<'a, C, A> CloudloadingAddBookCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: BooksCloudloadingResource = Default::default();
+/// let mut req = BooksCloudloadingResource::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -14558,16 +14729,20 @@ impl<'a, C, A> CloudloadingUpdateBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -14766,16 +14941,20 @@ impl<'a, C, A> CloudloadingDeleteBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())

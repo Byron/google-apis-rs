@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -72,6 +73,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -95,7 +102,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.accounts().authinfo();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -127,8 +134,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -137,10 +143,10 @@ impl Engine {
 
     fn _accounts_custombatch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AccountsCustomBatchRequest = Default::default();
+        let mut request = api::AccountsCustomBatchRequest::default();
         let mut call = self.hub.accounts().custombatch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -160,9 +166,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -184,8 +191,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -196,7 +202,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.accounts().delete(&self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -227,7 +233,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -238,7 +243,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.accounts().get(&self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -270,8 +275,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -280,10 +284,10 @@ impl Engine {
 
     fn _accounts_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Account = Default::default();
+        let mut request = api::Account::default();
         let mut call = self.hub.accounts().insert(&request, &self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -303,9 +307,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -348,8 +353,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -360,7 +364,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.accounts().list(&self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -398,8 +402,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -408,10 +411,10 @@ impl Engine {
 
     fn _accounts_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Account = Default::default();
+        let mut request = api::Account::default();
         let mut call = self.hub.accounts().patch(&request, &self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -431,9 +434,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -476,8 +480,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -486,10 +489,10 @@ impl Engine {
 
     fn _accounts_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Account = Default::default();
+        let mut request = api::Account::default();
         let mut call = self.hub.accounts().update(&request, &self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -509,9 +512,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -554,8 +558,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -564,11 +567,14 @@ impl Engine {
 
     fn _accountshipping_custombatch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AccountshippingCustomBatchRequest = Default::default();
+        let mut request = api::AccountshippingCustomBatchRequest::default();
         let mut call = self.hub.accountshipping().custombatch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "dry-run" => {
+                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                },
                 "alt"
                 |"fields"
                 |"key"
@@ -587,9 +593,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -611,8 +618,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -623,7 +629,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.accountshipping().get(&self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -655,8 +661,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -667,7 +672,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.accountshipping().list(&self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -705,8 +710,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -715,11 +719,14 @@ impl Engine {
 
     fn _accountshipping_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AccountShipping = Default::default();
+        let mut request = api::AccountShipping::default();
         let mut call = self.hub.accountshipping().patch(&request, &self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "dry-run" => {
+                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                },
                 "alt"
                 |"fields"
                 |"key"
@@ -738,9 +745,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -768,8 +776,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -778,11 +785,14 @@ impl Engine {
 
     fn _accountshipping_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AccountShipping = Default::default();
+        let mut request = api::AccountShipping::default();
         let mut call = self.hub.accountshipping().update(&request, &self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "dry-run" => {
+                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                },
                 "alt"
                 |"fields"
                 |"key"
@@ -801,9 +811,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -831,8 +842,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -841,10 +851,10 @@ impl Engine {
 
     fn _accountstatuses_custombatch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AccountstatusesCustomBatchRequest = Default::default();
+        let mut request = api::AccountstatusesCustomBatchRequest::default();
         let mut call = self.hub.accountstatuses().custombatch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -864,9 +874,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -888,8 +899,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -900,7 +910,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.accountstatuses().get(&self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -932,8 +942,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -944,7 +953,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.accountstatuses().list(&self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -982,8 +991,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -992,11 +1000,14 @@ impl Engine {
 
     fn _accounttax_custombatch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AccounttaxCustomBatchRequest = Default::default();
+        let mut request = api::AccounttaxCustomBatchRequest::default();
         let mut call = self.hub.accounttax().custombatch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "dry-run" => {
+                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                },
                 "alt"
                 |"fields"
                 |"key"
@@ -1015,9 +1026,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1039,8 +1051,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1051,7 +1062,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.accounttax().get(&self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1083,8 +1094,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1095,7 +1105,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.accounttax().list(&self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1133,8 +1143,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1143,11 +1152,14 @@ impl Engine {
 
     fn _accounttax_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AccountTax = Default::default();
+        let mut request = api::AccountTax::default();
         let mut call = self.hub.accounttax().patch(&request, &self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "dry-run" => {
+                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                },
                 "alt"
                 |"fields"
                 |"key"
@@ -1166,9 +1178,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1196,8 +1209,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1206,11 +1218,14 @@ impl Engine {
 
     fn _accounttax_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AccountTax = Default::default();
+        let mut request = api::AccountTax::default();
         let mut call = self.hub.accounttax().update(&request, &self.opt.arg_merchant_id, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "dry-run" => {
+                    call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
+                },
                 "alt"
                 |"fields"
                 |"key"
@@ -1229,9 +1244,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1259,8 +1275,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1269,10 +1284,10 @@ impl Engine {
 
     fn _datafeeds_custombatch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::DatafeedsCustomBatchRequest = Default::default();
+        let mut request = api::DatafeedsCustomBatchRequest::default();
         let mut call = self.hub.datafeeds().custombatch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1292,9 +1307,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1316,8 +1332,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1328,7 +1343,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datafeeds().delete(&self.opt.arg_merchant_id, &self.opt.arg_datafeed_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1359,7 +1374,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1370,7 +1384,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datafeeds().get(&self.opt.arg_merchant_id, &self.opt.arg_datafeed_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1402,8 +1416,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1412,10 +1425,10 @@ impl Engine {
 
     fn _datafeeds_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Datafeed = Default::default();
+        let mut request = api::Datafeed::default();
         let mut call = self.hub.datafeeds().insert(&request, &self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1435,9 +1448,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1468,43 +1482,43 @@ impl Engine {
                     },
                 "format.file-encoding" => {
                         request_format_init(&mut request);
-                        request.format.as_mut().unwrap().file_encoding = value.unwrap_or("").to_string();
+                        request.format.as_mut().unwrap().file_encoding = Some(value.unwrap_or("").to_string());
                     },
                 "format.quoting-mode" => {
                         request_format_init(&mut request);
-                        request.format.as_mut().unwrap().quoting_mode = value.unwrap_or("").to_string();
+                        request.format.as_mut().unwrap().quoting_mode = Some(value.unwrap_or("").to_string());
                     },
                 "format.column-delimiter" => {
                         request_format_init(&mut request);
-                        request.format.as_mut().unwrap().column_delimiter = value.unwrap_or("").to_string();
+                        request.format.as_mut().unwrap().column_delimiter = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.username" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().username = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().username = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.hour" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().hour = arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.hour", "integer");
+                        request.fetch_schedule.as_mut().unwrap().hour = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.hour", "integer"));
                     },
                 "fetch-schedule.fetch-url" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().fetch_url = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().fetch_url = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.weekday" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().weekday = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().weekday = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.time-zone" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.password" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().password = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.day-of-month" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().day_of_month = arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.day-of-month", "integer");
+                        request.fetch_schedule.as_mut().unwrap().day_of_month = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.day-of-month", "integer"));
                     },
                 "target-country" => {
                         request_fetch_schedule_init(&mut request);
@@ -1517,9 +1531,9 @@ impl Engine {
                 "intended-destinations" => {
                         request_fetch_schedule_init(&mut request);
                         if request.intended_destinations.is_none() {
-                            request.intended_destinations = Some(Default::default());
+                           request.intended_destinations = Some(Default::default());
                         }
-                        request.intended_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.intended_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_fetch_schedule_init(&mut request);
@@ -1546,8 +1560,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1558,7 +1571,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datafeeds().list(&self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1596,8 +1609,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1606,10 +1618,10 @@ impl Engine {
 
     fn _datafeeds_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Datafeed = Default::default();
+        let mut request = api::Datafeed::default();
         let mut call = self.hub.datafeeds().patch(&request, &self.opt.arg_merchant_id, &self.opt.arg_datafeed_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1629,9 +1641,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1662,43 +1675,43 @@ impl Engine {
                     },
                 "format.file-encoding" => {
                         request_format_init(&mut request);
-                        request.format.as_mut().unwrap().file_encoding = value.unwrap_or("").to_string();
+                        request.format.as_mut().unwrap().file_encoding = Some(value.unwrap_or("").to_string());
                     },
                 "format.quoting-mode" => {
                         request_format_init(&mut request);
-                        request.format.as_mut().unwrap().quoting_mode = value.unwrap_or("").to_string();
+                        request.format.as_mut().unwrap().quoting_mode = Some(value.unwrap_or("").to_string());
                     },
                 "format.column-delimiter" => {
                         request_format_init(&mut request);
-                        request.format.as_mut().unwrap().column_delimiter = value.unwrap_or("").to_string();
+                        request.format.as_mut().unwrap().column_delimiter = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.username" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().username = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().username = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.hour" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().hour = arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.hour", "integer");
+                        request.fetch_schedule.as_mut().unwrap().hour = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.hour", "integer"));
                     },
                 "fetch-schedule.fetch-url" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().fetch_url = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().fetch_url = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.weekday" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().weekday = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().weekday = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.time-zone" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.password" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().password = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.day-of-month" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().day_of_month = arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.day-of-month", "integer");
+                        request.fetch_schedule.as_mut().unwrap().day_of_month = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.day-of-month", "integer"));
                     },
                 "target-country" => {
                         request_fetch_schedule_init(&mut request);
@@ -1711,9 +1724,9 @@ impl Engine {
                 "intended-destinations" => {
                         request_fetch_schedule_init(&mut request);
                         if request.intended_destinations.is_none() {
-                            request.intended_destinations = Some(Default::default());
+                           request.intended_destinations = Some(Default::default());
                         }
-                        request.intended_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.intended_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_fetch_schedule_init(&mut request);
@@ -1740,8 +1753,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1750,10 +1762,10 @@ impl Engine {
 
     fn _datafeeds_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Datafeed = Default::default();
+        let mut request = api::Datafeed::default();
         let mut call = self.hub.datafeeds().update(&request, &self.opt.arg_merchant_id, &self.opt.arg_datafeed_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1773,9 +1785,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1806,43 +1819,43 @@ impl Engine {
                     },
                 "format.file-encoding" => {
                         request_format_init(&mut request);
-                        request.format.as_mut().unwrap().file_encoding = value.unwrap_or("").to_string();
+                        request.format.as_mut().unwrap().file_encoding = Some(value.unwrap_or("").to_string());
                     },
                 "format.quoting-mode" => {
                         request_format_init(&mut request);
-                        request.format.as_mut().unwrap().quoting_mode = value.unwrap_or("").to_string();
+                        request.format.as_mut().unwrap().quoting_mode = Some(value.unwrap_or("").to_string());
                     },
                 "format.column-delimiter" => {
                         request_format_init(&mut request);
-                        request.format.as_mut().unwrap().column_delimiter = value.unwrap_or("").to_string();
+                        request.format.as_mut().unwrap().column_delimiter = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.username" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().username = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().username = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.hour" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().hour = arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.hour", "integer");
+                        request.fetch_schedule.as_mut().unwrap().hour = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.hour", "integer"));
                     },
                 "fetch-schedule.fetch-url" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().fetch_url = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().fetch_url = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.weekday" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().weekday = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().weekday = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.time-zone" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().time_zone = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.password" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().password = value.unwrap_or("").to_string();
+                        request.fetch_schedule.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
                     },
                 "fetch-schedule.day-of-month" => {
                         request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().day_of_month = arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.day-of-month", "integer");
+                        request.fetch_schedule.as_mut().unwrap().day_of_month = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.day-of-month", "integer"));
                     },
                 "target-country" => {
                         request_fetch_schedule_init(&mut request);
@@ -1855,9 +1868,9 @@ impl Engine {
                 "intended-destinations" => {
                         request_fetch_schedule_init(&mut request);
                         if request.intended_destinations.is_none() {
-                            request.intended_destinations = Some(Default::default());
+                           request.intended_destinations = Some(Default::default());
                         }
-                        request.intended_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.intended_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_fetch_schedule_init(&mut request);
@@ -1884,8 +1897,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1894,10 +1906,10 @@ impl Engine {
 
     fn _datafeedstatuses_custombatch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::DatafeedstatusesCustomBatchRequest = Default::default();
+        let mut request = api::DatafeedstatusesCustomBatchRequest::default();
         let mut call = self.hub.datafeedstatuses().custombatch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1917,9 +1929,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1941,8 +1954,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1953,7 +1965,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datafeedstatuses().get(&self.opt.arg_merchant_id, &self.opt.arg_datafeed_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1985,8 +1997,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1997,7 +2008,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datafeedstatuses().list(&self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -2035,8 +2046,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2045,10 +2055,10 @@ impl Engine {
 
     fn _inventory_custombatch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::InventoryCustomBatchRequest = Default::default();
+        let mut request = api::InventoryCustomBatchRequest::default();
         let mut call = self.hub.inventory().custombatch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2068,9 +2078,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2092,8 +2103,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2102,10 +2112,10 @@ impl Engine {
 
     fn _inventory_set(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::InventorySetRequest = Default::default();
+        let mut request = api::InventorySetRequest::default();
         let mut call = self.hub.inventory().set(&request, &self.opt.arg_merchant_id, &self.opt.arg_store_code, &self.opt.arg_product_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2125,9 +2135,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2149,19 +2160,19 @@ impl Engine {
                     },
                 "price.currency" => {
                         request_price_init(&mut request);
-                        request.price.as_mut().unwrap().currency = value.unwrap_or("").to_string();
+                        request.price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
                     },
                 "price.value" => {
                         request_price_init(&mut request);
-                        request.price.as_mut().unwrap().value = value.unwrap_or("").to_string();
+                        request.price.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
                     },
                 "sale-price.currency" => {
                         request_sale_price_init(&mut request);
-                        request.sale_price.as_mut().unwrap().currency = value.unwrap_or("").to_string();
+                        request.sale_price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
                     },
                 "sale-price.value" => {
                         request_sale_price_init(&mut request);
-                        request.sale_price.as_mut().unwrap().value = value.unwrap_or("").to_string();
+                        request.sale_price.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
                     },
                 "availability" => {
                         request_sale_price_init(&mut request);
@@ -2188,8 +2199,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2198,10 +2208,10 @@ impl Engine {
 
     fn _products_custombatch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ProductsCustomBatchRequest = Default::default();
+        let mut request = api::ProductsCustomBatchRequest::default();
         let mut call = self.hub.products().custombatch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
                     call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
@@ -2224,9 +2234,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2248,8 +2259,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2260,7 +2270,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.products().delete(&self.opt.arg_merchant_id, &self.opt.arg_product_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
                     call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
@@ -2294,7 +2304,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2305,7 +2314,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.products().get(&self.opt.arg_merchant_id, &self.opt.arg_product_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2337,8 +2346,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2347,10 +2355,10 @@ impl Engine {
 
     fn _products_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Product = Default::default();
+        let mut request = api::Product::default();
         let mut call = self.hub.products().insert(&request, &self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
                     call = call.dry_run(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
@@ -2373,12 +2381,20 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_installment_amount_init(request: &mut api::Product) {
+                request_installment_init(request);
+                if request.installment.as_mut().unwrap().amount.is_none() {
+                    request.installment.as_mut().unwrap().amount = Some(Default::default());
+                }
+            }
+            
             fn request_installment_init(request: &mut api::Product) {
                 if request.installment.is_none() {
                     request.installment = Some(Default::default());
@@ -2448,15 +2464,15 @@ impl Engine {
                     },
                 "additional-image-links" => {
                         if request.additional_image_links.is_none() {
-                            request.additional_image_links = Some(Default::default());
+                           request.additional_image_links = Some(Default::default());
                         }
-                        request.additional_image_links.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.additional_image_links.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "adwords-labels" => {
                         if request.adwords_labels.is_none() {
-                            request.adwords_labels = Some(Default::default());
+                           request.adwords_labels = Some(Default::default());
                         }
-                        request.adwords_labels.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.adwords_labels.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "item-group-id" => {
                         request.item_group_id = Some(value.unwrap_or("").to_string());
@@ -2505,18 +2521,18 @@ impl Engine {
                     },
                 "unit-pricing-measure.value" => {
                         request_unit_pricing_measure_init(&mut request);
-                        request.unit_pricing_measure.as_mut().unwrap().value = arg_from_str(value.unwrap_or("0.0"), err, "unit-pricing-measure.value", "number");
+                        request.unit_pricing_measure.as_mut().unwrap().value = Some(arg_from_str(value.unwrap_or("0.0"), err, "unit-pricing-measure.value", "number"));
                     },
                 "unit-pricing-measure.unit" => {
                         request_unit_pricing_measure_init(&mut request);
-                        request.unit_pricing_measure.as_mut().unwrap().unit = value.unwrap_or("").to_string();
+                        request.unit_pricing_measure.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
                     },
                 "validated-destinations" => {
                         request_unit_pricing_measure_init(&mut request);
                         if request.validated_destinations.is_none() {
-                            request.validated_destinations = Some(Default::default());
+                           request.validated_destinations = Some(Default::default());
                         }
-                        request.validated_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.validated_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_unit_pricing_measure_init(&mut request);
@@ -2536,11 +2552,11 @@ impl Engine {
                     },
                 "price.currency" => {
                         request_price_init(&mut request);
-                        request.price.as_mut().unwrap().currency = value.unwrap_or("").to_string();
+                        request.price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
                     },
                 "price.value" => {
                         request_price_init(&mut request);
-                        request.price.as_mut().unwrap().value = value.unwrap_or("").to_string();
+                        request.price.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
                     },
                 "channel" => {
                         request_price_init(&mut request);
@@ -2548,23 +2564,23 @@ impl Engine {
                     },
                 "loyalty-points.ratio" => {
                         request_loyalty_points_init(&mut request);
-                        request.loyalty_points.as_mut().unwrap().ratio = arg_from_str(value.unwrap_or("0.0"), err, "loyalty-points.ratio", "number");
+                        request.loyalty_points.as_mut().unwrap().ratio = Some(arg_from_str(value.unwrap_or("0.0"), err, "loyalty-points.ratio", "number"));
                     },
                 "loyalty-points.name" => {
                         request_loyalty_points_init(&mut request);
-                        request.loyalty_points.as_mut().unwrap().name = value.unwrap_or("").to_string();
+                        request.loyalty_points.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 "loyalty-points.points-value" => {
                         request_loyalty_points_init(&mut request);
-                        request.loyalty_points.as_mut().unwrap().points_value = value.unwrap_or("").to_string();
+                        request.loyalty_points.as_mut().unwrap().points_value = Some(value.unwrap_or("").to_string());
                     },
                 "shipping-height.value" => {
                         request_shipping_height_init(&mut request);
-                        request.shipping_height.as_mut().unwrap().value = arg_from_str(value.unwrap_or("0.0"), err, "shipping-height.value", "number");
+                        request.shipping_height.as_mut().unwrap().value = Some(arg_from_str(value.unwrap_or("0.0"), err, "shipping-height.value", "number"));
                     },
                 "shipping-height.unit" => {
                         request_shipping_height_init(&mut request);
-                        request.shipping_height.as_mut().unwrap().unit = value.unwrap_or("").to_string();
+                        request.shipping_height.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
                     },
                 "content-language" => {
                         request_shipping_height_init(&mut request);
@@ -2592,11 +2608,11 @@ impl Engine {
                     },
                 "shipping-length.value" => {
                         request_shipping_length_init(&mut request);
-                        request.shipping_length.as_mut().unwrap().value = arg_from_str(value.unwrap_or("0.0"), err, "shipping-length.value", "number");
+                        request.shipping_length.as_mut().unwrap().value = Some(arg_from_str(value.unwrap_or("0.0"), err, "shipping-length.value", "number"));
                     },
                 "shipping-length.unit" => {
                         request_shipping_length_init(&mut request);
-                        request.shipping_length.as_mut().unwrap().unit = value.unwrap_or("").to_string();
+                        request.shipping_length.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
                     },
                 "link" => {
                         request_shipping_length_init(&mut request);
@@ -2648,30 +2664,30 @@ impl Engine {
                     },
                 "unit-pricing-base-measure.value" => {
                         request_unit_pricing_base_measure_init(&mut request);
-                        request.unit_pricing_base_measure.as_mut().unwrap().value = value.unwrap_or("").to_string();
+                        request.unit_pricing_base_measure.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
                     },
                 "unit-pricing-base-measure.unit" => {
                         request_unit_pricing_base_measure_init(&mut request);
-                        request.unit_pricing_base_measure.as_mut().unwrap().unit = value.unwrap_or("").to_string();
+                        request.unit_pricing_base_measure.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
                     },
                 "installment.amount.currency" => {
-                        request_installment_init(&mut request);
-                        request.installment.as_mut().unwrap().amount.currency = value.unwrap_or("").to_string();
+                        request_installment_amount_init(&mut request);
+                        request.installment.as_mut().unwrap().amount.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
                     },
                 "installment.amount.value" => {
-                        request_installment_init(&mut request);
-                        request.installment.as_mut().unwrap().amount.value = value.unwrap_or("").to_string();
+                        request_installment_amount_init(&mut request);
+                        request.installment.as_mut().unwrap().amount.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
                     },
                 "installment.months" => {
-                        request_installment_init(&mut request);
-                        request.installment.as_mut().unwrap().months = value.unwrap_or("").to_string();
+                        request_installment_amount_init(&mut request);
+                        request.installment.as_mut().unwrap().months = Some(value.unwrap_or("").to_string());
                     },
                 "sizes" => {
                         request_installment_init(&mut request);
                         if request.sizes.is_none() {
-                            request.sizes = Some(Default::default());
+                           request.sizes = Some(Default::default());
                         }
-                        request.sizes.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.sizes.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "gender" => {
                         request_installment_init(&mut request);
@@ -2679,19 +2695,19 @@ impl Engine {
                     },
                 "shipping-width.value" => {
                         request_shipping_width_init(&mut request);
-                        request.shipping_width.as_mut().unwrap().value = arg_from_str(value.unwrap_or("0.0"), err, "shipping-width.value", "number");
+                        request.shipping_width.as_mut().unwrap().value = Some(arg_from_str(value.unwrap_or("0.0"), err, "shipping-width.value", "number"));
                     },
                 "shipping-width.unit" => {
                         request_shipping_width_init(&mut request);
-                        request.shipping_width.as_mut().unwrap().unit = value.unwrap_or("").to_string();
+                        request.shipping_width.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
                     },
                 "shipping-weight.value" => {
                         request_shipping_weight_init(&mut request);
-                        request.shipping_weight.as_mut().unwrap().value = arg_from_str(value.unwrap_or("0.0"), err, "shipping-weight.value", "number");
+                        request.shipping_weight.as_mut().unwrap().value = Some(arg_from_str(value.unwrap_or("0.0"), err, "shipping-weight.value", "number"));
                     },
                 "shipping-weight.unit" => {
                         request_shipping_weight_init(&mut request);
-                        request.shipping_weight.as_mut().unwrap().unit = value.unwrap_or("").to_string();
+                        request.shipping_weight.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
                     },
                 "identifier-exists" => {
                         request_shipping_weight_init(&mut request);
@@ -2703,11 +2719,11 @@ impl Engine {
                     },
                 "sale-price.currency" => {
                         request_sale_price_init(&mut request);
-                        request.sale_price.as_mut().unwrap().currency = value.unwrap_or("").to_string();
+                        request.sale_price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
                     },
                 "sale-price.value" => {
                         request_sale_price_init(&mut request);
-                        request.sale_price.as_mut().unwrap().value = value.unwrap_or("").to_string();
+                        request.sale_price.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
                     },
                 "product-type" => {
                         request_sale_price_init(&mut request);
@@ -2716,9 +2732,9 @@ impl Engine {
                 "display-ads-similar-ids" => {
                         request_sale_price_init(&mut request);
                         if request.display_ads_similar_ids.is_none() {
-                            request.display_ads_similar_ids = Some(Default::default());
+                           request.display_ads_similar_ids = Some(Default::default());
                         }
-                        request.display_ads_similar_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.display_ads_similar_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "custom-label1" => {
                         request_sale_price_init(&mut request);
@@ -2749,8 +2765,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2761,7 +2776,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.products().list(&self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -2799,8 +2814,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2809,10 +2823,10 @@ impl Engine {
 
     fn _productstatuses_custombatch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ProductstatusesCustomBatchRequest = Default::default();
+        let mut request = api::ProductstatusesCustomBatchRequest::default();
         let mut call = self.hub.productstatuses().custombatch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2832,9 +2846,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2856,8 +2871,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2868,7 +2882,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.productstatuses().get(&self.opt.arg_merchant_id, &self.opt.arg_product_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2900,8 +2914,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2912,7 +2925,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.productstatuses().list(&self.opt.arg_merchant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -2950,8 +2963,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2983,7 +2995,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_accountshipping {
+        }
+ else if self.opt.cmd_accountshipping {
             if self.opt.cmd_custombatch {
                 call_result = self._accountshipping_custombatch(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -2997,7 +3010,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_accountstatuses {
+        }
+ else if self.opt.cmd_accountstatuses {
             if self.opt.cmd_custombatch {
                 call_result = self._accountstatuses_custombatch(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -3007,7 +3021,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_accounttax {
+        }
+ else if self.opt.cmd_accounttax {
             if self.opt.cmd_custombatch {
                 call_result = self._accounttax_custombatch(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -3021,7 +3036,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_datafeeds {
+        }
+ else if self.opt.cmd_datafeeds {
             if self.opt.cmd_custombatch {
                 call_result = self._datafeeds_custombatch(dry_run, &mut err);
             } else if self.opt.cmd_delete {
@@ -3039,7 +3055,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_datafeedstatuses {
+        }
+ else if self.opt.cmd_datafeedstatuses {
             if self.opt.cmd_custombatch {
                 call_result = self._datafeedstatuses_custombatch(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -3049,7 +3066,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_inventory {
+        }
+ else if self.opt.cmd_inventory {
             if self.opt.cmd_custombatch {
                 call_result = self._inventory_custombatch(dry_run, &mut err);
             } else if self.opt.cmd_set {
@@ -3057,7 +3075,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_products {
+        }
+ else if self.opt.cmd_products {
             if self.opt.cmd_custombatch {
                 call_result = self._products_custombatch(dry_run, &mut err);
             } else if self.opt.cmd_delete {
@@ -3071,7 +3090,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_productstatuses {
+        }
+ else if self.opt.cmd_productstatuses {
             if self.opt.cmd_custombatch {
                 call_result = self._productstatuses_custombatch(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -3101,21 +3121,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "content2-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "content2-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "content2",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "content2",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::ShoppingContent::new(hyper::Client::new(), auth),
+            hub: api::ShoppingContent::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -3135,12 +3171,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

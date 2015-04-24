@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -108,6 +109,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -131,7 +138,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.assets().get(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -163,8 +170,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -175,7 +181,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.assets().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "type" => {
                     call = call.type_(value.unwrap_or(""));
@@ -246,8 +252,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -258,7 +263,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.assets().parents_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -296,8 +301,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -308,7 +312,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.assets().permissions_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -340,8 +344,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -352,7 +355,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().cancel_processing(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -384,8 +387,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -394,10 +396,10 @@ impl Engine {
 
     fn _layers_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Layer = Default::default();
+        let mut request = api::Layer::default();
         let mut call = self.hub.layers().create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "process" => {
                     call = call.process(arg_from_str(value.unwrap_or("false"), err, "process", "boolean"));
@@ -420,12 +422,20 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_style_feature_info_init(request: &mut api::Layer) {
+                request_style_init(request);
+                if request.style.as_mut().unwrap().feature_info.is_none() {
+                    request.style.as_mut().unwrap().feature_info = Some(Default::default());
+                }
+            }
+            
             fn request_style_init(request: &mut api::Layer) {
                 if request.style.is_none() {
                     request.style = Some(Default::default());
@@ -434,12 +444,12 @@ impl Engine {
             
             match &field_name.to_string()[..] {
                 "style.feature-info.content" => {
-                        request_style_init(&mut request);
-                        request.style.as_mut().unwrap().feature_info.content = value.unwrap_or("").to_string();
+                        request_style_feature_info_init(&mut request);
+                        request.style.as_mut().unwrap().feature_info.as_mut().unwrap().content = Some(value.unwrap_or("").to_string());
                     },
                 "style.type" => {
-                        request_style_init(&mut request);
-                        request.style.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request_style_feature_info_init(&mut request);
+                        request.style.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "description" => {
                         request_style_init(&mut request);
@@ -480,9 +490,9 @@ impl Engine {
                 "bbox" => {
                         request_style_init(&mut request);
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "layer-type" => {
                         request_style_init(&mut request);
@@ -529,8 +539,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -541,7 +550,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().delete(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -572,7 +581,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -583,7 +591,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().get(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "version" => {
                     call = call.version(value.unwrap_or(""));
@@ -618,8 +626,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -630,7 +637,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().get_published(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -662,8 +669,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -674,7 +680,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "tags" => {
                     call = call.tags(value.unwrap_or(""));
@@ -745,8 +751,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -757,7 +762,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().list_published();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "project-id" => {
                     call = call.project_id(value.unwrap_or(""));
@@ -798,8 +803,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -810,7 +814,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().parents_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -848,8 +852,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -858,10 +861,10 @@ impl Engine {
 
     fn _layers_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Layer = Default::default();
+        let mut request = api::Layer::default();
         let mut call = self.hub.layers().patch(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -881,12 +884,20 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_style_feature_info_init(request: &mut api::Layer) {
+                request_style_init(request);
+                if request.style.as_mut().unwrap().feature_info.is_none() {
+                    request.style.as_mut().unwrap().feature_info = Some(Default::default());
+                }
+            }
+            
             fn request_style_init(request: &mut api::Layer) {
                 if request.style.is_none() {
                     request.style = Some(Default::default());
@@ -895,12 +906,12 @@ impl Engine {
             
             match &field_name.to_string()[..] {
                 "style.feature-info.content" => {
-                        request_style_init(&mut request);
-                        request.style.as_mut().unwrap().feature_info.content = value.unwrap_or("").to_string();
+                        request_style_feature_info_init(&mut request);
+                        request.style.as_mut().unwrap().feature_info.as_mut().unwrap().content = Some(value.unwrap_or("").to_string());
                     },
                 "style.type" => {
-                        request_style_init(&mut request);
-                        request.style.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request_style_feature_info_init(&mut request);
+                        request.style.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "description" => {
                         request_style_init(&mut request);
@@ -941,9 +952,9 @@ impl Engine {
                 "bbox" => {
                         request_style_init(&mut request);
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "layer-type" => {
                         request_style_init(&mut request);
@@ -989,7 +1000,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -998,10 +1008,10 @@ impl Engine {
 
     fn _layers_permissions_batch_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::PermissionsBatchDeleteRequest = Default::default();
+        let mut request = api::PermissionsBatchDeleteRequest::default();
         let mut call = self.hub.layers().permissions_batch_delete(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1021,18 +1031,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "ids" => {
                         if request.ids.is_none() {
-                            request.ids = Some(Default::default());
+                           request.ids = Some(Default::default());
                         }
-                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -1051,8 +1062,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1061,10 +1071,10 @@ impl Engine {
 
     fn _layers_permissions_batch_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::PermissionsBatchUpdateRequest = Default::default();
+        let mut request = api::PermissionsBatchUpdateRequest::default();
         let mut call = self.hub.layers().permissions_batch_update(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1084,9 +1094,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1108,8 +1119,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1120,7 +1130,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().permissions_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1152,8 +1162,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1164,7 +1173,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().process(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1196,8 +1205,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1208,7 +1216,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().publish(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
                     call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
@@ -1243,8 +1251,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1255,7 +1262,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.layers().unpublish(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1287,8 +1294,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1297,10 +1303,10 @@ impl Engine {
 
     fn _maps_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Map = Default::default();
+        let mut request = api::Map::default();
         let mut call = self.hub.maps().create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1320,9 +1326,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1341,9 +1348,9 @@ impl Engine {
                     },
                 "versions" => {
                         if request.versions.is_none() {
-                            request.versions = Some(Default::default());
+                           request.versions = Some(Default::default());
                         }
-                        request.versions.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.versions.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creation-time" => {
                         request.creation_time = Some(value.unwrap_or("").to_string());
@@ -1362,9 +1369,9 @@ impl Engine {
                     },
                 "bbox" => {
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "last-modifier-email" => {
                         request.last_modifier_email = Some(value.unwrap_or("").to_string());
@@ -1398,8 +1405,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1410,7 +1416,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.maps().delete(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1441,7 +1447,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1452,7 +1457,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.maps().get(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "version" => {
                     call = call.version(value.unwrap_or(""));
@@ -1487,8 +1492,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1499,7 +1503,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.maps().get_published(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1531,8 +1535,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1543,7 +1546,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.maps().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "tags" => {
                     call = call.tags(value.unwrap_or(""));
@@ -1614,8 +1617,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1626,7 +1628,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.maps().list_published();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "project-id" => {
                     call = call.project_id(value.unwrap_or(""));
@@ -1667,8 +1669,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1677,10 +1678,10 @@ impl Engine {
 
     fn _maps_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Map = Default::default();
+        let mut request = api::Map::default();
         let mut call = self.hub.maps().patch(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1700,9 +1701,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1721,9 +1723,9 @@ impl Engine {
                     },
                 "versions" => {
                         if request.versions.is_none() {
-                            request.versions = Some(Default::default());
+                           request.versions = Some(Default::default());
                         }
-                        request.versions.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.versions.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "creation-time" => {
                         request.creation_time = Some(value.unwrap_or("").to_string());
@@ -1742,9 +1744,9 @@ impl Engine {
                     },
                 "bbox" => {
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "last-modifier-email" => {
                         request.last_modifier_email = Some(value.unwrap_or("").to_string());
@@ -1777,7 +1779,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1786,10 +1787,10 @@ impl Engine {
 
     fn _maps_permissions_batch_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::PermissionsBatchDeleteRequest = Default::default();
+        let mut request = api::PermissionsBatchDeleteRequest::default();
         let mut call = self.hub.maps().permissions_batch_delete(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1809,18 +1810,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "ids" => {
                         if request.ids.is_none() {
-                            request.ids = Some(Default::default());
+                           request.ids = Some(Default::default());
                         }
-                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -1839,8 +1841,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1849,10 +1850,10 @@ impl Engine {
 
     fn _maps_permissions_batch_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::PermissionsBatchUpdateRequest = Default::default();
+        let mut request = api::PermissionsBatchUpdateRequest::default();
         let mut call = self.hub.maps().permissions_batch_update(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1872,9 +1873,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1896,8 +1898,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1908,7 +1909,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.maps().permissions_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1940,8 +1941,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1952,7 +1952,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.maps().publish(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "force" => {
                     call = call.force(arg_from_str(value.unwrap_or("false"), err, "force", "boolean"));
@@ -1987,8 +1987,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1999,7 +1998,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.maps().unpublish(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2031,8 +2030,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2041,10 +2039,10 @@ impl Engine {
 
     fn _projects_icons_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Icon = Default::default();
+        let mut request = api::Icon::default();
         let mut call = self.hub.projects().icons_create(&request, &self.opt.arg_project_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2064,9 +2062,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2107,8 +2106,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2120,7 +2118,7 @@ impl Engine {
         let mut download_mode = false;
         let mut call = self.hub.projects().icons_get(&self.opt.arg_project_id, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2155,9 +2153,8 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     if !download_mode {
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
@@ -2171,7 +2168,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.projects().icons_list(&self.opt.arg_project_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -2209,8 +2206,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2221,7 +2217,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.projects().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2253,8 +2249,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2265,7 +2260,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.raster_collections().cancel_processing(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2297,8 +2292,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2307,10 +2301,10 @@ impl Engine {
 
     fn _raster_collections_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::RasterCollection = Default::default();
+        let mut request = api::RasterCollection::default();
         let mut call = self.hub.raster_collections().create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2330,9 +2324,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2369,9 +2364,9 @@ impl Engine {
                     },
                 "bbox" => {
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "last-modifier-email" => {
                         request.last_modifier_email = Some(value.unwrap_or("").to_string());
@@ -2405,8 +2400,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2417,7 +2411,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.raster_collections().delete(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2448,7 +2442,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2459,7 +2452,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.raster_collections().get(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2491,8 +2484,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2503,7 +2495,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.raster_collections().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "tags" => {
                     call = call.tags(value.unwrap_or(""));
@@ -2574,8 +2566,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2586,7 +2577,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.raster_collections().parents_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -2624,8 +2615,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2634,10 +2624,10 @@ impl Engine {
 
     fn _raster_collections_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::RasterCollection = Default::default();
+        let mut request = api::RasterCollection::default();
         let mut call = self.hub.raster_collections().patch(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2657,9 +2647,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2696,9 +2687,9 @@ impl Engine {
                     },
                 "bbox" => {
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "last-modifier-email" => {
                         request.last_modifier_email = Some(value.unwrap_or("").to_string());
@@ -2731,7 +2722,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2740,10 +2730,10 @@ impl Engine {
 
     fn _raster_collections_permissions_batch_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::PermissionsBatchDeleteRequest = Default::default();
+        let mut request = api::PermissionsBatchDeleteRequest::default();
         let mut call = self.hub.raster_collections().permissions_batch_delete(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2763,18 +2753,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "ids" => {
                         if request.ids.is_none() {
-                            request.ids = Some(Default::default());
+                           request.ids = Some(Default::default());
                         }
-                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -2793,8 +2784,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2803,10 +2793,10 @@ impl Engine {
 
     fn _raster_collections_permissions_batch_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::PermissionsBatchUpdateRequest = Default::default();
+        let mut request = api::PermissionsBatchUpdateRequest::default();
         let mut call = self.hub.raster_collections().permissions_batch_update(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2826,9 +2816,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2850,8 +2841,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2862,7 +2852,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.raster_collections().permissions_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2894,8 +2884,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2906,7 +2895,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.raster_collections().process(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2938,8 +2927,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2948,10 +2936,10 @@ impl Engine {
 
     fn _raster_collections_rasters_batch_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::RasterCollectionsRasterBatchDeleteRequest = Default::default();
+        let mut request = api::RasterCollectionsRasterBatchDeleteRequest::default();
         let mut call = self.hub.raster_collections().rasters_batch_delete(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2971,18 +2959,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "ids" => {
                         if request.ids.is_none() {
-                            request.ids = Some(Default::default());
+                           request.ids = Some(Default::default());
                         }
-                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -3001,8 +2990,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3011,10 +2999,10 @@ impl Engine {
 
     fn _raster_collections_rasters_batch_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::RasterCollectionsRastersBatchInsertRequest = Default::default();
+        let mut request = api::RasterCollectionsRastersBatchInsertRequest::default();
         let mut call = self.hub.raster_collections().rasters_batch_insert(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3034,18 +3022,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "ids" => {
                         if request.ids.is_none() {
-                            request.ids = Some(Default::default());
+                           request.ids = Some(Default::default());
                         }
-                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -3064,8 +3053,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3076,7 +3064,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.raster_collections().rasters_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "tags" => {
                     call = call.tags(value.unwrap_or(""));
@@ -3141,8 +3129,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3153,7 +3140,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.rasters().delete(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3184,7 +3171,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -3195,7 +3181,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.rasters().files_insert(&self.opt.arg_id, &self.opt.arg_filename);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3236,7 +3222,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -3247,7 +3232,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.rasters().get(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3279,8 +3264,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3291,7 +3275,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.rasters().list(&self.opt.arg_project_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "tags" => {
                     call = call.tags(value.unwrap_or(""));
@@ -3359,8 +3343,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3371,7 +3354,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.rasters().parents_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -3409,8 +3392,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3419,10 +3401,10 @@ impl Engine {
 
     fn _rasters_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Raster = Default::default();
+        let mut request = api::Raster::default();
         let mut call = self.hub.rasters().patch(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3442,9 +3424,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3457,15 +3440,15 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "acquisition-time.start" => {
                         request_acquisition_time_init(&mut request);
-                        request.acquisition_time.as_mut().unwrap().start = value.unwrap_or("").to_string();
+                        request.acquisition_time.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
                     },
                 "acquisition-time.end" => {
                         request_acquisition_time_init(&mut request);
-                        request.acquisition_time.as_mut().unwrap().end = value.unwrap_or("").to_string();
+                        request.acquisition_time.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
                     },
                 "acquisition-time.precision" => {
                         request_acquisition_time_init(&mut request);
-                        request.acquisition_time.as_mut().unwrap().precision = value.unwrap_or("").to_string();
+                        request.acquisition_time.as_mut().unwrap().precision = Some(value.unwrap_or("").to_string());
                     },
                 "attribution" => {
                         request_acquisition_time_init(&mut request);
@@ -3510,9 +3493,9 @@ impl Engine {
                 "bbox" => {
                         request_acquisition_time_init(&mut request);
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "last-modifier-email" => {
                         request_acquisition_time_init(&mut request);
@@ -3550,7 +3533,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -3559,10 +3541,10 @@ impl Engine {
 
     fn _rasters_permissions_batch_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::PermissionsBatchDeleteRequest = Default::default();
+        let mut request = api::PermissionsBatchDeleteRequest::default();
         let mut call = self.hub.rasters().permissions_batch_delete(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3582,18 +3564,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "ids" => {
                         if request.ids.is_none() {
-                            request.ids = Some(Default::default());
+                           request.ids = Some(Default::default());
                         }
-                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -3612,8 +3595,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3622,10 +3604,10 @@ impl Engine {
 
     fn _rasters_permissions_batch_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::PermissionsBatchUpdateRequest = Default::default();
+        let mut request = api::PermissionsBatchUpdateRequest::default();
         let mut call = self.hub.rasters().permissions_batch_update(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3645,9 +3627,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3669,8 +3652,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3681,7 +3663,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.rasters().permissions_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3713,8 +3695,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3725,7 +3706,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.rasters().process(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3757,8 +3738,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3767,10 +3747,10 @@ impl Engine {
 
     fn _rasters_upload(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Raster = Default::default();
+        let mut request = api::Raster::default();
         let mut call = self.hub.rasters().upload(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3790,9 +3770,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3805,15 +3786,15 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "acquisition-time.start" => {
                         request_acquisition_time_init(&mut request);
-                        request.acquisition_time.as_mut().unwrap().start = value.unwrap_or("").to_string();
+                        request.acquisition_time.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
                     },
                 "acquisition-time.end" => {
                         request_acquisition_time_init(&mut request);
-                        request.acquisition_time.as_mut().unwrap().end = value.unwrap_or("").to_string();
+                        request.acquisition_time.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
                     },
                 "acquisition-time.precision" => {
                         request_acquisition_time_init(&mut request);
-                        request.acquisition_time.as_mut().unwrap().precision = value.unwrap_or("").to_string();
+                        request.acquisition_time.as_mut().unwrap().precision = Some(value.unwrap_or("").to_string());
                     },
                 "attribution" => {
                         request_acquisition_time_init(&mut request);
@@ -3858,9 +3839,9 @@ impl Engine {
                 "bbox" => {
                         request_acquisition_time_init(&mut request);
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "last-modifier-email" => {
                         request_acquisition_time_init(&mut request);
@@ -3899,8 +3880,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3909,10 +3889,10 @@ impl Engine {
 
     fn _tables_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Table = Default::default();
+        let mut request = api::Table::default();
         let mut call = self.hub.tables().create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3932,9 +3912,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3947,11 +3928,11 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "schema.primary-geometry" => {
                         request_schema_init(&mut request);
-                        request.schema.as_mut().unwrap().primary_geometry = value.unwrap_or("").to_string();
+                        request.schema.as_mut().unwrap().primary_geometry = Some(value.unwrap_or("").to_string());
                     },
                 "schema.primary-key" => {
                         request_schema_init(&mut request);
-                        request.schema.as_mut().unwrap().primary_key = value.unwrap_or("").to_string();
+                        request.schema.as_mut().unwrap().primary_key = Some(value.unwrap_or("").to_string());
                     },
                 "description" => {
                         request_schema_init(&mut request);
@@ -3992,9 +3973,9 @@ impl Engine {
                 "bbox" => {
                         request_schema_init(&mut request);
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "last-modifier-email" => {
                         request_schema_init(&mut request);
@@ -4033,8 +4014,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4045,7 +4025,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().delete(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4076,7 +4056,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -4085,10 +4064,10 @@ impl Engine {
 
     fn _tables_features_batch_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::FeaturesBatchDeleteRequest = Default::default();
+        let mut request = api::FeaturesBatchDeleteRequest::default();
         let mut call = self.hub.tables().features_batch_delete(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4108,24 +4087,25 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "gx-ids" => {
                         if request.gx_ids.is_none() {
-                            request.gx_ids = Some(Default::default());
+                           request.gx_ids = Some(Default::default());
                         }
-                        request.gx_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.gx_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "primary-keys" => {
                         if request.primary_keys.is_none() {
-                            request.primary_keys = Some(Default::default());
+                           request.primary_keys = Some(Default::default());
                         }
-                        request.primary_keys.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.primary_keys.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -4143,7 +4123,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -4152,10 +4131,10 @@ impl Engine {
 
     fn _tables_features_batch_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::FeaturesBatchInsertRequest = Default::default();
+        let mut request = api::FeaturesBatchInsertRequest::default();
         let mut call = self.hub.tables().features_batch_insert(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4175,9 +4154,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4201,7 +4181,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -4210,10 +4189,10 @@ impl Engine {
 
     fn _tables_features_batch_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::FeaturesBatchPatchRequest = Default::default();
+        let mut request = api::FeaturesBatchPatchRequest::default();
         let mut call = self.hub.tables().features_batch_patch(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4233,9 +4212,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4259,7 +4239,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -4270,7 +4249,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().features_get(&self.opt.arg_table_id, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "version" => {
                     call = call.version(value.unwrap_or(""));
@@ -4308,8 +4287,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4320,7 +4298,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().features_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "where" => {
                     call = call.where_(value.unwrap_or(""));
@@ -4379,8 +4357,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4391,7 +4368,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().files_insert(&self.opt.arg_id, &self.opt.arg_filename);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4432,7 +4409,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -4443,7 +4419,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().get(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "version" => {
                     call = call.version(value.unwrap_or(""));
@@ -4478,8 +4454,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4490,7 +4465,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "tags" => {
                     call = call.tags(value.unwrap_or(""));
@@ -4561,8 +4536,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4573,7 +4547,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().parents_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -4611,8 +4585,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4621,10 +4594,10 @@ impl Engine {
 
     fn _tables_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Table = Default::default();
+        let mut request = api::Table::default();
         let mut call = self.hub.tables().patch(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4644,9 +4617,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4659,11 +4633,11 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "schema.primary-geometry" => {
                         request_schema_init(&mut request);
-                        request.schema.as_mut().unwrap().primary_geometry = value.unwrap_or("").to_string();
+                        request.schema.as_mut().unwrap().primary_geometry = Some(value.unwrap_or("").to_string());
                     },
                 "schema.primary-key" => {
                         request_schema_init(&mut request);
-                        request.schema.as_mut().unwrap().primary_key = value.unwrap_or("").to_string();
+                        request.schema.as_mut().unwrap().primary_key = Some(value.unwrap_or("").to_string());
                     },
                 "description" => {
                         request_schema_init(&mut request);
@@ -4704,9 +4678,9 @@ impl Engine {
                 "bbox" => {
                         request_schema_init(&mut request);
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "last-modifier-email" => {
                         request_schema_init(&mut request);
@@ -4744,7 +4718,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -4753,10 +4726,10 @@ impl Engine {
 
     fn _tables_permissions_batch_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::PermissionsBatchDeleteRequest = Default::default();
+        let mut request = api::PermissionsBatchDeleteRequest::default();
         let mut call = self.hub.tables().permissions_batch_delete(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4776,18 +4749,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "ids" => {
                         if request.ids.is_none() {
-                            request.ids = Some(Default::default());
+                           request.ids = Some(Default::default());
                         }
-                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -4806,8 +4780,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4816,10 +4789,10 @@ impl Engine {
 
     fn _tables_permissions_batch_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::PermissionsBatchUpdateRequest = Default::default();
+        let mut request = api::PermissionsBatchUpdateRequest::default();
         let mut call = self.hub.tables().permissions_batch_update(&request, &self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4839,9 +4812,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4863,8 +4837,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4875,7 +4848,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().permissions_list(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4907,8 +4880,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4919,7 +4891,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().process(&self.opt.arg_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4951,8 +4923,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4961,10 +4932,10 @@ impl Engine {
 
     fn _tables_upload(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Table = Default::default();
+        let mut request = api::Table::default();
         let mut call = self.hub.tables().upload(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4984,9 +4955,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4999,11 +4971,11 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "schema.primary-geometry" => {
                         request_schema_init(&mut request);
-                        request.schema.as_mut().unwrap().primary_geometry = value.unwrap_or("").to_string();
+                        request.schema.as_mut().unwrap().primary_geometry = Some(value.unwrap_or("").to_string());
                     },
                 "schema.primary-key" => {
                         request_schema_init(&mut request);
-                        request.schema.as_mut().unwrap().primary_key = value.unwrap_or("").to_string();
+                        request.schema.as_mut().unwrap().primary_key = Some(value.unwrap_or("").to_string());
                     },
                 "description" => {
                         request_schema_init(&mut request);
@@ -5044,9 +5016,9 @@ impl Engine {
                 "bbox" => {
                         request_schema_init(&mut request);
                         if request.bbox.is_none() {
-                            request.bbox = Some(Default::default());
+                           request.bbox = Some(Default::default());
                         }
-                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
+                                        request.bbox.as_mut().unwrap().push(arg_from_str(value.unwrap_or("0.0"), err, "bbox", "number"));
                     },
                 "last-modifier-email" => {
                         request_schema_init(&mut request);
@@ -5085,8 +5057,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -5110,7 +5081,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_layers {
+        }
+ else if self.opt.cmd_layers {
             if self.opt.cmd_cancel_processing {
                 call_result = self._layers_cancel_processing(dry_run, &mut err);
             } else if self.opt.cmd_create {
@@ -5144,7 +5116,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_maps {
+        }
+ else if self.opt.cmd_maps {
             if self.opt.cmd_create {
                 call_result = self._maps_create(dry_run, &mut err);
             } else if self.opt.cmd_delete {
@@ -5172,7 +5145,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_projects {
+        }
+ else if self.opt.cmd_projects {
             if self.opt.cmd_icons_create {
                 call_result = self._projects_icons_create(dry_run, &mut err);
             } else if self.opt.cmd_icons_get {
@@ -5184,7 +5158,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_raster_collections {
+        }
+ else if self.opt.cmd_raster_collections {
             if self.opt.cmd_cancel_processing {
                 call_result = self._raster_collections_cancel_processing(dry_run, &mut err);
             } else if self.opt.cmd_create {
@@ -5216,7 +5191,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_rasters {
+        }
+ else if self.opt.cmd_rasters {
             if self.opt.cmd_delete {
                 call_result = self._rasters_delete(dry_run, &mut err);
             } else if self.opt.cmd_files_insert {
@@ -5242,7 +5218,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_tables {
+        }
+ else if self.opt.cmd_tables {
             if self.opt.cmd_create {
                 call_result = self._tables_create(dry_run, &mut err);
             } else if self.opt.cmd_delete {
@@ -5300,21 +5277,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "mapsengine1-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "mapsengine1-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "mapsengine1",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "mapsengine1",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::MapsEngine::new(hyper::Client::new(), auth),
+            hub: api::MapsEngine::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -5334,12 +5327,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

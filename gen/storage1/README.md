@@ -24,7 +24,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [object access controls](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControl.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlUpdateCall.html)
 * [objects](http://byron.github.io/google-apis-rs/google_storage1/struct.Object.html)
- * [*compose*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectComposeCall.html), [*copy*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectCopyCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectPatchCall.html), [*update*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectUpdateCall.html) and [*watch all*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectWatchAllCall.html)
+ * [*compose*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectComposeCall.html), [*copy*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectCopyCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectPatchCall.html), [*rewrite*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectRewriteCall.html), [*update*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectUpdateCall.html) and [*watch all*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectWatchAllCall.html)
 
 
 Upload supported by ...
@@ -74,16 +74,16 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.object_access_controls().get(...).doit()
-let r = hub.default_object_access_controls().patch(...).doit()
-let r = hub.object_access_controls().update(...).doit()
-let r = hub.object_access_controls().list(...).doit()
-let r = hub.object_access_controls().patch(...).doit()
-let r = hub.default_object_access_controls().update(...).doit()
-let r = hub.default_object_access_controls().insert(...).doit()
-let r = hub.object_access_controls().insert(...).doit()
-let r = hub.object_access_controls().delete(...).doit()
-let r = hub.default_object_access_controls().get(...).doit()
+let r = hub.objects().list(...).doit()
+let r = hub.objects().rewrite(...).doit()
+let r = hub.objects().copy(...).doit()
+let r = hub.objects().watch_all(...).doit()
+let r = hub.objects().get(...).doit()
+let r = hub.objects().insert(...).doit()
+let r = hub.objects().compose(...).doit()
+let r = hub.objects().update(...).doit()
+let r = hub.objects().delete(...).doit()
+let r = hub.objects().patch(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -108,7 +108,7 @@ google-storage1 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_storage1 as storage1;
-use storage1::ObjectAccessControl;
+use storage1::Object;
 use storage1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -129,13 +129,25 @@ let mut hub = Storage::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req: ObjectAccessControl = Default::default();
+let mut req = Object::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.object_access_controls().update(&req, "bucket", "object", "entity")
-             .generation("sed")
+let result = hub.objects().rewrite(&req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
+             .source_generation("et")
+             .rewrite_token("dolores")
+             .projection("kasd")
+             .max_bytes_rewritten_per_call("accusam")
+             .if_source_metageneration_not_match("takimata")
+             .if_source_metageneration_match("justo")
+             .if_source_generation_not_match("amet.")
+             .if_source_generation_match("erat")
+             .if_metageneration_not_match("labore")
+             .if_metageneration_match("sea")
+             .if_generation_not_match("nonumy")
+             .if_generation_match("dolores")
+             .destination_predefined_acl("gubergren")
              .doit();
 
 match result {

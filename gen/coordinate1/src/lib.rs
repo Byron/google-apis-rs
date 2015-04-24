@@ -108,7 +108,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: Job = Default::default();
+//! let mut req = Job::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -297,7 +297,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Job = Default::default();
+/// let mut req = Job::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -398,14 +398,14 @@ impl<'a, C, A> Coordinate<C, A>
 pub struct LocationListResponse {
     /// A token to provide to get the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Locations in the collection.
-    pub items: Vec<LocationRecord>,
+    pub items: Option<Vec<LocationRecord>>,
     /// Identifies this object as a list of locations.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Pagination information for token pagination.
     #[serde(rename="tokenPagination")]
-    pub token_pagination: TokenPagination,
+    pub token_pagination: Option<TokenPagination>,
 }
 
 impl ResponseResult for LocationListResponse {}
@@ -418,11 +418,11 @@ impl ResponseResult for LocationListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobChange {
     /// Time at which this change was applied.
-    pub timestamp: String,
+    pub timestamp: Option<String>,
     /// Identifies this object as a job change.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Change applied to the job. Only the fields that were changed are set.
-    pub state: JobState,
+    pub state: Option<JobState>,
 }
 
 impl Part for JobChange {}
@@ -435,11 +435,11 @@ impl Part for JobChange {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnumItemDef {
     /// Whether the enum item is active. Jobs may contain inactive enum values; however, setting an enum to an inactive value when creating or updating a job will result in a 500 error.
-    pub active: bool,
+    pub active: Option<bool>,
     /// Identifies this object as an enum item definition.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Custom field value.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for EnumItemDef {}
@@ -457,9 +457,9 @@ impl Part for EnumItemDef {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomFieldDefListResponse {
     /// Collection of custom field definitions in a team.
-    pub items: Vec<CustomFieldDef>,
+    pub items: Option<Vec<CustomFieldDef>>,
     /// Identifies this object as a collection of custom field definitions in a team.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for CustomFieldDefListResponse {}
@@ -473,12 +473,12 @@ impl ResponseResult for CustomFieldDefListResponse {}
 pub struct TokenPagination {
     /// A token to provide to get the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A token to provide to get the previous page of results.
     #[serde(rename="previousPageToken")]
-    pub previous_page_token: String,
+    pub previous_page_token: Option<String>,
     /// Identifies this object as pagination information.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl Part for TokenPagination {}
@@ -491,14 +491,14 @@ impl Part for TokenPagination {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
     /// Latitude.
-    pub lat: f64,
+    pub lat: Option<f64>,
     /// Identifies this object as a location.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Address.
     #[serde(rename="addressLine")]
-    pub address_line: Vec<String>,
+    pub address_line: Option<Vec<String>>,
     /// Longitude.
-    pub lng: f64,
+    pub lng: Option<f64>,
 }
 
 impl Part for Location {}
@@ -511,11 +511,11 @@ impl Part for Location {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Team {
     /// Identifies this object as a team.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Team id, as found in a coordinate team url e.g. https://coordinate.google.com/f/xyz where "xyz" is the team id.
-    pub id: String,
+    pub id: Option<String>,
     /// Team name
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for Team {}
@@ -528,26 +528,26 @@ impl Part for Team {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobState {
     /// Identifies this object as a job state.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Customer name.
     #[serde(rename="customerName")]
-    pub customer_name: String,
+    pub customer_name: Option<String>,
     /// Job title.
-    pub title: String,
+    pub title: Option<String>,
     /// Note added to the job.
-    pub note: Vec<String>,
+    pub note: Option<Vec<String>>,
     /// Email address of the assignee, or the string "DELETED_USER" if the account is no longer available.
-    pub assignee: String,
+    pub assignee: Option<String>,
     /// Customer phone number.
     #[serde(rename="customerPhoneNumber")]
-    pub customer_phone_number: String,
+    pub customer_phone_number: Option<String>,
     /// Job location.
-    pub location: Location,
+    pub location: Option<Location>,
     /// Job progress.
-    pub progress: String,
+    pub progress: Option<String>,
     /// Custom fields.
     #[serde(rename="customFields")]
-    pub custom_fields: CustomFields,
+    pub custom_fields: Option<CustomFields>,
 }
 
 impl Part for JobState {}
@@ -560,10 +560,10 @@ impl Part for JobState {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomFields {
     /// Identifies this object as a collection of custom fields.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Collection of custom fields.
     #[serde(rename="customField")]
-    pub custom_field: Vec<CustomField>,
+    pub custom_field: Option<Vec<CustomField>>,
 }
 
 impl Part for CustomFields {}
@@ -581,9 +581,9 @@ impl Part for CustomFields {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WorkerListResponse {
     /// Workers in the collection.
-    pub items: Vec<Worker>,
+    pub items: Option<Vec<Worker>>,
     /// Identifies this object as a list of workers.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for WorkerListResponse {}
@@ -596,17 +596,17 @@ impl ResponseResult for WorkerListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationRecord {
     /// Latitude.
-    pub latitude: f64,
+    pub latitude: Option<f64>,
     /// The collection time in milliseconds since the epoch.
     #[serde(rename="collectionTime")]
-    pub collection_time: String,
+    pub collection_time: Option<String>,
     /// The location accuracy in meters. This is the radius of a 95% confidence interval around the location measurement.
     #[serde(rename="confidenceRadius")]
-    pub confidence_radius: f64,
+    pub confidence_radius: Option<f64>,
     /// Identifies this object as a location.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Longitude.
-    pub longitude: f64,
+    pub longitude: Option<f64>,
 }
 
 impl Part for LocationRecord {}
@@ -656,9 +656,9 @@ impl ResponseResult for Schedule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamListResponse {
     /// Teams in the collection.
-    pub items: Vec<Team>,
+    pub items: Option<Vec<Team>>,
     /// Identifies this object as a list of teams.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for TeamListResponse {}
@@ -677,11 +677,11 @@ impl ResponseResult for TeamListResponse {}
 pub struct JobListResponse {
     /// A token to provide to get the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Jobs in the collection.
-    pub items: Vec<Job>,
+    pub items: Option<Vec<Job>>,
     /// Identifies this object as a list of jobs.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for JobListResponse {}
@@ -694,9 +694,9 @@ impl ResponseResult for JobListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Worker {
     /// Identifies this object as a worker.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Worker email address. If a worker has been deleted from your team, the email address will appear as DELETED_USER.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for Worker {}
@@ -740,21 +740,21 @@ impl ResponseResult for Job {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomFieldDef {
     /// Identifies this object as a custom field definition.
-    pub kind: String,
+    pub kind: Option<String>,
     /// List of enum items for this custom field. Populated only if the field type is enum. Enum fields appear as 'lists' in the Coordinate web and mobile UI.
-    pub enumitems: Vec<EnumItemDef>,
+    pub enumitems: Option<Vec<EnumItemDef>>,
     /// Custom field name.
-    pub name: String,
+    pub name: Option<String>,
     /// Custom field type.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Whether the field is required for checkout.
     #[serde(rename="requiredForCheckout")]
-    pub required_for_checkout: bool,
+    pub required_for_checkout: Option<bool>,
     /// Whether the field is enabled.
-    pub enabled: bool,
+    pub enabled: Option<bool>,
     /// Custom field id.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for CustomFieldDef {}
@@ -767,12 +767,12 @@ impl Part for CustomFieldDef {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomField {
     /// Identifies this object as a custom field.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Custom field id.
     #[serde(rename="customFieldId")]
-    pub custom_field_id: String,
+    pub custom_field_id: Option<String>,
     /// Custom field value.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for CustomField {}
@@ -1419,16 +1419,20 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1578,7 +1582,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Job = Default::default();
+/// let mut req = Job::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1726,16 +1730,20 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1969,7 +1977,7 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Job = Default::default();
+/// let mut req = Job::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2117,16 +2125,20 @@ impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2456,16 +2468,20 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2626,7 +2642,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Job = Default::default();
+/// let mut req = Job::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2755,16 +2771,20 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2993,7 +3013,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Schedule = Default::default();
+/// let mut req = Schedule::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3107,16 +3127,20 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3307,7 +3331,7 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Schedule = Default::default();
+/// let mut req = Schedule::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3421,16 +3445,20 @@ impl<'a, C, A> SchedulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3704,16 +3732,20 @@ impl<'a, C, A> ScheduleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3944,16 +3976,20 @@ impl<'a, C, A> WorkerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4188,16 +4224,20 @@ impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4441,16 +4481,20 @@ impl<'a, C, A> TeamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4682,16 +4726,20 @@ impl<'a, C, A> CustomFieldDefListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

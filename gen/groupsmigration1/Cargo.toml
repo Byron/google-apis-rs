@@ -5,7 +5,7 @@
 
 name = "google-groupsmigration1"
 version = "0.1.5+20140416"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1"
 homepage = "https://developers.google.com/google-apps/groups-migration/"

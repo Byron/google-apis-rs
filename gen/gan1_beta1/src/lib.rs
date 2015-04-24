@@ -364,61 +364,61 @@ impl<'a, C, A> Gan<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Advertiser {
     /// The status of the requesting publisher's relationship this advertiser.
-    pub status: String,
+    pub status: Option<String>,
     /// Allows advertisers to submit product listings to Google Product Search.
     #[serde(rename="productFeedsEnabled")]
-    pub product_feeds_enabled: bool,
+    pub product_feeds_enabled: Option<bool>,
     /// Phone that this advertiser would like publishers to contact them with.
     #[serde(rename="contactPhone")]
-    pub contact_phone: String,
+    pub contact_phone: Option<String>,
     /// Description of the website the advertiser advertises from.
-    pub description: String,
+    pub description: Option<String>,
     /// List of merchant center ids for this advertiser
     #[serde(rename="merchantCenterIds")]
-    pub merchant_center_ids: Vec<String>,
+    pub merchant_center_ids: Option<Vec<String>>,
     /// The longest possible length of a commission (how long the cookies on the customer's browser last before they expire).
     #[serde(rename="commissionDuration")]
-    pub commission_duration: i32,
+    pub commission_duration: Option<i32>,
     /// Email that this advertiser would like publishers to contact them with.
     #[serde(rename="contactEmail")]
-    pub contact_email: String,
+    pub contact_email: Option<String>,
     /// Date that this advertiser was approved as a Google Affiliate Network advertiser.
     #[serde(rename="joinDate")]
-    pub join_date: String,
+    pub join_date: Option<String>,
     /// The ID of this advertiser.
-    pub id: String,
+    pub id: Option<String>,
     /// Category that this advertiser belongs to. A valid list of categories can be found here: http://www.google.com/support/affiliatenetwork/advertiser/bin/answer.py?hl=en&answer=107581
-    pub category: String,
+    pub category: Option<String>,
     /// The default link id for this advertiser.
     #[serde(rename="defaultLinkId")]
-    pub default_link_id: String,
+    pub default_link_id: Option<String>,
     /// The kind for an advertiser.
-    pub kind: String,
+    pub kind: Option<String>,
     /// URL of the website this advertiser advertises from.
     #[serde(rename="siteUrl")]
-    pub site_url: String,
+    pub site_url: Option<String>,
     /// The name of this advertiser.
-    pub name: String,
+    pub name: Option<String>,
     /// A rank based on commissions paid to publishers over the past 90 days. A number between 1 and 4 where 4 means the top quartile (most money paid) and 1 means the bottom quartile (least money paid).
     #[serde(rename="payoutRank")]
-    pub payout_rank: String,
+    pub payout_rank: Option<String>,
     /// The sum of fees paid to publishers divided by the total number of clicks over the past seven days. This value should be multiplied by 100 at the time of display.
     #[serde(rename="epcSevenDayAverage")]
-    pub epc_seven_day_average: Money,
+    pub epc_seven_day_average: Option<Money>,
     /// The sum of fees paid to publishers divided by the total number of clicks over the past three months. This value should be multiplied by 100 at the time of display.
     #[serde(rename="epcNinetyDayAverage")]
-    pub epc_ninety_day_average: Money,
+    pub epc_ninety_day_average: Option<Money>,
     /// True if the advertiser allows publisher created links, otherwise false.
     #[serde(rename="allowPublisherCreatedLinks")]
-    pub allow_publisher_created_links: bool,
+    pub allow_publisher_created_links: Option<bool>,
     /// The requested advertiser.
-    pub item: Option<Box<Advertiser>>,
+    pub item: Option<Option<Box<Advertiser>>>,
     /// URL to the logo this advertiser uses on the Google Affiliate Network.
     #[serde(rename="logoUrl")]
-    pub logo_url: String,
+    pub logo_url: Option<String>,
     /// List of redirect URLs for this advertiser
     #[serde(rename="redirectDomains")]
-    pub redirect_domains: Vec<String>,
+    pub redirect_domains: Option<Vec<String>>,
 }
 
 impl Resource for Advertiser {}
@@ -432,21 +432,21 @@ impl ResponseResult for Advertiser {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOfferRewards {
     /// The kind of purchases covered by this rule.
-    pub category: String,
+    pub category: Option<String>,
     /// The number of units rewarded per purchase dollar.
-    pub amount: f64,
+    pub amount: Option<f64>,
     /// The minimum purchase amount in the given category before this rule applies.
     #[serde(rename="minRewardTier")]
-    pub min_reward_tier: f64,
+    pub min_reward_tier: Option<f64>,
     /// Other limits, for example, if this rule only applies during an introductory period.
     #[serde(rename="additionalDetails")]
-    pub additional_details: String,
+    pub additional_details: Option<String>,
     /// The maximum purchase amount in the given category for this rule to apply.
     #[serde(rename="maxRewardTier")]
-    pub max_reward_tier: f64,
+    pub max_reward_tier: Option<f64>,
     /// How long rewards granted by this rule last.
     #[serde(rename="expirationMonths")]
-    pub expiration_months: f64,
+    pub expiration_months: Option<f64>,
 }
 
 impl NestedType for CcOfferRewards {}
@@ -466,11 +466,11 @@ impl Part for CcOfferRewards {}
 pub struct Links {
     /// The next page token.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The links.
-    pub items: Vec<Link>,
+    pub items: Option<Vec<Link>>,
     /// The kind for a page of links.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Links {}
@@ -489,11 +489,11 @@ impl ResponseResult for Links {}
 pub struct Publishers {
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The entity list.
-    pub items: Vec<Publisher>,
+    pub items: Option<Vec<Publisher>>,
     /// The kind for a page of entities.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Publishers {}
@@ -506,10 +506,10 @@ impl ResponseResult for Publishers {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Money {
     /// The amount of money.
-    pub amount: f64,
+    pub amount: Option<f64>,
     /// The 3-letter code of the currency in question.
     #[serde(rename="currencyCode")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
 }
 
 impl Part for Money {}
@@ -528,31 +528,31 @@ impl Part for Money {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Publisher {
     /// The status of the requesting advertiser's relationship with this publisher.
-    pub status: String,
+    pub status: Option<String>,
     /// The kind for a publisher.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The name of this publisher.
-    pub name: String,
+    pub name: Option<String>,
     /// Classification that this publisher belongs to. See this link for all publisher classifications: http://www.google.com/support/affiliatenetwork/advertiser/bin/answer.py?hl=en&answer=107625&ctx=cb&src=cb&cbid=-k5fihzthfaik&cbrank=4
-    pub classification: String,
+    pub classification: Option<String>,
     /// The sum of fees paid to this publisher divided by the total number of clicks over the past seven days. Values are multiplied by 100 for display purposes.
     #[serde(rename="epcSevenDayAverage")]
-    pub epc_seven_day_average: Money,
+    pub epc_seven_day_average: Option<Money>,
     /// Websites that this publisher uses to advertise.
-    pub sites: Vec<String>,
+    pub sites: Option<Vec<String>>,
     /// The sum of fees paid to this publisher divided by the total number of clicks over the past three months. Values are multiplied by 100 for display purposes.
     #[serde(rename="epcNinetyDayAverage")]
-    pub epc_ninety_day_average: Money,
+    pub epc_ninety_day_average: Option<Money>,
     /// The requested publisher.
-    pub item: Option<Box<Publisher>>,
+    pub item: Option<Option<Box<Publisher>>>,
     /// A rank based on commissions paid to this publisher over the past 90 days. A number between 1 and 4 where 4 means the top quartile (most money paid) and 1 means the bottom quartile (least money paid).
     #[serde(rename="payoutRank")]
-    pub payout_rank: String,
+    pub payout_rank: Option<String>,
     /// Date that this publisher was approved as a Google Affiliate Network publisher.
     #[serde(rename="joinDate")]
-    pub join_date: String,
+    pub join_date: Option<String>,
     /// The ID of this publisher.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Resource for Publisher {}
@@ -567,28 +567,28 @@ impl ResponseResult for Publisher {}
 pub struct LinkSpecialOffers {
     /// Price cut on the purchase
     #[serde(rename="priceCut")]
-    pub price_cut: Money,
+    pub price_cut: Option<Money>,
     /// Minimum purchase amount for price cut promotion
     #[serde(rename="priceCutMin")]
-    pub price_cut_min: Money,
+    pub price_cut_min: Option<Money>,
     /// Whether there is free shipping
     #[serde(rename="freeShipping")]
-    pub free_shipping: bool,
+    pub free_shipping: Option<bool>,
     /// List of promotion code associated with the link
     #[serde(rename="promotionCodes")]
-    pub promotion_codes: Vec<String>,
+    pub promotion_codes: Option<Vec<String>>,
     /// Percent off on the purchase
     #[serde(rename="percentOff")]
-    pub percent_off: f64,
+    pub percent_off: Option<f64>,
     /// Minimum purchase amount for percent off promotion
     #[serde(rename="percentOffMin")]
-    pub percent_off_min: Money,
+    pub percent_off_min: Option<Money>,
     /// Whether there is a free gift
     #[serde(rename="freeGift")]
-    pub free_gift: bool,
+    pub free_gift: Option<bool>,
     /// Minimum purchase amount for free shipping promotion
     #[serde(rename="freeShippingMin")]
-    pub free_shipping_min: Money,
+    pub free_shipping_min: Option<Money>,
 }
 
 impl NestedType for LinkSpecialOffers {}
@@ -608,11 +608,11 @@ impl Part for LinkSpecialOffers {}
 pub struct Events {
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The event list.
-    pub items: Vec<Event>,
+    pub items: Option<Vec<Event>>,
     /// The kind for a page of events.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Events {}
@@ -625,9 +625,9 @@ impl ResponseResult for Events {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOfferBonusRewards {
     /// How many units of reward will be granted.
-    pub amount: f64,
+    pub amount: Option<f64>,
     /// The circumstances under which this rule applies, for example, booking a flight via Orbitz.
-    pub details: String,
+    pub details: Option<String>,
 }
 
 impl NestedType for CcOfferBonusRewards {}
@@ -641,16 +641,16 @@ impl Part for CcOfferBonusRewards {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOfferDefaultFees {
     /// The type of charge, for example Purchases.
-    pub category: String,
+    pub category: Option<String>,
     /// The highest rate the issuer may charge for defaulting on debt in this category. Expressed as an absolute number, not as a percentage.
     #[serde(rename="maxRate")]
-    pub max_rate: f64,
+    pub max_rate: Option<f64>,
     /// The lowest rate the issuer may charge for defaulting on debt in this category. Expressed as an absolute number, not as a percentage.
     #[serde(rename="minRate")]
-    pub min_rate: f64,
+    pub min_rate: Option<f64>,
     /// Fixed or variable.
     #[serde(rename="rateType")]
-    pub rate_type: String,
+    pub rate_type: Option<String>,
 }
 
 impl NestedType for CcOfferDefaultFees {}
@@ -669,9 +669,9 @@ impl Part for CcOfferDefaultFees {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CcOffers {
     /// The credit card offers.
-    pub items: Vec<CcOffer>,
+    pub items: Option<Vec<CcOffer>>,
     /// The kind for a page of credit card offers.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for CcOffers {}
@@ -761,28 +761,28 @@ impl ResponseResult for Link {}
 pub struct EventProducts {
     /// Fee that the advertiser paid to the Google Affiliate Network for this product.
     #[serde(rename="networkFee")]
-    pub network_fee: Money,
+    pub network_fee: Option<Money>,
     /// Sku of this product.
-    pub sku: String,
+    pub sku: Option<String>,
     /// Name of the category this product belongs to.
     #[serde(rename="categoryName")]
-    pub category_name: String,
+    pub category_name: Option<String>,
     /// Sku name of this product.
     #[serde(rename="skuName")]
-    pub sku_name: String,
+    pub sku_name: Option<String>,
     /// Fee that the advertiser paid to the publisehr for this product.
     #[serde(rename="publisherFee")]
-    pub publisher_fee: Money,
+    pub publisher_fee: Option<Money>,
     /// Amount earned by the publisher on this product.
-    pub earnings: Money,
+    pub earnings: Option<Money>,
     /// Price per unit of this product.
     #[serde(rename="unitPrice")]
-    pub unit_price: Money,
+    pub unit_price: Option<Money>,
     /// Id of the category this product belongs to.
     #[serde(rename="categoryId")]
-    pub category_id: String,
+    pub category_id: Option<String>,
     /// Quantity of this product bought/exchanged.
-    pub quantity: String,
+    pub quantity: Option<String>,
 }
 
 impl NestedType for EventProducts {}
@@ -801,22 +801,22 @@ impl Part for EventProducts {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Report {
     /// The totals rows for the report
-    pub totals_rows: Vec<Vec<String>>,
+    pub totals_rows: Option<Vec<Vec<String>>>,
     /// The kind for a report.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The rows of data for the report
-    pub rows: Vec<Vec<String>>,
+    pub rows: Option<Vec<Vec<String>>>,
     /// The end of the date range for this report, exclusive.
-    pub end_date: String,
+    pub end_date: Option<String>,
     /// The number of matching rows before paging is applied.
-    pub matching_row_count: String,
+    pub matching_row_count: Option<String>,
     /// The column names for the report
-    pub column_names: Vec<String>,
+    pub column_names: Option<Vec<String>>,
     /// The report type.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The start of the date range for this report, inclusive.
-    pub start_date: String,
+    pub start_date: Option<String>,
 }
 
 impl Resource for Report {}
@@ -836,11 +836,11 @@ impl ResponseResult for Report {}
 pub struct Advertisers {
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The advertiser list.
-    pub items: Vec<Advertiser>,
+    pub items: Option<Vec<Advertiser>>,
     /// The kind for a page of advertisers.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for Advertisers {}
@@ -2180,7 +2180,7 @@ impl<'a, C, A> PublisherGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Link = Default::default();
+/// let mut req = Link::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.

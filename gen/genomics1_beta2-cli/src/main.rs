@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -64,7 +65,7 @@ Usage:
   genomics1-beta2 [options] references search -r <kv>... [-p <v>]... [-o <out>]
   genomics1-beta2 [options] referencesets get <reference-set-id> [-p <v>]... [-o <out>]
   genomics1-beta2 [options] referencesets search -r <kv>... [-p <v>]... [-o <out>]
-  genomics1-beta2 [options] streaming-variant-store streamvariants -r <kv>... [-p <v>]... [-o <out>]
+  genomics1-beta2 [options] streaming-readstore streamreads -r <kv>... [-p <v>]... [-o <out>]
   genomics1-beta2 [options] variants create -r <kv>... [-p <v>]... [-o <out>]
   genomics1-beta2 [options] variants delete <variant-id> [-p <v>]...
   genomics1-beta2 [options] variants get <variant-id> [-p <v>]... [-o <out>]
@@ -91,6 +92,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -112,10 +119,10 @@ struct Engine {
 impl Engine {
     fn _annotation_sets_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AnnotationSet = Default::default();
+        let mut request = api::AnnotationSet::default();
         let mut call = self.hub.annotation_sets().create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -135,9 +142,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -177,8 +185,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -189,7 +196,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.annotation_sets().delete(&self.opt.arg_annotation_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -220,7 +227,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -231,7 +237,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.annotation_sets().get(&self.opt.arg_annotation_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -263,8 +269,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -273,10 +278,10 @@ impl Engine {
 
     fn _annotation_sets_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AnnotationSet = Default::default();
+        let mut request = api::AnnotationSet::default();
         let mut call = self.hub.annotation_sets().patch(&request, &self.opt.arg_annotation_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -296,9 +301,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -338,8 +344,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -348,10 +353,10 @@ impl Engine {
 
     fn _annotation_sets_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SearchAnnotationSetsRequest = Default::default();
+        let mut request = api::SearchAnnotationSetsRequest::default();
         let mut call = self.hub.annotation_sets().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -371,9 +376,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -386,9 +392,9 @@ impl Engine {
                     },
                 "dataset-ids" => {
                         if request.dataset_ids.is_none() {
-                            request.dataset_ids = Some(Default::default());
+                           request.dataset_ids = Some(Default::default());
                         }
-                        request.dataset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.dataset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "page-token" => {
                         request.page_token = Some(value.unwrap_or("").to_string());
@@ -398,9 +404,9 @@ impl Engine {
                     },
                 "types" => {
                         if request.types.is_none() {
-                            request.types = Some(Default::default());
+                           request.types = Some(Default::default());
                         }
-                        request.types.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.types.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -419,8 +425,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -429,10 +434,10 @@ impl Engine {
 
     fn _annotation_sets_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AnnotationSet = Default::default();
+        let mut request = api::AnnotationSet::default();
         let mut call = self.hub.annotation_sets().update(&request, &self.opt.arg_annotation_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -452,9 +457,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -494,8 +500,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -504,10 +509,10 @@ impl Engine {
 
     fn _annotations_batch_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::BatchCreateAnnotationsRequest = Default::default();
+        let mut request = api::BatchCreateAnnotationsRequest::default();
         let mut call = self.hub.annotations().batch_create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -527,9 +532,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -551,8 +557,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -561,10 +566,10 @@ impl Engine {
 
     fn _annotations_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Annotation = Default::default();
+        let mut request = api::Annotation::default();
         let mut call = self.hub.annotations().create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -584,15 +589,23 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             fn request_position_init(request: &mut api::Annotation) {
                 if request.position.is_none() {
                     request.position = Some(Default::default());
+                }
+            }
+            
+            fn request_transcript_coding_sequence_init(request: &mut api::Annotation) {
+                request_transcript_init(request);
+                if request.transcript.as_mut().unwrap().coding_sequence.is_none() {
+                    request.transcript.as_mut().unwrap().coding_sequence = Some(Default::default());
                 }
             }
             
@@ -613,40 +626,43 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 "transcript.coding-sequence.start" => {
-                        request_transcript_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.start = value.unwrap_or("").to_string();
+                        request_transcript_coding_sequence_init(&mut request);
+                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
                     },
                 "transcript.coding-sequence.end" => {
-                        request_transcript_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.end = value.unwrap_or("").to_string();
+                        request_transcript_coding_sequence_init(&mut request);
+                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
                     },
                 "transcript.gene-id" => {
-                        request_transcript_init(&mut request);
-                        request.transcript.as_mut().unwrap().gene_id = value.unwrap_or("").to_string();
+                        request_transcript_coding_sequence_init(&mut request);
+                        request.transcript.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
                     },
                 "variant.effect" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().effect = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().effect = Some(value.unwrap_or("").to_string());
                     },
                 "variant.transcript-ids" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().transcript_ids.push(value.unwrap_or("").to_string());
+                        if request.variant.as_mut().unwrap().transcript_ids.is_none() {
+                           request.variant.as_mut().unwrap().transcript_ids = Some(Default::default());
+                        }
+                                        request.variant.as_mut().unwrap().transcript_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "variant.alternate-bases" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().alternate_bases = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().alternate_bases = Some(value.unwrap_or("").to_string());
                     },
                 "variant.clinical-significance" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().clinical_significance = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().clinical_significance = Some(value.unwrap_or("").to_string());
                     },
                 "variant.type" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "variant.gene-id" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().gene_id = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
                     },
                 "annotation-set-id" => {
                         request_variant_init(&mut request);
@@ -654,23 +670,23 @@ impl Engine {
                     },
                 "position.start" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().start = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
                     },
                 "position.reference-id" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_id = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().reference_id = Some(value.unwrap_or("").to_string());
                     },
                 "position.end" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().end = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
                     },
                 "position.reverse-strand" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reverse_strand = arg_from_str(value.unwrap_or("false"), err, "position.reverse-strand", "boolean");
+                        request.position.as_mut().unwrap().reverse_strand = Some(arg_from_str(value.unwrap_or("false"), err, "position.reverse-strand", "boolean"));
                     },
                 "position.reference-name" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_name = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().reference_name = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_position_init(&mut request);
@@ -697,8 +713,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -709,7 +724,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.annotations().delete(&self.opt.arg_annotation_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -740,7 +755,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -751,7 +765,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.annotations().get(&self.opt.arg_annotation_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -783,8 +797,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -793,10 +806,10 @@ impl Engine {
 
     fn _annotations_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Annotation = Default::default();
+        let mut request = api::Annotation::default();
         let mut call = self.hub.annotations().patch(&request, &self.opt.arg_annotation_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -816,15 +829,23 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             fn request_position_init(request: &mut api::Annotation) {
                 if request.position.is_none() {
                     request.position = Some(Default::default());
+                }
+            }
+            
+            fn request_transcript_coding_sequence_init(request: &mut api::Annotation) {
+                request_transcript_init(request);
+                if request.transcript.as_mut().unwrap().coding_sequence.is_none() {
+                    request.transcript.as_mut().unwrap().coding_sequence = Some(Default::default());
                 }
             }
             
@@ -845,40 +866,43 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 "transcript.coding-sequence.start" => {
-                        request_transcript_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.start = value.unwrap_or("").to_string();
+                        request_transcript_coding_sequence_init(&mut request);
+                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
                     },
                 "transcript.coding-sequence.end" => {
-                        request_transcript_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.end = value.unwrap_or("").to_string();
+                        request_transcript_coding_sequence_init(&mut request);
+                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
                     },
                 "transcript.gene-id" => {
-                        request_transcript_init(&mut request);
-                        request.transcript.as_mut().unwrap().gene_id = value.unwrap_or("").to_string();
+                        request_transcript_coding_sequence_init(&mut request);
+                        request.transcript.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
                     },
                 "variant.effect" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().effect = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().effect = Some(value.unwrap_or("").to_string());
                     },
                 "variant.transcript-ids" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().transcript_ids.push(value.unwrap_or("").to_string());
+                        if request.variant.as_mut().unwrap().transcript_ids.is_none() {
+                           request.variant.as_mut().unwrap().transcript_ids = Some(Default::default());
+                        }
+                                        request.variant.as_mut().unwrap().transcript_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "variant.alternate-bases" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().alternate_bases = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().alternate_bases = Some(value.unwrap_or("").to_string());
                     },
                 "variant.clinical-significance" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().clinical_significance = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().clinical_significance = Some(value.unwrap_or("").to_string());
                     },
                 "variant.type" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "variant.gene-id" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().gene_id = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
                     },
                 "annotation-set-id" => {
                         request_variant_init(&mut request);
@@ -886,23 +910,23 @@ impl Engine {
                     },
                 "position.start" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().start = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
                     },
                 "position.reference-id" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_id = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().reference_id = Some(value.unwrap_or("").to_string());
                     },
                 "position.end" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().end = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
                     },
                 "position.reverse-strand" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reverse_strand = arg_from_str(value.unwrap_or("false"), err, "position.reverse-strand", "boolean");
+                        request.position.as_mut().unwrap().reverse_strand = Some(arg_from_str(value.unwrap_or("false"), err, "position.reverse-strand", "boolean"));
                     },
                 "position.reference-name" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_name = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().reference_name = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_position_init(&mut request);
@@ -929,8 +953,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -939,10 +962,10 @@ impl Engine {
 
     fn _annotations_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SearchAnnotationsRequest = Default::default();
+        let mut request = api::SearchAnnotationsRequest::default();
         let mut call = self.hub.annotations().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -962,9 +985,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -980,26 +1004,26 @@ impl Engine {
                     },
                 "range.start" => {
                         request_range_init(&mut request);
-                        request.range.as_mut().unwrap().start = value.unwrap_or("").to_string();
+                        request.range.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
                     },
                 "range.reference-id" => {
                         request_range_init(&mut request);
-                        request.range.as_mut().unwrap().reference_id = value.unwrap_or("").to_string();
+                        request.range.as_mut().unwrap().reference_id = Some(value.unwrap_or("").to_string());
                     },
                 "range.end" => {
                         request_range_init(&mut request);
-                        request.range.as_mut().unwrap().end = value.unwrap_or("").to_string();
+                        request.range.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
                     },
                 "range.reference-name" => {
                         request_range_init(&mut request);
-                        request.range.as_mut().unwrap().reference_name = value.unwrap_or("").to_string();
+                        request.range.as_mut().unwrap().reference_name = Some(value.unwrap_or("").to_string());
                     },
                 "annotation-set-ids" => {
                         request_range_init(&mut request);
                         if request.annotation_set_ids.is_none() {
-                            request.annotation_set_ids = Some(Default::default());
+                           request.annotation_set_ids = Some(Default::default());
                         }
-                        request.annotation_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.annotation_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "page-size" => {
                         request_range_init(&mut request);
@@ -1022,8 +1046,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1032,10 +1055,10 @@ impl Engine {
 
     fn _annotations_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Annotation = Default::default();
+        let mut request = api::Annotation::default();
         let mut call = self.hub.annotations().update(&request, &self.opt.arg_annotation_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1055,15 +1078,23 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             fn request_position_init(request: &mut api::Annotation) {
                 if request.position.is_none() {
                     request.position = Some(Default::default());
+                }
+            }
+            
+            fn request_transcript_coding_sequence_init(request: &mut api::Annotation) {
+                request_transcript_init(request);
+                if request.transcript.as_mut().unwrap().coding_sequence.is_none() {
+                    request.transcript.as_mut().unwrap().coding_sequence = Some(Default::default());
                 }
             }
             
@@ -1084,40 +1115,43 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 "transcript.coding-sequence.start" => {
-                        request_transcript_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.start = value.unwrap_or("").to_string();
+                        request_transcript_coding_sequence_init(&mut request);
+                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
                     },
                 "transcript.coding-sequence.end" => {
-                        request_transcript_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.end = value.unwrap_or("").to_string();
+                        request_transcript_coding_sequence_init(&mut request);
+                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
                     },
                 "transcript.gene-id" => {
-                        request_transcript_init(&mut request);
-                        request.transcript.as_mut().unwrap().gene_id = value.unwrap_or("").to_string();
+                        request_transcript_coding_sequence_init(&mut request);
+                        request.transcript.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
                     },
                 "variant.effect" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().effect = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().effect = Some(value.unwrap_or("").to_string());
                     },
                 "variant.transcript-ids" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().transcript_ids.push(value.unwrap_or("").to_string());
+                        if request.variant.as_mut().unwrap().transcript_ids.is_none() {
+                           request.variant.as_mut().unwrap().transcript_ids = Some(Default::default());
+                        }
+                                        request.variant.as_mut().unwrap().transcript_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "variant.alternate-bases" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().alternate_bases = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().alternate_bases = Some(value.unwrap_or("").to_string());
                     },
                 "variant.clinical-significance" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().clinical_significance = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().clinical_significance = Some(value.unwrap_or("").to_string());
                     },
                 "variant.type" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().type_ = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
                     },
                 "variant.gene-id" => {
                         request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().gene_id = value.unwrap_or("").to_string();
+                        request.variant.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
                     },
                 "annotation-set-id" => {
                         request_variant_init(&mut request);
@@ -1125,23 +1159,23 @@ impl Engine {
                     },
                 "position.start" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().start = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
                     },
                 "position.reference-id" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_id = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().reference_id = Some(value.unwrap_or("").to_string());
                     },
                 "position.end" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().end = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
                     },
                 "position.reverse-strand" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reverse_strand = arg_from_str(value.unwrap_or("false"), err, "position.reverse-strand", "boolean");
+                        request.position.as_mut().unwrap().reverse_strand = Some(arg_from_str(value.unwrap_or("false"), err, "position.reverse-strand", "boolean"));
                     },
                 "position.reference-name" => {
                         request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_name = value.unwrap_or("").to_string();
+                        request.position.as_mut().unwrap().reference_name = Some(value.unwrap_or("").to_string());
                     },
                 "type" => {
                         request_position_init(&mut request);
@@ -1168,8 +1202,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1178,10 +1211,10 @@ impl Engine {
 
     fn _callsets_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CallSet = Default::default();
+        let mut request = api::CallSet::default();
         let mut call = self.hub.callsets().create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1201,9 +1234,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1216,9 +1250,9 @@ impl Engine {
                     },
                 "variant-set-ids" => {
                         if request.variant_set_ids.is_none() {
-                            request.variant_set_ids = Some(Default::default());
+                           request.variant_set_ids = Some(Default::default());
                         }
-                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "name" => {
                         request.name = Some(value.unwrap_or("").to_string());
@@ -1243,8 +1277,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1255,7 +1288,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.callsets().delete(&self.opt.arg_call_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1286,7 +1319,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1297,7 +1329,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.callsets().get(&self.opt.arg_call_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1329,8 +1361,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1339,10 +1370,10 @@ impl Engine {
 
     fn _callsets_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CallSet = Default::default();
+        let mut request = api::CallSet::default();
         let mut call = self.hub.callsets().patch(&request, &self.opt.arg_call_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1362,9 +1393,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1377,9 +1409,9 @@ impl Engine {
                     },
                 "variant-set-ids" => {
                         if request.variant_set_ids.is_none() {
-                            request.variant_set_ids = Some(Default::default());
+                           request.variant_set_ids = Some(Default::default());
                         }
-                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "name" => {
                         request.name = Some(value.unwrap_or("").to_string());
@@ -1404,8 +1436,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1414,10 +1445,10 @@ impl Engine {
 
     fn _callsets_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SearchCallSetsRequest = Default::default();
+        let mut request = api::SearchCallSetsRequest::default();
         let mut call = self.hub.callsets().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1437,9 +1468,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1449,9 +1481,9 @@ impl Engine {
                     },
                 "variant-set-ids" => {
                         if request.variant_set_ids.is_none() {
-                            request.variant_set_ids = Some(Default::default());
+                           request.variant_set_ids = Some(Default::default());
                         }
-                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "name" => {
                         request.name = Some(value.unwrap_or("").to_string());
@@ -1476,8 +1508,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1486,10 +1517,10 @@ impl Engine {
 
     fn _callsets_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CallSet = Default::default();
+        let mut request = api::CallSet::default();
         let mut call = self.hub.callsets().update(&request, &self.opt.arg_call_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1509,9 +1540,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1524,9 +1556,9 @@ impl Engine {
                     },
                 "variant-set-ids" => {
                         if request.variant_set_ids.is_none() {
-                            request.variant_set_ids = Some(Default::default());
+                           request.variant_set_ids = Some(Default::default());
                         }
-                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "name" => {
                         request.name = Some(value.unwrap_or("").to_string());
@@ -1551,8 +1583,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1561,10 +1592,10 @@ impl Engine {
 
     fn _datasets_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Dataset = Default::default();
+        let mut request = api::Dataset::default();
         let mut call = self.hub.datasets().create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1584,9 +1615,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1620,8 +1652,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1632,7 +1663,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datasets().delete(&self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1663,7 +1694,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1674,7 +1704,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datasets().get(&self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1706,8 +1736,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1718,7 +1747,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datasets().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "project-number" => {
                     call = call.project_number(value.unwrap_or(""));
@@ -1759,8 +1788,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1769,10 +1797,10 @@ impl Engine {
 
     fn _datasets_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Dataset = Default::default();
+        let mut request = api::Dataset::default();
         let mut call = self.hub.datasets().patch(&request, &self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1792,9 +1820,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1828,8 +1857,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1840,7 +1868,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datasets().undelete(&self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1872,8 +1900,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1882,10 +1909,10 @@ impl Engine {
 
     fn _datasets_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Dataset = Default::default();
+        let mut request = api::Dataset::default();
         let mut call = self.hub.datasets().update(&request, &self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1905,9 +1932,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1941,8 +1969,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1951,10 +1978,10 @@ impl Engine {
 
     fn _experimental_jobs_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ExperimentalCreateJobRequest = Default::default();
+        let mut request = api::ExperimentalCreateJobRequest::default();
         let mut call = self.hub.experimental().jobs_create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1974,18 +2001,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "paired-source-uris" => {
                         if request.paired_source_uris.is_none() {
-                            request.paired_source_uris = Some(Default::default());
+                           request.paired_source_uris = Some(Default::default());
                         }
-                        request.paired_source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.paired_source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "align" => {
                         request.align = Some(arg_from_str(value.unwrap_or("false"), err, "align", "boolean"));
@@ -1995,9 +2023,9 @@ impl Engine {
                     },
                 "source-uris" => {
                         if request.source_uris.is_none() {
-                            request.source_uris = Some(Default::default());
+                           request.source_uris = Some(Default::default());
                         }
-                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "gcs-output-path" => {
                         request.gcs_output_path = Some(value.unwrap_or("").to_string());
@@ -2022,8 +2050,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2034,7 +2061,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.jobs().cancel(&self.opt.arg_job_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2065,7 +2092,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2076,7 +2102,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.jobs().get(&self.opt.arg_job_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2108,8 +2134,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2118,10 +2143,10 @@ impl Engine {
 
     fn _jobs_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SearchJobsRequest = Default::default();
+        let mut request = api::SearchJobsRequest::default();
         let mut call = self.hub.jobs().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2141,18 +2166,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "status" => {
                         if request.status.is_none() {
-                            request.status = Some(Default::default());
+                           request.status = Some(Default::default());
                         }
-                        request.status.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.status.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "created-after" => {
                         request.created_after = Some(value.unwrap_or("").to_string());
@@ -2186,8 +2212,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2196,10 +2221,10 @@ impl Engine {
 
     fn _readgroupsets_align(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AlignReadGroupSetsRequest = Default::default();
+        let mut request = api::AlignReadGroupSetsRequest::default();
         let mut call = self.hub.readgroupsets().align(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2219,9 +2244,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2231,71 +2257,94 @@ impl Engine {
                 }
             }
             
+            fn request_interleaved_fastq_source_metadata_init(request: &mut api::AlignReadGroupSetsRequest) {
+                request_interleaved_fastq_source_init(request);
+                if request.interleaved_fastq_source.as_mut().unwrap().metadata.is_none() {
+                    request.interleaved_fastq_source.as_mut().unwrap().metadata = Some(Default::default());
+                }
+            }
+            
             fn request_paired_fastq_source_init(request: &mut api::AlignReadGroupSetsRequest) {
                 if request.paired_fastq_source.is_none() {
                     request.paired_fastq_source = Some(Default::default());
                 }
             }
             
+            fn request_paired_fastq_source_metadata_init(request: &mut api::AlignReadGroupSetsRequest) {
+                request_paired_fastq_source_init(request);
+                if request.paired_fastq_source.as_mut().unwrap().metadata.is_none() {
+                    request.paired_fastq_source.as_mut().unwrap().metadata = Some(Default::default());
+                }
+            }
+            
             match &field_name.to_string()[..] {
                 "interleaved-fastq-source.source-uris" => {
                         request_interleaved_fastq_source_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().source_uris.push(value.unwrap_or("").to_string());
+                        if request.interleaved_fastq_source.as_mut().unwrap().source_uris.is_none() {
+                           request.interleaved_fastq_source.as_mut().unwrap().source_uris = Some(Default::default());
+                        }
+                                        request.interleaved_fastq_source.as_mut().unwrap().source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "interleaved-fastq-source.metadata.read-group-name" => {
-                        request_interleaved_fastq_source_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().metadata.read_group_name = value.unwrap_or("").to_string();
+                        request_interleaved_fastq_source_metadata_init(&mut request);
+                        request.interleaved_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().read_group_name = Some(value.unwrap_or("").to_string());
                     },
                 "interleaved-fastq-source.metadata.sample-name" => {
-                        request_interleaved_fastq_source_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().metadata.sample_name = value.unwrap_or("").to_string();
+                        request_interleaved_fastq_source_metadata_init(&mut request);
+                        request.interleaved_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().sample_name = Some(value.unwrap_or("").to_string());
                     },
                 "interleaved-fastq-source.metadata.library-name" => {
-                        request_interleaved_fastq_source_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().metadata.library_name = value.unwrap_or("").to_string();
+                        request_interleaved_fastq_source_metadata_init(&mut request);
+                        request.interleaved_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().library_name = Some(value.unwrap_or("").to_string());
                     },
                 "interleaved-fastq-source.metadata.platform-name" => {
-                        request_interleaved_fastq_source_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().metadata.platform_name = value.unwrap_or("").to_string();
+                        request_interleaved_fastq_source_metadata_init(&mut request);
+                        request.interleaved_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().platform_name = Some(value.unwrap_or("").to_string());
                     },
                 "interleaved-fastq-source.metadata.platform-unit" => {
-                        request_interleaved_fastq_source_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().metadata.platform_unit = value.unwrap_or("").to_string();
+                        request_interleaved_fastq_source_metadata_init(&mut request);
+                        request.interleaved_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().platform_unit = Some(value.unwrap_or("").to_string());
                     },
                 "bam-source-uris" => {
                         request_interleaved_fastq_source_init(&mut request);
                         if request.bam_source_uris.is_none() {
-                            request.bam_source_uris = Some(Default::default());
+                           request.bam_source_uris = Some(Default::default());
                         }
-                        request.bam_source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.bam_source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "paired-fastq-source.second-source-uris" => {
                         request_paired_fastq_source_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().second_source_uris.push(value.unwrap_or("").to_string());
+                        if request.paired_fastq_source.as_mut().unwrap().second_source_uris.is_none() {
+                           request.paired_fastq_source.as_mut().unwrap().second_source_uris = Some(Default::default());
+                        }
+                                        request.paired_fastq_source.as_mut().unwrap().second_source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "paired-fastq-source.metadata.read-group-name" => {
-                        request_paired_fastq_source_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().metadata.read_group_name = value.unwrap_or("").to_string();
+                        request_paired_fastq_source_metadata_init(&mut request);
+                        request.paired_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().read_group_name = Some(value.unwrap_or("").to_string());
                     },
                 "paired-fastq-source.metadata.sample-name" => {
-                        request_paired_fastq_source_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().metadata.sample_name = value.unwrap_or("").to_string();
+                        request_paired_fastq_source_metadata_init(&mut request);
+                        request.paired_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().sample_name = Some(value.unwrap_or("").to_string());
                     },
                 "paired-fastq-source.metadata.library-name" => {
-                        request_paired_fastq_source_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().metadata.library_name = value.unwrap_or("").to_string();
+                        request_paired_fastq_source_metadata_init(&mut request);
+                        request.paired_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().library_name = Some(value.unwrap_or("").to_string());
                     },
                 "paired-fastq-source.metadata.platform-name" => {
-                        request_paired_fastq_source_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().metadata.platform_name = value.unwrap_or("").to_string();
+                        request_paired_fastq_source_metadata_init(&mut request);
+                        request.paired_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().platform_name = Some(value.unwrap_or("").to_string());
                     },
                 "paired-fastq-source.metadata.platform-unit" => {
-                        request_paired_fastq_source_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().metadata.platform_unit = value.unwrap_or("").to_string();
+                        request_paired_fastq_source_metadata_init(&mut request);
+                        request.paired_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().platform_unit = Some(value.unwrap_or("").to_string());
                     },
                 "paired-fastq-source.first-source-uris" => {
-                        request_paired_fastq_source_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().first_source_uris.push(value.unwrap_or("").to_string());
+                        request_paired_fastq_source_metadata_init(&mut request);
+                        if request.paired_fastq_source.as_mut().unwrap().first_source_uris.is_none() {
+                           request.paired_fastq_source.as_mut().unwrap().first_source_uris = Some(Default::default());
+                        }
+                                        request.paired_fastq_source.as_mut().unwrap().first_source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "read-group-set-id" => {
                         request_paired_fastq_source_init(&mut request);
@@ -2322,8 +2371,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2332,10 +2380,10 @@ impl Engine {
 
     fn _readgroupsets_call(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::CallReadGroupSetsRequest = Default::default();
+        let mut request = api::CallReadGroupSetsRequest::default();
         let mut call = self.hub.readgroupsets().call(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2355,18 +2403,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "source-uris" => {
                         if request.source_uris.is_none() {
-                            request.source_uris = Some(Default::default());
+                           request.source_uris = Some(Default::default());
                         }
-                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "read-group-set-id" => {
                         request.read_group_set_id = Some(value.unwrap_or("").to_string());
@@ -2391,8 +2440,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2403,7 +2451,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.readgroupsets().coveragebuckets_list(&self.opt.arg_read_group_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "target-bucket-width" => {
                     call = call.target_bucket_width(value.unwrap_or(""));
@@ -2453,8 +2501,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2465,7 +2512,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.readgroupsets().delete(&self.opt.arg_read_group_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2496,7 +2543,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2505,10 +2551,10 @@ impl Engine {
 
     fn _readgroupsets_export(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ExportReadGroupSetsRequest = Default::default();
+        let mut request = api::ExportReadGroupSetsRequest::default();
         let mut call = self.hub.readgroupsets().export(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2528,9 +2574,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2540,15 +2587,15 @@ impl Engine {
                     },
                 "reference-names" => {
                         if request.reference_names.is_none() {
-                            request.reference_names = Some(Default::default());
+                           request.reference_names = Some(Default::default());
                         }
-                        request.reference_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.reference_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "read-group-set-ids" => {
                         if request.read_group_set_ids.is_none() {
-                            request.read_group_set_ids = Some(Default::default());
+                           request.read_group_set_ids = Some(Default::default());
                         }
-                        request.read_group_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.read_group_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "project-number" => {
                         request.project_number = Some(value.unwrap_or("").to_string());
@@ -2570,8 +2617,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2582,7 +2628,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.readgroupsets().get(&self.opt.arg_read_group_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2614,8 +2660,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2624,10 +2669,10 @@ impl Engine {
 
     fn _readgroupsets_import(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ImportReadGroupSetsRequest = Default::default();
+        let mut request = api::ImportReadGroupSetsRequest::default();
         let mut call = self.hub.readgroupsets().import(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2647,9 +2692,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2659,9 +2705,9 @@ impl Engine {
                     },
                 "source-uris" => {
                         if request.source_uris.is_none() {
-                            request.source_uris = Some(Default::default());
+                           request.source_uris = Some(Default::default());
                         }
-                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "partition-strategy" => {
                         request.partition_strategy = Some(value.unwrap_or("").to_string());
@@ -2686,8 +2732,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2696,10 +2741,10 @@ impl Engine {
 
     fn _readgroupsets_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ReadGroupSet = Default::default();
+        let mut request = api::ReadGroupSet::default();
         let mut call = self.hub.readgroupsets().patch(&request, &self.opt.arg_read_group_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2719,9 +2764,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2758,8 +2804,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2768,10 +2813,10 @@ impl Engine {
 
     fn _readgroupsets_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SearchReadGroupSetsRequest = Default::default();
+        let mut request = api::SearchReadGroupSetsRequest::default();
         let mut call = self.hub.readgroupsets().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2791,9 +2836,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2803,9 +2849,9 @@ impl Engine {
                     },
                 "dataset-ids" => {
                         if request.dataset_ids.is_none() {
-                            request.dataset_ids = Some(Default::default());
+                           request.dataset_ids = Some(Default::default());
                         }
-                        request.dataset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.dataset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "name" => {
                         request.name = Some(value.unwrap_or("").to_string());
@@ -2830,8 +2876,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2840,10 +2885,10 @@ impl Engine {
 
     fn _readgroupsets_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ReadGroupSet = Default::default();
+        let mut request = api::ReadGroupSet::default();
         let mut call = self.hub.readgroupsets().update(&request, &self.opt.arg_read_group_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2863,9 +2908,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2902,8 +2948,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2912,10 +2957,10 @@ impl Engine {
 
     fn _reads_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SearchReadsRequest = Default::default();
+        let mut request = api::SearchReadsRequest::default();
         let mut call = self.hub.reads().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2935,24 +2980,25 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "read-group-set-ids" => {
                         if request.read_group_set_ids.is_none() {
-                            request.read_group_set_ids = Some(Default::default());
+                           request.read_group_set_ids = Some(Default::default());
                         }
-                        request.read_group_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.read_group_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "read-group-ids" => {
                         if request.read_group_ids.is_none() {
-                            request.read_group_ids = Some(Default::default());
+                           request.read_group_ids = Some(Default::default());
                         }
-                        request.read_group_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.read_group_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "page-size" => {
                         request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
@@ -2986,8 +3032,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2998,7 +3043,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.references().bases_list(&self.opt.arg_reference_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start" => {
                     call = call.start(value.unwrap_or(""));
@@ -3042,8 +3087,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3054,7 +3098,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.references().get(&self.opt.arg_reference_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3086,8 +3130,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3096,10 +3139,10 @@ impl Engine {
 
     fn _references_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SearchReferencesRequest = Default::default();
+        let mut request = api::SearchReferencesRequest::default();
         let mut call = self.hub.references().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3119,18 +3162,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "md5checksums" => {
                         if request.md5checksums.is_none() {
-                            request.md5checksums = Some(Default::default());
+                           request.md5checksums = Some(Default::default());
                         }
-                        request.md5checksums.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.md5checksums.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "page-token" => {
                         request.page_token = Some(value.unwrap_or("").to_string());
@@ -3140,9 +3184,9 @@ impl Engine {
                     },
                 "accessions" => {
                         if request.accessions.is_none() {
-                            request.accessions = Some(Default::default());
+                           request.accessions = Some(Default::default());
                         }
-                        request.accessions.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.accessions.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "page-size" => {
                         request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
@@ -3164,8 +3208,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3176,7 +3219,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.referencesets().get(&self.opt.arg_reference_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3208,8 +3251,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3218,10 +3260,10 @@ impl Engine {
 
     fn _referencesets_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SearchReferenceSetsRequest = Default::default();
+        let mut request = api::SearchReferenceSetsRequest::default();
         let mut call = self.hub.referencesets().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3241,27 +3283,28 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "md5checksums" => {
                         if request.md5checksums.is_none() {
-                            request.md5checksums = Some(Default::default());
+                           request.md5checksums = Some(Default::default());
                         }
-                        request.md5checksums.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.md5checksums.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "assembly-id" => {
                         request.assembly_id = Some(value.unwrap_or("").to_string());
                     },
                 "accessions" => {
                         if request.accessions.is_none() {
-                            request.accessions = Some(Default::default());
+                           request.accessions = Some(Default::default());
                         }
-                        request.accessions.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.accessions.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "page-size" => {
                         request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
@@ -3286,20 +3329,19 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
         }
     }
 
-    fn _streaming_variant_store_streamvariants(&self, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _streaming_readstore_streamreads(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::StreamVariantsRequest = Default::default();
-        let mut call = self.hub.streaming_variant_store().streamvariants(&request);
+        let mut request = api::StreamReadsRequest::default();
+        let mut call = self.hub.streaming_readstore().streamreads(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3319,24 +3361,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
-                "variant-set-ids" => {
-                        if request.variant_set_ids.is_none() {
-                            request.variant_set_ids = Some(Default::default());
+                "read-group-set-ids" => {
+                        if request.read_group_set_ids.is_none() {
+                           request.read_group_set_ids = Some(Default::default());
                         }
-                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "call-set-ids" => {
-                        if request.call_set_ids.is_none() {
-                            request.call_set_ids = Some(Default::default());
-                        }
-                        request.call_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.read_group_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "end" => {
                         request.end = Some(value.unwrap_or("").to_string());
@@ -3364,8 +3401,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3374,10 +3410,10 @@ impl Engine {
 
     fn _variants_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Variant = Default::default();
+        let mut request = api::Variant::default();
         let mut call = self.hub.variants().create(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3397,9 +3433,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3418,24 +3455,24 @@ impl Engine {
                     },
                 "filter" => {
                         if request.filter.is_none() {
-                            request.filter = Some(Default::default());
+                           request.filter = Some(Default::default());
                         }
-                        request.filter.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.filter.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "start" => {
                         request.start = Some(value.unwrap_or("").to_string());
                     },
                 "names" => {
                         if request.names.is_none() {
-                            request.names = Some(Default::default());
+                           request.names = Some(Default::default());
                         }
-                        request.names.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.names.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "alternate-bases" => {
                         if request.alternate_bases.is_none() {
-                            request.alternate_bases = Some(Default::default());
+                           request.alternate_bases = Some(Default::default());
                         }
-                        request.alternate_bases.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.alternate_bases.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "reference-name" => {
                         request.reference_name = Some(value.unwrap_or("").to_string());
@@ -3463,8 +3500,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3475,7 +3511,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.variants().delete(&self.opt.arg_variant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3506,7 +3542,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -3517,7 +3552,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.variants().get(&self.opt.arg_variant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3549,8 +3584,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3559,10 +3593,10 @@ impl Engine {
 
     fn _variants_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SearchVariantsRequest = Default::default();
+        let mut request = api::SearchVariantsRequest::default();
         let mut call = self.hub.variants().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3582,9 +3616,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3606,9 +3641,9 @@ impl Engine {
                     },
                 "call-set-ids" => {
                         if request.call_set_ids.is_none() {
-                            request.call_set_ids = Some(Default::default());
+                           request.call_set_ids = Some(Default::default());
                         }
-                        request.call_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.call_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "variant-name" => {
                         request.variant_name = Some(value.unwrap_or("").to_string());
@@ -3618,9 +3653,9 @@ impl Engine {
                     },
                 "variant-set-ids" => {
                         if request.variant_set_ids.is_none() {
-                            request.variant_set_ids = Some(Default::default());
+                           request.variant_set_ids = Some(Default::default());
                         }
-                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -3639,8 +3674,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3649,10 +3683,10 @@ impl Engine {
 
     fn _variants_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Variant = Default::default();
+        let mut request = api::Variant::default();
         let mut call = self.hub.variants().update(&request, &self.opt.arg_variant_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3672,9 +3706,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3693,24 +3728,24 @@ impl Engine {
                     },
                 "filter" => {
                         if request.filter.is_none() {
-                            request.filter = Some(Default::default());
+                           request.filter = Some(Default::default());
                         }
-                        request.filter.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.filter.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "start" => {
                         request.start = Some(value.unwrap_or("").to_string());
                     },
                 "names" => {
                         if request.names.is_none() {
-                            request.names = Some(Default::default());
+                           request.names = Some(Default::default());
                         }
-                        request.names.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.names.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "alternate-bases" => {
                         if request.alternate_bases.is_none() {
-                            request.alternate_bases = Some(Default::default());
+                           request.alternate_bases = Some(Default::default());
                         }
-                        request.alternate_bases.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.alternate_bases.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "reference-name" => {
                         request.reference_name = Some(value.unwrap_or("").to_string());
@@ -3738,8 +3773,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3750,7 +3784,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.variantsets().delete(&self.opt.arg_variant_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3781,7 +3815,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -3790,10 +3823,10 @@ impl Engine {
 
     fn _variantsets_export(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ExportVariantSetRequest = Default::default();
+        let mut request = api::ExportVariantSetRequest::default();
         let mut call = self.hub.variantsets().export(&request, &self.opt.arg_variant_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3813,9 +3846,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -3828,9 +3862,9 @@ impl Engine {
                     },
                 "call-set-ids" => {
                         if request.call_set_ids.is_none() {
-                            request.call_set_ids = Some(Default::default());
+                           request.call_set_ids = Some(Default::default());
                         }
-                        request.call_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.call_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "project-number" => {
                         request.project_number = Some(value.unwrap_or("").to_string());
@@ -3855,8 +3889,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3867,7 +3900,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.variantsets().get(&self.opt.arg_variant_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3899,8 +3932,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3909,10 +3941,10 @@ impl Engine {
 
     fn _variantsets_import_variants(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ImportVariantsRequest = Default::default();
+        let mut request = api::ImportVariantsRequest::default();
         let mut call = self.hub.variantsets().import_variants(&request, &self.opt.arg_variant_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3932,18 +3964,19 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "source-uris" => {
                         if request.source_uris.is_none() {
-                            request.source_uris = Some(Default::default());
+                           request.source_uris = Some(Default::default());
                         }
-                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "format" => {
                         request.format = Some(value.unwrap_or("").to_string());
@@ -3965,8 +3998,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -3975,10 +4007,10 @@ impl Engine {
 
     fn _variantsets_merge_variants(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::MergeVariantsRequest = Default::default();
+        let mut request = api::MergeVariantsRequest::default();
         let mut call = self.hub.variantsets().merge_variants(&request, &self.opt.arg_variant_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3998,9 +4030,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4021,7 +4054,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -4030,10 +4062,10 @@ impl Engine {
 
     fn _variantsets_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::VariantSet = Default::default();
+        let mut request = api::VariantSet::default();
         let mut call = self.hub.variantsets().patch(&request, &self.opt.arg_variant_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4053,9 +4085,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4083,8 +4116,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4093,10 +4125,10 @@ impl Engine {
 
     fn _variantsets_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SearchVariantSetsRequest = Default::default();
+        let mut request = api::SearchVariantSetsRequest::default();
         let mut call = self.hub.variantsets().search(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4116,9 +4148,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4128,9 +4161,9 @@ impl Engine {
                     },
                 "dataset-ids" => {
                         if request.dataset_ids.is_none() {
-                            request.dataset_ids = Some(Default::default());
+                           request.dataset_ids = Some(Default::default());
                         }
-                        request.dataset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.dataset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "page-size" => {
                         request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
@@ -4152,8 +4185,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4162,10 +4194,10 @@ impl Engine {
 
     fn _variantsets_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::VariantSet = Default::default();
+        let mut request = api::VariantSet::default();
         let mut call = self.hub.variantsets().update(&request, &self.opt.arg_variant_set_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -4185,9 +4217,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -4215,8 +4248,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -4244,7 +4276,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_annotations {
+        }
+ else if self.opt.cmd_annotations {
             if self.opt.cmd_batch_create {
                 call_result = self._annotations_batch_create(dry_run, &mut err);
             } else if self.opt.cmd_create {
@@ -4262,7 +4295,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_callsets {
+        }
+ else if self.opt.cmd_callsets {
             if self.opt.cmd_create {
                 call_result = self._callsets_create(dry_run, &mut err);
             } else if self.opt.cmd_delete {
@@ -4278,7 +4312,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_datasets {
+        }
+ else if self.opt.cmd_datasets {
             if self.opt.cmd_create {
                 call_result = self._datasets_create(dry_run, &mut err);
             } else if self.opt.cmd_delete {
@@ -4296,13 +4331,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_experimental {
+        }
+ else if self.opt.cmd_experimental {
             if self.opt.cmd_jobs_create {
                 call_result = self._experimental_jobs_create(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_jobs {
+        }
+ else if self.opt.cmd_jobs {
             if self.opt.cmd_cancel {
                 call_result = self._jobs_cancel(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -4312,7 +4349,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_readgroupsets {
+        }
+ else if self.opt.cmd_readgroupsets {
             if self.opt.cmd_align {
                 call_result = self._readgroupsets_align(dry_run, &mut err);
             } else if self.opt.cmd_call {
@@ -4336,13 +4374,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_reads {
+        }
+ else if self.opt.cmd_reads {
             if self.opt.cmd_search {
                 call_result = self._reads_search(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_references {
+        }
+ else if self.opt.cmd_references {
             if self.opt.cmd_bases_list {
                 call_result = self._references_bases_list(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -4352,7 +4392,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_referencesets {
+        }
+ else if self.opt.cmd_referencesets {
             if self.opt.cmd_get {
                 call_result = self._referencesets_get(dry_run, &mut err);
             } else if self.opt.cmd_search {
@@ -4360,13 +4401,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_streaming_variant_store {
-            if self.opt.cmd_streamvariants {
-                call_result = self._streaming_variant_store_streamvariants(dry_run, &mut err);
+        }
+ else if self.opt.cmd_streaming_readstore {
+            if self.opt.cmd_streamreads {
+                call_result = self._streaming_readstore_streamreads(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_variants {
+        }
+ else if self.opt.cmd_variants {
             if self.opt.cmd_create {
                 call_result = self._variants_create(dry_run, &mut err);
             } else if self.opt.cmd_delete {
@@ -4380,7 +4423,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_variantsets {
+        }
+ else if self.opt.cmd_variantsets {
             if self.opt.cmd_delete {
                 call_result = self._variantsets_delete(dry_run, &mut err);
             } else if self.opt.cmd_export {
@@ -4420,21 +4464,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "genomics1-beta2-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "genomics1-beta2-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "genomics1-beta2",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "genomics1-beta2",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::Genomics::new(hyper::Client::new(), auth),
+            hub: api::Genomics::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -4454,12 +4514,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

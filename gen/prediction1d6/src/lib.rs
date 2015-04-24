@@ -98,7 +98,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: Update = Default::default();
+//! let mut req = Update::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -285,7 +285,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Update = Default::default();
+/// let mut req = Update::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -358,9 +358,9 @@ impl<'a, C, A> Prediction<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesCategoricalValues {
     /// Number of times this feature had this value.
-    pub count: String,
+    pub count: Option<String>,
     /// The category name.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for AnalyzeDataDescriptionFeaturesCategoricalValues {}
@@ -413,9 +413,9 @@ impl RequestValue for Insert {}
 pub struct AnalyzeDataDescription {
     /// Description of the output value or label.
     #[serde(rename="outputFeature")]
-    pub output_feature: AnalyzeDataDescriptionOutputFeature,
+    pub output_feature: Option<AnalyzeDataDescriptionOutputFeature>,
     /// Description of the input features in the data set.
-    pub features: Vec<AnalyzeDataDescriptionFeatures>,
+    pub features: Option<Vec<AnalyzeDataDescriptionFeatures>>,
 }
 
 impl NestedType for AnalyzeDataDescription {}
@@ -429,11 +429,11 @@ impl Part for AnalyzeDataDescription {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesNumeric {
     /// Number of numeric values for this feature in the data set.
-    pub count: String,
+    pub count: Option<String>,
     /// Variance of the numeric values of this feature in the data set.
-    pub variance: String,
+    pub variance: Option<String>,
     /// Mean of the numeric values of this feature in the data set.
-    pub mean: String,
+    pub mean: Option<String>,
 }
 
 impl NestedType for AnalyzeDataDescriptionFeaturesNumeric {}
@@ -453,14 +453,14 @@ impl Part for AnalyzeDataDescriptionFeaturesNumeric {}
 pub struct List {
     /// Pagination token to fetch the next page, if one exists.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// List of models.
-    pub items: Vec<Insert2>,
+    pub items: Option<Vec<Insert2>>,
     /// What kind of resource this is.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A URL to re-request this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for List {}
@@ -474,7 +474,7 @@ impl ResponseResult for List {}
 pub struct InputInput {
     /// A list of input features, these can be strings or doubles.
     #[serde(rename="csvInstance")]
-    pub csv_instance: Vec<String>,
+    pub csv_instance: Option<Vec<String>>,
 }
 
 impl NestedType for InputInput {}
@@ -488,7 +488,7 @@ impl Part for InputInput {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesText {
     /// Number of multiple-word text values for this feature.
-    pub count: String,
+    pub count: Option<String>,
 }
 
 impl NestedType for AnalyzeDataDescriptionFeaturesText {}
@@ -502,13 +502,13 @@ impl Part for AnalyzeDataDescriptionFeaturesText {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionFeatures {
     /// The feature index.
-    pub index: String,
+    pub index: Option<String>,
     /// Description of the categorical values of this feature.
-    pub categorical: AnalyzeDataDescriptionFeaturesCategorical,
+    pub categorical: Option<AnalyzeDataDescriptionFeaturesCategorical>,
     /// Description of the numeric values of this feature.
-    pub numeric: AnalyzeDataDescriptionFeaturesNumeric,
+    pub numeric: Option<AnalyzeDataDescriptionFeaturesNumeric>,
     /// Description of multiple-word text values of this feature.
-    pub text: AnalyzeDataDescriptionFeaturesText,
+    pub text: Option<AnalyzeDataDescriptionFeaturesText>,
 }
 
 impl NestedType for AnalyzeDataDescriptionFeatures {}
@@ -547,21 +547,21 @@ impl RequestValue for Input {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Output {
     /// What kind of resource this is.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of class labels with their estimated probabilities (Categorical models only).
     #[serde(rename="outputMulti")]
-    pub output_multi: Vec<OutputOutputMulti>,
+    pub output_multi: Option<Vec<OutputOutputMulti>>,
     /// The most likely class label (Categorical models only).
     #[serde(rename="outputLabel")]
-    pub output_label: String,
+    pub output_label: Option<String>,
     /// The unique name for the predictive model.
-    pub id: String,
+    pub id: Option<String>,
     /// A URL to re-request this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// The estimated regression value (Regression models only).
     #[serde(rename="outputValue")]
-    pub output_value: String,
+    pub output_value: Option<String>,
 }
 
 impl ResponseResult for Output {}
@@ -579,20 +579,20 @@ impl ResponseResult for Output {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Analyze {
     /// What kind of resource this is.
-    pub kind: String,
+    pub kind: Option<String>,
     /// List of errors with the data.
-    pub errors: Vec<HashMap<String, String>>,
+    pub errors: Option<Vec<HashMap<String, String>>>,
     /// Description of the data the model was trained on.
     #[serde(rename="dataDescription")]
-    pub data_description: AnalyzeDataDescription,
+    pub data_description: Option<AnalyzeDataDescription>,
     /// Description of the model.
     #[serde(rename="modelDescription")]
-    pub model_description: AnalyzeModelDescription,
+    pub model_description: Option<AnalyzeModelDescription>,
     /// The unique name for the predictive model.
-    pub id: String,
+    pub id: Option<String>,
     /// A URL to re-request this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for Analyze {}
@@ -612,35 +612,35 @@ impl ResponseResult for Analyze {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Insert2 {
     /// What kind of resource this is.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Insert time of the model (as a RFC 3339 timestamp).
-    pub created: String,
+    pub created: Option<String>,
     /// Google storage location of the preprocessing pmml file.
     #[serde(rename="storagePMMLLocation")]
-    pub storage_pmml_location: String,
+    pub storage_pmml_location: Option<String>,
     /// Google storage location of the pmml model file.
     #[serde(rename="storagePMMLModelLocation")]
-    pub storage_pmml_model_location: String,
+    pub storage_pmml_model_location: Option<String>,
     /// Type of predictive model (CLASSIFICATION or REGRESSION).
     #[serde(rename="modelType")]
-    pub model_type: String,
+    pub model_type: Option<String>,
     /// Google storage location of the training data file.
     #[serde(rename="storageDataLocation")]
-    pub storage_data_location: String,
+    pub storage_data_location: Option<String>,
     /// A URL to re-request this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// Model metadata.
     #[serde(rename="modelInfo")]
-    pub model_info: Insert2ModelInfo,
+    pub model_info: Option<Insert2ModelInfo>,
     /// Training completion time (as a RFC 3339 timestamp).
     #[serde(rename="trainingComplete")]
-    pub training_complete: String,
+    pub training_complete: Option<String>,
     /// The unique name for the predictive model.
-    pub id: String,
+    pub id: Option<String>,
     /// The current status of the training job. This can be one of following: RUNNING; DONE; ERROR; ERROR: TRAINING JOB NOT FOUND
     #[serde(rename="trainingStatus")]
-    pub training_status: String,
+    pub training_status: Option<String>,
 }
 
 impl ResponseResult for Insert2 {}
@@ -653,11 +653,11 @@ impl ResponseResult for Insert2 {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionOutputFeatureNumeric {
     /// Number of numeric output values in the data set.
-    pub count: String,
+    pub count: Option<String>,
     /// Variance of the output values in the data set.
-    pub variance: String,
+    pub variance: Option<String>,
     /// Mean of the output values in the data set.
-    pub mean: String,
+    pub mean: Option<String>,
 }
 
 impl NestedType for AnalyzeDataDescriptionOutputFeatureNumeric {}
@@ -671,9 +671,9 @@ impl Part for AnalyzeDataDescriptionOutputFeatureNumeric {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionOutputFeature {
     /// Description of the output labels in the data set.
-    pub text: Vec<AnalyzeDataDescriptionOutputFeatureText>,
+    pub text: Option<Vec<AnalyzeDataDescriptionOutputFeatureText>>,
     /// Description of the output values in the data set.
-    pub numeric: AnalyzeDataDescriptionOutputFeatureNumeric,
+    pub numeric: Option<AnalyzeDataDescriptionOutputFeatureNumeric>,
 }
 
 impl NestedType for AnalyzeDataDescriptionOutputFeature {}
@@ -688,12 +688,12 @@ impl Part for AnalyzeDataDescriptionOutputFeature {}
 pub struct AnalyzeModelDescription {
     /// An output confusion matrix. This shows an estimate for how this model will do in predictions. This is first indexed by the true class label. For each true class label, this provides a pair {predicted_label, count}, where count is the estimated number of times the model will predict the predicted label given the true label. Will not output if more then 100 classes (Categorical models only).
     #[serde(rename="confusionMatrix")]
-    pub confusion_matrix: HashMap<String, HashMap<String, String>>,
+    pub confusion_matrix: Option<HashMap<String, HashMap<String, String>>>,
     /// A list of the confusion matrix row totals.
     #[serde(rename="confusionMatrixRowTotals")]
-    pub confusion_matrix_row_totals: HashMap<String, String>,
+    pub confusion_matrix_row_totals: Option<HashMap<String, String>>,
     /// Basic information about the model.
-    pub modelinfo: Insert2,
+    pub modelinfo: Option<Insert2>,
 }
 
 impl NestedType for AnalyzeModelDescription {}
@@ -708,22 +708,22 @@ impl Part for AnalyzeModelDescription {}
 pub struct Insert2ModelInfo {
     /// Number of valid data instances used in the trained model.
     #[serde(rename="numberInstances")]
-    pub number_instances: String,
+    pub number_instances: Option<String>,
     /// Estimated accuracy of model taking utility weights into account (Categorical models only).
     #[serde(rename="classWeightedAccuracy")]
-    pub class_weighted_accuracy: String,
+    pub class_weighted_accuracy: Option<String>,
     /// Number of class labels in the trained model (Categorical models only).
     #[serde(rename="numberLabels")]
-    pub number_labels: String,
+    pub number_labels: Option<String>,
     /// A number between 0.0 and 1.0, where 1.0 is 100% accurate. This is an estimate, based on the amount and quality of the training data, of the estimated prediction accuracy. You can use this is a guide to decide whether the results are accurate enough for your needs. This estimate will be more reliable if your real input data is similar to your training data (Categorical models only).
     #[serde(rename="classificationAccuracy")]
-    pub classification_accuracy: String,
+    pub classification_accuracy: Option<String>,
     /// An estimated mean squared error. The can be used to measure the quality of the predicted model (Regression models only).
     #[serde(rename="meanSquaredError")]
-    pub mean_squared_error: String,
+    pub mean_squared_error: Option<String>,
     /// Type of predictive model (CLASSIFICATION or REGRESSION).
     #[serde(rename="modelType")]
-    pub model_type: String,
+    pub model_type: Option<String>,
 }
 
 impl NestedType for Insert2ModelInfo {}
@@ -737,9 +737,9 @@ impl Part for Insert2ModelInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionOutputFeatureText {
     /// Number of times the output label occurred in the data set.
-    pub count: String,
+    pub count: Option<String>,
     /// The output label.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for AnalyzeDataDescriptionOutputFeatureText {}
@@ -753,9 +753,9 @@ impl Part for AnalyzeDataDescriptionOutputFeatureText {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesCategorical {
     /// Number of categorical values for this feature in the data.
-    pub count: String,
+    pub count: Option<String>,
     /// List of all the categories for this feature in the data set.
-    pub values: Vec<AnalyzeDataDescriptionFeaturesCategoricalValues>,
+    pub values: Option<Vec<AnalyzeDataDescriptionFeaturesCategoricalValues>>,
 }
 
 impl NestedType for AnalyzeDataDescriptionFeaturesCategorical {}
@@ -790,10 +790,10 @@ impl RequestValue for Update {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InsertTrainingInstances {
     /// The generic output value - could be regression or class label.
-    pub output: String,
+    pub output: Option<String>,
     /// The input features for this instance.
     #[serde(rename="csvInstance")]
-    pub csv_instance: Vec<String>,
+    pub csv_instance: Option<Vec<String>>,
 }
 
 impl NestedType for InsertTrainingInstances {}
@@ -807,9 +807,9 @@ impl Part for InsertTrainingInstances {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OutputOutputMulti {
     /// The probability of the class label.
-    pub score: String,
+    pub score: Option<String>,
     /// The class label.
-    pub label: String,
+    pub label: Option<String>,
 }
 
 impl NestedType for OutputOutputMulti {}
@@ -1177,16 +1177,20 @@ impl<'a, C, A> TrainedmodelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1336,7 +1340,7 @@ impl<'a, C, A> TrainedmodelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Update = Default::default();
+/// let mut req = Update::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1430,16 +1434,20 @@ impl<'a, C, A> TrainedmodelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1693,16 +1701,20 @@ impl<'a, C, A> TrainedmodelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1938,16 +1950,20 @@ impl<'a, C, A> TrainedmodelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2087,7 +2103,7 @@ impl<'a, C, A> TrainedmodelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Insert = Default::default();
+/// let mut req = Insert::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2179,16 +2195,20 @@ impl<'a, C, A> TrainedmodelInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2424,16 +2444,20 @@ impl<'a, C, A> TrainedmodelAnalyzeCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2583,7 +2607,7 @@ impl<'a, C, A> TrainedmodelAnalyzeCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Input = Default::default();
+/// let mut req = Input::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2677,16 +2701,20 @@ impl<'a, C, A> TrainedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2849,7 +2877,7 @@ impl<'a, C, A> TrainedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Input = Default::default();
+/// let mut req = Input::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2943,16 +2971,20 @@ impl<'a, C, A> HostedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -51,6 +52,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -74,7 +81,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datasets().delete(&self.opt.arg_project_id, &self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "delete-contents" => {
                     call = call.delete_contents(arg_from_str(value.unwrap_or("false"), err, "delete-contents", "boolean"));
@@ -108,7 +115,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -119,7 +125,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datasets().get(&self.opt.arg_project_id, &self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -151,8 +157,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -161,10 +166,10 @@ impl Engine {
 
     fn _datasets_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Dataset = Default::default();
+        let mut request = api::Dataset::default();
         let mut call = self.hub.datasets().insert(&request, &self.opt.arg_project_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -184,9 +189,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -205,11 +211,11 @@ impl Engine {
                     },
                 "dataset-reference.project-id" => {
                         request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().project_id = value.unwrap_or("").to_string();
+                        request.dataset_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "dataset-reference.dataset-id" => {
                         request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().dataset_id = value.unwrap_or("").to_string();
+                        request.dataset_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "creation-time" => {
                         request_dataset_reference_init(&mut request);
@@ -256,8 +262,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -268,7 +273,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.datasets().list(&self.opt.arg_project_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -309,8 +314,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -319,10 +323,10 @@ impl Engine {
 
     fn _datasets_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Dataset = Default::default();
+        let mut request = api::Dataset::default();
         let mut call = self.hub.datasets().patch(&request, &self.opt.arg_project_id, &self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -342,9 +346,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -363,11 +368,11 @@ impl Engine {
                     },
                 "dataset-reference.project-id" => {
                         request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().project_id = value.unwrap_or("").to_string();
+                        request.dataset_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "dataset-reference.dataset-id" => {
                         request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().dataset_id = value.unwrap_or("").to_string();
+                        request.dataset_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "creation-time" => {
                         request_dataset_reference_init(&mut request);
@@ -414,8 +419,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -424,10 +428,10 @@ impl Engine {
 
     fn _datasets_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Dataset = Default::default();
+        let mut request = api::Dataset::default();
         let mut call = self.hub.datasets().update(&request, &self.opt.arg_project_id, &self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -447,9 +451,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -468,11 +473,11 @@ impl Engine {
                     },
                 "dataset-reference.project-id" => {
                         request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().project_id = value.unwrap_or("").to_string();
+                        request.dataset_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "dataset-reference.dataset-id" => {
                         request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().dataset_id = value.unwrap_or("").to_string();
+                        request.dataset_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "creation-time" => {
                         request_dataset_reference_init(&mut request);
@@ -519,8 +524,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -531,7 +535,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.jobs().get(&self.opt.arg_project_id, &self.opt.arg_job_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -563,8 +567,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -575,7 +578,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.jobs().get_query_results(&self.opt.arg_project_id, &self.opt.arg_job_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "timeout-ms" => {
                     call = call.timeout_ms(arg_from_str(value.unwrap_or("-0"), err, "timeout-ms", "integer"));
@@ -619,8 +622,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -629,10 +631,10 @@ impl Engine {
 
     fn _jobs_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Job = Default::default();
+        let mut request = api::Job::default();
         let mut call = self.hub.jobs().insert(&request, &self.opt.arg_project_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -652,15 +654,100 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_configuration_copy_destination_table_init(request: &mut api::Job) {
+                request_configuration_copy_init(request);
+                if request.configuration.as_mut().unwrap().copy.as_mut().unwrap().destination_table.is_none() {
+                    request.configuration.as_mut().unwrap().copy.as_mut().unwrap().destination_table = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_copy_init(request: &mut api::Job) {
+                request_configuration_init(request);
+                if request.configuration.as_mut().unwrap().copy.is_none() {
+                    request.configuration.as_mut().unwrap().copy = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_copy_source_table_init(request: &mut api::Job) {
+                request_configuration_copy_init(request);
+                if request.configuration.as_mut().unwrap().copy.as_mut().unwrap().source_table.is_none() {
+                    request.configuration.as_mut().unwrap().copy.as_mut().unwrap().source_table = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_extract_init(request: &mut api::Job) {
+                request_configuration_init(request);
+                if request.configuration.as_mut().unwrap().extract.is_none() {
+                    request.configuration.as_mut().unwrap().extract = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_extract_source_table_init(request: &mut api::Job) {
+                request_configuration_extract_init(request);
+                if request.configuration.as_mut().unwrap().extract.as_mut().unwrap().source_table.is_none() {
+                    request.configuration.as_mut().unwrap().extract.as_mut().unwrap().source_table = Some(Default::default());
+                }
+            }
+            
             fn request_configuration_init(request: &mut api::Job) {
                 if request.configuration.is_none() {
                     request.configuration = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_link_destination_table_init(request: &mut api::Job) {
+                request_configuration_link_init(request);
+                if request.configuration.as_mut().unwrap().link.as_mut().unwrap().destination_table.is_none() {
+                    request.configuration.as_mut().unwrap().link.as_mut().unwrap().destination_table = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_link_init(request: &mut api::Job) {
+                request_configuration_init(request);
+                if request.configuration.as_mut().unwrap().link.is_none() {
+                    request.configuration.as_mut().unwrap().link = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_load_destination_table_init(request: &mut api::Job) {
+                request_configuration_load_init(request);
+                if request.configuration.as_mut().unwrap().load.as_mut().unwrap().destination_table.is_none() {
+                    request.configuration.as_mut().unwrap().load.as_mut().unwrap().destination_table = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_load_init(request: &mut api::Job) {
+                request_configuration_init(request);
+                if request.configuration.as_mut().unwrap().load.is_none() {
+                    request.configuration.as_mut().unwrap().load = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_query_default_dataset_init(request: &mut api::Job) {
+                request_configuration_query_init(request);
+                if request.configuration.as_mut().unwrap().query.as_mut().unwrap().default_dataset.is_none() {
+                    request.configuration.as_mut().unwrap().query.as_mut().unwrap().default_dataset = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_query_destination_table_init(request: &mut api::Job) {
+                request_configuration_query_init(request);
+                if request.configuration.as_mut().unwrap().query.as_mut().unwrap().destination_table.is_none() {
+                    request.configuration.as_mut().unwrap().query.as_mut().unwrap().destination_table = Some(Default::default());
+                }
+            }
+            
+            fn request_configuration_query_init(request: &mut api::Job) {
+                request_configuration_init(request);
+                if request.configuration.as_mut().unwrap().query.is_none() {
+                    request.configuration.as_mut().unwrap().query = Some(Default::default());
                 }
             }
             
@@ -670,9 +757,37 @@ impl Engine {
                 }
             }
             
+            fn request_statistics_extract_init(request: &mut api::Job) {
+                request_statistics_init(request);
+                if request.statistics.as_mut().unwrap().extract.is_none() {
+                    request.statistics.as_mut().unwrap().extract = Some(Default::default());
+                }
+            }
+            
             fn request_statistics_init(request: &mut api::Job) {
                 if request.statistics.is_none() {
                     request.statistics = Some(Default::default());
+                }
+            }
+            
+            fn request_statistics_load_init(request: &mut api::Job) {
+                request_statistics_init(request);
+                if request.statistics.as_mut().unwrap().load.is_none() {
+                    request.statistics.as_mut().unwrap().load = Some(Default::default());
+                }
+            }
+            
+            fn request_statistics_query_init(request: &mut api::Job) {
+                request_statistics_init(request);
+                if request.statistics.as_mut().unwrap().query.is_none() {
+                    request.statistics.as_mut().unwrap().query = Some(Default::default());
+                }
+            }
+            
+            fn request_status_error_result_init(request: &mut api::Job) {
+                request_status_init(request);
+                if request.status.as_mut().unwrap().error_result.is_none() {
+                    request.status.as_mut().unwrap().error_result = Some(Default::default());
                 }
             }
             
@@ -685,79 +800,82 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "status.state" => {
                         request_status_init(&mut request);
-                        request.status.as_mut().unwrap().state = value.unwrap_or("").to_string();
+                        request.status.as_mut().unwrap().state = Some(value.unwrap_or("").to_string());
                     },
                 "status.error-result.debug-info" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().error_result.debug_info = value.unwrap_or("").to_string();
+                        request_status_error_result_init(&mut request);
+                        request.status.as_mut().unwrap().error_result.as_mut().unwrap().debug_info = Some(value.unwrap_or("").to_string());
                     },
                 "status.error-result.message" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().error_result.message = value.unwrap_or("").to_string();
+                        request_status_error_result_init(&mut request);
+                        request.status.as_mut().unwrap().error_result.as_mut().unwrap().message = Some(value.unwrap_or("").to_string());
                     },
                 "status.error-result.reason" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().error_result.reason = value.unwrap_or("").to_string();
+                        request_status_error_result_init(&mut request);
+                        request.status.as_mut().unwrap().error_result.as_mut().unwrap().reason = Some(value.unwrap_or("").to_string());
                     },
                 "status.error-result.location" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().error_result.location = value.unwrap_or("").to_string();
+                        request_status_error_result_init(&mut request);
+                        request.status.as_mut().unwrap().error_result.as_mut().unwrap().location = Some(value.unwrap_or("").to_string());
                     },
                 "kind" => {
                         request_status_init(&mut request);
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
                 "statistics.load.output-rows" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().load.output_rows = value.unwrap_or("").to_string();
+                        request_statistics_load_init(&mut request);
+                        request.statistics.as_mut().unwrap().load.as_mut().unwrap().output_rows = Some(value.unwrap_or("").to_string());
                     },
                 "statistics.load.input-files" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().load.input_files = value.unwrap_or("").to_string();
+                        request_statistics_load_init(&mut request);
+                        request.statistics.as_mut().unwrap().load.as_mut().unwrap().input_files = Some(value.unwrap_or("").to_string());
                     },
                 "statistics.load.input-file-bytes" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().load.input_file_bytes = value.unwrap_or("").to_string();
+                        request_statistics_load_init(&mut request);
+                        request.statistics.as_mut().unwrap().load.as_mut().unwrap().input_file_bytes = Some(value.unwrap_or("").to_string());
                     },
                 "statistics.load.output-bytes" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().load.output_bytes = value.unwrap_or("").to_string();
+                        request_statistics_load_init(&mut request);
+                        request.statistics.as_mut().unwrap().load.as_mut().unwrap().output_bytes = Some(value.unwrap_or("").to_string());
                     },
                 "statistics.creation-time" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().creation_time = value.unwrap_or("").to_string();
+                        request_statistics_load_init(&mut request);
+                        request.statistics.as_mut().unwrap().creation_time = Some(value.unwrap_or("").to_string());
                     },
                 "statistics.total-bytes-processed" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().total_bytes_processed = value.unwrap_or("").to_string();
+                        request_statistics_load_init(&mut request);
+                        request.statistics.as_mut().unwrap().total_bytes_processed = Some(value.unwrap_or("").to_string());
                     },
                 "statistics.start-time" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().start_time = value.unwrap_or("").to_string();
+                        request_statistics_load_init(&mut request);
+                        request.statistics.as_mut().unwrap().start_time = Some(value.unwrap_or("").to_string());
                     },
                 "statistics.query.cache-hit" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().query.cache_hit = arg_from_str(value.unwrap_or("false"), err, "statistics.query.cache-hit", "boolean");
+                        request_statistics_query_init(&mut request);
+                        request.statistics.as_mut().unwrap().query.as_mut().unwrap().cache_hit = Some(arg_from_str(value.unwrap_or("false"), err, "statistics.query.cache-hit", "boolean"));
                     },
                 "statistics.query.total-bytes-processed" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().query.total_bytes_processed = value.unwrap_or("").to_string();
+                        request_statistics_query_init(&mut request);
+                        request.statistics.as_mut().unwrap().query.as_mut().unwrap().total_bytes_processed = Some(value.unwrap_or("").to_string());
                     },
                 "statistics.end-time" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().end_time = value.unwrap_or("").to_string();
+                        request_statistics_query_init(&mut request);
+                        request.statistics.as_mut().unwrap().end_time = Some(value.unwrap_or("").to_string());
                     },
                 "statistics.extract.destination-uri-file-counts" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().extract.destination_uri_file_counts.push(arg_from_str(value.unwrap_or("-0"), err, "statistics.extract.destination-uri-file-counts", "int64"));
+                        request_statistics_extract_init(&mut request);
+                        if request.statistics.as_mut().unwrap().extract.as_mut().unwrap().destination_uri_file_counts.is_none() {
+                           request.statistics.as_mut().unwrap().extract.as_mut().unwrap().destination_uri_file_counts = Some(Default::default());
+                        }
+                                        request.statistics.as_mut().unwrap().extract.as_mut().unwrap().destination_uri_file_counts.as_mut().unwrap().push(arg_from_str(value.unwrap_or("-0"), err, "statistics.extract.destination-uri-file-counts", "int64"));
                     },
                 "job-reference.project-id" => {
                         request_job_reference_init(&mut request);
-                        request.job_reference.as_mut().unwrap().project_id = value.unwrap_or("").to_string();
+                        request.job_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "job-reference.job-id" => {
                         request_job_reference_init(&mut request);
-                        request.job_reference.as_mut().unwrap().job_id = value.unwrap_or("").to_string();
+                        request.job_reference.as_mut().unwrap().job_id = Some(value.unwrap_or("").to_string());
                     },
                 "etag" => {
                         request_job_reference_init(&mut request);
@@ -768,224 +886,236 @@ impl Engine {
                         request.user_email = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.encoding" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.encoding = value.unwrap_or("").to_string();
+                        request_configuration_load_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().encoding = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.skip-leading-rows" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.skip_leading_rows = arg_from_str(value.unwrap_or("-0"), err, "configuration.load.skip-leading-rows", "integer");
+                        request_configuration_load_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().skip_leading_rows = Some(arg_from_str(value.unwrap_or("-0"), err, "configuration.load.skip-leading-rows", "integer"));
                     },
                 "configuration.load.quote" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.quote = value.unwrap_or("").to_string();
+                        request_configuration_load_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().quote = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.source-format" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.source_format = value.unwrap_or("").to_string();
+                        request_configuration_load_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().source_format = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.destination-table.project-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.destination_table.project_id = value.unwrap_or("").to_string();
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().destination_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.destination-table.table-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.destination_table.table_id = value.unwrap_or("").to_string();
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().destination_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.destination-table.dataset-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.destination_table.dataset_id = value.unwrap_or("").to_string();
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().destination_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.max-bad-records" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.max_bad_records = arg_from_str(value.unwrap_or("-0"), err, "configuration.load.max-bad-records", "integer");
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().max_bad_records = Some(arg_from_str(value.unwrap_or("-0"), err, "configuration.load.max-bad-records", "integer"));
                     },
                 "configuration.load.allow-jagged-rows" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.allow_jagged_rows = arg_from_str(value.unwrap_or("false"), err, "configuration.load.allow-jagged-rows", "boolean");
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().allow_jagged_rows = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.load.allow-jagged-rows", "boolean"));
                     },
                 "configuration.load.write-disposition" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.write_disposition = value.unwrap_or("").to_string();
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().write_disposition = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.source-uris" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.source_uris.push(value.unwrap_or("").to_string());
+                        request_configuration_load_destination_table_init(&mut request);
+                        if request.configuration.as_mut().unwrap().load.as_mut().unwrap().source_uris.is_none() {
+                           request.configuration.as_mut().unwrap().load.as_mut().unwrap().source_uris = Some(Default::default());
+                        }
+                                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "configuration.load.field-delimiter" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.field_delimiter = value.unwrap_or("").to_string();
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().field_delimiter = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.create-disposition" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.create_disposition = value.unwrap_or("").to_string();
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().create_disposition = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.schema-inline-format" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.schema_inline_format = value.unwrap_or("").to_string();
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().schema_inline_format = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.schema-inline" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.schema_inline = value.unwrap_or("").to_string();
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().schema_inline = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.load.allow-quoted-newlines" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.allow_quoted_newlines = arg_from_str(value.unwrap_or("false"), err, "configuration.load.allow-quoted-newlines", "boolean");
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().allow_quoted_newlines = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.load.allow-quoted-newlines", "boolean"));
                     },
                 "configuration.load.projection-fields" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.projection_fields.push(value.unwrap_or("").to_string());
+                        request_configuration_load_destination_table_init(&mut request);
+                        if request.configuration.as_mut().unwrap().load.as_mut().unwrap().projection_fields.is_none() {
+                           request.configuration.as_mut().unwrap().load.as_mut().unwrap().projection_fields = Some(Default::default());
+                        }
+                                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().projection_fields.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "configuration.load.ignore-unknown-values" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.ignore_unknown_values = arg_from_str(value.unwrap_or("false"), err, "configuration.load.ignore-unknown-values", "boolean");
+                        request_configuration_load_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().ignore_unknown_values = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.load.ignore-unknown-values", "boolean"));
                     },
                 "configuration.dry-run" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().dry_run = arg_from_str(value.unwrap_or("false"), err, "configuration.dry-run", "boolean");
+                        request_configuration_load_init(&mut request);
+                        request.configuration.as_mut().unwrap().dry_run = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.dry-run", "boolean"));
                     },
                 "configuration.link.create-disposition" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.create_disposition = value.unwrap_or("").to_string();
+                        request_configuration_link_init(&mut request);
+                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().create_disposition = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.link.write-disposition" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.write_disposition = value.unwrap_or("").to_string();
+                        request_configuration_link_init(&mut request);
+                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().write_disposition = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.link.destination-table.project-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.destination_table.project_id = value.unwrap_or("").to_string();
+                        request_configuration_link_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().destination_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.link.destination-table.table-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.destination_table.table_id = value.unwrap_or("").to_string();
+                        request_configuration_link_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().destination_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.link.destination-table.dataset-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.destination_table.dataset_id = value.unwrap_or("").to_string();
+                        request_configuration_link_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().destination_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.link.source-uri" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.source_uri.push(value.unwrap_or("").to_string());
+                        request_configuration_link_destination_table_init(&mut request);
+                        if request.configuration.as_mut().unwrap().link.as_mut().unwrap().source_uri.is_none() {
+                           request.configuration.as_mut().unwrap().link.as_mut().unwrap().source_uri = Some(Default::default());
+                        }
+                                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().source_uri.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "configuration.query.flatten-results" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.flatten_results = arg_from_str(value.unwrap_or("false"), err, "configuration.query.flatten-results", "boolean");
+                        request_configuration_query_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().flatten_results = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.query.flatten-results", "boolean"));
                     },
                 "configuration.query.use-query-cache" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.use_query_cache = arg_from_str(value.unwrap_or("false"), err, "configuration.query.use-query-cache", "boolean");
+                        request_configuration_query_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().use_query_cache = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.query.use-query-cache", "boolean"));
                     },
                 "configuration.query.default-dataset.project-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.default_dataset.project_id = value.unwrap_or("").to_string();
+                        request_configuration_query_default_dataset_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().default_dataset.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.query.default-dataset.dataset-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.default_dataset.dataset_id = value.unwrap_or("").to_string();
+                        request_configuration_query_default_dataset_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().default_dataset.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.query.destination-table.project-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.destination_table.project_id = value.unwrap_or("").to_string();
+                        request_configuration_query_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().destination_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.query.destination-table.table-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.destination_table.table_id = value.unwrap_or("").to_string();
+                        request_configuration_query_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().destination_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.query.destination-table.dataset-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.destination_table.dataset_id = value.unwrap_or("").to_string();
+                        request_configuration_query_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().destination_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.query.priority" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.priority = value.unwrap_or("").to_string();
+                        request_configuration_query_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().priority = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.query.write-disposition" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.write_disposition = value.unwrap_or("").to_string();
+                        request_configuration_query_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().write_disposition = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.query.allow-large-results" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.allow_large_results = arg_from_str(value.unwrap_or("false"), err, "configuration.query.allow-large-results", "boolean");
+                        request_configuration_query_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().allow_large_results = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.query.allow-large-results", "boolean"));
                     },
                 "configuration.query.create-disposition" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.create_disposition = value.unwrap_or("").to_string();
+                        request_configuration_query_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().create_disposition = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.query.query" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.query = value.unwrap_or("").to_string();
+                        request_configuration_query_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().query = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.query.preserve-nulls" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.preserve_nulls = arg_from_str(value.unwrap_or("false"), err, "configuration.query.preserve-nulls", "boolean");
+                        request_configuration_query_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().preserve_nulls = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.query.preserve-nulls", "boolean"));
                     },
                 "configuration.copy.create-disposition" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.create_disposition = value.unwrap_or("").to_string();
+                        request_configuration_copy_init(&mut request);
+                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().create_disposition = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.copy.write-disposition" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.write_disposition = value.unwrap_or("").to_string();
+                        request_configuration_copy_init(&mut request);
+                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().write_disposition = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.copy.destination-table.project-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.destination_table.project_id = value.unwrap_or("").to_string();
+                        request_configuration_copy_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().destination_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.copy.destination-table.table-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.destination_table.table_id = value.unwrap_or("").to_string();
+                        request_configuration_copy_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().destination_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.copy.destination-table.dataset-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.destination_table.dataset_id = value.unwrap_or("").to_string();
+                        request_configuration_copy_destination_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().destination_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.copy.source-table.project-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.source_table.project_id = value.unwrap_or("").to_string();
+                        request_configuration_copy_source_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().source_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.copy.source-table.table-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.source_table.table_id = value.unwrap_or("").to_string();
+                        request_configuration_copy_source_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().source_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.copy.source-table.dataset-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.source_table.dataset_id = value.unwrap_or("").to_string();
+                        request_configuration_copy_source_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().source_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.extract.destination-uri" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.destination_uri = value.unwrap_or("").to_string();
+                        request_configuration_extract_init(&mut request);
+                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().destination_uri = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.extract.compression" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.compression = value.unwrap_or("").to_string();
+                        request_configuration_extract_init(&mut request);
+                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().compression = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.extract.field-delimiter" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.field_delimiter = value.unwrap_or("").to_string();
+                        request_configuration_extract_init(&mut request);
+                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().field_delimiter = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.extract.destination-format" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.destination_format = value.unwrap_or("").to_string();
+                        request_configuration_extract_init(&mut request);
+                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().destination_format = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.extract.print-header" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.print_header = arg_from_str(value.unwrap_or("false"), err, "configuration.extract.print-header", "boolean");
+                        request_configuration_extract_init(&mut request);
+                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().print_header = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.extract.print-header", "boolean"));
                     },
                 "configuration.extract.destination-uris" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.destination_uris.push(value.unwrap_or("").to_string());
+                        request_configuration_extract_init(&mut request);
+                        if request.configuration.as_mut().unwrap().extract.as_mut().unwrap().destination_uris.is_none() {
+                           request.configuration.as_mut().unwrap().extract.as_mut().unwrap().destination_uris = Some(Default::default());
+                        }
+                                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().destination_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "configuration.extract.source-table.project-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.source_table.project_id = value.unwrap_or("").to_string();
+                        request_configuration_extract_source_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().source_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.extract.source-table.table-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.source_table.table_id = value.unwrap_or("").to_string();
+                        request_configuration_extract_source_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().source_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
                     },
                 "configuration.extract.source-table.dataset-id" => {
-                        request_configuration_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.source_table.dataset_id = value.unwrap_or("").to_string();
+                        request_configuration_extract_source_table_init(&mut request);
+                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().source_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_configuration_init(&mut request);
@@ -1022,8 +1152,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1034,7 +1163,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.jobs().list(&self.opt.arg_project_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "state-filter" => {
                     call = call.add_state_filter(value.unwrap_or(""));
@@ -1081,8 +1210,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1091,10 +1219,10 @@ impl Engine {
 
     fn _jobs_query(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::QueryRequest = Default::default();
+        let mut request = api::QueryRequest::default();
         let mut call = self.hub.jobs().query(&request, &self.opt.arg_project_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1114,9 +1242,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1141,11 +1270,11 @@ impl Engine {
                     },
                 "default-dataset.project-id" => {
                         request_default_dataset_init(&mut request);
-                        request.default_dataset.as_mut().unwrap().project_id = value.unwrap_or("").to_string();
+                        request.default_dataset.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "default-dataset.dataset-id" => {
                         request_default_dataset_init(&mut request);
-                        request.default_dataset.as_mut().unwrap().dataset_id = value.unwrap_or("").to_string();
+                        request.default_dataset.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "max-results" => {
                         request_default_dataset_init(&mut request);
@@ -1176,8 +1305,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1188,7 +1316,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.projects().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1226,8 +1354,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1236,10 +1363,10 @@ impl Engine {
 
     fn _tabledata_insert_all(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::TableDataInsertAllRequest = Default::default();
+        let mut request = api::TableDataInsertAllRequest::default();
         let mut call = self.hub.tabledata().insert_all(&request, &self.opt.arg_project_id, &self.opt.arg_dataset_id, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1259,9 +1386,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1292,8 +1420,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1304,7 +1431,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tabledata().list(&self.opt.arg_project_id, &self.opt.arg_dataset_id, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(value.unwrap_or(""));
@@ -1345,8 +1472,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1357,7 +1483,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().delete(&self.opt.arg_project_id, &self.opt.arg_dataset_id, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1388,7 +1514,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1399,7 +1524,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().get(&self.opt.arg_project_id, &self.opt.arg_dataset_id, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1431,8 +1556,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1441,10 +1565,10 @@ impl Engine {
 
     fn _tables_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Table = Default::default();
+        let mut request = api::Table::default();
         let mut call = self.hub.tables().insert(&request, &self.opt.arg_project_id, &self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1464,9 +1588,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1497,15 +1622,15 @@ impl Engine {
                     },
                 "table-reference.project-id" => {
                         request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().project_id = value.unwrap_or("").to_string();
+                        request.table_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "table-reference.table-id" => {
                         request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().table_id = value.unwrap_or("").to_string();
+                        request.table_reference.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
                     },
                 "table-reference.dataset-id" => {
                         request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().dataset_id = value.unwrap_or("").to_string();
+                        request.table_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "num-rows" => {
                         request_table_reference_init(&mut request);
@@ -1541,7 +1666,7 @@ impl Engine {
                     },
                 "view.query" => {
                         request_view_init(&mut request);
-                        request.view.as_mut().unwrap().query = value.unwrap_or("").to_string();
+                        request.view.as_mut().unwrap().query = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -1560,8 +1685,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1572,7 +1696,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.tables().list(&self.opt.arg_project_id, &self.opt.arg_dataset_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1610,8 +1734,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1620,10 +1743,10 @@ impl Engine {
 
     fn _tables_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Table = Default::default();
+        let mut request = api::Table::default();
         let mut call = self.hub.tables().patch(&request, &self.opt.arg_project_id, &self.opt.arg_dataset_id, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1643,9 +1766,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1676,15 +1800,15 @@ impl Engine {
                     },
                 "table-reference.project-id" => {
                         request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().project_id = value.unwrap_or("").to_string();
+                        request.table_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "table-reference.table-id" => {
                         request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().table_id = value.unwrap_or("").to_string();
+                        request.table_reference.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
                     },
                 "table-reference.dataset-id" => {
                         request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().dataset_id = value.unwrap_or("").to_string();
+                        request.table_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "num-rows" => {
                         request_table_reference_init(&mut request);
@@ -1720,7 +1844,7 @@ impl Engine {
                     },
                 "view.query" => {
                         request_view_init(&mut request);
-                        request.view.as_mut().unwrap().query = value.unwrap_or("").to_string();
+                        request.view.as_mut().unwrap().query = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -1739,8 +1863,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1749,10 +1872,10 @@ impl Engine {
 
     fn _tables_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Table = Default::default();
+        let mut request = api::Table::default();
         let mut call = self.hub.tables().update(&request, &self.opt.arg_project_id, &self.opt.arg_dataset_id, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1772,9 +1895,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1805,15 +1929,15 @@ impl Engine {
                     },
                 "table-reference.project-id" => {
                         request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().project_id = value.unwrap_or("").to_string();
+                        request.table_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
                     },
                 "table-reference.table-id" => {
                         request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().table_id = value.unwrap_or("").to_string();
+                        request.table_reference.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
                     },
                 "table-reference.dataset-id" => {
                         request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().dataset_id = value.unwrap_or("").to_string();
+                        request.table_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
                     },
                 "num-rows" => {
                         request_table_reference_init(&mut request);
@@ -1849,7 +1973,7 @@ impl Engine {
                     },
                 "view.query" => {
                         request_view_init(&mut request);
-                        request.view.as_mut().unwrap().query = value.unwrap_or("").to_string();
+                        request.view.as_mut().unwrap().query = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -1868,8 +1992,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1897,7 +2020,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_jobs {
+        }
+ else if self.opt.cmd_jobs {
             if self.opt.cmd_get {
                 call_result = self._jobs_get(dry_run, &mut err);
             } else if self.opt.cmd_get_query_results {
@@ -1911,13 +2035,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_projects {
+        }
+ else if self.opt.cmd_projects {
             if self.opt.cmd_list {
                 call_result = self._projects_list(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_tabledata {
+        }
+ else if self.opt.cmd_tabledata {
             if self.opt.cmd_insert_all {
                 call_result = self._tabledata_insert_all(dry_run, &mut err);
             } else if self.opt.cmd_list {
@@ -1925,7 +2051,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_tables {
+        }
+ else if self.opt.cmd_tables {
             if self.opt.cmd_delete {
                 call_result = self._tables_delete(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -1961,21 +2088,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "bigquery2-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "bigquery2-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "bigquery2",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "bigquery2",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::Bigquery::new(hyper::Client::new(), auth),
+            hub: api::Bigquery::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -1995,12 +2138,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/X7hvmvZAuE2GX5lBTJUD_xWfVrI\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/SRyMqDO5Lt1H_OK2ek0Fc_aeb5M\"",
  "discoveryVersion": "v1",
  "id": "compute:v1",
  "name": "compute",
@@ -2968,9 +2968,13 @@
       "TARGET_HTTP_PROXIES",
       "TARGET_INSTANCES",
       "TARGET_POOLS",
-      "URL_MAPS"
+      "TARGET_VPN_GATEWAYS",
+      "URL_MAPS",
+      "VPN_TUNNELS"
      ],
      "enumDescriptions": [
+      "",
+      "",
       "",
       "",
       "",
@@ -7551,6 +7555,15 @@
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
+      },
+      "port": {
+       "type": "integer",
+       "description": "Which COM port to retrieve data from.",
+       "default": "1",
+       "format": "int32",
+       "minimum": "1",
+       "maximum": "4",
+       "location": "query"
       },
       "project": {
        "type": "string",

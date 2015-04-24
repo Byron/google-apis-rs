@@ -5,7 +5,7 @@
 
 name = "google-translate2"
 version = "0.1.5+20141123"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with translate (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/translate2"
 homepage = "https://developers.google.com/translate/v2/using_rest"

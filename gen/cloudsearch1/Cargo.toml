@@ -4,8 +4,8 @@
 [package]
 
 name = "google-cloudsearch1"
-version = "0.1.5+20150309"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+version = "0.1.5+20150416"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudsearch (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudsearch1"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudsearch1"

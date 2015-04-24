@@ -96,7 +96,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: LogSink = Default::default();
+//! let mut req = LogSink::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -271,7 +271,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LogSink = Default::default();
+/// let mut req = LogSink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -341,11 +341,11 @@ impl<'a, C, A> Logging<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Status {
     /// A developer-facing error message, which should be in English. The user-facing error message should be localized and stored in the [google.rpc.Status.details][google.rpc.Status.details] field.
-    pub message: String,
+    pub message: Option<String>,
     /// The status code, which should be an enum value of [google.rpc.Code][].
-    pub code: i32,
+    pub code: Option<i32>,
     /// A list of messages that carry the error details. There will be a common set of message types for APIs to use.
-    pub details: Vec<HashMap<String, String>>,
+    pub details: Option<Vec<HashMap<String, String>>>,
 }
 
 impl Part for Status {}
@@ -358,12 +358,12 @@ impl Part for Status {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LogError {
     /// The description of the last error observed.
-    pub status: Status,
+    pub status: Option<Status>,
     /// The last time the error was observed, in nanoseconds since the Unix epoch.
     #[serde(rename="timeNanos")]
-    pub time_nanos: String,
+    pub time_nanos: Option<String>,
     /// The resource associated with the error. It may be different from the sink destination. For example, the sink may point to a BigQuery dataset, but the error may refer to a table resource inside the dataset.
-    pub resource: String,
+    pub resource: Option<String>,
 }
 
 impl Part for LogError {}
@@ -377,12 +377,12 @@ impl Part for LogError {}
 pub struct Log {
     /// Type URL describing the expected payload type for the log.
     #[serde(rename="payloadType")]
-    pub payload_type: String,
+    pub payload_type: Option<String>,
     /// Name used when displaying the log to the user (for example, in a UI). Example: `"activity_log"`
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// REQUIRED: The log's name name. Example: `"compute.googleapis.com/activity_log"`.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for Log {}
@@ -401,9 +401,9 @@ impl Part for Log {}
 pub struct ListLogsResponse {
     /// If there are more results, then `nextPageToken` is returned in the response. To get the next batch of logs, use the value of `nextPageToken` as `pageToken` in the next call of `ListLogs`. If `nextPageToken` is empty, then there are no more results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of log resources.
-    pub logs: Vec<Log>,
+    pub logs: Option<Vec<Log>>,
 }
 
 impl ResponseResult for ListLogsResponse {}
@@ -417,9 +417,9 @@ impl ResponseResult for ListLogsResponse {}
 pub struct LogService {
     /// Label keys used when labeling log entries for this service. The order of the keys is significant, with higher priority keys coming earlier in the list.
     #[serde(rename="indexKeys")]
-    pub index_keys: Vec<String>,
+    pub index_keys: Option<Vec<String>>,
     /// The service's name.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for LogService {}
@@ -452,7 +452,7 @@ impl ResponseResult for WriteLogEntriesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLogSinksResponse {
     /// The requested log sinks. If any of the returned `LogSink` objects have an empty `destination` field, then call `logServices.sinks.get` to retrieve the complete `LogSink` object.
-    pub sinks: Vec<LogSink>,
+    pub sinks: Option<Vec<LogSink>>,
 }
 
 impl ResponseResult for ListLogSinksResponse {}
@@ -492,10 +492,10 @@ impl RequestValue for WriteLogEntriesRequest {}
 pub struct ListLogServicesResponse {
     /// If there are more results, then `nextPageToken` is returned in the response. To get the next batch of services, use the value of `nextPageToken` as `pageToken` in the next call of `ListLogServices`. If `nextPageToken` is empty, then there are no more results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of log services.
     #[serde(rename="logServices")]
-    pub log_services: Vec<LogService>,
+    pub log_services: Option<Vec<LogService>>,
 }
 
 impl ResponseResult for ListLogServicesResponse {}
@@ -509,20 +509,20 @@ impl ResponseResult for ListLogServicesResponse {}
 pub struct LogEntry {
     /// The log entry payload, represented as a protocol buffer that is expressed as a JSON object. You can only pass `protoPayload` values that belong to a set of approved types.
     #[serde(rename="protoPayload")]
-    pub proto_payload: HashMap<String, String>,
+    pub proto_payload: Option<HashMap<String, String>>,
     /// The log to which this entry belongs. When a log entry is ingested, the value of this field is set by the logging system.
-    pub log: String,
+    pub log: Option<String>,
     /// The log entry payload, represented as a text string.
     #[serde(rename="textPayload")]
-    pub text_payload: String,
+    pub text_payload: Option<String>,
     /// A unique ID for the log entry. If you provide this field, the logging service considers other log entries in the same log with the same ID as duplicates which can be removed.
     #[serde(rename="insertId")]
-    pub insert_id: String,
+    pub insert_id: Option<String>,
     /// The log entry payload, represented as a structure that is expressed as a JSON object.
     #[serde(rename="structPayload")]
-    pub struct_payload: HashMap<String, String>,
+    pub struct_payload: Option<HashMap<String, String>>,
     /// Information about the log entry.
-    pub metadata: LogEntryMetadata,
+    pub metadata: Option<LogEntryMetadata>,
 }
 
 impl Part for LogEntry {}
@@ -535,24 +535,24 @@ impl Part for LogEntry {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct LogEntryMetadata {
     /// The severity of the log entry.
-    pub severity: String,
+    pub severity: Option<String>,
     /// The zone of the Google Cloud Platform service that created the log entry. For example, `"us-central1-a"`.
-    pub zone: String,
+    pub zone: Option<String>,
     /// The time the event described by the log entry occurred. Timestamps must be later than January 1, 1970.
-    pub timestamp: String,
+    pub timestamp: Option<String>,
     /// The region name of the Google Cloud Platform service that created the log entry. For example, `"us-central1"`.
-    pub region: String,
+    pub region: Option<String>,
     /// A set of (key, value) data that provides additional information about the log entry. If the log entry is from one of the Google Cloud Platform sources listed below, the indicated (key, value) information must be provided: Google App Engine, service_name `appengine.googleapis.com`: "appengine.googleapis.com/module_id",  "appengine.googleapis.com/version_id",  and one of: "appengine.googleapis.com/replica_index",  "appengine.googleapis.com/clone_id",  or else provide the following Compute Engine labels: Google Compute Engine, service_name `compute.googleapis.com`: "compute.googleapis.com/resource_type", "instance" "compute.googleapis.com/resource_id",
-    pub labels: HashMap<String, String>,
+    pub labels: Option<HashMap<String, String>>,
     /// The fully-qualified email address of the authenticated user that performed or requested the action represented by the log entry. If the log entry does not apply to an action taken by an authenticated user, then the field should be empty.
     #[serde(rename="userId")]
-    pub user_id: String,
+    pub user_id: Option<String>,
     /// The API name of the Google Cloud Platform service that created the log entry. For example, `"compute.googleapis.com"`.
     #[serde(rename="serviceName")]
-    pub service_name: String,
+    pub service_name: Option<String>,
     /// The project ID of the Google Cloud Platform service that created the log entry.
     #[serde(rename="projectId")]
-    pub project_id: String,
+    pub project_id: Option<String>,
 }
 
 impl Part for LogEntryMetadata {}
@@ -571,10 +571,10 @@ impl Part for LogEntryMetadata {}
 pub struct ListLogServiceIndexesResponse {
     /// If there are more results, then `nextPageToken` is returned in the response. To get the next batch of indexes, use the value of `nextPageToken` as `pageToken` in the next call of `ListLogServiceIndexess`. If `nextPageToken` is empty, then there are no more results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of log service index prefixes.
     #[serde(rename="serviceIndexPrefixes")]
-    pub service_index_prefixes: Vec<String>,
+    pub service_index_prefixes: Option<Vec<String>>,
 }
 
 impl ResponseResult for ListLogServiceIndexesResponse {}
@@ -637,7 +637,7 @@ impl ResponseResult for Empty {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLogServiceSinksResponse {
     /// The requested log service sinks. If any of the returned `LogSink` objects have an empty `destination` field, then call `logServices.sinks.get` to retrieve the complete `LogSink` object.
-    pub sinks: Vec<LogSink>,
+    pub sinks: Option<Vec<LogSink>>,
 }
 
 impl ResponseResult for ListLogServiceSinksResponse {}
@@ -1133,16 +1133,20 @@ impl<'a, C, A> ProjectLogServiceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1408,16 +1412,20 @@ impl<'a, C, A> ProjectLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1674,16 +1682,20 @@ impl<'a, C, A> ProjectLogSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1847,7 +1859,7 @@ impl<'a, C, A> ProjectLogSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LogSink = Default::default();
+/// let mut req = LogSink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1943,16 +1955,20 @@ impl<'a, C, A> ProjectLogServiceSinkUpdateCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2129,7 +2145,7 @@ impl<'a, C, A> ProjectLogServiceSinkUpdateCall<'a, C, A> where C: BorrowMut<hype
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: WriteLogEntriesRequest = Default::default();
+/// let mut req = WriteLogEntriesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2223,16 +2239,20 @@ impl<'a, C, A> ProjectLogEntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2484,16 +2504,20 @@ impl<'a, C, A> ProjectLogServiceSinkDeleteCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2765,16 +2789,20 @@ impl<'a, C, A> ProjectLogServiceIndexeListCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3046,16 +3074,20 @@ impl<'a, C, A> ProjectLogSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3209,7 +3241,7 @@ impl<'a, C, A> ProjectLogSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LogSink = Default::default();
+/// let mut req = LogSink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3305,16 +3337,20 @@ impl<'a, C, A> ProjectLogSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3491,7 +3527,7 @@ impl<'a, C, A> ProjectLogSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LogSink = Default::default();
+/// let mut req = LogSink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3585,16 +3621,20 @@ impl<'a, C, A> ProjectLogServiceSinkCreateCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3846,16 +3886,20 @@ impl<'a, C, A> ProjectLogSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -4019,7 +4063,7 @@ impl<'a, C, A> ProjectLogSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LogSink = Default::default();
+/// let mut req = LogSink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -4113,16 +4157,20 @@ impl<'a, C, A> ProjectLogSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4374,16 +4422,20 @@ impl<'a, C, A> ProjectLogServiceSinkGetCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4630,16 +4682,20 @@ impl<'a, C, A> ProjectLogServiceSinkListCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4876,16 +4932,20 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())

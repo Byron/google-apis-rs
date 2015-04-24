@@ -367,24 +367,24 @@ impl<'a, C, A> Customsearch<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultImage {
     /// no description provided
-    pub width: i32,
+    pub width: Option<i32>,
     /// no description provided
     #[serde(rename="contextLink")]
-    pub context_link: String,
+    pub context_link: Option<String>,
     /// no description provided
     #[serde(rename="thumbnailWidth")]
-    pub thumbnail_width: i32,
+    pub thumbnail_width: Option<i32>,
     /// no description provided
     #[serde(rename="thumbnailLink")]
-    pub thumbnail_link: String,
+    pub thumbnail_link: Option<String>,
     /// no description provided
     #[serde(rename="byteSize")]
-    pub byte_size: i32,
+    pub byte_size: Option<i32>,
     /// no description provided
     #[serde(rename="thumbnailHeight")]
-    pub thumbnail_height: i32,
+    pub thumbnail_height: Option<i32>,
     /// no description provided
-    pub height: i32,
+    pub height: Option<i32>,
 }
 
 impl NestedType for ResultImage {}
@@ -403,22 +403,22 @@ impl Part for ResultImage {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Search {
     /// no description provided
-    pub promotions: Vec<Promotion>,
+    pub promotions: Option<Vec<Promotion>>,
     /// no description provided
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub url: SearchUrl,
+    pub url: Option<SearchUrl>,
     /// no description provided
-    pub items: Vec<ResultType>,
+    pub items: Option<Vec<ResultType>>,
     /// no description provided
-    pub context: Context,
+    pub context: Option<Context>,
     /// no description provided
-    pub queries: HashMap<String, Vec<Query>>,
+    pub queries: Option<HashMap<String, Vec<Query>>>,
     /// no description provided
-    pub spelling: SearchSpelling,
+    pub spelling: Option<SearchSpelling>,
     /// no description provided
     #[serde(rename="searchInformation")]
-    pub search_information: SearchSearchInformation,
+    pub search_information: Option<SearchSearchInformation>,
 }
 
 impl ResponseResult for Search {}
@@ -431,11 +431,11 @@ impl ResponseResult for Search {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotionImage {
     /// no description provided
-    pub source: String,
+    pub source: Option<String>,
     /// no description provided
-    pub height: i32,
+    pub height: Option<i32>,
     /// no description provided
-    pub width: i32,
+    pub width: Option<i32>,
 }
 
 impl NestedType for PromotionImage {}
@@ -450,9 +450,9 @@ impl Part for PromotionImage {}
 pub struct SearchUrl {
     /// no description provided
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// no description provided
-    pub template: String,
+    pub template: Option<String>,
 }
 
 impl NestedType for SearchUrl {}
@@ -467,10 +467,10 @@ impl Part for SearchUrl {}
 pub struct SearchSpelling {
     /// no description provided
     #[serde(rename="correctedQuery")]
-    pub corrected_query: String,
+    pub corrected_query: Option<String>,
     /// no description provided
     #[serde(rename="htmlCorrectedQuery")]
-    pub html_corrected_query: String,
+    pub html_corrected_query: Option<String>,
 }
 
 impl NestedType for SearchSpelling {}
@@ -484,14 +484,14 @@ impl Part for SearchSpelling {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotionBodyLines {
     /// no description provided
-    pub url: String,
+    pub url: Option<String>,
     /// no description provided
     #[serde(rename="htmlTitle")]
-    pub html_title: String,
+    pub html_title: Option<String>,
     /// no description provided
-    pub link: String,
+    pub link: Option<String>,
     /// no description provided
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl NestedType for PromotionBodyLines {}
@@ -505,42 +505,42 @@ impl Part for PromotionBodyLines {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultType {
     /// no description provided
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub labels: Vec<ResultLabels>,
+    pub labels: Option<Vec<ResultLabels>>,
     /// no description provided
-    pub title: String,
+    pub title: Option<String>,
     /// no description provided
     #[serde(rename="displayLink")]
-    pub display_link: String,
+    pub display_link: Option<String>,
     /// no description provided
     #[serde(rename="cacheId")]
-    pub cache_id: String,
+    pub cache_id: Option<String>,
     /// no description provided
     #[serde(rename="formattedUrl")]
-    pub formatted_url: String,
+    pub formatted_url: Option<String>,
     /// no description provided
     #[serde(rename="htmlFormattedUrl")]
-    pub html_formatted_url: String,
+    pub html_formatted_url: Option<String>,
     /// no description provided
-    pub pagemap: HashMap<String, Vec<HashMap<String, String>>>,
+    pub pagemap: Option<HashMap<String, Vec<HashMap<String, String>>>>,
     /// no description provided
     #[serde(rename="fileFormat")]
-    pub file_format: String,
+    pub file_format: Option<String>,
     /// no description provided
-    pub snippet: String,
+    pub snippet: Option<String>,
     /// no description provided
     #[serde(rename="htmlSnippet")]
-    pub html_snippet: String,
+    pub html_snippet: Option<String>,
     /// no description provided
-    pub link: String,
+    pub link: Option<String>,
     /// no description provided
-    pub image: ResultImage,
+    pub image: Option<ResultImage>,
     /// no description provided
-    pub mime: String,
+    pub mime: Option<String>,
     /// no description provided
     #[serde(rename="htmlTitle")]
-    pub html_title: String,
+    pub html_title: Option<String>,
 }
 
 impl Part for ResultType {}
@@ -553,9 +553,9 @@ impl Part for ResultType {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Context {
     /// no description provided
-    pub facets: Vec<Vec<ContextFacets>>,
+    pub facets: Option<Vec<Vec<ContextFacets>>>,
     /// no description provided
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for Context {}
@@ -568,11 +568,11 @@ impl Part for Context {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContextFacets {
     /// no description provided
-    pub label_with_op: String,
+    pub label_with_op: Option<String>,
     /// no description provided
-    pub anchor: String,
+    pub anchor: Option<String>,
     /// no description provided
-    pub label: String,
+    pub label: Option<String>,
 }
 
 impl NestedType for ContextFacets {}
@@ -587,102 +587,102 @@ impl Part for ContextFacets {}
 pub struct Query {
     /// no description provided
     #[serde(rename="dateRestrict")]
-    pub date_restrict: String,
+    pub date_restrict: Option<String>,
     /// no description provided
     #[serde(rename="inputEncoding")]
-    pub input_encoding: String,
+    pub input_encoding: Option<String>,
     /// no description provided
     #[serde(rename="orTerms")]
-    pub or_terms: String,
+    pub or_terms: Option<String>,
     /// no description provided
     #[serde(rename="highRange")]
-    pub high_range: String,
+    pub high_range: Option<String>,
     /// no description provided
-    pub cx: String,
+    pub cx: Option<String>,
     /// no description provided
     #[serde(rename="startPage")]
-    pub start_page: i32,
+    pub start_page: Option<i32>,
     /// no description provided
     #[serde(rename="disableCnTwTranslation")]
-    pub disable_cn_tw_translation: String,
+    pub disable_cn_tw_translation: Option<String>,
     /// no description provided
-    pub cr: String,
+    pub cr: Option<String>,
     /// no description provided
     #[serde(rename="imgType")]
-    pub img_type: String,
+    pub img_type: Option<String>,
     /// no description provided
     #[serde(rename="relatedSite")]
-    pub related_site: String,
+    pub related_site: Option<String>,
     /// no description provided
-    pub gl: String,
+    pub gl: Option<String>,
     /// no description provided
     #[serde(rename="searchType")]
-    pub search_type: String,
+    pub search_type: Option<String>,
     /// no description provided
-    pub title: String,
+    pub title: Option<String>,
     /// no description provided
     #[serde(rename="googleHost")]
-    pub google_host: String,
+    pub google_host: Option<String>,
     /// no description provided
     #[serde(rename="fileType")]
-    pub file_type: String,
+    pub file_type: Option<String>,
     /// no description provided
     #[serde(rename="imgDominantColor")]
-    pub img_dominant_color: String,
+    pub img_dominant_color: Option<String>,
     /// no description provided
     #[serde(rename="siteSearch")]
-    pub site_search: String,
+    pub site_search: Option<String>,
     /// no description provided
-    pub cref: String,
+    pub cref: Option<String>,
     /// no description provided
-    pub sort: String,
+    pub sort: Option<String>,
     /// no description provided
-    pub hq: String,
+    pub hq: Option<String>,
     /// no description provided
     #[serde(rename="outputEncoding")]
-    pub output_encoding: String,
+    pub output_encoding: Option<String>,
     /// no description provided
-    pub safe: String,
+    pub safe: Option<String>,
     /// no description provided
     #[serde(rename="searchTerms")]
-    pub search_terms: String,
+    pub search_terms: Option<String>,
     /// no description provided
     #[serde(rename="exactTerms")]
-    pub exact_terms: String,
+    pub exact_terms: Option<String>,
     /// no description provided
     #[serde(rename="imgColorType")]
-    pub img_color_type: String,
+    pub img_color_type: Option<String>,
     /// no description provided
-    pub hl: String,
+    pub hl: Option<String>,
     /// no description provided
     #[serde(rename="totalResults")]
-    pub total_results: String,
+    pub total_results: Option<String>,
     /// no description provided
     #[serde(rename="lowRange")]
-    pub low_range: String,
+    pub low_range: Option<String>,
     /// no description provided
-    pub count: i32,
+    pub count: Option<i32>,
     /// no description provided
     #[serde(rename="imgSize")]
-    pub img_size: String,
+    pub img_size: Option<String>,
     /// no description provided
-    pub language: String,
+    pub language: Option<String>,
     /// no description provided
-    pub rights: String,
+    pub rights: Option<String>,
     /// no description provided
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// no description provided
     #[serde(rename="excludeTerms")]
-    pub exclude_terms: String,
+    pub exclude_terms: Option<String>,
     /// no description provided
-    pub filter: String,
+    pub filter: Option<String>,
     /// no description provided
     #[serde(rename="linkSite")]
-    pub link_site: String,
+    pub link_site: Option<String>,
     /// no description provided
     #[serde(rename="siteSearchFilter")]
-    pub site_search_filter: String,
+    pub site_search_filter: Option<String>,
 }
 
 impl Part for Query {}
@@ -696,19 +696,19 @@ impl Part for Query {}
 pub struct Promotion {
     /// no description provided
     #[serde(rename="bodyLines")]
-    pub body_lines: Vec<PromotionBodyLines>,
+    pub body_lines: Option<Vec<PromotionBodyLines>>,
     /// no description provided
-    pub title: String,
+    pub title: Option<String>,
     /// no description provided
-    pub link: String,
+    pub link: Option<String>,
     /// no description provided
     #[serde(rename="displayLink")]
-    pub display_link: String,
+    pub display_link: Option<String>,
     /// no description provided
     #[serde(rename="htmlTitle")]
-    pub html_title: String,
+    pub html_title: Option<String>,
     /// no description provided
-    pub image: PromotionImage,
+    pub image: Option<PromotionImage>,
 }
 
 impl Part for Promotion {}
@@ -722,16 +722,16 @@ impl Part for Promotion {}
 pub struct SearchSearchInformation {
     /// no description provided
     #[serde(rename="formattedSearchTime")]
-    pub formatted_search_time: String,
+    pub formatted_search_time: Option<String>,
     /// no description provided
     #[serde(rename="formattedTotalResults")]
-    pub formatted_total_results: String,
+    pub formatted_total_results: Option<String>,
     /// no description provided
     #[serde(rename="totalResults")]
-    pub total_results: String,
+    pub total_results: Option<String>,
     /// no description provided
     #[serde(rename="searchTime")]
-    pub search_time: f64,
+    pub search_time: Option<f64>,
 }
 
 impl NestedType for SearchSearchInformation {}
@@ -746,11 +746,11 @@ impl Part for SearchSearchInformation {}
 pub struct ResultLabels {
     /// no description provided
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// no description provided
-    pub label_with_op: String,
+    pub label_with_op: Option<String>,
     /// no description provided
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for ResultLabels {}

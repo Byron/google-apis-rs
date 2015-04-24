@@ -4,8 +4,8 @@
 [package]
 
 name = "google-mapsengine1-cli"
-version = "0.0.1+20150225"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+version = "0.0.1+20150414"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Maps Engine (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/mapsengine1-cli"
 homepage = "https://developers.google.com/maps-engine/"
@@ -23,6 +23,7 @@ yup-oauth2 = "*"
 docopt = "*"
 docopt_macros = "*"
 rustc-serialize = "*"
+yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
 

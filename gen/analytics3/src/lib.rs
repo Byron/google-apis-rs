@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *analytics* crate version *0.1.5+20150308*, where *20150308* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *analytics* crate version *0.1.5+20150305*, where *20150305* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *analytics* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/).
@@ -109,7 +109,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: EntityUserLink = Default::default();
+//! let mut req = EntityUserLink::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -304,7 +304,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EntityUserLink = Default::default();
+/// let mut req = EntityUserLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -505,7 +505,7 @@ impl ResponseResult for Goal {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebpropertyPermissions {
     /// All the permissions that the user has for this web property. These include any implied permissions (e.g., EDIT implies VIEW) or inherited permissions from the parent account.
-    pub effective: Vec<String>,
+    pub effective: Option<Vec<String>>,
 }
 
 impl NestedType for WebpropertyPermissions {}
@@ -519,16 +519,16 @@ impl Part for WebpropertyPermissions {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterRef {
     /// Kind value for filter reference.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Link for this filter.
-    pub href: String,
+    pub href: Option<String>,
     /// Account ID to which this filter belongs.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
     /// Filter ID.
-    pub id: String,
+    pub id: Option<String>,
     /// Name of this filter.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for FilterRef {}
@@ -542,10 +542,10 @@ impl Part for FilterRef {}
 pub struct GoalEventDetails {
     /// List of event conditions.
     #[serde(rename="eventConditions")]
-    pub event_conditions: Vec<GoalEventDetailsEventConditions>,
+    pub event_conditions: Option<Vec<GoalEventDetailsEventConditions>>,
     /// Determines if the event value should be used as the value for this goal.
     #[serde(rename="useEventValue")]
-    pub use_event_value: bool,
+    pub use_event_value: Option<bool>,
 }
 
 impl NestedType for GoalEventDetails {}
@@ -579,22 +579,22 @@ impl RequestValue for AnalyticsDataimportDeleteUploadDataRequest {}
 pub struct RealtimeDataProfileInfo {
     /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(rename="internalWebPropertyId")]
-    pub internal_web_property_id: String,
+    pub internal_web_property_id: Option<String>,
     /// Table ID for view (profile).
     #[serde(rename="tableId")]
-    pub table_id: String,
+    pub table_id: Option<String>,
     /// Web Property ID to which this view (profile) belongs.
     #[serde(rename="webPropertyId")]
-    pub web_property_id: String,
+    pub web_property_id: Option<String>,
     /// View (Profile) ID.
     #[serde(rename="profileId")]
-    pub profile_id: String,
+    pub profile_id: Option<String>,
     /// View (Profile) name.
     #[serde(rename="profileName")]
-    pub profile_name: String,
+    pub profile_name: Option<String>,
     /// Account ID to which this view (profile) belongs.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
 }
 
 impl NestedType for RealtimeDataProfileInfo {}
@@ -609,17 +609,17 @@ impl Part for RealtimeDataProfileInfo {}
 pub struct RealtimeDataQuery {
     /// Maximum results per page.
     #[serde(rename="max-results")]
-    pub max_results: i32,
+    pub max_results: Option<i32>,
     /// List of dimensions or metrics based on which real time data is sorted.
-    pub sort: Vec<String>,
+    pub sort: Option<Vec<String>>,
     /// List of real time metrics.
-    pub metrics: Vec<String>,
+    pub metrics: Option<Vec<String>>,
     /// List of real time dimensions.
-    pub dimensions: String,
+    pub dimensions: Option<String>,
     /// Comma-separated list of dimension or metric filters.
-    pub filters: String,
+    pub filters: Option<String>,
     /// Unique table ID.
-    pub ids: String,
+    pub ids: Option<String>,
 }
 
 impl NestedType for RealtimeDataQuery {}
@@ -633,22 +633,22 @@ impl Part for RealtimeDataQuery {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileRef {
     /// Analytics view (profile) reference.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Link for this view (profile).
-    pub href: String,
+    pub href: Option<String>,
     /// Name of this view (profile).
-    pub name: String,
+    pub name: Option<String>,
     /// Web property ID of the form UA-XXXXX-YY to which this view (profile) belongs.
     #[serde(rename="webPropertyId")]
-    pub web_property_id: String,
+    pub web_property_id: Option<String>,
     /// Account ID to which this view (profile) belongs.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
     /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(rename="internalWebPropertyId")]
-    pub internal_web_property_id: String,
+    pub internal_web_property_id: Option<String>,
     /// View (Profile) ID.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for ProfileRef {}
@@ -666,46 +666,46 @@ impl Part for ProfileRef {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct McfData {
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Analytics data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.
-    pub rows: Vec<Vec<McfDataRows>>,
+    pub rows: Option<Vec<Vec<McfDataRows>>>,
     /// Determines if the Analytics data contains sampled data.
     #[serde(rename="containsSampledData")]
-    pub contains_sampled_data: bool,
+    pub contains_sampled_data: Option<bool>,
     /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.
     #[serde(rename="columnHeaders")]
-    pub column_headers: Vec<McfDataColumnHeaders>,
+    pub column_headers: Option<Vec<McfDataColumnHeaders>>,
     /// The total number of rows for the query, regardless of the number of rows in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
     /// The maximum number of rows the response can contain, regardless of the actual number of rows returned. Its value ranges from 1 to 10,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.
     #[serde(rename="totalsForAllResults")]
-    pub totals_for_all_results: HashMap<String, String>,
+    pub totals_for_all_results: Option<HashMap<String, String>>,
     /// Link to next page for this Analytics data query.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The number of samples used to calculate the result.
     #[serde(rename="sampleSize")]
-    pub sample_size: String,
+    pub sample_size: Option<String>,
     /// Analytics data request query parameters.
-    pub query: McfDataQuery,
+    pub query: Option<McfDataQuery>,
     /// Link to previous page for this Analytics data query.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// Information for the view (profile), for which the Analytics data was requested.
     #[serde(rename="profileInfo")]
-    pub profile_info: McfDataProfileInfo,
+    pub profile_info: Option<McfDataProfileInfo>,
     /// Unique ID for this data response.
-    pub id: String,
+    pub id: Option<String>,
     /// Link to this page.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// Total size of the sample space from which the samples were selected.
     #[serde(rename="sampleSpace")]
-    pub sample_space: String,
+    pub sample_space: Option<String>,
 }
 
 impl ResponseResult for McfData {}
@@ -723,26 +723,26 @@ impl ResponseResult for McfData {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDataSources {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Collection of custom data sources.
-    pub items: Vec<CustomDataSource>,
+    pub items: Option<Vec<CustomDataSource>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this custom data source collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this custom data source collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for CustomDataSources {}
@@ -760,26 +760,26 @@ impl ResponseResult for CustomDataSources {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Goals {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of goals.
-    pub items: Vec<Goal>,
+    pub items: Option<Vec<Goal>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this goal collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this goal collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of resources in the result.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for Goals {}
@@ -792,23 +792,23 @@ impl ResponseResult for Goals {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
     /// Resource type for Analytics account.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Account name.
-    pub name: String,
+    pub name: Option<String>,
     /// Time the account was created.
-    pub created: String,
+    pub created: Option<String>,
     /// Time the account was last modified.
-    pub updated: String,
+    pub updated: Option<String>,
     /// Child link for an account entry. Points to the list of web properties for this account.
     #[serde(rename="childLink")]
-    pub child_link: AccountChildLink,
+    pub child_link: Option<AccountChildLink>,
     /// Account ID.
-    pub id: String,
+    pub id: Option<String>,
     /// Link for this account.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// Permissions the user has for this account.
-    pub permissions: AccountPermissions,
+    pub permissions: Option<AccountPermissions>,
 }
 
 impl Part for Account {}
@@ -827,48 +827,48 @@ impl Part for Account {}
 pub struct GaData {
     /// Determines if Analytics data contains samples.
     #[serde(rename="containsSampledData")]
-    pub contains_sampled_data: bool,
+    pub contains_sampled_data: Option<bool>,
     /// Link to previous page for this Analytics data query.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// no description provided
     #[serde(rename="dataTable")]
-    pub data_table: GaDataDataTable,
+    pub data_table: Option<GaDataDataTable>,
     /// Analytics data request query parameters.
-    pub query: GaDataQuery,
+    pub query: Option<GaDataQuery>,
     /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.
     #[serde(rename="totalsForAllResults")]
-    pub totals_for_all_results: HashMap<String, String>,
+    pub totals_for_all_results: Option<HashMap<String, String>>,
     /// Unique ID for this data response.
-    pub id: String,
+    pub id: Option<String>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Analytics data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.
-    pub rows: Vec<Vec<String>>,
+    pub rows: Option<Vec<Vec<String>>>,
     /// The total number of rows for the query, regardless of the number of rows in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
     /// The maximum number of rows the response can contain, regardless of the actual number of rows returned. Its value ranges from 1 to 10,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to next page for this Analytics data query.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The number of samples used to calculate the result.
     #[serde(rename="sampleSize")]
-    pub sample_size: String,
+    pub sample_size: Option<String>,
     /// Information for the view (profile), for which the Analytics data was requested.
     #[serde(rename="profileInfo")]
-    pub profile_info: GaDataProfileInfo,
+    pub profile_info: Option<GaDataProfileInfo>,
     /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.
     #[serde(rename="columnHeaders")]
-    pub column_headers: Vec<GaDataColumnHeaders>,
+    pub column_headers: Option<Vec<GaDataColumnHeaders>>,
     /// Link to this page.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// Total size of the sample space from which the samples were selected.
     #[serde(rename="sampleSpace")]
-    pub sample_space: String,
+    pub sample_space: Option<String>,
 }
 
 impl ResponseResult for GaData {}
@@ -881,10 +881,10 @@ impl ResponseResult for GaData {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExperimentParentLink {
     /// Link to the view (profile) to which this experiment belongs. This field is read-only.
-    pub href: String,
+    pub href: Option<String>,
     /// Value is "analytics#profile". This field is read-only.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for ExperimentParentLink {}
@@ -963,10 +963,10 @@ impl ResponseResult for UnsampledReport {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebpropertyParentLink {
     /// Link to the account for this web property.
-    pub href: String,
+    pub href: Option<String>,
     /// Type of the parent link. Its value is "analytics#account".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for WebpropertyParentLink {}
@@ -980,10 +980,10 @@ impl Part for WebpropertyParentLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileParentLink {
     /// Link to the web property to which this view (profile) belongs.
-    pub href: String,
+    pub href: Option<String>,
     /// Value is "analytics#webproperty".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for ProfileParentLink {}
@@ -997,11 +997,11 @@ impl Part for ProfileParentLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserRef {
     /// no description provided
-    pub kind: String,
+    pub kind: Option<String>,
     /// Email ID of this user.
-    pub email: String,
+    pub email: Option<String>,
     /// User ID.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for UserRef {}
@@ -1019,26 +1019,26 @@ impl Part for UserRef {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Accounts {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of accounts.
-    pub items: Vec<Account>,
+    pub items: Option<Vec<Account>>,
     /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Previous link for this account collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Next link for this account collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for Accounts {}
@@ -1052,34 +1052,34 @@ impl ResponseResult for Accounts {}
 pub struct FilterAdvancedDetails {
     /// Field A.
     #[serde(rename="fieldA")]
-    pub field_a: String,
+    pub field_a: Option<String>,
     /// Indicates if the existing value of the output field, if any, should be overridden by the output expression.
     #[serde(rename="overrideOutputField")]
-    pub override_output_field: bool,
+    pub override_output_field: Option<bool>,
     /// Indicates if field A is required to match.
     #[serde(rename="fieldARequired")]
-    pub field_a_required: bool,
+    pub field_a_required: Option<bool>,
     /// Expression used to construct the output value.
     #[serde(rename="outputConstructor")]
-    pub output_constructor: String,
+    pub output_constructor: Option<String>,
     /// Indicates if field B is required to match.
     #[serde(rename="fieldBRequired")]
-    pub field_b_required: bool,
+    pub field_b_required: Option<bool>,
     /// Indicates if the filter expressions are case sensitive.
     #[serde(rename="caseSensitive")]
-    pub case_sensitive: bool,
+    pub case_sensitive: Option<bool>,
     /// Field B.
     #[serde(rename="fieldB")]
-    pub field_b: String,
+    pub field_b: Option<String>,
     /// Expression to extract from field B.
     #[serde(rename="extractB")]
-    pub extract_b: String,
+    pub extract_b: Option<String>,
     /// Expression to extract from field A.
     #[serde(rename="extractA")]
-    pub extract_a: String,
+    pub extract_a: Option<String>,
     /// Output field.
     #[serde(rename="outputToField")]
-    pub output_to_field: String,
+    pub output_to_field: Option<String>,
 }
 
 impl NestedType for FilterAdvancedDetails {}
@@ -1094,20 +1094,20 @@ impl Part for FilterAdvancedDetails {}
 pub struct WebPropertySummary {
     /// Website url for this web property.
     #[serde(rename="websiteUrl")]
-    pub website_url: String,
+    pub website_url: Option<String>,
     /// Resource type for Analytics WebPropertySummary.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Web property name.
-    pub name: String,
+    pub name: Option<String>,
     /// Level for this web property. Possible values are STANDARD or PREMIUM.
-    pub level: String,
+    pub level: Option<String>,
     /// Internal ID for this web property.
     #[serde(rename="internalWebPropertyId")]
-    pub internal_web_property_id: String,
+    pub internal_web_property_id: Option<String>,
     /// List of profiles under this web property.
-    pub profiles: Vec<ProfileSummary>,
+    pub profiles: Option<Vec<ProfileSummary>>,
     /// Web property ID of the form UA-XXXXX-YY.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for WebPropertySummary {}
@@ -1151,22 +1151,22 @@ impl ResponseResult for AccountTicket {}
 pub struct McfDataProfileInfo {
     /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(rename="internalWebPropertyId")]
-    pub internal_web_property_id: String,
+    pub internal_web_property_id: Option<String>,
     /// Table ID for view (profile).
     #[serde(rename="tableId")]
-    pub table_id: String,
+    pub table_id: Option<String>,
     /// Web Property ID to which this view (profile) belongs.
     #[serde(rename="webPropertyId")]
-    pub web_property_id: String,
+    pub web_property_id: Option<String>,
     /// View (Profile) ID.
     #[serde(rename="profileId")]
-    pub profile_id: String,
+    pub profile_id: Option<String>,
     /// View (Profile) name.
     #[serde(rename="profileName")]
-    pub profile_name: String,
+    pub profile_name: Option<String>,
     /// Account ID to which this view (profile) belongs.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
 }
 
 impl NestedType for McfDataProfileInfo {}
@@ -1181,10 +1181,10 @@ impl Part for McfDataProfileInfo {}
 pub struct UnsampledReportCloudStorageDownloadDetails {
     /// Id of the bucket the file object is stored in.
     #[serde(rename="bucketId")]
-    pub bucket_id: String,
+    pub bucket_id: Option<String>,
     /// Id of the file object containing the report data.
     #[serde(rename="objectId")]
-    pub object_id: String,
+    pub object_id: Option<String>,
 }
 
 impl NestedType for UnsampledReportCloudStorageDownloadDetails {}
@@ -1199,10 +1199,10 @@ impl Part for UnsampledReportCloudStorageDownloadDetails {}
 pub struct GoalVisitTimeOnSiteDetails {
     /// Type of comparison. Possible values are LESS_THAN or GREATER_THAN.
     #[serde(rename="comparisonType")]
-    pub comparison_type: String,
+    pub comparison_type: Option<String>,
     /// Value used for this comparison.
     #[serde(rename="comparisonValue")]
-    pub comparison_value: String,
+    pub comparison_value: Option<String>,
 }
 
 impl NestedType for GoalVisitTimeOnSiteDetails {}
@@ -1216,9 +1216,9 @@ impl Part for GoalVisitTimeOnSiteDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaDataDataTable {
     /// no description provided
-    pub rows: Vec<GaDataDataTableRows>,
+    pub rows: Option<Vec<GaDataDataTableRows>>,
     /// no description provided
-    pub cols: Vec<GaDataDataTableCols>,
+    pub cols: Option<Vec<GaDataDataTableCols>>,
 }
 
 impl NestedType for GaDataDataTable {}
@@ -1273,26 +1273,26 @@ impl ResponseResult for EntityUserLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountSummaries {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of AccountSummaries.
-    pub items: Vec<AccountSummary>,
+    pub items: Option<Vec<AccountSummary>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this AccountSummary collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this AccountSummary collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for AccountSummaries {}
@@ -1310,26 +1310,26 @@ impl ResponseResult for AccountSummaries {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDimensions {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Collection of custom dimensions.
-    pub items: Vec<CustomDimension>,
+    pub items: Option<Vec<CustomDimension>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this custom dimension collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this custom dimension collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for CustomDimensions {}
@@ -1343,7 +1343,7 @@ impl ResponseResult for CustomDimensions {}
 pub struct UnsampledReportDriveDownloadDetails {
     /// Id of the document/file containing the report data.
     #[serde(rename="documentId")]
-    pub document_id: String,
+    pub document_id: Option<String>,
 }
 
 impl NestedType for UnsampledReportDriveDownloadDetails {}
@@ -1357,18 +1357,18 @@ impl Part for UnsampledReportDriveDownloadDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalUrlDestinationDetails {
     /// URL for this goal.
-    pub url: String,
+    pub url: Option<String>,
     /// Determines if the goal URL must exactly match the capitalization of visited URLs.
     #[serde(rename="caseSensitive")]
-    pub case_sensitive: bool,
+    pub case_sensitive: Option<bool>,
     /// Match type for the goal URL. Possible values are HEAD, EXACT, or REGEX.
     #[serde(rename="matchType")]
-    pub match_type: String,
+    pub match_type: Option<String>,
     /// List of steps configured for this goal funnel.
-    pub steps: Vec<GoalUrlDestinationDetailsSteps>,
+    pub steps: Option<Vec<GoalUrlDestinationDetailsSteps>>,
     /// Determines if the first step in this goal is required.
     #[serde(rename="firstStepRequired")]
-    pub first_step_required: bool,
+    pub first_step_required: Option<bool>,
 }
 
 impl NestedType for GoalUrlDestinationDetails {}
@@ -1388,19 +1388,19 @@ impl Part for GoalUrlDestinationDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Upload {
     /// Upload status. Possible values: PENDING, COMPLETED, FAILED, DELETING, DELETED.
-    pub status: String,
+    pub status: Option<String>,
     /// Resource type for Analytics upload.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Data import errors collection.
-    pub errors: Vec<String>,
+    pub errors: Option<Vec<String>>,
     /// Custom data source Id to which this data import belongs.
     #[serde(rename="customDataSourceId")]
-    pub custom_data_source_id: String,
+    pub custom_data_source_id: Option<String>,
     /// A unique ID for this upload.
-    pub id: String,
+    pub id: Option<String>,
     /// Account Id to which this upload belongs.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
 }
 
 impl ResponseResult for Upload {}
@@ -1418,26 +1418,26 @@ impl ResponseResult for Upload {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Profiles {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of views (profiles).
-    pub items: Vec<Profile>,
+    pub items: Option<Vec<Profile>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this view (profile) collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this view (profile) collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for Profiles {}
@@ -1450,7 +1450,7 @@ impl ResponseResult for Profiles {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountPermissions {
     /// All the permissions that the user has for this account. These include any implied permissions (e.g., EDIT implies VIEW).
-    pub effective: Vec<String>,
+    pub effective: Option<Vec<String>>,
 }
 
 impl NestedType for AccountPermissions {}
@@ -1465,22 +1465,22 @@ impl Part for AccountPermissions {}
 pub struct GaDataProfileInfo {
     /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(rename="internalWebPropertyId")]
-    pub internal_web_property_id: String,
+    pub internal_web_property_id: Option<String>,
     /// Table ID for view (profile).
     #[serde(rename="tableId")]
-    pub table_id: String,
+    pub table_id: Option<String>,
     /// Web Property ID to which this view (profile) belongs.
     #[serde(rename="webPropertyId")]
-    pub web_property_id: String,
+    pub web_property_id: Option<String>,
     /// View (Profile) ID.
     #[serde(rename="profileId")]
-    pub profile_id: String,
+    pub profile_id: Option<String>,
     /// View (Profile) name.
     #[serde(rename="profileName")]
-    pub profile_name: String,
+    pub profile_name: Option<String>,
     /// Account ID to which this view (profile) belongs.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
 }
 
 impl NestedType for GaDataProfileInfo {}
@@ -1494,10 +1494,10 @@ impl Part for GaDataProfileInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterParentLink {
     /// Link to the account to which this filter belongs.
-    pub href: String,
+    pub href: Option<String>,
     /// Value is "analytics#account".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for FilterParentLink {}
@@ -1516,26 +1516,26 @@ impl Part for FilterParentLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Webproperties {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of web properties.
-    pub items: Vec<Webproperty>,
+    pub items: Option<Vec<Webproperty>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this web property collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this web property collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for Webproperties {}
@@ -1548,9 +1548,9 @@ impl ResponseResult for Webproperties {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityUserLinkPermissions {
     /// Permissions that a user has been assigned at this very level. Does not include any implied or inherited permissions. Local permissions are modifiable.
-    pub local: Vec<String>,
+    pub local: Option<Vec<String>>,
     /// Effective permissions represent all the permissions that a user has for this entity. These include any implied permissions (e.g., EDIT implies VIEW) or inherited permissions from the parent entity. Effective permissions are read-only.
-    pub effective: Vec<String>,
+    pub effective: Option<Vec<String>>,
 }
 
 impl NestedType for EntityUserLinkPermissions {}
@@ -1601,14 +1601,14 @@ impl ResponseResult for ProfileFilterLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountSummary {
     /// Resource type for Analytics AccountSummary.
-    pub kind: String,
+    pub kind: Option<String>,
     /// List of web properties under this account.
     #[serde(rename="webProperties")]
-    pub web_properties: Vec<WebPropertySummary>,
+    pub web_properties: Option<Vec<WebPropertySummary>>,
     /// Account ID.
-    pub id: String,
+    pub id: Option<String>,
     /// Account name.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for AccountSummary {}
@@ -1687,28 +1687,28 @@ impl ResponseResult for Webproperty {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RealtimeData {
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Real time data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.
-    pub rows: Vec<Vec<String>>,
+    pub rows: Option<Vec<Vec<String>>>,
     /// The total number of rows for the query, regardless of the number of rows in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
     /// Information for the view (profile), for which the real time data was requested.
     #[serde(rename="profileInfo")]
-    pub profile_info: RealtimeDataProfileInfo,
+    pub profile_info: Option<RealtimeDataProfileInfo>,
     /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.
     #[serde(rename="columnHeaders")]
-    pub column_headers: Vec<RealtimeDataColumnHeaders>,
+    pub column_headers: Option<Vec<RealtimeDataColumnHeaders>>,
     /// Real time data request query parameters.
-    pub query: RealtimeDataQuery,
+    pub query: Option<RealtimeDataQuery>,
     /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.
     #[serde(rename="totalsForAllResults")]
-    pub totals_for_all_results: HashMap<String, String>,
+    pub totals_for_all_results: Option<HashMap<String, String>>,
     /// Unique ID for this data response.
-    pub id: String,
+    pub id: Option<String>,
     /// Link to this page.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for RealtimeData {}
@@ -1722,15 +1722,15 @@ impl ResponseResult for RealtimeData {}
 pub struct FilterSearchAndReplaceDetails {
     /// Determines if the filter is case sensitive.
     #[serde(rename="caseSensitive")]
-    pub case_sensitive: bool,
+    pub case_sensitive: Option<bool>,
     /// Term to search.
     #[serde(rename="searchString")]
-    pub search_string: String,
+    pub search_string: Option<String>,
     /// Term to replace the search term with.
     #[serde(rename="replaceString")]
-    pub replace_string: String,
+    pub replace_string: Option<String>,
     /// Field to use in the filter.
-    pub field: String,
+    pub field: Option<String>,
 }
 
 impl NestedType for FilterSearchAndReplaceDetails {}
@@ -1847,26 +1847,26 @@ impl ResponseResult for Experiment {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomMetrics {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Collection of custom metrics.
-    pub items: Vec<CustomMetric>,
+    pub items: Option<Vec<CustomMetric>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this custom metric collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this custom metric collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for CustomMetrics {}
@@ -1880,31 +1880,31 @@ impl ResponseResult for CustomMetrics {}
 pub struct GaDataQuery {
     /// Maximum results per page.
     #[serde(rename="max-results")]
-    pub max_results: i32,
+    pub max_results: Option<i32>,
     /// List of dimensions or metrics based on which Analytics data is sorted.
-    pub sort: Vec<String>,
+    pub sort: Option<Vec<String>>,
     /// List of analytics dimensions.
-    pub dimensions: String,
+    pub dimensions: Option<String>,
     /// Start date.
     #[serde(rename="start-date")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     /// Start index.
     #[serde(rename="start-index")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// End date.
     #[serde(rename="end-date")]
-    pub end_date: String,
+    pub end_date: Option<String>,
     /// Unique table ID.
-    pub ids: String,
+    pub ids: Option<String>,
     /// List of analytics metrics.
-    pub metrics: Vec<String>,
+    pub metrics: Option<Vec<String>>,
     /// Desired sampling level
     #[serde(rename="samplingLevel")]
-    pub sampling_level: String,
+    pub sampling_level: Option<String>,
     /// Comma-separated list of dimension or metric filters.
-    pub filters: String,
+    pub filters: Option<String>,
     /// Analytics advanced segment.
-    pub segment: String,
+    pub segment: Option<String>,
 }
 
 impl NestedType for GaDataQuery {}
@@ -1923,17 +1923,17 @@ impl Part for GaDataQuery {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Columns {
     /// List of columns for a report type.
-    pub items: Vec<Column>,
+    pub items: Option<Vec<Column>>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Etag of collection. This etag can be compared with the last response etag to check if response has changed.
-    pub etag: String,
+    pub etag: Option<String>,
     /// Total number of columns returned in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
     /// List of attributes names returned by columns.
     #[serde(rename="attributeNames")]
-    pub attribute_names: Vec<String>,
+    pub attribute_names: Option<Vec<String>>,
 }
 
 impl ResponseResult for Columns {}
@@ -1947,15 +1947,15 @@ impl ResponseResult for Columns {}
 pub struct FilterExpression {
     /// Determines if the filter is case sensitive.
     #[serde(rename="caseSensitive")]
-    pub case_sensitive: bool,
+    pub case_sensitive: Option<bool>,
     /// Kind value for filter expression
-    pub kind: String,
+    pub kind: Option<String>,
     /// Match type for this filter. Possible values are BEGINS_WITH, EQUAL, ENDS_WITH, CONTAINS, MATCHES. Include and Exclude filters can use any match type. Match type is not applicable to Upper case and Lower case filters. Search and Replace expressions in the Search and Replace filter and all filter expressions in the Advanced filter default to MATCHES. User should not set match type for those filters.
     #[serde(rename="matchType")]
-    pub match_type: String,
+    pub match_type: Option<String>,
     /// Filter expression value
     #[serde(rename="expressionValue")]
-    pub expression_value: String,
+    pub expression_value: Option<String>,
     /// Field to filter. Possible values:  
     /// - Content and Traffic  
     /// - PAGE_REQUEST_URI, 
@@ -2041,7 +2041,7 @@ pub struct FilterExpression {
     /// - SOCIAL_NETWORK, 
     /// - SOCIAL_ACTION, 
     /// - SOCIAL_ACTION_TARGET,
-    pub field: String,
+    pub field: Option<String>,
 }
 
 impl Part for FilterExpression {}
@@ -2055,10 +2055,10 @@ impl Part for FilterExpression {}
 pub struct McfDataRowsConversionPathValue {
     /// Node value of an interaction on conversion path. Such as source, medium etc.
     #[serde(rename="nodeValue")]
-    pub node_value: String,
+    pub node_value: Option<String>,
     /// Type of an interaction on conversion path. Such as CLICK, IMPRESSION etc.
     #[serde(rename="interactionType")]
-    pub interaction_type: String,
+    pub interaction_type: Option<String>,
 }
 
 impl NestedType for McfDataRowsConversionPathValue {}
@@ -2072,7 +2072,7 @@ impl Part for McfDataRowsConversionPathValue {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaDataDataTableRows {
     /// no description provided
-    pub c: Vec<GaDataDataTableRowsC>,
+    pub c: Option<Vec<GaDataDataTableRowsC>>,
 }
 
 impl NestedType for GaDataDataTableRows {}
@@ -2086,13 +2086,13 @@ impl Part for GaDataDataTableRows {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdWordsAccount {
     /// Resource type for AdWords account.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Customer ID. This field is required when creating an AdWords link.
     #[serde(rename="customerId")]
-    pub customer_id: String,
+    pub customer_id: Option<String>,
     /// True if auto-tagging is enabled on the AdWords account. Read-only after the insert operation.
     #[serde(rename="autoTaggingEnabled")]
-    pub auto_tagging_enabled: bool,
+    pub auto_tagging_enabled: Option<bool>,
 }
 
 impl Part for AdWordsAccount {}
@@ -2105,19 +2105,19 @@ impl Part for AdWordsAccount {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebPropertyRef {
     /// Analytics web property reference.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Link for this web property.
-    pub href: String,
+    pub href: Option<String>,
     /// Name of this web property.
-    pub name: String,
+    pub name: Option<String>,
     /// Account ID to which this web property belongs.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
     /// Internal ID for this web property.
     #[serde(rename="internalWebPropertyId")]
-    pub internal_web_property_id: String,
+    pub internal_web_property_id: Option<String>,
     /// Web property ID of the form UA-XXXXX-YY.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for WebPropertyRef {}
@@ -2130,10 +2130,10 @@ impl Part for WebPropertyRef {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebpropertyChildLink {
     /// Link to the list of views (profiles) for this web property.
-    pub href: String,
+    pub href: Option<String>,
     /// Type of the parent link. Its value is "analytics#profiles".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for WebpropertyChildLink {}
@@ -2147,7 +2147,7 @@ impl Part for WebpropertyChildLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GaDataDataTableRowsC {
     /// no description provided
-    pub v: String,
+    pub v: Option<String>,
 }
 
 impl NestedType for GaDataDataTableRowsC {}
@@ -2161,11 +2161,11 @@ impl Part for GaDataDataTableRowsC {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Column {
     /// Map of attribute name and value for this column.
-    pub attributes: HashMap<String, String>,
+    pub attributes: Option<HashMap<String, String>>,
     /// Resource type for Analytics column.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Column id.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for Column {}
@@ -2183,26 +2183,26 @@ impl Part for Column {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileFilterLinks {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of profile filter links.
-    pub items: Vec<ProfileFilterLink>,
+    pub items: Option<Vec<ProfileFilterLink>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this profile filter link collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this profile filter link collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for ProfileFilterLinks {}
@@ -2318,24 +2318,24 @@ impl ResponseResult for EntityAdWordsLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Uploads {
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The total number of results for the query, regardless of the number of resources in the result.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
     /// A list of uploads.
-    pub items: Vec<Upload>,
+    pub items: Option<Vec<Upload>>,
     /// Link to previous page for this upload collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this upload collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
 }
 
 impl ResponseResult for Uploads {}
@@ -2348,7 +2348,7 @@ impl ResponseResult for Uploads {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterLowercaseDetails {
     /// Field to use in the filter.
-    pub field: String,
+    pub field: Option<String>,
 }
 
 impl NestedType for FilterLowercaseDetails {}
@@ -2362,19 +2362,19 @@ impl Part for FilterLowercaseDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalEventDetailsEventConditions {
     /// Expression used for this match.
-    pub expression: String,
+    pub expression: Option<String>,
     /// Type of the match to be performed. Possible values are REGEXP, BEGINS_WITH, or EXACT.
     #[serde(rename="matchType")]
-    pub match_type: String,
+    pub match_type: Option<String>,
     /// Type of this event condition. Possible values are CATEGORY, ACTION, LABEL, or VALUE.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Type of comparison. Possible values are LESS_THAN, GREATER_THAN or EQUAL.
     #[serde(rename="comparisonType")]
-    pub comparison_type: String,
+    pub comparison_type: Option<String>,
     /// Value used for this comparison.
     #[serde(rename="comparisonValue")]
-    pub comparison_value: String,
+    pub comparison_value: Option<String>,
 }
 
 impl NestedType for GoalEventDetailsEventConditions {}
@@ -2388,11 +2388,11 @@ impl Part for GoalEventDetailsEventConditions {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalUrlDestinationDetailsSteps {
     /// URL for this step.
-    pub url: String,
+    pub url: Option<String>,
     /// Step name.
-    pub name: String,
+    pub name: Option<String>,
     /// Step number.
-    pub number: i32,
+    pub number: Option<i32>,
 }
 
 impl NestedType for GoalUrlDestinationDetailsSteps {}
@@ -2406,10 +2406,10 @@ impl Part for GoalUrlDestinationDetailsSteps {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomMetricParentLink {
     /// Link to the property to which the custom metric belongs.
-    pub href: String,
+    pub href: Option<String>,
     /// Type of the parent link. Set to "analytics#webproperty".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for CustomMetricParentLink {}
@@ -2424,12 +2424,12 @@ impl Part for CustomMetricParentLink {}
 pub struct McfDataColumnHeaders {
     /// Data type. Dimension and metric values data types such as INTEGER, DOUBLE, CURRENCY, MCF_SEQUENCE etc.
     #[serde(rename="dataType")]
-    pub data_type: String,
+    pub data_type: Option<String>,
     /// Column Type. Either DIMENSION or METRIC.
     #[serde(rename="columnType")]
-    pub column_type: String,
+    pub column_type: Option<String>,
     /// Column name.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for McfDataColumnHeaders {}
@@ -2443,10 +2443,10 @@ impl Part for McfDataColumnHeaders {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalParentLink {
     /// Link to the view (profile) to which this goal belongs.
-    pub href: String,
+    pub href: Option<String>,
     /// Value is "analytics#profile".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for GoalParentLink {}
@@ -2465,24 +2465,24 @@ impl Part for GoalParentLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityAdWordsLinks {
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
     /// A list of entity AdWords links.
-    pub items: Vec<EntityAdWordsLink>,
+    pub items: Option<Vec<EntityAdWordsLink>>,
     /// Previous link for this AdWords link collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Next link for this AdWords link collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
 }
 
 impl ResponseResult for EntityAdWordsLinks {}
@@ -2496,13 +2496,13 @@ impl ResponseResult for EntityAdWordsLinks {}
 pub struct EntityUserLinkEntity {
     /// Account for this link.
     #[serde(rename="accountRef")]
-    pub account_ref: AccountRef,
+    pub account_ref: Option<AccountRef>,
     /// View (Profile) for this link.
     #[serde(rename="profileRef")]
-    pub profile_ref: ProfileRef,
+    pub profile_ref: Option<ProfileRef>,
     /// Web property for this link.
     #[serde(rename="webPropertyRef")]
-    pub web_property_ref: WebPropertyRef,
+    pub web_property_ref: Option<WebPropertyRef>,
 }
 
 impl NestedType for EntityUserLinkEntity {}
@@ -2516,13 +2516,13 @@ impl Part for EntityUserLinkEntity {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountRef {
     /// Analytics account reference.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Link for this account.
-    pub href: String,
+    pub href: Option<String>,
     /// Account ID.
-    pub id: String,
+    pub id: Option<String>,
     /// Account name.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for AccountRef {}
@@ -2542,24 +2542,24 @@ impl Part for AccountRef {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityUserLinks {
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
     /// A list of entity user links.
-    pub items: Vec<EntityUserLink>,
+    pub items: Option<Vec<EntityUserLink>>,
     /// Previous link for this account collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Next link for this account collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
 }
 
 impl ResponseResult for EntityUserLinks {}
@@ -2577,26 +2577,26 @@ impl ResponseResult for EntityUserLinks {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Segments {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type for segments.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of segments.
-    pub items: Vec<Segment>,
+    pub items: Option<Vec<Segment>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this segment collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this segment collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for Segments {}
@@ -2609,10 +2609,10 @@ impl ResponseResult for Segments {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountChildLink {
     /// Link to the list of web properties for this account.
-    pub href: String,
+    pub href: Option<String>,
     /// Type of the child link. Its value is "analytics#webproperties".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for AccountChildLink {}
@@ -2626,7 +2626,7 @@ impl Part for AccountChildLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterUppercaseDetails {
     /// Field to use in the filter.
-    pub field: String,
+    pub field: Option<String>,
 }
 
 impl NestedType for FilterUppercaseDetails {}
@@ -2641,10 +2641,10 @@ impl Part for FilterUppercaseDetails {}
 pub struct McfDataRows {
     /// A primitive dimension value. A primitive metric value.
     #[serde(rename="primitiveValue")]
-    pub primitive_value: String,
+    pub primitive_value: Option<String>,
     /// A conversion path dimension value, containing a list of interactions with their attributes.
     #[serde(rename="conversionPathValue")]
-    pub conversion_path_value: Vec<McfDataRowsConversionPathValue>,
+    pub conversion_path_value: Option<Vec<McfDataRowsConversionPathValue>>,
 }
 
 impl NestedType for McfDataRows {}
@@ -2658,14 +2658,14 @@ impl Part for McfDataRows {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileSummary {
     /// Resource type for Analytics ProfileSummary.
-    pub kind: String,
+    pub kind: Option<String>,
     /// View (Profile) type. Supported types: WEB or APP.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// View (profile) ID.
-    pub id: String,
+    pub id: Option<String>,
     /// View (profile) name.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for ProfileSummary {}
@@ -2726,7 +2726,7 @@ impl ResponseResult for CustomDimension {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfilePermissions {
     /// All the permissions that the user has for this view (profile). These include any implied permissions (e.g., EDIT implies VIEW) or inherited permissions from the parent web property.
-    pub effective: Vec<String>,
+    pub effective: Option<Vec<String>>,
 }
 
 impl NestedType for ProfilePermissions {}
@@ -2740,15 +2740,15 @@ impl Part for ProfilePermissions {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExperimentVariations {
     /// Status of the variation. Possible values: "ACTIVE", "INACTIVE". INACTIVE variations are not served. This field may not be changed for an experiment whose status is ENDED.
-    pub status: String,
+    pub status: Option<String>,
     /// The URL of the variation. This field may not be changed for an experiment whose status is RUNNING or ENDED.
-    pub url: String,
+    pub url: Option<String>,
     /// True if the experiment has ended and this variation performed (statistically) significantly better than the original. This field is read-only.
-    pub won: bool,
+    pub won: Option<bool>,
     /// The name of the variation. This field is required when creating an experiment. This field may not be changed for an experiment whose status is ENDED.
-    pub name: String,
+    pub name: Option<String>,
     /// Weight that this variation should receive. Only present if the experiment is running. This field is read-only.
-    pub weight: f64,
+    pub weight: Option<f64>,
 }
 
 impl NestedType for ExperimentVariations {}
@@ -2762,26 +2762,26 @@ impl Part for ExperimentVariations {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Segment {
     /// Segment definition.
-    pub definition: String,
+    pub definition: Option<String>,
     /// Resource type for Analytics segment.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Segment ID. Can be used with the 'segment' parameter in Core Reporting API.
     #[serde(rename="segmentId")]
-    pub segment_id: String,
+    pub segment_id: Option<String>,
     /// Time the segment was created.
-    pub created: String,
+    pub created: Option<String>,
     /// Time the segment was last modified.
-    pub updated: String,
+    pub updated: Option<String>,
     /// Type for a segment. Possible values are "BUILT_IN" or "CUSTOM".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Segment ID.
-    pub id: String,
+    pub id: Option<String>,
     /// Link for this segment.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// Segment name.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for Segment {}
@@ -2795,31 +2795,31 @@ impl Part for Segment {}
 pub struct McfDataQuery {
     /// Maximum results per page.
     #[serde(rename="max-results")]
-    pub max_results: i32,
+    pub max_results: Option<i32>,
     /// List of dimensions or metrics based on which Analytics data is sorted.
-    pub sort: Vec<String>,
+    pub sort: Option<Vec<String>>,
     /// List of analytics dimensions.
-    pub dimensions: String,
+    pub dimensions: Option<String>,
     /// Start date.
     #[serde(rename="start-date")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     /// Start index.
     #[serde(rename="start-index")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// End date.
     #[serde(rename="end-date")]
-    pub end_date: String,
+    pub end_date: Option<String>,
     /// Unique table ID.
-    pub ids: String,
+    pub ids: Option<String>,
     /// List of analytics metrics.
-    pub metrics: Vec<String>,
+    pub metrics: Option<Vec<String>>,
     /// Desired sampling level
     #[serde(rename="samplingLevel")]
-    pub sampling_level: String,
+    pub sampling_level: Option<String>,
     /// Comma-separated list of dimension or metric filters.
-    pub filters: String,
+    pub filters: Option<String>,
     /// Analytics advanced segment.
-    pub segment: String,
+    pub segment: Option<String>,
 }
 
 impl NestedType for McfDataQuery {}
@@ -2919,12 +2919,12 @@ impl ResponseResult for Profile {}
 pub struct GaDataColumnHeaders {
     /// Data type. Dimension column headers have only STRING as the data type. Metric column headers have data types for metric values such as INTEGER, DOUBLE, CURRENCY etc.
     #[serde(rename="dataType")]
-    pub data_type: String,
+    pub data_type: Option<String>,
     /// Column Type. Either DIMENSION or METRIC.
     #[serde(rename="columnType")]
-    pub column_type: String,
+    pub column_type: Option<String>,
     /// Column name.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for GaDataColumnHeaders {}
@@ -2939,11 +2939,11 @@ impl Part for GaDataColumnHeaders {}
 pub struct GaDataDataTableCols {
     /// no description provided
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// no description provided
-    pub id: String,
+    pub id: Option<String>,
     /// no description provided
-    pub label: String,
+    pub label: Option<String>,
 }
 
 impl NestedType for GaDataDataTableCols {}
@@ -2958,10 +2958,10 @@ impl Part for GaDataDataTableCols {}
 pub struct GoalVisitNumPagesDetails {
     /// Type of comparison. Possible values are LESS_THAN, GREATER_THAN, or EQUAL.
     #[serde(rename="comparisonType")]
-    pub comparison_type: String,
+    pub comparison_type: Option<String>,
     /// Value used for this comparison.
     #[serde(rename="comparisonValue")]
-    pub comparison_value: String,
+    pub comparison_value: Option<String>,
 }
 
 impl NestedType for GoalVisitNumPagesDetails {}
@@ -2975,10 +2975,10 @@ impl Part for GoalVisitNumPagesDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDataSourceChildLink {
     /// Link to the list of daily uploads for this custom data source. Link to the list of uploads for this custom data source.
-    pub href: String,
+    pub href: Option<String>,
     /// Value is "analytics#dailyUploads". Value is "analytics#uploads".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for CustomDataSourceChildLink {}
@@ -2997,26 +2997,26 @@ impl Part for CustomDataSourceChildLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnsampledReports {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of unsampled reports.
-    pub items: Vec<UnsampledReport>,
+    pub items: Option<Vec<UnsampledReport>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this unsampled report collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this unsampled report collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of resources in the result.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for UnsampledReports {}
@@ -3030,12 +3030,12 @@ impl ResponseResult for UnsampledReports {}
 pub struct RealtimeDataColumnHeaders {
     /// Data type. Dimension column headers have only STRING as the data type. Metric column headers have data types for metric values such as INTEGER, DOUBLE, CURRENCY etc.
     #[serde(rename="dataType")]
-    pub data_type: String,
+    pub data_type: Option<String>,
     /// Column Type. Either DIMENSION or METRIC.
     #[serde(rename="columnType")]
-    pub column_type: String,
+    pub column_type: Option<String>,
     /// Column name.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for RealtimeDataColumnHeaders {}
@@ -3050,7 +3050,7 @@ impl Part for RealtimeDataColumnHeaders {}
 pub struct EntityAdWordsLinkEntity {
     /// no description provided
     #[serde(rename="webPropertyRef")]
-    pub web_property_ref: WebPropertyRef,
+    pub web_property_ref: Option<WebPropertyRef>,
 }
 
 impl NestedType for EntityAdWordsLinkEntity {}
@@ -3064,10 +3064,10 @@ impl Part for EntityAdWordsLinkEntity {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDataSourceParentLink {
     /// Link to the web property to which this custom data source belongs.
-    pub href: String,
+    pub href: Option<String>,
     /// Value is "analytics#webproperty".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for CustomDataSourceParentLink {}
@@ -3081,44 +3081,44 @@ impl Part for CustomDataSourceParentLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDataSource {
     /// Resource type for Analytics custom data source.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Description of custom data source.
-    pub description: String,
+    pub description: Option<String>,
     /// IDs of views (profiles) linked to the custom data source.
     #[serde(rename="profilesLinked")]
-    pub profiles_linked: Vec<String>,
+    pub profiles_linked: Option<Vec<String>>,
     /// no description provided
     #[serde(rename="uploadType")]
-    pub upload_type: String,
+    pub upload_type: Option<String>,
     /// Time this custom data source was created.
-    pub created: String,
+    pub created: Option<String>,
     /// Time this custom data source was last modified.
-    pub updated: String,
+    pub updated: Option<String>,
     /// Account ID to which this custom data source belongs.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
     /// no description provided
     #[serde(rename="childLink")]
-    pub child_link: CustomDataSourceChildLink,
+    pub child_link: Option<CustomDataSourceChildLink>,
     /// Web property ID of the form UA-XXXXX-YY to which this custom data source belongs.
     #[serde(rename="webPropertyId")]
-    pub web_property_id: String,
+    pub web_property_id: Option<String>,
     /// Parent link for this custom data source. Points to the web property to which this custom data source belongs.
     #[serde(rename="parentLink")]
-    pub parent_link: CustomDataSourceParentLink,
+    pub parent_link: Option<CustomDataSourceParentLink>,
     /// no description provided
     #[serde(rename="importBehavior")]
-    pub import_behavior: String,
+    pub import_behavior: Option<String>,
     /// Type of the custom data source.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Custom data source ID.
-    pub id: String,
+    pub id: Option<String>,
     /// Link for this Analytics custom data source.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// Name of this custom data source.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for CustomDataSource {}
@@ -3131,10 +3131,10 @@ impl Part for CustomDataSource {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDimensionParentLink {
     /// Link to the property to which the custom dimension belongs.
-    pub href: String,
+    pub href: Option<String>,
     /// Type of the parent link. Set to "analytics#webproperty".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for CustomDimensionParentLink {}
@@ -3153,26 +3153,26 @@ impl Part for CustomDimensionParentLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Experiments {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of experiments.
-    pub items: Vec<Experiment>,
+    pub items: Option<Vec<Experiment>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this experiment collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this experiment collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of resources in the result.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for Experiments {}
@@ -3190,26 +3190,26 @@ impl ResponseResult for Experiments {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Filters {
     /// Email ID of the authenticated user
-    pub username: String,
+    pub username: Option<String>,
     /// Collection type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of filters.
-    pub items: Vec<Filter>,
+    pub items: Option<Vec<Filter>>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(rename="itemsPerPage")]
-    pub items_per_page: i32,
+    pub items_per_page: Option<i32>,
     /// Link to previous page for this filter collection.
     #[serde(rename="previousLink")]
-    pub previous_link: String,
+    pub previous_link: Option<String>,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(rename="startIndex")]
-    pub start_index: i32,
+    pub start_index: Option<i32>,
     /// Link to next page for this filter collection.
     #[serde(rename="nextLink")]
-    pub next_link: String,
+    pub next_link: Option<String>,
     /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(rename="totalResults")]
-    pub total_results: i32,
+    pub total_results: Option<i32>,
 }
 
 impl ResponseResult for Filters {}
@@ -3222,10 +3222,10 @@ impl ResponseResult for Filters {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileChildLink {
     /// Link to the list of goals for this view (profile).
-    pub href: String,
+    pub href: Option<String>,
     /// Value is "analytics#goals".
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for ProfileChildLink {}
@@ -5133,7 +5133,7 @@ impl<'a, C, A> MetadataMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Webproperty = Default::default();
+/// let mut req = Webproperty::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -5225,16 +5225,20 @@ impl<'a, C, A> ManagementWebpropertyInsertCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -5472,16 +5476,20 @@ impl<'a, C, A> ManagementProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5706,16 +5714,20 @@ impl<'a, C, A> ManagementAccountListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5859,7 +5871,7 @@ impl<'a, C, A> ManagementAccountListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ProfileFilterLink = Default::default();
+/// let mut req = ProfileFilterLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -5957,16 +5969,20 @@ impl<'a, C, A> ManagementProfileFilterLinkPatchCall<'a, C, A> where C: BorrowMut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -6233,16 +6249,20 @@ impl<'a, C, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> where C: Borrow
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -6478,16 +6498,20 @@ impl<'a, C, A> ManagementProfileUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -6647,7 +6671,7 @@ impl<'a, C, A> ManagementProfileUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EntityUserLink = Default::default();
+/// let mut req = EntityUserLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6745,16 +6769,20 @@ impl<'a, C, A> ManagementProfileUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -6937,7 +6965,7 @@ impl<'a, C, A> ManagementProfileUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Filter = Default::default();
+/// let mut req = Filter::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7029,16 +7057,20 @@ impl<'a, C, A> ManagementFilterInsertCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7191,7 +7223,7 @@ impl<'a, C, A> ManagementFilterInsertCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EntityUserLink = Default::default();
+/// let mut req = EntityUserLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7285,16 +7317,20 @@ impl<'a, C, A> ManagementAccountUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7457,7 +7493,7 @@ impl<'a, C, A> ManagementAccountUserLinkUpdateCall<'a, C, A> where C: BorrowMut<
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Webproperty = Default::default();
+/// let mut req = Webproperty::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7551,16 +7587,20 @@ impl<'a, C, A> ManagementWebpropertyUpdateCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7723,7 +7763,7 @@ impl<'a, C, A> ManagementWebpropertyUpdateCall<'a, C, A> where C: BorrowMut<hype
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EntityUserLink = Default::default();
+/// let mut req = EntityUserLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7819,16 +7859,20 @@ impl<'a, C, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> where C: Borrow
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8001,7 +8045,7 @@ impl<'a, C, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> where C: Borrow
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: UnsampledReport = Default::default();
+/// let mut req = UnsampledReport::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -8097,16 +8141,20 @@ impl<'a, C, A> ManagementUnsampledReportInsertCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8364,16 +8412,20 @@ impl<'a, C, A> ManagementCustomMetricGetCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8620,16 +8672,20 @@ impl<'a, C, A> ManagementUploadGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8884,16 +8940,20 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> where C: Borrow
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9146,16 +9206,20 @@ impl<'a, C, A> ManagementWebpropertyUserLinkListCall<'a, C, A> where C: BorrowMu
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9319,7 +9383,7 @@ impl<'a, C, A> ManagementWebpropertyUserLinkListCall<'a, C, A> where C: BorrowMu
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ProfileFilterLink = Default::default();
+/// let mut req = ProfileFilterLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -9417,16 +9481,20 @@ impl<'a, C, A> ManagementProfileFilterLinkUpdateCall<'a, C, A> where C: BorrowMu
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -9696,16 +9764,20 @@ impl<'a, C, A> ManagementExperimentGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9875,7 +9947,7 @@ impl<'a, C, A> ManagementExperimentGetCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CustomDimension = Default::default();
+/// let mut req = CustomDimension::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -9976,16 +10048,20 @@ impl<'a, C, A> ManagementCustomDimensionUpdateCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10252,16 +10328,20 @@ impl<'a, C, A> ManagementUnsampledReportGetCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -10431,7 +10511,7 @@ impl<'a, C, A> ManagementUnsampledReportGetCall<'a, C, A> where C: BorrowMut<hyp
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ProfileFilterLink = Default::default();
+/// let mut req = ProfileFilterLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -10527,16 +10607,20 @@ impl<'a, C, A> ManagementProfileFilterLinkInsertCall<'a, C, A> where C: BorrowMu
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10709,7 +10793,7 @@ impl<'a, C, A> ManagementProfileFilterLinkInsertCall<'a, C, A> where C: BorrowMu
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Filter = Default::default();
+/// let mut req = Filter::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -10803,16 +10887,20 @@ impl<'a, C, A> ManagementFilterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -11061,16 +11149,20 @@ impl<'a, C, A> ManagementProfileFilterLinkDeleteCall<'a, C, A> where C: BorrowMu
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -11295,16 +11387,20 @@ impl<'a, C, A> ManagementSegmentListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11532,16 +11628,20 @@ impl<'a, C, A> ManagementProfileDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -11691,7 +11791,7 @@ impl<'a, C, A> ManagementProfileDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Goal = Default::default();
+/// let mut req = Goal::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -11789,16 +11889,20 @@ impl<'a, C, A> ManagementGoalPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -11981,7 +12085,7 @@ impl<'a, C, A> ManagementGoalPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CustomDimension = Default::default();
+/// let mut req = CustomDimension::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -12082,16 +12186,20 @@ impl<'a, C, A> ManagementCustomDimensionPatchCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12271,7 +12379,7 @@ impl<'a, C, A> ManagementCustomDimensionPatchCall<'a, C, A> where C: BorrowMut<h
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Experiment = Default::default();
+/// let mut req = Experiment::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -12369,16 +12477,20 @@ impl<'a, C, A> ManagementExperimentPatchCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12656,16 +12768,20 @@ impl<'a, C, A> ManagementExperimentListCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -12932,16 +13048,20 @@ impl<'a, C, A> ManagementProfileListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -13200,16 +13320,20 @@ impl<'a, C, A> ManagementGoalListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -13383,7 +13507,7 @@ impl<'a, C, A> ManagementGoalListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Goal = Default::default();
+/// let mut req = Goal::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -13479,16 +13603,20 @@ impl<'a, C, A> ManagementGoalInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13661,7 +13789,7 @@ impl<'a, C, A> ManagementGoalInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CustomMetric = Default::default();
+/// let mut req = CustomMetric::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -13762,16 +13890,20 @@ impl<'a, C, A> ManagementCustomMetricPatchCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -14048,16 +14180,20 @@ impl<'a, C, A> ManagementUploadUploadDataCall<'a, C, A> where C: BorrowMut<hyper
         let mut upload_url: Option<String> = None;
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
@@ -14315,7 +14451,7 @@ impl<'a, C, A> ManagementUploadUploadDataCall<'a, C, A> where C: BorrowMut<hyper
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EntityUserLink = Default::default();
+/// let mut req = EntityUserLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -14407,16 +14543,20 @@ impl<'a, C, A> ManagementAccountUserLinkInsertCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -14569,7 +14709,7 @@ impl<'a, C, A> ManagementAccountUserLinkInsertCall<'a, C, A> where C: BorrowMut<
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EntityUserLink = Default::default();
+/// let mut req = EntityUserLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -14663,16 +14803,20 @@ impl<'a, C, A> ManagementWebpropertyUserLinkInsertCall<'a, C, A> where C: Borrow
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -14921,16 +15065,20 @@ impl<'a, C, A> ManagementExperimentDeleteCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -15090,7 +15238,7 @@ impl<'a, C, A> ManagementExperimentDeleteCall<'a, C, A> where C: BorrowMut<hyper
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Profile = Default::default();
+/// let mut req = Profile::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -15186,16 +15334,20 @@ impl<'a, C, A> ManagementProfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -15451,16 +15603,20 @@ impl<'a, C, A> ManagementFilterGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -15703,16 +15859,20 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> where C: Borro
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -15941,16 +16101,20 @@ impl<'a, C, A> ManagementAccountSummaryListCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -16187,16 +16351,20 @@ impl<'a, C, A> ManagementCustomDimensionListCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -16455,16 +16623,20 @@ impl<'a, C, A> ManagementUploadListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -16733,16 +16905,20 @@ impl<'a, C, A> ManagementProfileUserLinkListCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -17007,16 +17183,20 @@ impl<'a, C, A> ManagementAccountUserLinkListCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -17170,7 +17350,7 @@ impl<'a, C, A> ManagementAccountUserLinkListCall<'a, C, A> where C: BorrowMut<hy
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CustomMetric = Default::default();
+/// let mut req = CustomMetric::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -17271,16 +17451,20 @@ impl<'a, C, A> ManagementCustomMetricUpdateCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -17460,7 +17644,7 @@ impl<'a, C, A> ManagementCustomMetricUpdateCall<'a, C, A> where C: BorrowMut<hyp
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AnalyticsDataimportDeleteUploadDataRequest = Default::default();
+/// let mut req = AnalyticsDataimportDeleteUploadDataRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -17555,16 +17739,20 @@ impl<'a, C, A> ManagementUploadDeleteUploadDataCall<'a, C, A> where C: BorrowMut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -17727,7 +17915,7 @@ impl<'a, C, A> ManagementUploadDeleteUploadDataCall<'a, C, A> where C: BorrowMut
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Experiment = Default::default();
+/// let mut req = Experiment::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -17825,16 +18013,20 @@ impl<'a, C, A> ManagementExperimentUpdateCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -18017,7 +18209,7 @@ impl<'a, C, A> ManagementExperimentUpdateCall<'a, C, A> where C: BorrowMut<hyper
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Goal = Default::default();
+/// let mut req = Goal::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -18115,16 +18307,20 @@ impl<'a, C, A> ManagementGoalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -18400,16 +18596,20 @@ impl<'a, C, A> ManagementCustomDataSourceListCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -18666,16 +18866,20 @@ impl<'a, C, A> ManagementCustomMetricListCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -18934,16 +19138,20 @@ impl<'a, C, A> ManagementUnsampledReportListCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -19200,16 +19408,20 @@ impl<'a, C, A> ManagementWebpropertyGetCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -19359,7 +19571,7 @@ impl<'a, C, A> ManagementWebpropertyGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Experiment = Default::default();
+/// let mut req = Experiment::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -19455,16 +19667,20 @@ impl<'a, C, A> ManagementExperimentInsertCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -19722,16 +19938,20 @@ impl<'a, C, A> ManagementCustomDimensionGetCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -19986,16 +20206,20 @@ impl<'a, C, A> ManagementProfileFilterLinkListCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -20169,7 +20393,7 @@ impl<'a, C, A> ManagementProfileFilterLinkListCall<'a, C, A> where C: BorrowMut<
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Webproperty = Default::default();
+/// let mut req = Webproperty::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -20263,16 +20487,20 @@ impl<'a, C, A> ManagementWebpropertyPatchCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -20435,7 +20663,7 @@ impl<'a, C, A> ManagementWebpropertyPatchCall<'a, C, A> where C: BorrowMut<hyper
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CustomDimension = Default::default();
+/// let mut req = CustomDimension::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -20529,16 +20757,20 @@ impl<'a, C, A> ManagementCustomDimensionInsertCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -20701,7 +20933,7 @@ impl<'a, C, A> ManagementCustomDimensionInsertCall<'a, C, A> where C: BorrowMut<
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CustomMetric = Default::default();
+/// let mut req = CustomMetric::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -20795,16 +21027,20 @@ impl<'a, C, A> ManagementCustomMetricInsertCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -20967,7 +21203,7 @@ impl<'a, C, A> ManagementCustomMetricInsertCall<'a, C, A> where C: BorrowMut<hyp
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EntityUserLink = Default::default();
+/// let mut req = EntityUserLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -21063,16 +21299,20 @@ impl<'a, C, A> ManagementProfileUserLinkInsertCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -21336,16 +21576,20 @@ impl<'a, C, A> ManagementWebpropertyListCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -21499,7 +21743,7 @@ impl<'a, C, A> ManagementWebpropertyListCall<'a, C, A> where C: BorrowMut<hyper:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EntityAdWordsLink = Default::default();
+/// let mut req = EntityAdWordsLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -21593,16 +21837,20 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> where C: Bor
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -21765,7 +22013,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> where C: Bor
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EntityAdWordsLink = Default::default();
+/// let mut req = EntityAdWordsLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -21861,16 +22109,20 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> where C: Borr
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -22130,16 +22382,20 @@ impl<'a, C, A> ManagementGoalGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -22393,16 +22649,20 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> where C: Bor
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -22552,7 +22812,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> where C: Bor
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EntityAdWordsLink = Default::default();
+/// let mut req = EntityAdWordsLink::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -22648,16 +22908,20 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> where C: Bor
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -22830,7 +23094,7 @@ impl<'a, C, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> where C: Bor
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Filter = Default::default();
+/// let mut req = Filter::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -22924,16 +23188,20 @@ impl<'a, C, A> ManagementFilterPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -23187,16 +23455,20 @@ impl<'a, C, A> ManagementFilterListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -23433,16 +23705,20 @@ impl<'a, C, A> ManagementFilterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -23592,7 +23868,7 @@ impl<'a, C, A> ManagementFilterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Profile = Default::default();
+/// let mut req = Profile::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -23686,16 +23962,20 @@ impl<'a, C, A> ManagementProfileInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -23940,16 +24220,20 @@ impl<'a, C, A> ManagementAccountUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -24089,7 +24373,7 @@ impl<'a, C, A> ManagementAccountUserLinkDeleteCall<'a, C, A> where C: BorrowMut<
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Profile = Default::default();
+/// let mut req = Profile::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -24185,16 +24469,20 @@ impl<'a, C, A> ManagementProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -24454,16 +24742,20 @@ impl<'a, C, A> ManagementProfileFilterLinkGetCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -24726,16 +25018,20 @@ impl<'a, C, A> DataMcfGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -25050,16 +25346,20 @@ impl<'a, C, A> DataGaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -25364,16 +25664,20 @@ impl<'a, C, A> DataRealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -25551,7 +25855,7 @@ impl<'a, C, A> DataRealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AccountTicket = Default::default();
+/// let mut req = AccountTicket::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -25617,16 +25921,20 @@ impl<'a, C, A> ProvisioningCreateAccountTicketCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -25850,16 +26158,20 @@ impl<'a, C, A> MetadataColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-adexchangebuyer1d3` library allows access to all features of the *Google Ad Exchange Buyer* service.
 
-This documentation was generated from *Ad Exchange Buyer* crate version *0.1.5+20150323*, where *20150323* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *Ad Exchange Buyer* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 
 Everything else about the *Ad Exchange Buyer* *v1d3* API can be found at the
 [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -108,7 +108,7 @@ let mut hub = AdExchangeBuyer::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req: PretargetingConfig = Default::default();
+let mut req = PretargetingConfig::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.

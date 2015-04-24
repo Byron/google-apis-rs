@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-analytics3` library allows access to all features of the *Google analytics* service.
 
-This documentation was generated from *analytics* crate version *0.1.5+20150308*, where *20150308* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *analytics* crate version *0.1.5+20150305*, where *20150305* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 
 Everything else about the *analytics* *v3* API can be found at the
 [official documentation site](https://developers.google.com/analytics/).
@@ -108,7 +108,7 @@ let mut hub = Analytics::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req: EntityUserLink = Default::default();
+let mut req = EntityUserLink::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-identitytoolkit3` library allows access to all features of the *Google Identity Toolkit* service.
 
-This documentation was generated from *Identity Toolkit* crate version *0.1.5+20141009*, where *20141009* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *Identity Toolkit* crate version *0.1.5+20150406*, where *20150406* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 
 Everything else about the *Identity Toolkit* *v3* API can be found at the
 [official documentation site](https://developers.google.com/identity-toolkit/v3/).
@@ -14,7 +14,7 @@ Everything else about the *Identity Toolkit* *v3* API can be found at the
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.IdentityToolkit.html) ... 
 
 * [relyingparty](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.Relyingparty.html)
- * [*create auth uri*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyCreateAuthUriCall.html), [*delete account*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyDeleteAccountCall.html), [*download account*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyDownloadAccountCall.html), [*get account info*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyGetAccountInfoCall.html), [*get oob confirmation code*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyGetOobConfirmationCodeCall.html), [*get public keys*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyGetPublicKeyCall.html), [*reset password*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyResetPasswordCall.html), [*set account info*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartySetAccountInfoCall.html), [*upload account*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyUploadAccountCall.html), [*verify assertion*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyVerifyAssertionCall.html) and [*verify password*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyVerifyPasswordCall.html)
+ * [*create auth uri*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyCreateAuthUriCall.html), [*delete account*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyDeleteAccountCall.html), [*download account*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyDownloadAccountCall.html), [*get account info*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyGetAccountInfoCall.html), [*get oob confirmation code*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyGetOobConfirmationCodeCall.html), [*get public keys*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyGetPublicKeyCall.html), [*get recaptcha param*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyGetRecaptchaParamCall.html), [*reset password*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyResetPasswordCall.html), [*set account info*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartySetAccountInfoCall.html), [*upload account*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyUploadAccountCall.html), [*verify assertion*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyVerifyAssertionCall.html) and [*verify password*](http://byron.github.io/google-apis-rs/google_identitytoolkit3/struct.RelyingpartyVerifyPasswordCall.html)
 
 
 
@@ -93,7 +93,7 @@ let mut hub = IdentityToolkit::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req: IdentitytoolkitRelyingpartyVerifyAssertionRequest = Default::default();
+let mut req = IdentitytoolkitRelyingpartyVerifyAssertionRequest::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.

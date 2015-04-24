@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -37,6 +38,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -60,7 +67,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.advertisers().get(&self.opt.arg_role, &self.opt.arg_role_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "advertiser-id" => {
                     call = call.advertiser_id(value.unwrap_or(""));
@@ -95,8 +102,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -107,7 +113,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.advertisers().list(&self.opt.arg_role, &self.opt.arg_role_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "relationship-status" => {
                     call = call.relationship_status(value.unwrap_or(""));
@@ -160,8 +166,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -172,7 +177,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.cc_offers().list(&self.opt.arg_publisher);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
@@ -210,8 +215,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -222,7 +226,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.events().list(&self.opt.arg_role, &self.opt.arg_role_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "type" => {
                     call = call.type_(value.unwrap_or(""));
@@ -302,8 +306,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -314,7 +317,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.links().get(&self.opt.arg_role, &self.opt.arg_role_id, &self.opt.arg_link_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -346,8 +349,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -356,10 +358,10 @@ impl Engine {
 
     fn _links_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Link = Default::default();
+        let mut request = api::Link::default();
         let mut call = self.hub.links().insert(&request, &self.opt.arg_role, &self.opt.arg_role_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -379,9 +381,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -397,9 +400,37 @@ impl Engine {
                 }
             }
             
+            fn request_special_offers_free_shipping_min_init(request: &mut api::Link) {
+                request_special_offers_init(request);
+                if request.special_offers.as_mut().unwrap().free_shipping_min.is_none() {
+                    request.special_offers.as_mut().unwrap().free_shipping_min = Some(Default::default());
+                }
+            }
+            
             fn request_special_offers_init(request: &mut api::Link) {
                 if request.special_offers.is_none() {
                     request.special_offers = Some(Default::default());
+                }
+            }
+            
+            fn request_special_offers_percent_off_min_init(request: &mut api::Link) {
+                request_special_offers_init(request);
+                if request.special_offers.as_mut().unwrap().percent_off_min.is_none() {
+                    request.special_offers.as_mut().unwrap().percent_off_min = Some(Default::default());
+                }
+            }
+            
+            fn request_special_offers_price_cut_init(request: &mut api::Link) {
+                request_special_offers_init(request);
+                if request.special_offers.as_mut().unwrap().price_cut.is_none() {
+                    request.special_offers.as_mut().unwrap().price_cut = Some(Default::default());
+                }
+            }
+            
+            fn request_special_offers_price_cut_min_init(request: &mut api::Link) {
+                request_special_offers_init(request);
+                if request.special_offers.as_mut().unwrap().price_cut_min.is_none() {
+                    request.special_offers.as_mut().unwrap().price_cut_min = Some(Default::default());
                 }
             }
             
@@ -423,60 +454,63 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 "special-offers.price-cut.amount" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().price_cut.amount = arg_from_str(value.unwrap_or("0.0"), err, "special-offers.price-cut.amount", "number");
+                        request_special_offers_price_cut_init(&mut request);
+                        request.special_offers.as_mut().unwrap().price_cut.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "special-offers.price-cut.amount", "number"));
                     },
                 "special-offers.price-cut.currency-code" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().price_cut.currency_code = value.unwrap_or("").to_string();
+                        request_special_offers_price_cut_init(&mut request);
+                        request.special_offers.as_mut().unwrap().price_cut.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "special-offers.price-cut-min.amount" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().price_cut_min.amount = arg_from_str(value.unwrap_or("0.0"), err, "special-offers.price-cut-min.amount", "number");
+                        request_special_offers_price_cut_min_init(&mut request);
+                        request.special_offers.as_mut().unwrap().price_cut_min.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "special-offers.price-cut-min.amount", "number"));
                     },
                 "special-offers.price-cut-min.currency-code" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().price_cut_min.currency_code = value.unwrap_or("").to_string();
+                        request_special_offers_price_cut_min_init(&mut request);
+                        request.special_offers.as_mut().unwrap().price_cut_min.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "special-offers.free-shipping" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().free_shipping = arg_from_str(value.unwrap_or("false"), err, "special-offers.free-shipping", "boolean");
+                        request_special_offers_price_cut_min_init(&mut request);
+                        request.special_offers.as_mut().unwrap().free_shipping = Some(arg_from_str(value.unwrap_or("false"), err, "special-offers.free-shipping", "boolean"));
                     },
                 "special-offers.promotion-codes" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().promotion_codes.push(value.unwrap_or("").to_string());
+                        request_special_offers_price_cut_min_init(&mut request);
+                        if request.special_offers.as_mut().unwrap().promotion_codes.is_none() {
+                           request.special_offers.as_mut().unwrap().promotion_codes = Some(Default::default());
+                        }
+                                        request.special_offers.as_mut().unwrap().promotion_codes.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "special-offers.percent-off" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().percent_off = arg_from_str(value.unwrap_or("0.0"), err, "special-offers.percent-off", "number");
+                        request_special_offers_price_cut_min_init(&mut request);
+                        request.special_offers.as_mut().unwrap().percent_off = Some(arg_from_str(value.unwrap_or("0.0"), err, "special-offers.percent-off", "number"));
                     },
                 "special-offers.percent-off-min.amount" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().percent_off_min.amount = arg_from_str(value.unwrap_or("0.0"), err, "special-offers.percent-off-min.amount", "number");
+                        request_special_offers_percent_off_min_init(&mut request);
+                        request.special_offers.as_mut().unwrap().percent_off_min.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "special-offers.percent-off-min.amount", "number"));
                     },
                 "special-offers.percent-off-min.currency-code" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().percent_off_min.currency_code = value.unwrap_or("").to_string();
+                        request_special_offers_percent_off_min_init(&mut request);
+                        request.special_offers.as_mut().unwrap().percent_off_min.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "special-offers.free-gift" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().free_gift = arg_from_str(value.unwrap_or("false"), err, "special-offers.free-gift", "boolean");
+                        request_special_offers_percent_off_min_init(&mut request);
+                        request.special_offers.as_mut().unwrap().free_gift = Some(arg_from_str(value.unwrap_or("false"), err, "special-offers.free-gift", "boolean"));
                     },
                 "special-offers.free-shipping-min.amount" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().free_shipping_min.amount = arg_from_str(value.unwrap_or("0.0"), err, "special-offers.free-shipping-min.amount", "number");
+                        request_special_offers_free_shipping_min_init(&mut request);
+                        request.special_offers.as_mut().unwrap().free_shipping_min.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "special-offers.free-shipping-min.amount", "number"));
                     },
                 "special-offers.free-shipping-min.currency-code" => {
-                        request_special_offers_init(&mut request);
-                        request.special_offers.as_mut().unwrap().free_shipping_min.currency_code = value.unwrap_or("").to_string();
+                        request_special_offers_free_shipping_min_init(&mut request);
+                        request.special_offers.as_mut().unwrap().free_shipping_min.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "epc-seven-day-average.amount" => {
                         request_epc_seven_day_average_init(&mut request);
-                        request.epc_seven_day_average.as_mut().unwrap().amount = arg_from_str(value.unwrap_or("0.0"), err, "epc-seven-day-average.amount", "number");
+                        request.epc_seven_day_average.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "epc-seven-day-average.amount", "number"));
                     },
                 "epc-seven-day-average.currency-code" => {
                         request_epc_seven_day_average_init(&mut request);
-                        request.epc_seven_day_average.as_mut().unwrap().currency_code = value.unwrap_or("").to_string();
+                        request.epc_seven_day_average.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "create-date" => {
                         request_epc_seven_day_average_init(&mut request);
@@ -516,11 +550,11 @@ impl Engine {
                     },
                 "epc-ninety-day-average.amount" => {
                         request_epc_ninety_day_average_init(&mut request);
-                        request.epc_ninety_day_average.as_mut().unwrap().amount = arg_from_str(value.unwrap_or("0.0"), err, "epc-ninety-day-average.amount", "number");
+                        request.epc_ninety_day_average.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "epc-ninety-day-average.amount", "number"));
                     },
                 "epc-ninety-day-average.currency-code" => {
                         request_epc_ninety_day_average_init(&mut request);
-                        request.epc_ninety_day_average.as_mut().unwrap().currency_code = value.unwrap_or("").to_string();
+                        request.epc_ninety_day_average.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "availability" => {
                         request_epc_ninety_day_average_init(&mut request);
@@ -551,8 +585,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -563,7 +596,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.links().list(&self.opt.arg_role, &self.opt.arg_role_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-date-min" => {
                     call = call.start_date_min(value.unwrap_or(""));
@@ -634,8 +667,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -646,7 +678,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.publishers().get(&self.opt.arg_role, &self.opt.arg_role_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "publisher-id" => {
                     call = call.publisher_id(value.unwrap_or(""));
@@ -681,8 +713,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -693,7 +724,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.publishers().list(&self.opt.arg_role, &self.opt.arg_role_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "relationship-status" => {
                     call = call.relationship_status(value.unwrap_or(""));
@@ -746,8 +777,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -758,7 +788,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.reports().get(&self.opt.arg_role, &self.opt.arg_role_id, &self.opt.arg_report_type);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "status" => {
                     call = call.status(value.unwrap_or(""));
@@ -823,8 +853,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -844,19 +873,22 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_cc_offers {
+        }
+ else if self.opt.cmd_cc_offers {
             if self.opt.cmd_list {
                 call_result = self._cc_offers_list(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_events {
+        }
+ else if self.opt.cmd_events {
             if self.opt.cmd_list {
                 call_result = self._events_list(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_links {
+        }
+ else if self.opt.cmd_links {
             if self.opt.cmd_get {
                 call_result = self._links_get(dry_run, &mut err);
             } else if self.opt.cmd_insert {
@@ -866,7 +898,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_publishers {
+        }
+ else if self.opt.cmd_publishers {
             if self.opt.cmd_get {
                 call_result = self._publishers_get(dry_run, &mut err);
             } else if self.opt.cmd_list {
@@ -874,7 +907,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_reports {
+        }
+ else if self.opt.cmd_reports {
             if self.opt.cmd_get {
                 call_result = self._reports_get(dry_run, &mut err);
             } else {
@@ -900,21 +934,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "gan1-beta1-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "gan1-beta1-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "gan1-beta1",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "gan1-beta1",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::Gan::new(hyper::Client::new(), auth),
+            hub: api::Gan::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -934,12 +984,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

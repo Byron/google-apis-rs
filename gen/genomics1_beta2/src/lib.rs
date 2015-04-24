@@ -31,8 +31,8 @@
 //!  * [*bases list*](struct.ReferenceBaseListCall.html), [*get*](struct.ReferenceGetCall.html) and [*search*](struct.ReferenceSearchCall.html)
 //! * referencesets
 //!  * [*get*](struct.ReferencesetGetCall.html) and [*search*](struct.ReferencesetSearchCall.html)
-//! * streaming variant store
-//!  * [*streamvariants*](struct.StreamingVariantStoreStreamvariantCall.html)
+//! * streaming readstore
+//!  * [*streamreads*](struct.StreamingReadstoreStreamreadCall.html)
 //! * [variants](struct.Variant.html)
 //!  * [*create*](struct.VariantCreateCall.html), [*delete*](struct.VariantDeleteCall.html), [*get*](struct.VariantGetCall.html), [*search*](struct.VariantSearchCall.html) and [*update*](struct.VariantUpdateCall.html)
 //! * variantsets
@@ -124,7 +124,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: Annotation = Default::default();
+//! let mut req = Annotation::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -311,7 +311,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Annotation = Default::default();
+/// let mut req = Annotation::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -385,8 +385,8 @@ impl<'a, C, A> Genomics<C, A>
     pub fn referencesets(&'a self) -> ReferencesetMethods<'a, C, A> {
         ReferencesetMethods { hub: &self }
     }
-    pub fn streaming_variant_store(&'a self) -> StreamingVariantStoreMethods<'a, C, A> {
-        StreamingVariantStoreMethods { hub: &self }
+    pub fn streaming_readstore(&'a self) -> StreamingReadstoreMethods<'a, C, A> {
+        StreamingReadstoreMethods { hub: &self }
     }
     pub fn variants(&'a self) -> VariantMethods<'a, C, A> {
         VariantMethods { hub: &self }
@@ -422,7 +422,7 @@ impl<'a, C, A> Genomics<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchAnnotationsResponse {
     /// The resulting per-annotation entries, ordered consistently with the original request.
-    pub entries: Vec<BatchAnnotationsResponseEntry>,
+    pub entries: Option<Vec<BatchAnnotationsResponseEntry>>,
 }
 
 impl ResponseResult for BatchAnnotationsResponse {}
@@ -460,7 +460,7 @@ impl RequestValue for SearchVariantSetsRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Int32Value {
     /// The int32 value.
-    pub value: i32,
+    pub value: Option<i32>,
 }
 
 impl Part for Int32Value {}
@@ -479,9 +479,9 @@ impl Part for Int32Value {}
 pub struct SearchJobsResponse {
     /// The continuation token which is used to page through large result sets. Provide this value is a subsequent request to return the next page of results. This field will be empty if there are no more results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The list of jobs results, ordered newest to oldest.
-    pub jobs: Vec<Job>,
+    pub jobs: Option<Vec<Job>>,
 }
 
 impl ResponseResult for SearchJobsResponse {}
@@ -495,23 +495,23 @@ impl ResponseResult for SearchJobsResponse {}
 pub struct VariantAnnotation {
     /// Google annotation IDs of the transcripts affected by this variant. These should be provided when the variant is created.
     #[serde(rename="transcriptIds")]
-    pub transcript_ids: Vec<String>,
+    pub transcript_ids: Option<Vec<String>>,
     /// The alternate allele for this variant. If multiple alternate alleles exist at this location, create a separate variant for each one, as they may represent distinct conditions.
     #[serde(rename="alternateBases")]
-    pub alternate_bases: String,
+    pub alternate_bases: Option<String>,
     /// Describes the clinical significance of a variant. It is adapted from the ClinVar controlled vocabulary for clinical significance described at: http://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/
     #[serde(rename="clinicalSignificance")]
-    pub clinical_significance: String,
+    pub clinical_significance: Option<String>,
     /// The set of conditions associated with this variant. A condition describes the way a variant influences human health.
-    pub conditions: Vec<VariantAnnotationCondition>,
+    pub conditions: Option<Vec<VariantAnnotationCondition>>,
     /// Type has been adapted from ClinVar's list of variant types.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Effect of the variant on the coding sequence.
-    pub effect: String,
+    pub effect: Option<String>,
     /// Google annotation ID of the gene affected by this variant. This should be provided when the variant is created.
     #[serde(rename="geneId")]
-    pub gene_id: String,
+    pub gene_id: Option<String>,
 }
 
 impl Part for VariantAnnotation {}
@@ -525,15 +525,15 @@ impl Part for VariantAnnotation {}
 pub struct VariantAnnotationCondition {
     /// The MedGen concept id associated with this gene. Search for these IDs at http://www.ncbi.nlm.nih.gov/medgen/
     #[serde(rename="conceptId")]
-    pub concept_id: String,
+    pub concept_id: Option<String>,
     /// The OMIM id for this condition. Search for these IDs at http://omim.org/
     #[serde(rename="omimId")]
-    pub omim_id: String,
+    pub omim_id: Option<String>,
     /// The set of external IDs for this condition.
     #[serde(rename="externalIds")]
-    pub external_ids: Vec<ExternalId>,
+    pub external_ids: Option<Vec<ExternalId>>,
     /// A set of names for the condition.
-    pub names: Vec<String>,
+    pub names: Option<Vec<String>>,
 }
 
 impl Part for VariantAnnotationCondition {}
@@ -567,20 +567,20 @@ impl RequestValue for ImportVariantsRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
     /// Remaining structured metadata key-value pairs.
-    pub info: HashMap<String, Vec<String>>,
+    pub info: Option<HashMap<String, Vec<String>>>,
     /// A textual description of this metadata.
-    pub description: String,
+    pub description: Option<String>,
     /// The top-level key.
-    pub key: String,
+    pub key: Option<String>,
     /// The type of data. Possible types include: Integer, Float, Flag, Character, and String.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The number of values that can be included in a field described by this metadata.
-    pub number: String,
+    pub number: Option<String>,
     /// The value field for simple metadata
-    pub value: String,
+    pub value: Option<String>,
     /// User-provided ID field, not enforced by this API. Two or more pieces of structured metadata with identical id and key fields are considered equivalent.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for Metadata {}
@@ -599,13 +599,13 @@ impl Part for Metadata {}
 pub struct ListCoverageBucketsResponse {
     /// The coverage buckets. The list of buckets is sparse; a bucket with 0 overlapping reads is not returned. A bucket never crosses more than one reference sequence. Each bucket has width bucketWidth, unless its end is the end of the reference sequence.
     #[serde(rename="coverageBuckets")]
-    pub coverage_buckets: Vec<CoverageBucket>,
+    pub coverage_buckets: Option<Vec<CoverageBucket>>,
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The length of each coverage bucket in base pairs. Note that buckets at the end of a reference sequence may be shorter. This value is omitted if the bucket width is infinity (the default behaviour, with no range or targetBucketWidth).
     #[serde(rename="bucketWidth")]
-    pub bucket_width: String,
+    pub bucket_width: Option<String>,
 }
 
 impl ResponseResult for ListCoverageBucketsResponse {}
@@ -619,19 +619,19 @@ impl ResponseResult for ListCoverageBucketsResponse {}
 pub struct FastqMetadata {
     /// Optionally specifies the platform unit for alignment from FASTQ. For example: flowcell-barcode.lane for Illumina or slide for SOLID.
     #[serde(rename="platformUnit")]
-    pub platform_unit: String,
+    pub platform_unit: Option<String>,
     /// Optionally specifies the read group name for alignment from FASTQ.
     #[serde(rename="readGroupName")]
-    pub read_group_name: String,
+    pub read_group_name: Option<String>,
     /// Optionally specifies the library name for alignment from FASTQ.
     #[serde(rename="libraryName")]
-    pub library_name: String,
+    pub library_name: Option<String>,
     /// Optionally specifies the platform name for alignment from FASTQ. For example: CAPILLARY, LS454, ILLUMINA, SOLID, HELICOS, IONTORRENT, PACBIO.
     #[serde(rename="platformName")]
-    pub platform_name: String,
+    pub platform_name: Option<String>,
     /// Optionally specifies the sample name for alignment from FASTQ.
     #[serde(rename="sampleName")]
-    pub sample_name: String,
+    pub sample_name: Option<String>,
 }
 
 impl Part for FastqMetadata {}
@@ -650,7 +650,7 @@ impl Part for FastqMetadata {}
 pub struct ExportVariantSetResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
-    pub job_id: String,
+    pub job_id: Option<String>,
 }
 
 impl ResponseResult for ExportVariantSetResponse {}
@@ -669,9 +669,9 @@ impl ResponseResult for ExportVariantSetResponse {}
 pub struct SearchAnnotationsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The matching annotations.
-    pub annotations: Vec<Annotation>,
+    pub annotations: Option<Vec<Annotation>>,
 }
 
 impl ResponseResult for SearchAnnotationsResponse {}
@@ -685,16 +685,16 @@ impl ResponseResult for SearchAnnotationsResponse {}
 pub struct ReadGroupProgram {
     /// The command line used to run this program.
     #[serde(rename="commandLine")]
-    pub command_line: String,
+    pub command_line: Option<String>,
     /// The version of the program run.
-    pub version: String,
+    pub version: Option<String>,
     /// The user specified locally unique ID of the program. Used along with prevProgramId to define an ordering between programs.
-    pub id: String,
+    pub id: Option<String>,
     /// The name of the program.
-    pub name: String,
+    pub name: Option<String>,
     /// The ID of the program run before this one.
     #[serde(rename="prevProgramId")]
-    pub prev_program_id: String,
+    pub prev_program_id: Option<String>,
 }
 
 impl Part for ReadGroupProgram {}
@@ -741,7 +741,7 @@ pub struct Transcript {
     /// 
     /// Note that in some cases, the reference genome will not exactly match the observed mRNA transcript e.g. due to variance in the source genome from reference. In these cases, exon.frame will not necessarily match the expected reference reading frame and coding exon reference bases cannot necessarily be concatenated to produce the original transcript mRNA.
     #[serde(rename="codingSequence")]
-    pub coding_sequence: TranscriptCodingSequence,
+    pub coding_sequence: Option<TranscriptCodingSequence>,
     /// The exons that compose this transcript. This field should be unset for genomes where transcript splicing does not occur, for example prokaryotes.
     /// 
     /// 
@@ -752,10 +752,10 @@ pub struct Transcript {
     /// 
     /// 
     /// Exons are ordered by start position and may not overlap.
-    pub exons: Vec<TranscriptExon>,
+    pub exons: Option<Vec<TranscriptExon>>,
     /// The annotation ID of the gene from which this transcript is transcribed.
     #[serde(rename="geneId")]
-    pub gene_id: String,
+    pub gene_id: Option<String>,
 }
 
 impl Part for Transcript {}
@@ -810,12 +810,12 @@ impl ResponseResult for Annotation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobRequest {
     /// The data source of the request, for example, a Google Cloud Storage object path or Readset ID.
-    pub source: Vec<String>,
+    pub source: Option<Vec<String>>,
     /// The data destination of the request, for example, a Google BigQuery Table or Dataset ID.
-    pub destination: Vec<String>,
+    pub destination: Option<Vec<String>>,
     /// The original request type.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl Part for JobRequest {}
@@ -834,9 +834,9 @@ impl Part for JobRequest {}
 pub struct SearchVariantsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The list of matching Variants.
-    pub variants: Vec<Variant>,
+    pub variants: Option<Vec<Variant>>,
 }
 
 impl ResponseResult for SearchVariantsResponse {}
@@ -882,18 +882,18 @@ impl RequestValue for SearchJobsRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RangePosition {
     /// The start position of the range on the reference, 0-based inclusive.
-    pub start: String,
+    pub start: Option<String>,
     /// The ID of the Google Genomics reference associated with this range.
     #[serde(rename="referenceId")]
-    pub reference_id: String,
+    pub reference_id: Option<String>,
     /// The end position of the range on the reference, 0-based exclusive.
-    pub end: String,
+    pub end: Option<String>,
     /// Whether this range refers to the reverse strand, as opposed to the forward strand. Note that regardless of this field, the start/end position of the range always refer to the forward strand.
     #[serde(rename="reverseStrand")]
-    pub reverse_strand: bool,
+    pub reverse_strand: Option<bool>,
     /// The display name corresponding to the reference specified by referenceId, for example chr1, 1, or chrX.
     #[serde(rename="referenceName")]
-    pub reference_name: String,
+    pub reference_name: Option<String>,
 }
 
 impl Part for RangePosition {}
@@ -907,9 +907,9 @@ impl Part for RangePosition {}
 pub struct ExternalId {
     /// The name of the source of this data.
     #[serde(rename="sourceName")]
-    pub source_name: String,
+    pub source_name: Option<String>,
     /// The id used by the source of this data.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for ExternalId {}
@@ -957,13 +957,13 @@ impl ResponseResult for CallSet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Position {
     /// The 0-based offset from the start of the forward strand for that reference.
-    pub position: String,
+    pub position: Option<String>,
     /// Whether this position is on the reverse strand, as opposed to the forward strand.
     #[serde(rename="reverseStrand")]
-    pub reverse_strand: bool,
+    pub reverse_strand: Option<bool>,
     /// The name of the reference in whatever reference set is being used.
     #[serde(rename="referenceName")]
-    pub reference_name: String,
+    pub reference_name: Option<String>,
 }
 
 impl Part for Position {}
@@ -982,7 +982,7 @@ impl Part for Position {}
 pub struct ImportVariantsResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
-    pub job_id: String,
+    pub job_id: Option<String>,
 }
 
 impl ResponseResult for ImportVariantsResponse {}
@@ -996,16 +996,16 @@ impl ResponseResult for ImportVariantsResponse {}
 pub struct ReadGroupExperiment {
     /// The sequencing center used as part of this experiment.
     #[serde(rename="sequencingCenter")]
-    pub sequencing_center: String,
+    pub sequencing_center: Option<String>,
     /// The library used as part of this experiment. Note: This is not an actual ID within this repository, but rather an identifier for a library which may be meaningful to some external system.
     #[serde(rename="libraryId")]
-    pub library_id: String,
+    pub library_id: Option<String>,
     /// The instrument model used as part of this experiment. This maps to sequencing technology in BAM.
     #[serde(rename="instrumentModel")]
-    pub instrument_model: String,
+    pub instrument_model: Option<String>,
     /// The platform unit used as part of this experiment e.g. flowcell-barcode.lane for Illumina or slide for SOLiD. Corresponds to the
     #[serde(rename="platformUnit")]
-    pub platform_unit: String,
+    pub platform_unit: Option<String>,
 }
 
 impl Part for ReadGroupExperiment {}
@@ -1030,7 +1030,7 @@ pub struct SearchCallSetsRequest {
     pub variant_set_ids: Option<Vec<String>>,
     /// Only return call sets for which a substring of the name matches this string.
     pub name: Option<String>,
-    /// The maximum number of call sets to return.
+    /// The maximum number of call sets to return. If unspecified, defaults to 1000.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
 }
@@ -1051,9 +1051,9 @@ impl RequestValue for SearchCallSetsRequest {}
 pub struct ListDatasetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The list of matching Datasets.
-    pub datasets: Vec<Dataset>,
+    pub datasets: Option<Vec<Dataset>>,
 }
 
 impl ResponseResult for ListDatasetsResponse {}
@@ -1100,7 +1100,7 @@ impl RequestValue for ImportReadGroupSetsRequest {}
 pub struct CallReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
-    pub job_id: String,
+    pub job_id: Option<String>,
 }
 
 impl ResponseResult for CallReadGroupSetsResponse {}
@@ -1120,22 +1120,22 @@ impl ResponseResult for CallReadGroupSetsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Reference {
     /// The length of this reference's sequence.
-    pub length: String,
+    pub length: Option<String>,
     /// The name of this reference, for example 22.
-    pub name: String,
+    pub name: Option<String>,
     /// The URI from which the sequence was obtained. Specifies a FASTA format file/string with one name, sequence pair.
     #[serde(rename="sourceURI")]
-    pub source_uri: String,
+    pub source_uri: Option<String>,
     /// ID from http://www.ncbi.nlm.nih.gov/taxonomy (e.g. 9606->human) if not specified by the containing reference set.
     #[serde(rename="ncbiTaxonId")]
-    pub ncbi_taxon_id: i32,
+    pub ncbi_taxon_id: Option<i32>,
     /// All known corresponding accession IDs in INSDC (GenBank/ENA/DDBJ) ideally with a version number, for example GCF_000001405.26.
     #[serde(rename="sourceAccessions")]
-    pub source_accessions: Vec<String>,
+    pub source_accessions: Option<Vec<String>>,
     /// The Google generated immutable ID of the reference.
-    pub id: String,
+    pub id: Option<String>,
     /// MD5 of the upper-case sequence excluding all whitespace characters (this is equivalent to SQ:M5 in SAM). This value is represented in lower case hexadecimal format.
-    pub md5checksum: String,
+    pub md5checksum: Option<String>,
 }
 
 impl Resource for Reference {}
@@ -1208,29 +1208,29 @@ impl RequestValue for SearchReferencesRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReadGroup {
     /// A map of additional read group information.
-    pub info: HashMap<String, Vec<String>>,
+    pub info: Option<HashMap<String, Vec<String>>>,
     /// The predicted insert size of this read group. The insert size is the length the sequenced DNA fragment from end-to-end, not including the adapters.
     #[serde(rename="predictedInsertSize")]
-    pub predicted_insert_size: i32,
+    pub predicted_insert_size: Option<i32>,
     /// The read group name. This corresponds to the @RG ID field in the SAM spec.
-    pub name: String,
+    pub name: Option<String>,
     /// The programs used to generate this read group. Programs are always identical for all read groups within a read group set. For this reason, only the first read group in a returned set will have this field populated.
-    pub programs: Vec<ReadGroupProgram>,
+    pub programs: Option<Vec<ReadGroupProgram>>,
     /// The sample this read group's data was generated from. Note: This is not an actual ID within this repository, but rather an identifier for a sample which may be meaningful to some external system.
     #[serde(rename="sampleId")]
-    pub sample_id: String,
+    pub sample_id: Option<String>,
     /// The experiment used to generate this read group.
-    pub experiment: ReadGroupExperiment,
+    pub experiment: Option<ReadGroupExperiment>,
     /// The reference set the reads in this read group are aligned to. Required if there are any read alignments.
     #[serde(rename="referenceSetId")]
-    pub reference_set_id: String,
+    pub reference_set_id: Option<String>,
     /// The generated unique read group ID. Note: This is different than the @RG ID field in the SAM spec. For that value, see the name field.
-    pub id: String,
+    pub id: Option<String>,
     /// The ID of the dataset this read group belongs to.
     #[serde(rename="datasetId")]
-    pub dataset_id: String,
+    pub dataset_id: Option<String>,
     /// A free-form text description of this read group.
-    pub description: String,
+    pub description: Option<String>,
 }
 
 impl Part for ReadGroup {}
@@ -1249,10 +1249,10 @@ impl Part for ReadGroup {}
 pub struct SearchReadGroupSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The list of matching read group sets.
     #[serde(rename="readGroupSets")]
-    pub read_group_sets: Vec<ReadGroupSet>,
+    pub read_group_sets: Option<Vec<ReadGroupSet>>,
 }
 
 impl ResponseResult for SearchReadGroupSetsResponse {}
@@ -1271,7 +1271,7 @@ impl ResponseResult for SearchReadGroupSetsResponse {}
 pub struct ImportReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
-    pub job_id: String,
+    pub job_id: Option<String>,
 }
 
 impl ResponseResult for ImportReadGroupSetsResponse {}
@@ -1290,7 +1290,7 @@ impl ResponseResult for ImportReadGroupSetsResponse {}
 pub struct ExportReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
-    pub job_id: String,
+    pub job_id: Option<String>,
 }
 
 impl ResponseResult for ExportReadGroupSetsResponse {}
@@ -1330,9 +1330,9 @@ impl RequestValue for SearchReadGroupSetsRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchAnnotationsResponseEntry {
     /// The resulting status for this annotation operation.
-    pub status: BatchAnnotationsResponseEntryStatus,
+    pub status: Option<BatchAnnotationsResponseEntryStatus>,
     /// The annotation, if any.
-    pub annotation: Annotation,
+    pub annotation: Option<Annotation>,
 }
 
 impl Part for BatchAnnotationsResponseEntry {}
@@ -1345,9 +1345,9 @@ impl Part for BatchAnnotationsResponseEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchAnnotationsResponseEntryStatus {
     /// Error message for this status, if any.
-    pub message: String,
+    pub message: Option<String>,
     /// The HTTP status code for this operation.
-    pub code: i32,
+    pub code: Option<i32>,
 }
 
 impl Part for BatchAnnotationsResponseEntryStatus {}
@@ -1366,11 +1366,11 @@ impl Part for BatchAnnotationsResponseEntryStatus {}
 pub struct ListBasesResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The offset position (0-based) of the given sequence from the start of this Reference. This value will differ for each page in a paginated request.
-    pub offset: String,
+    pub offset: Option<String>,
     /// A substring of the bases that make up this reference.
-    pub sequence: String,
+    pub sequence: Option<String>,
 }
 
 impl ResponseResult for ListBasesResponse {}
@@ -1384,10 +1384,10 @@ impl ResponseResult for ListBasesResponse {}
 pub struct ReferenceBound {
     /// An upper bound (inclusive) on the starting coordinate of any variant in the reference sequence.
     #[serde(rename="upperBound")]
-    pub upper_bound: String,
+    pub upper_bound: Option<String>,
     /// The reference the bound is associate with.
     #[serde(rename="referenceName")]
-    pub reference_name: String,
+    pub reference_name: Option<String>,
 }
 
 impl Part for ReferenceBound {}
@@ -1400,20 +1400,20 @@ impl Part for ReferenceBound {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Call {
     /// A map of additional variant call information.
-    pub info: HashMap<String, Vec<String>>,
+    pub info: Option<HashMap<String, Vec<String>>>,
     /// The genotype of this variant call. Each value represents either the value of the referenceBases field or a 1-based index into alternateBases. If a variant had a referenceBases value of T and an alternateBases value of ["A", "C"], and the genotype was [2, 1], that would mean the call represented the heterozygous value CA for this variant. If the genotype was instead [0, 1], the represented value would be TA. Ordering of the genotype values is important if the phaseset is present. If a genotype is not called (that is, a . is present in the GT string) -1 is returned.
-    pub genotype: Vec<i32>,
+    pub genotype: Option<Vec<i32>>,
     /// The ID of the call set this variant call belongs to.
     #[serde(rename="callSetId")]
-    pub call_set_id: String,
+    pub call_set_id: Option<String>,
     /// If this field is present, this variant call's genotype ordering implies the phase of the bases and is consistent with any other variant calls in the same reference sequence which have the same phaseset value. When importing data from VCF, if the genotype data was phased but no phase set was specified this field will be set to *.
-    pub phaseset: String,
+    pub phaseset: Option<String>,
     /// The genotype likelihoods for this variant call. Each array entry represents how likely a specific genotype is for this call. The value ordering is defined by the GL tag in the VCF spec. If Phred-scaled genotype likelihood scores (PL) are available and log10(P) genotype likelihood scores (GL) are not, PL scores are converted to GL scores. If both are available, PL scores are stored in info.
     #[serde(rename="genotypeLikelihood")]
-    pub genotype_likelihood: Vec<f64>,
+    pub genotype_likelihood: Option<Vec<f64>>,
     /// The name of the call set this variant call belongs to.
     #[serde(rename="callSetName")]
-    pub call_set_name: String,
+    pub call_set_name: Option<String>,
 }
 
 impl Part for Call {}
@@ -1432,7 +1432,7 @@ impl Part for Call {}
 pub struct ExperimentalCreateJobResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
-    pub job_id: String,
+    pub job_id: Option<String>,
 }
 
 impl ResponseResult for ExperimentalCreateJobResponse {}
@@ -1449,18 +1449,18 @@ impl ResponseResult for ExperimentalCreateJobResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchVariantsRequest {
-    /// Required. The end of the window (0-based, exclusive) for which overlapping variants should be returned.
+    /// The end of the window, 0-based exclusive. If unspecified or 0, defaults to the length of the reference.
     pub end: Option<String>,
-    /// The maximum number of variants to return.
+    /// The maximum number of variants to return. If unspecified, defaults to 5000.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     #[serde(rename="pageToken")]
     pub page_token: Option<String>,
-    /// The maximum number of calls to return. However, at least one variant will always be returned, even if it has more calls than this limit.
+    /// The maximum number of calls to return. However, at least one variant will always be returned, even if it has more calls than this limit. If unspecified, defaults to 5000.
     #[serde(rename="maxCalls")]
     pub max_calls: Option<i32>,
-    /// Required. The beginning of the window (0-based, inclusive) for which overlapping variants should be returned.
+    /// The beginning of the window (0-based, inclusive) for which overlapping variants should be returned. If unspecified, defaults to 0.
     pub start: Option<String>,
     /// Only return variant calls which belong to call sets with these ids. Leaving this blank returns all variant calls. If a variant has no calls belonging to any of these call sets, it won't be returned at all. Currently, variants with no calls from any call set will never be returned.
     #[serde(rename="callSetIds")]
@@ -1536,7 +1536,7 @@ pub struct Read {
     /// The fragment name. Equivalent to QNAME (query template name) in SAM.
     #[serde(rename="fragmentName")]
     pub fragment_name: Option<String>,
-    /// The mapping of the primary alignment of the (readNumber+1)%numberReads read in the fragment. It replaces mate position and mate strand in SAM.
+    /// The position of the primary alignment of the (readNumber+1)%numberReads read in the fragment. It replaces mate position and mate strand in SAM. This field will be unset if that read is unmapped or if the fragment only has a single read.
     #[serde(rename="nextMatePosition")]
     pub next_mate_position: Option<Position>,
     /// Whether this alignment is supplementary. Equivalent to SAM flag 0x800. Supplementary alignments are used in the representation of a chimeric alignment. In a chimeric alignment, a read is split into multiple linear alignments that map to different reference contigs. The first linear alignment in the read will be designated as the representative alignment; the remaining linear alignments will be designated as supplementary alignments. These alignments may have different mapping quality scores. In each linear alignment in a chimeric alignment, the read will be hard clipped. The alignedSequence and alignedQuality fields in the alignment record will only represent the bases for its respective linear alignment.
@@ -1547,7 +1547,7 @@ pub struct Read {
     pub fragment_length: Option<i32>,
     /// The unique ID for this read. This is a generated unique ID, not to be confused with fragmentName.
     pub id: Option<String>,
-    /// The linear alignment for this alignment record. This field will be null if the read is unmapped.
+    /// The linear alignment for this alignment record. This field will be unset if the read is unmapped.
     pub alignment: Option<LinearAlignment>,
     /// A map of additional read alignment information.
     pub info: Option<HashMap<String, Vec<String>>>,
@@ -1620,12 +1620,11 @@ impl RequestValue for ExperimentalCreateJobRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [streamvariants streaming variant store](struct.StreamingVariantStoreStreamvariantCall.html) (response)
+/// * [get variants](struct.VariantGetCall.html) (response)
+/// * [search variants](struct.VariantSearchCall.html) (none)
 /// * [update variants](struct.VariantUpdateCall.html) (request|response)
 /// * [delete variants](struct.VariantDeleteCall.html) (none)
 /// * [create variants](struct.VariantCreateCall.html) (request|response)
-/// * [get variants](struct.VariantGetCall.html) (response)
-/// * [search variants](struct.VariantSearchCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Variant {
@@ -1679,10 +1678,10 @@ impl ResponseResult for Variant {}
 pub struct SearchAnnotationSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The matching annotation sets.
     #[serde(rename="annotationSets")]
-    pub annotation_sets: Vec<AnnotationSet>,
+    pub annotation_sets: Option<Vec<AnnotationSet>>,
 }
 
 impl ResponseResult for SearchAnnotationSetsResponse {}
@@ -1703,25 +1702,25 @@ impl ResponseResult for SearchAnnotationSetsResponse {}
 pub struct Job {
     /// A more detailed description of this job's current status.
     #[serde(rename="detailedStatus")]
-    pub detailed_status: String,
+    pub detailed_status: Option<String>,
     /// The status of this job.
-    pub status: String,
+    pub status: Option<String>,
     /// Any errors that occurred during processing.
-    pub errors: Vec<String>,
+    pub errors: Option<Vec<String>>,
     /// Any warnings that occurred during processing.
-    pub warnings: Vec<String>,
+    pub warnings: Option<Vec<String>>,
     /// The date this job was created, in milliseconds from the epoch.
-    pub created: String,
+    pub created: Option<String>,
     /// A summarized representation of the original service request.
-    pub request: JobRequest,
+    pub request: Option<JobRequest>,
     /// The job ID.
-    pub id: String,
+    pub id: Option<String>,
     /// If this Job represents an import, this field will contain the IDs of the objects that were successfully imported.
     #[serde(rename="importedIds")]
-    pub imported_ids: Vec<String>,
+    pub imported_ids: Option<Vec<String>>,
     /// The Google Developers Console project number to which this job belongs.
     #[serde(rename="projectNumber")]
-    pub project_number: String,
+    pub project_number: Option<String>,
 }
 
 impl Resource for Job {}
@@ -1830,10 +1829,10 @@ impl RequestValue for ExportReadGroupSetsRequest {}
 pub struct SearchReferenceSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The matching references sets.
     #[serde(rename="referenceSets")]
-    pub reference_sets: Vec<ReferenceSet>,
+    pub reference_sets: Option<Vec<ReferenceSet>>,
 }
 
 impl ResponseResult for SearchReferenceSetsResponse {}
@@ -1851,26 +1850,26 @@ impl ResponseResult for SearchReferenceSetsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReferenceSet {
     /// Free text description of this reference set.
-    pub description: String,
+    pub description: Option<String>,
     /// The URI from which the references were obtained.
     #[serde(rename="sourceURI")]
-    pub source_uri: String,
+    pub source_uri: Option<String>,
     /// The IDs of the reference objects that are part of this set. Reference.md5checksum must be unique within this set.
     #[serde(rename="referenceIds")]
-    pub reference_ids: Vec<String>,
+    pub reference_ids: Option<Vec<String>>,
     /// Public id of this reference set, such as GRCh37.
     #[serde(rename="assemblyId")]
-    pub assembly_id: String,
+    pub assembly_id: Option<String>,
     /// All known corresponding accession IDs in INSDC (GenBank/ENA/DDBJ) ideally with a version number, for example NC_000001.11.
     #[serde(rename="sourceAccessions")]
-    pub source_accessions: Vec<String>,
+    pub source_accessions: Option<Vec<String>>,
     /// ID from http://www.ncbi.nlm.nih.gov/taxonomy (e.g. 9606->human) indicating the species which this assembly is intended to model. Note that contained references may specify a different ncbiTaxonId, as assemblies may contain reference sequences which do not belong to the modeled species, e.g. EBV in a human reference genome.
     #[serde(rename="ncbiTaxonId")]
-    pub ncbi_taxon_id: i32,
+    pub ncbi_taxon_id: Option<i32>,
     /// The Google generated immutable ID of the reference set.
-    pub id: String,
+    pub id: Option<String>,
     /// Order-independent MD5 checksum which identifies this reference set. The checksum is computed by sorting all lower case hexidecimal string reference.md5checksum (for all reference in this set) in ascending lexicographic order, concatenating, and taking the MD5 of that value. The resulting value is represented in lower case hexadecimal format.
-    pub md5checksum: String,
+    pub md5checksum: Option<String>,
 }
 
 impl Resource for ReferenceSet {}
@@ -1920,7 +1919,7 @@ impl ResponseResult for VariantSet {}
 pub struct AlignReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
     #[serde(rename="jobId")]
-    pub job_id: String,
+    pub job_id: Option<String>,
 }
 
 impl ResponseResult for AlignReadGroupSetsResponse {}
@@ -1961,12 +1960,12 @@ impl RequestValue for SearchAnnotationsRequest {}
 pub struct PairedFastqSource {
     /// A list of URIs pointing at paired end FASTQ files in Google Cloud Storage which will be aligned. The second of each paired file should be specified here, in an order that matches the first of each paired file specified in firstSourceUris. For example: firstSourceUris: [file1_1.fq, file2_1.fq], secondSourceUris: [file1_2.fq, file2_2.fq]. The caller must have READ permissions for these files.
     #[serde(rename="secondSourceUris")]
-    pub second_source_uris: Vec<String>,
+    pub second_source_uris: Option<Vec<String>>,
     /// A list of URIs pointing at paired end FASTQ files in Google Cloud Storage which will be aligned. The first of each paired file should be specified here, in an order that matches the second of each paired file specified in secondSourceUris. For example: firstSourceUris: [file1_1.fq, file2_1.fq], secondSourceUris: [file1_2.fq, file2_2.fq]. The caller must have READ permissions for these files.
     #[serde(rename="firstSourceUris")]
-    pub first_source_uris: Vec<String>,
+    pub first_source_uris: Option<Vec<String>>,
     /// Optionally specifies the metadata to be associated with the final aligned read group set.
-    pub metadata: FastqMetadata,
+    pub metadata: Option<FastqMetadata>,
 }
 
 impl Part for PairedFastqSource {}
@@ -2014,12 +2013,12 @@ impl RequestValue for SearchReadsRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Range {
     /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.
-    pub start: String,
+    pub start: Option<String>,
     /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.
-    pub end: String,
+    pub end: Option<String>,
     /// The reference sequence name, for example chr1, 1, or chrX.
     #[serde(rename="referenceName")]
-    pub reference_name: String,
+    pub reference_name: Option<String>,
 }
 
 impl Part for Range {}
@@ -2070,9 +2069,9 @@ impl RequestValue for SearchAnnotationSetsRequest {}
 pub struct SearchReadsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The list of matching alignments sorted by mapped genomic coordinate, if any, ascending in position within the same reference. Unmapped reads, which have no position, are returned last and are further sorted in ascending lexicographic order by fragment name.
-    pub alignments: Vec<Read>,
+    pub alignments: Option<Vec<Read>>,
 }
 
 impl ResponseResult for SearchReadsResponse {}
@@ -2086,12 +2085,30 @@ impl ResponseResult for SearchReadsResponse {}
 pub struct InterleavedFastqSource {
     /// A list of URIs pointing at interleaved FASTQ files in Google Cloud Storage which will be aligned. The caller must have READ permissions for these files.
     #[serde(rename="sourceUris")]
-    pub source_uris: Vec<String>,
+    pub source_uris: Option<Vec<String>>,
     /// Optionally specifies the metadata to be associated with the final aligned read group set.
-    pub metadata: FastqMetadata,
+    pub metadata: Option<FastqMetadata>,
 }
 
 impl Part for InterleavedFastqSource {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [streamreads streaming readstore](struct.StreamingReadstoreStreamreadCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StreamReadsResponse {
+    /// no description provided
+    pub alignments: Option<Vec<Read>>,
+}
+
+impl ResponseResult for StreamReadsResponse {}
 
 
 /// There is no detailed description.
@@ -2107,41 +2124,12 @@ impl Part for InterleavedFastqSource {}
 pub struct SearchReferencesResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The matching references.
-    pub references: Vec<Reference>,
+    pub references: Option<Vec<Reference>>,
 }
 
 impl ResponseResult for SearchReferencesResponse {}
-
-
-/// The stream variants request.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [streamvariants streaming variant store](struct.StreamingVariantStoreStreamvariantCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize)]
-pub struct StreamVariantsRequest {
-    /// The end of the window (0-based, exclusive) for which overlapping variants should be returned.
-    pub end: Option<String>,
-    /// Exactly one variant set ID must be provided. Only variants from this variant set will be returned.
-    #[serde(rename="variantSetIds")]
-    pub variant_set_ids: Option<Vec<String>>,
-    /// Required. Only return variants in this reference sequence.
-    #[serde(rename="referenceName")]
-    pub reference_name: Option<String>,
-    /// Only return variant calls which belong to call sets with these ids. Leaving this blank returns all variant calls.
-    #[serde(rename="callSetIds")]
-    pub call_set_ids: Option<Vec<String>>,
-    /// The beginning of the window (0-based, inclusive) for which overlapping variants should be returned.
-    pub start: Option<String>,
-}
-
-impl RequestValue for StreamVariantsRequest {}
 
 
 /// A read group set is a logical collection of read groups, which are collections of reads produced by a sequencer. A read group set typically models reads corresponding to one sample, sequenced one way, and aligned one way.  
@@ -2184,6 +2172,32 @@ impl Resource for ReadGroupSet {}
 impl ResponseResult for ReadGroupSet {}
 
 
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [streamreads streaming readstore](struct.StreamingReadstoreStreamreadCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize)]
+pub struct StreamReadsRequest {
+    /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.
+    pub end: Option<String>,
+    /// The reference sequence name, for example chr1, 1, or chrX. If set to *, only unmapped reads are returned.
+    #[serde(rename="referenceName")]
+    pub reference_name: Option<String>,
+    /// The ID of the read groups set within which to search for reads. Exactly one ID must be provided.
+    #[serde(rename="readGroupSetIds")]
+    pub read_group_set_ids: Option<Vec<String>>,
+    /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.
+    pub start: Option<String>,
+}
+
+impl RequestValue for StreamReadsRequest {}
+
+
 /// A 0-based half-open genomic coordinate range for search requests.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2191,15 +2205,15 @@ impl ResponseResult for ReadGroupSet {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct QueryRange {
     /// The start position of the range on the reference, 0-based inclusive. If specified, referenceId or referenceName must also be specified. Defaults to 0.
-    pub start: String,
+    pub start: Option<String>,
     /// The ID of the reference to query. At most one of referenceId and referenceName should be specified.
     #[serde(rename="referenceId")]
-    pub reference_id: String,
+    pub reference_id: Option<String>,
     /// The end position of the range on the reference, 0-based exclusive. If specified, referenceId or referenceName must also be specified. If unset or 0, defaults to the length of the reference.
-    pub end: String,
+    pub end: Option<String>,
     /// The name of the reference to query, within the reference set associated with this query. At most one of referenceId and referenceName pshould be specified.
     #[serde(rename="referenceName")]
-    pub reference_name: String,
+    pub reference_name: Option<String>,
 }
 
 impl Part for QueryRange {}
@@ -2212,12 +2226,12 @@ impl Part for QueryRange {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LinearAlignment {
     /// The position of this alignment.
-    pub position: Position,
+    pub position: Option<Position>,
     /// Represents the local alignment of this sequence (alignment matches, indels, etc) against the reference.
-    pub cigar: Vec<CigarUnit>,
+    pub cigar: Option<Vec<CigarUnit>>,
     /// The mapping quality of this alignment. Represents how likely the read maps to this position as opposed to other locations.
     #[serde(rename="mappingQuality")]
-    pub mapping_quality: i32,
+    pub mapping_quality: Option<i32>,
 }
 
 impl Part for LinearAlignment {}
@@ -2272,12 +2286,12 @@ impl ResponseResult for AnnotationSet {}
 pub struct CigarUnit {
     /// referenceSequence is only used at mismatches (SEQUENCE_MISMATCH) and deletions (DELETE). Filling this field replaces SAM's MD tag. If the relevant information is not available, this field is unset.
     #[serde(rename="referenceSequence")]
-    pub reference_sequence: String,
+    pub reference_sequence: Option<String>,
     /// no description provided
-    pub operation: String,
+    pub operation: Option<String>,
     /// The number of bases that the operation runs for. Required.
     #[serde(rename="operationLength")]
-    pub operation_length: String,
+    pub operation_length: Option<String>,
 }
 
 impl Part for CigarUnit {}
@@ -2290,9 +2304,9 @@ impl Part for CigarUnit {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TranscriptCodingSequence {
     /// The start of the coding sequence on this annotation's reference sequence, 0-based inclusive. Note that this position is relative to the reference start, and not the containing annotation start.
-    pub start: String,
+    pub start: Option<String>,
     /// The end of the coding sequence on this annotation's reference sequence, 0-based exclusive. Note that this position is relative to the reference start, and not the containing annotation start.
-    pub end: String,
+    pub end: Option<String>,
 }
 
 impl Part for TranscriptCodingSequence {}
@@ -2305,13 +2319,13 @@ impl Part for TranscriptCodingSequence {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TranscriptExon {
     /// The start position of the exon on this annotation's reference sequence, 0-based inclusive. Note that this is relative to the reference start, and not the containing annotation start.
-    pub start: String,
+    pub start: Option<String>,
     /// The frame of this exon. Contains a value of 0, 1, or 2, which indicates the offset of the first coding base of the exon within the reading frame of the coding DNA sequence, if any. This field is dependent on the strandedness of this annotation (see Annotation.position.reverseStrand). For forward stranded annotations, this offset is relative to the exon.start. For reverse strand annotations, this offset is relative to the exon.end-1.
     /// 
     /// Unset if this exon does not intersect the coding sequence. Upon creation of a transcript, the frame must be populated for all or none of the coding exons.
-    pub frame: Int32Value,
+    pub frame: Option<Int32Value>,
     /// The end position of the exon on this annotation's reference sequence, 0-based exclusive. Note that this is relative to the reference start, and not the containing annotation start.
-    pub end: String,
+    pub end: Option<String>,
 }
 
 impl Part for TranscriptExon {}
@@ -2330,10 +2344,10 @@ impl Part for TranscriptExon {}
 pub struct SearchVariantSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The variant sets belonging to the requested dataset.
     #[serde(rename="variantSets")]
-    pub variant_sets: Vec<VariantSet>,
+    pub variant_sets: Option<Vec<VariantSet>>,
 }
 
 impl ResponseResult for SearchVariantSetsResponse {}
@@ -2347,9 +2361,9 @@ impl ResponseResult for SearchVariantSetsResponse {}
 pub struct CoverageBucket {
     /// The average number of reads which are aligned to each individual reference base in this bucket.
     #[serde(rename="meanCoverage")]
-    pub mean_coverage: f32,
+    pub mean_coverage: Option<f32>,
     /// The genomic coordinate range spanned by this bucket.
-    pub range: Range,
+    pub range: Option<Range>,
 }
 
 impl Part for CoverageBucket {}
@@ -2368,10 +2382,10 @@ impl Part for CoverageBucket {}
 pub struct SearchCallSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The list of matching call sets.
     #[serde(rename="callSets")]
-    pub call_sets: Vec<CallSet>,
+    pub call_sets: Option<Vec<CallSet>>,
 }
 
 impl ResponseResult for SearchCallSetsResponse {}
@@ -2451,23 +2465,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new dataset.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn create(&self, request: &Dataset) -> DatasetCreateCall<'a, C, A> {
-        DatasetCreateCall {
-            hub: self.hub,
-            _request: request.clone(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Updates a dataset.
     /// 
     /// # Arguments
@@ -2479,6 +2476,23 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
             hub: self.hub,
             _request: request.clone(),
             _dataset_id: dataset_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn create(&self, request: &Dataset) -> DatasetCreateCall<'a, C, A> {
+        DatasetCreateCall {
+            hub: self.hub,
+            _request: request.clone(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2538,6 +2552,21 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists datasets within a project.
+    pub fn list(&self) -> DatasetListCall<'a, C, A> {
+        DatasetListCall {
+            hub: self.hub,
+            _project_number: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates a dataset. This method supports patch semantics.
     /// 
     /// # Arguments
@@ -2549,21 +2578,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
             hub: self.hub,
             _request: request.clone(),
             _dataset_id: dataset_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists datasets within a project.
-    pub fn list(&self) -> DatasetListCall<'a, C, A> {
-        DatasetListCall {
-            hub: self.hub,
-            _project_number: Default::default(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2744,63 +2758,6 @@ impl<'a, C, A> ReferencesetMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *streamingVariantStore* resources.
-/// It is not used directly, but through the `Genomics` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_genomics1_beta2 as genomics1_beta2;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use genomics1_beta2::Genomics;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::new(),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Genomics::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `streamvariants(...)`
-/// // to build up your call.
-/// let rb = hub.streaming_variant_store();
-/// # }
-/// ```
-pub struct StreamingVariantStoreMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Genomics<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for StreamingVariantStoreMethods<'a, C, A> {}
-
-impl<'a, C, A> StreamingVariantStoreMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Returns a stream of all the variants matching the search request, ordered by reference name, position, and ID.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn streamvariants(&self, request: &StreamVariantsRequest) -> StreamingVariantStoreStreamvariantCall<'a, C, A> {
-        StreamingVariantStoreStreamvariantCall {
-            hub: self.hub,
-            _request: request.clone(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
 /// A builder providing access to all methods supported on *callset* resources.
 /// It is not used directly, but through the `Genomics` hub.
 ///
@@ -2950,6 +2907,67 @@ impl<'a, C, A> CallsetMethods<'a, C, A> {
 
 
 
+/// A builder providing access to all methods supported on *streamingReadstore* resources.
+/// It is not used directly, but through the `Genomics` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_genomics1_beta2 as genomics1_beta2;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use genomics1_beta2::Genomics;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Genomics::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `streamreads(...)`
+/// // to build up your call.
+/// let rb = hub.streaming_readstore();
+/// # }
+/// ```
+pub struct StreamingReadstoreMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Genomics<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for StreamingReadstoreMethods<'a, C, A> {}
+
+impl<'a, C, A> StreamingReadstoreMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a stream of reads for one or more read group sets. Reads search operates over a genomic coordinate space of reference sequence & position defined over the reference sequences to which the requested read group sets are aligned.
+    /// 
+    /// If a target positional range is specified, all reads whose alignment to the reference genome overlap the range are returned.
+    /// 
+    /// All reads returned are ordered by genomic coordinate (reference sequence & position). Reads with equivalent genomic coordinates are returned in a deterministic order.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn streamreads(&self, request: &StreamReadsRequest) -> StreamingReadstoreStreamreadCall<'a, C, A> {
+        StreamingReadstoreStreamreadCall {
+            hub: self.hub,
+            _request: request.clone(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
 /// A builder providing access to all methods supported on *read* resources.
 /// It is not used directly, but through the `Genomics` hub.
 ///
@@ -3054,25 +3072,6 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a read group set.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `readGroupSetId` - The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
-    pub fn update(&self, request: &ReadGroupSet, read_group_set_id: &str) -> ReadgroupsetUpdateCall<'a, C, A> {
-        ReadgroupsetUpdateCall {
-            hub: self.hub,
-            _request: request.clone(),
-            _read_group_set_id: read_group_set_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Exports read group sets to a BAM file in Google Cloud Storage.
     /// 
     /// Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. In particular, comments in the input file header will not be preserved, some custom tags will be converted to strings, and original reference sequence order is not necessarily preserved.
@@ -3082,25 +3081,6 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     /// * `request` - No description provided.
     pub fn export(&self, request: &ExportReadGroupSetsRequest) -> ReadgroupsetExportCall<'a, C, A> {
         ReadgroupsetExportCall {
-            hub: self.hub,
-            _request: request.clone(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Creates read group sets by asynchronously importing the provided information.
-    /// 
-    /// Note that currently comments in the input file header are not imported and some custom tags will be converted to strings, rather than preserving tag types. The caller must have WRITE permissions to the dataset.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn import(&self, request: &ImportReadGroupSetsRequest) -> ReadgroupsetImportCall<'a, C, A> {
-        ReadgroupsetImportCall {
             hub: self.hub,
             _request: request.clone(),
             _delegate: Default::default(),
@@ -3147,6 +3127,25 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates read group sets by asynchronously importing the provided information.
+    /// 
+    /// Note that currently comments in the input file header are not imported and some custom tags will be converted to strings, rather than preserving tag types. The caller must have WRITE permissions to the dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn import(&self, request: &ImportReadGroupSetsRequest) -> ReadgroupsetImportCall<'a, C, A> {
+        ReadgroupsetImportCall {
+            hub: self.hub,
+            _request: request.clone(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Aligns read data from existing read group sets or files from Google Cloud Storage. See the  alignment and variant calling documentation for more details.
     /// 
     /// # Arguments
@@ -3156,6 +3155,42 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
         ReadgroupsetAlignCall {
             hub: self.hub,
             _request: request.clone(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a read group set by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `readGroupSetId` - The ID of the read group set.
+    pub fn get(&self, read_group_set_id: &str) -> ReadgroupsetGetCall<'a, C, A> {
+        ReadgroupsetGetCall {
+            hub: self.hub,
+            _read_group_set_id: read_group_set_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a read group set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `readGroupSetId` - The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
+    pub fn update(&self, request: &ReadGroupSet, read_group_set_id: &str) -> ReadgroupsetUpdateCall<'a, C, A> {
+        ReadgroupsetUpdateCall {
+            hub: self.hub,
+            _request: request.clone(),
+            _read_group_set_id: read_group_set_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3217,23 +3252,6 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
         ReadgroupsetSearchCall {
             hub: self.hub,
             _request: request.clone(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Gets a read group set by ID.
-    /// 
-    /// # Arguments
-    ///
-    /// * `readGroupSetId` - The ID of the read group set.
-    pub fn get(&self, read_group_set_id: &str) -> ReadgroupsetGetCall<'a, C, A> {
-        ReadgroupsetGetCall {
-            hub: self.hub,
-            _read_group_set_id: read_group_set_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3662,14 +3680,14 @@ impl<'a, C, A> AnnotationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset. This method supports patch semantics.
+    /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `annotationId` - The ID of the annotation set to be updated.
-    pub fn patch(&self, request: &Annotation, annotation_id: &str) -> AnnotationPatchCall<'a, C, A> {
-        AnnotationPatchCall {
+    pub fn update(&self, request: &Annotation, annotation_id: &str) -> AnnotationUpdateCall<'a, C, A> {
+        AnnotationUpdateCall {
             hub: self.hub,
             _request: request.clone(),
             _annotation_id: annotation_id.to_string(),
@@ -3681,16 +3699,14 @@ impl<'a, C, A> AnnotationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset.
+    /// Gets an annotation. Caller must have READ permission for the associated annotation set.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `annotationId` - The ID of the annotation set to be updated.
-    pub fn update(&self, request: &Annotation, annotation_id: &str) -> AnnotationUpdateCall<'a, C, A> {
-        AnnotationUpdateCall {
+    /// * `annotationId` - The ID of the annotation set to be retrieved.
+    pub fn get(&self, annotation_id: &str) -> AnnotationGetCall<'a, C, A> {
+        AnnotationGetCall {
             hub: self.hub,
-            _request: request.clone(),
             _annotation_id: annotation_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3734,14 +3750,16 @@ impl<'a, C, A> AnnotationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets an annotation. Caller must have READ permission for the associated annotation set.
+    /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
-    /// * `annotationId` - The ID of the annotation set to be retrieved.
-    pub fn get(&self, annotation_id: &str) -> AnnotationGetCall<'a, C, A> {
-        AnnotationGetCall {
+    /// * `request` - No description provided.
+    /// * `annotationId` - The ID of the annotation set to be updated.
+    pub fn patch(&self, request: &Annotation, annotation_id: &str) -> AnnotationPatchCall<'a, C, A> {
+        AnnotationPatchCall {
             hub: self.hub,
+            _request: request.clone(),
             _annotation_id: annotation_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -4046,224 +4064,6 @@ impl<'a, C, A> VariantsetMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Creates a new dataset.
-///
-/// A builder for the *create* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_genomics1_beta2 as genomics1_beta2;
-/// use genomics1_beta2::Dataset;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use genomics1_beta2::Genomics;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req: Dataset = Default::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.datasets().create(&req)
-///              .doit();
-/// # }
-/// ```
-pub struct DatasetCreateCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Genomics<C, A>,
-    _request: Dataset,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for DatasetCreateCall<'a, C, A> {}
-
-impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Dataset)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "genomics.datasets.create", 
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/genomics/v1beta2/datasets".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return Err(Error::Failure(res))
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Dataset) -> DatasetCreateCall<'a, C, A> {
-        self._request = new_value.clone();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetCreateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetCreateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetCreateCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Updates a dataset.
 ///
 /// A builder for the *update* method supported by a *dataset* resource.
@@ -4291,7 +4091,7 @@ impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Dataset = Default::default();
+/// let mut req = Dataset::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -4383,16 +4183,20 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4518,6 +4322,228 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
+/// Creates a new dataset.
+///
+/// A builder for the *create* method supported by a *dataset* resource.
+/// It is not used directly, but through a `DatasetMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_genomics1_beta2 as genomics1_beta2;
+/// use genomics1_beta2::Dataset;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use genomics1_beta2::Genomics;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Dataset::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.datasets().create(&req)
+///              .doit();
+/// # }
+/// ```
+pub struct DatasetCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Genomics<C, A>,
+    _request: Dataset,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DatasetCreateCall<'a, C, A> {}
+
+impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Dataset)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "genomics.datasets.create", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/genomics/v1beta2/datasets".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: &Dataset) -> DatasetCreateCall<'a, C, A> {
+        self._request = new_value.clone();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetCreateCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Deletes a dataset.
 ///
 /// A builder for the *delete* method supported by a *dataset* resource.
@@ -4625,16 +4651,20 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -4845,16 +4875,20 @@ impl<'a, C, A> DatasetUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -5075,16 +5109,20 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5197,6 +5235,240 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
+/// Lists datasets within a project.
+///
+/// A builder for the *list* method supported by a *dataset* resource.
+/// It is not used directly, but through a `DatasetMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_genomics1_beta2 as genomics1_beta2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use genomics1_beta2::Genomics;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.datasets().list()
+///              .project_number("accusam")
+///              .page_token("takimata")
+///              .page_size(-70)
+///              .doit();
+/// # }
+/// ```
+pub struct DatasetListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Genomics<C, A>,
+    _project_number: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DatasetListCall<'a, C, A> {}
+
+impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListDatasetsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "genomics.datasets.list", 
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        if let Some(value) = self._project_number {
+            params.push(("projectNumber", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "projectNumber", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/genomics/v1beta2/datasets".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The project to list datasets for.
+    ///
+    /// Sets the *project number* query property to the given value.
+    pub fn project_number(mut self, new_value: &str) -> DatasetListCall<'a, C, A> {
+        self._project_number = Some(new_value.to_string());
+        self
+    }
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> DatasetListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of results returned by this request. If unspecified, defaults to 50.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> DatasetListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetListCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Updates a dataset. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *dataset* resource.
@@ -5224,7 +5496,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Dataset = Default::default();
+/// let mut req = Dataset::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -5316,16 +5588,20 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -5451,236 +5727,6 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Lists datasets within a project.
-///
-/// A builder for the *list* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_genomics1_beta2 as genomics1_beta2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use genomics1_beta2::Genomics;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.datasets().list()
-///              .project_number("takimata")
-///              .page_token("justo")
-///              .page_size(-1)
-///              .doit();
-/// # }
-/// ```
-pub struct DatasetListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Genomics<C, A>,
-    _project_number: Option<String>,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for DatasetListCall<'a, C, A> {}
-
-impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListDatasetsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "genomics.datasets.list", 
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        if let Some(value) = self._project_number {
-            params.push(("projectNumber", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "projectNumber", "pageToken", "pageSize"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/genomics/v1beta2/datasets".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
-        }
-
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
-        }
-
-
-
-        loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return Err(Error::Failure(res))
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The project to list datasets for.
-    ///
-    /// Sets the *project number* query property to the given value.
-    pub fn project_number(mut self, new_value: &str) -> DatasetListCall<'a, C, A> {
-        self._project_number = Some(new_value.to_string());
-        self
-    }
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DatasetListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of results returned by this request. If unspecified, defaults to 50.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> DatasetListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetListCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Cancels a job by ID. Note that it is possible for partial results to be generated and stored for cancelled jobs.
 ///
 /// A builder for the *cancel* method supported by a *job* resource.
@@ -5788,16 +5834,20 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -6008,16 +6058,20 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6157,7 +6211,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SearchJobsRequest = Default::default();
+/// let mut req = SearchJobsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6223,16 +6277,20 @@ impl<'a, C, A> JobSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -6377,7 +6435,7 @@ impl<'a, C, A> JobSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SearchReferenceSetsRequest = Default::default();
+/// let mut req = SearchReferenceSetsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6443,16 +6501,20 @@ impl<'a, C, A> ReferencesetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -6678,16 +6740,20 @@ impl<'a, C, A> ReferencesetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6800,205 +6866,6 @@ impl<'a, C, A> ReferencesetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Returns a stream of all the variants matching the search request, ordered by reference name, position, and ID.
-///
-/// A builder for the *streamvariants* method supported by a *streamingVariantStore* resource.
-/// It is not used directly, but through a `StreamingVariantStoreMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_genomics1_beta2 as genomics1_beta2;
-/// use genomics1_beta2::StreamVariantsRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use genomics1_beta2::Genomics;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req: StreamVariantsRequest = Default::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.streaming_variant_store().streamvariants(&req)
-///              .doit();
-/// # }
-/// ```
-pub struct StreamingVariantStoreStreamvariantCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Genomics<C, A>,
-    _request: StreamVariantsRequest,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-}
-
-impl<'a, C, A> CallBuilder for StreamingVariantStoreStreamvariantCall<'a, C, A> {}
-
-impl<'a, C, A> StreamingVariantStoreStreamvariantCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Variant)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "genomics.streamingVariantStore.streamvariants", 
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/genomics/v1beta2/streamingVariantStore/streamvariants".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
-        }
-
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return Err(Error::Failure(res))
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &StreamVariantsRequest) -> StreamingVariantStoreStreamvariantCall<'a, C, A> {
-        self._request = new_value.clone();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StreamingVariantStoreStreamvariantCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StreamingVariantStoreStreamvariantCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-}
-
-
 /// Deletes a call set.
 ///
 /// A builder for the *delete* method supported by a *callset* resource.
@@ -7106,16 +6973,20 @@ impl<'a, C, A> CallsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -7247,7 +7118,7 @@ impl<'a, C, A> CallsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SearchCallSetsRequest = Default::default();
+/// let mut req = SearchCallSetsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7313,16 +7184,20 @@ impl<'a, C, A> CallsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7465,7 +7340,7 @@ impl<'a, C, A> CallsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CallSet = Default::default();
+/// let mut req = CallSet::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7557,16 +7432,20 @@ impl<'a, C, A> CallsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7719,7 +7598,7 @@ impl<'a, C, A> CallsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CallSet = Default::default();
+/// let mut req = CallSet::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7785,16 +7664,20 @@ impl<'a, C, A> CallsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8018,16 +7901,20 @@ impl<'a, C, A> CallsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8167,7 +8054,7 @@ impl<'a, C, A> CallsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CallSet = Default::default();
+/// let mut req = CallSet::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -8259,16 +8146,20 @@ impl<'a, C, A> CallsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8394,6 +8285,209 @@ impl<'a, C, A> CallsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
+/// Gets a stream of reads for one or more read group sets. Reads search operates over a genomic coordinate space of reference sequence & position defined over the reference sequences to which the requested read group sets are aligned.
+/// 
+/// If a target positional range is specified, all reads whose alignment to the reference genome overlap the range are returned.
+/// 
+/// All reads returned are ordered by genomic coordinate (reference sequence & position). Reads with equivalent genomic coordinates are returned in a deterministic order.
+///
+/// A builder for the *streamreads* method supported by a *streamingReadstore* resource.
+/// It is not used directly, but through a `StreamingReadstoreMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_genomics1_beta2 as genomics1_beta2;
+/// use genomics1_beta2::StreamReadsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use genomics1_beta2::Genomics;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = StreamReadsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.streaming_readstore().streamreads(&req)
+///              .doit();
+/// # }
+/// ```
+pub struct StreamingReadstoreStreamreadCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Genomics<C, A>,
+    _request: StreamReadsRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, C, A> CallBuilder for StreamingReadstoreStreamreadCall<'a, C, A> {}
+
+impl<'a, C, A> StreamingReadstoreStreamreadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, StreamReadsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "genomics.streamingReadstore.streamreads", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/genomics/v1beta2/streamingReadstore/streamreads".to_string();
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: &StreamReadsRequest) -> StreamingReadstoreStreamreadCall<'a, C, A> {
+        self._request = new_value.clone();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StreamingReadstoreStreamreadCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> StreamingReadstoreStreamreadCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
 /// Gets a list of reads for one or more read group sets. Reads search operates over a genomic coordinate space of reference sequence & position defined over the reference sequences to which the requested read group sets are aligned.
 /// 
 /// If a target positional range is specified, search returns all reads whose alignment to the reference genome overlap the range. A query which specifies only read group set IDs yields all reads in those read group sets, including unmapped reads.
@@ -8427,7 +8521,7 @@ impl<'a, C, A> CallsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SearchReadsRequest = Default::default();
+/// let mut req = SearchReadsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -8493,16 +8587,20 @@ impl<'a, C, A> ReadSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8618,260 +8716,6 @@ impl<'a, C, A> ReadSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Updates a read group set.
-///
-/// A builder for the *update* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_genomics1_beta2 as genomics1_beta2;
-/// use genomics1_beta2::ReadGroupSet;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use genomics1_beta2::Genomics;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req: ReadGroupSet = Default::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.readgroupsets().update(&req, "readGroupSetId")
-///              .doit();
-/// # }
-/// ```
-pub struct ReadgroupsetUpdateCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Genomics<C, A>,
-    _request: ReadGroupSet,
-    _read_group_set_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ReadgroupsetUpdateCall<'a, C, A> {}
-
-impl<'a, C, A> ReadgroupsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ReadGroupSet)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "genomics.readgroupsets.update", 
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("readGroupSetId", self._read_group_set_id.to_string()));
-        for &field in ["alt", "readGroupSetId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/{readGroupSetId}".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{readGroupSetId}", "readGroupSetId")].iter() {
-                        let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["readGroupSetId"].iter() {
-                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
-                    if name == param_name {
-                        indices_for_removal.push(params.len() - index - 1);
-                        break;
-                    }
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return Err(Error::Failure(res))
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &ReadGroupSet) -> ReadgroupsetUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
-        self
-    }
-    /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
-    ///
-    /// Sets the *read group set id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetUpdateCall<'a, C, A> {
-        self._read_group_set_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetUpdateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetUpdateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetUpdateCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Exports read group sets to a BAM file in Google Cloud Storage.
 /// 
 /// Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. In particular, comments in the input file header will not be preserved, some custom tags will be converted to strings, and original reference sequence order is not necessarily preserved.
@@ -8901,7 +8745,7 @@ impl<'a, C, A> ReadgroupsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ExportReadGroupSetsRequest = Default::default();
+/// let mut req = ExportReadGroupSetsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -8967,16 +8811,20 @@ impl<'a, C, A> ReadgroupsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -9092,226 +8940,6 @@ impl<'a, C, A> ReadgroupsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Creates read group sets by asynchronously importing the provided information.
-/// 
-/// Note that currently comments in the input file header are not imported and some custom tags will be converted to strings, rather than preserving tag types. The caller must have WRITE permissions to the dataset.
-///
-/// A builder for the *import* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_genomics1_beta2 as genomics1_beta2;
-/// use genomics1_beta2::ImportReadGroupSetsRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use genomics1_beta2::Genomics;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req: ImportReadGroupSetsRequest = Default::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.readgroupsets().import(&req)
-///              .doit();
-/// # }
-/// ```
-pub struct ReadgroupsetImportCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Genomics<C, A>,
-    _request: ImportReadGroupSetsRequest,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ReadgroupsetImportCall<'a, C, A> {}
-
-impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ImportReadGroupSetsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "genomics.readgroupsets.import", 
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/import".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DevstorageReadWrite.as_ref().to_string(), ());
-        }
-
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return Err(Error::Failure(res))
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &ImportReadGroupSetsRequest) -> ReadgroupsetImportCall<'a, C, A> {
-        self._request = new_value.clone();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetImportCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetImportCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DevstorageReadWrite`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetImportCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Updates a read group set. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *readgroupset* resource.
@@ -9339,7 +8967,7 @@ impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ReadGroupSet = Default::default();
+/// let mut req = ReadGroupSet::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -9431,16 +9059,20 @@ impl<'a, C, A> ReadgroupsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -9593,7 +9225,7 @@ impl<'a, C, A> ReadgroupsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CallReadGroupSetsRequest = Default::default();
+/// let mut req = CallReadGroupSetsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -9659,16 +9291,20 @@ impl<'a, C, A> ReadgroupsetCallCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -9784,6 +9420,230 @@ impl<'a, C, A> ReadgroupsetCallCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
+/// Creates read group sets by asynchronously importing the provided information.
+/// 
+/// Note that currently comments in the input file header are not imported and some custom tags will be converted to strings, rather than preserving tag types. The caller must have WRITE permissions to the dataset.
+///
+/// A builder for the *import* method supported by a *readgroupset* resource.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_genomics1_beta2 as genomics1_beta2;
+/// use genomics1_beta2::ImportReadGroupSetsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use genomics1_beta2::Genomics;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ImportReadGroupSetsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.readgroupsets().import(&req)
+///              .doit();
+/// # }
+/// ```
+pub struct ReadgroupsetImportCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Genomics<C, A>,
+    _request: ImportReadGroupSetsRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ReadgroupsetImportCall<'a, C, A> {}
+
+impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ImportReadGroupSetsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "genomics.readgroupsets.import", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/import".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DevstorageReadWrite.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: &ImportReadGroupSetsRequest) -> ReadgroupsetImportCall<'a, C, A> {
+        self._request = new_value.clone();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetImportCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetImportCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DevstorageReadWrite`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetImportCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Aligns read data from existing read group sets or files from Google Cloud Storage. See the  alignment and variant calling documentation for more details.
 ///
 /// A builder for the *align* method supported by a *readgroupset* resource.
@@ -9811,7 +9671,7 @@ impl<'a, C, A> ReadgroupsetCallCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AlignReadGroupSetsRequest = Default::default();
+/// let mut req = AlignReadGroupSetsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -9877,16 +9737,20 @@ impl<'a, C, A> ReadgroupsetAlignCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10002,6 +9866,498 @@ impl<'a, C, A> ReadgroupsetAlignCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
+/// Gets a read group set by ID.
+///
+/// A builder for the *get* method supported by a *readgroupset* resource.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_genomics1_beta2 as genomics1_beta2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use genomics1_beta2::Genomics;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.readgroupsets().get("readGroupSetId")
+///              .doit();
+/// # }
+/// ```
+pub struct ReadgroupsetGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Genomics<C, A>,
+    _read_group_set_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ReadgroupsetGetCall<'a, C, A> {}
+
+impl<'a, C, A> ReadgroupsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ReadGroupSet)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "genomics.readgroupsets.get", 
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("readGroupSetId", self._read_group_set_id.to_string()));
+        for &field in ["alt", "readGroupSetId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/{readGroupSetId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{readGroupSetId}", "readGroupSetId")].iter() {
+                        let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["readGroupSetId"].iter() {
+                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
+                    if name == param_name {
+                        indices_for_removal.push(params.len() - index - 1);
+                        break;
+                    }
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the read group set.
+    ///
+    /// Sets the *read group set id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetGetCall<'a, C, A> {
+        self._read_group_set_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetGetCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Updates a read group set.
+///
+/// A builder for the *update* method supported by a *readgroupset* resource.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_genomics1_beta2 as genomics1_beta2;
+/// use genomics1_beta2::ReadGroupSet;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use genomics1_beta2::Genomics;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ReadGroupSet::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.readgroupsets().update(&req, "readGroupSetId")
+///              .doit();
+/// # }
+/// ```
+pub struct ReadgroupsetUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Genomics<C, A>,
+    _request: ReadGroupSet,
+    _read_group_set_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ReadgroupsetUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> ReadgroupsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ReadGroupSet)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "genomics.readgroupsets.update", 
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("readGroupSetId", self._read_group_set_id.to_string()));
+        for &field in ["alt", "readGroupSetId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/{readGroupSetId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{readGroupSetId}", "readGroupSetId")].iter() {
+                        let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["readGroupSetId"].iter() {
+                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
+                    if name == param_name {
+                        indices_for_removal.push(params.len() - index - 1);
+                        break;
+                    }
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: &ReadGroupSet) -> ReadgroupsetUpdateCall<'a, C, A> {
+        self._request = new_value.clone();
+        self
+    }
+    /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
+    ///
+    /// Sets the *read group set id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetUpdateCall<'a, C, A> {
+        self._read_group_set_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetUpdateCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Lists fixed width coverage buckets for a read group set, each of which correspond to a range of a reference sequence. Each bucket summarizes coverage information across its corresponding genomic range.
 /// 
 /// Coverage is defined as the number of reads which are aligned to a given base in the reference sequence. Coverage buckets are available at several precomputed bucket widths, enabling retrieval of various coverage 'zoom levels'. The caller must have READ permissions for the target read group set.
@@ -10032,11 +10388,11 @@ impl<'a, C, A> ReadgroupsetAlignCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.readgroupsets().coveragebuckets_list("readGroupSetId")
 ///              .target_bucket_width("justo")
-///              .range_start("justo")
+///              .range_start("et")
 ///              .range_reference_name("et")
-///              .range_end("et")
-///              .page_token("diam")
-///              .page_size(-55)
+///              .range_end("diam")
+///              .page_token("ipsum")
+///              .page_size(-5)
 ///              .doit();
 /// # }
 /// ```
@@ -10142,16 +10498,20 @@ impl<'a, C, A> ReadgroupsetCoveragebucketListCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -10413,16 +10773,20 @@ impl<'a, C, A> ReadgroupsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -10554,7 +10918,7 @@ impl<'a, C, A> ReadgroupsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SearchReadGroupSetsRequest = Default::default();
+/// let mut req = SearchReadGroupSetsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -10620,16 +10984,20 @@ impl<'a, C, A> ReadgroupsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10738,236 +11106,6 @@ impl<'a, C, A> ReadgroupsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetSearchCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
-/// Gets a read group set by ID.
-///
-/// A builder for the *get* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_genomics1_beta2 as genomics1_beta2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use genomics1_beta2::Genomics;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.readgroupsets().get("readGroupSetId")
-///              .doit();
-/// # }
-/// ```
-pub struct ReadgroupsetGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Genomics<C, A>,
-    _read_group_set_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ReadgroupsetGetCall<'a, C, A> {}
-
-impl<'a, C, A> ReadgroupsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ReadGroupSet)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "genomics.readgroupsets.get", 
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("readGroupSetId", self._read_group_set_id.to_string()));
-        for &field in ["alt", "readGroupSetId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/genomics/v1beta2/readgroupsets/{readGroupSetId}".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{readGroupSetId}", "readGroupSetId")].iter() {
-                        let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["readGroupSetId"].iter() {
-                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
-                    if name == param_name {
-                        indices_for_removal.push(params.len() - index - 1);
-                        break;
-                    }
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
-        }
-
-
-
-        loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return Err(Error::Failure(res))
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the read group set.
-    ///
-    /// Sets the *read group set id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetGetCall<'a, C, A> {
-        self._read_group_set_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11105,16 +11243,20 @@ impl<'a, C, A> ReferenceBaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11284,7 +11426,7 @@ impl<'a, C, A> ReferenceBaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SearchReferencesRequest = Default::default();
+/// let mut req = SearchReferencesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -11350,16 +11492,20 @@ impl<'a, C, A> ReferenceSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -11585,16 +11731,20 @@ impl<'a, C, A> ReferenceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11815,16 +11965,20 @@ impl<'a, C, A> AnnotationSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11964,7 +12118,7 @@ impl<'a, C, A> AnnotationSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AnnotationSet = Default::default();
+/// let mut req = AnnotationSet::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -12056,16 +12210,20 @@ impl<'a, C, A> AnnotationSetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12218,7 +12376,7 @@ impl<'a, C, A> AnnotationSetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AnnotationSet = Default::default();
+/// let mut req = AnnotationSet::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -12284,16 +12442,20 @@ impl<'a, C, A> AnnotationSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12436,7 +12598,7 @@ impl<'a, C, A> AnnotationSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SearchAnnotationSetsRequest = Default::default();
+/// let mut req = SearchAnnotationSetsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -12502,16 +12664,20 @@ impl<'a, C, A> AnnotationSetSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12654,7 +12820,7 @@ impl<'a, C, A> AnnotationSetSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AnnotationSet = Default::default();
+/// let mut req = AnnotationSet::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -12746,16 +12912,20 @@ impl<'a, C, A> AnnotationSetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12988,16 +13158,20 @@ impl<'a, C, A> AnnotationSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -13129,7 +13303,7 @@ impl<'a, C, A> AnnotationSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SearchVariantsRequest = Default::default();
+/// let mut req = SearchVariantsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -13195,16 +13369,20 @@ impl<'a, C, A> VariantSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13427,16 +13605,20 @@ impl<'a, C, A> VariantDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -13647,16 +13829,20 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -13796,7 +13982,7 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Variant = Default::default();
+/// let mut req = Variant::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -13862,16 +14048,20 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -14014,7 +14204,7 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Variant = Default::default();
+/// let mut req = Variant::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -14106,16 +14296,20 @@ impl<'a, C, A> VariantUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -14241,260 +14435,6 @@ impl<'a, C, A> VariantUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *annotation* resource.
-/// It is not used directly, but through a `AnnotationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_genomics1_beta2 as genomics1_beta2;
-/// use genomics1_beta2::Annotation;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use genomics1_beta2::Genomics;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req: Annotation = Default::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.annotations().patch(&req, "annotationId")
-///              .doit();
-/// # }
-/// ```
-pub struct AnnotationPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Genomics<C, A>,
-    _request: Annotation,
-    _annotation_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AnnotationPatchCall<'a, C, A> {}
-
-impl<'a, C, A> AnnotationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Annotation)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "genomics.annotations.patch", 
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("annotationId", self._annotation_id.to_string()));
-        for &field in ["alt", "annotationId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = "https://www.googleapis.com/genomics/v1beta2/annotations/{annotationId}".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{annotationId}", "annotationId")].iter() {
-                        let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["annotationId"].iter() {
-                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
-                    if name == param_name {
-                        indices_for_removal.push(params.len() - index - 1);
-                        break;
-                    }
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return Err(Error::Failure(res))
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Annotation) -> AnnotationPatchCall<'a, C, A> {
-        self._request = new_value.clone();
-        self
-    }
-    /// The ID of the annotation set to be updated.
-    ///
-    /// Sets the *annotation id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn annotation_id(mut self, new_value: &str) -> AnnotationPatchCall<'a, C, A> {
-        self._annotation_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationPatchCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
 /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset.
 ///
 /// A builder for the *update* method supported by a *annotation* resource.
@@ -14522,7 +14462,7 @@ impl<'a, C, A> AnnotationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Annotation = Default::default();
+/// let mut req = Annotation::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -14614,16 +14554,20 @@ impl<'a, C, A> AnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -14749,6 +14693,240 @@ impl<'a, C, A> AnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
+/// Gets an annotation. Caller must have READ permission for the associated annotation set.
+///
+/// A builder for the *get* method supported by a *annotation* resource.
+/// It is not used directly, but through a `AnnotationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_genomics1_beta2 as genomics1_beta2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use genomics1_beta2::Genomics;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Genomics::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.annotations().get("annotationId")
+///              .doit();
+/// # }
+/// ```
+pub struct AnnotationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Genomics<C, A>,
+    _annotation_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AnnotationGetCall<'a, C, A> {}
+
+impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Annotation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "genomics.annotations.get", 
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("annotationId", self._annotation_id.to_string()));
+        for &field in ["alt", "annotationId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/genomics/v1beta2/annotations/{annotationId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{annotationId}", "annotationId")].iter() {
+                        let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["annotationId"].iter() {
+                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
+                    if name == param_name {
+                        indices_for_removal.push(params.len() - index - 1);
+                        break;
+                    }
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the annotation set to be retrieved.
+    ///
+    /// Sets the *annotation id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn annotation_id(mut self, new_value: &str) -> AnnotationGetCall<'a, C, A> {
+        self._annotation_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationGetCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Searches for annotations that match the given criteria. Results are returned ordered by start position. Annotations that have matching start positions are ordered deterministically. Caller must have READ permission for the queried annotation sets.
 ///
 /// A builder for the *search* method supported by a *annotation* resource.
@@ -14776,7 +14954,7 @@ impl<'a, C, A> AnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SearchAnnotationsRequest = Default::default();
+/// let mut req = SearchAnnotationsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -14842,16 +15020,20 @@ impl<'a, C, A> AnnotationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -15074,16 +15256,20 @@ impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -15186,9 +15372,9 @@ impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Gets an annotation. Caller must have READ permission for the associated annotation set.
+/// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset. This method supports patch semantics.
 ///
-/// A builder for the *get* method supported by a *annotation* resource.
+/// A builder for the *patch* method supported by a *annotation* resource.
 /// It is not used directly, but through a `AnnotationMethods` instance.
 ///
 /// # Example
@@ -15199,6 +15385,7 @@ impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_genomics1_beta2 as genomics1_beta2;
+/// use genomics1_beta2::Annotation;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -15209,26 +15396,32 @@ impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Genomics::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Annotation::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.annotations().get("annotationId")
+/// let result = hub.annotations().patch(&req, "annotationId")
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationGetCall<'a, C, A>
+pub struct AnnotationPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Genomics<C, A>,
+    _request: Annotation,
     _annotation_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AnnotationGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AnnotationPatchCall<'a, C, A> {}
 
-impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15240,9 +15433,9 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "genomics.annotations.get", 
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "genomics.annotations.patch", 
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("annotationId", self._annotation_id.to_string()));
         for &field in ["alt", "annotationId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -15258,7 +15451,7 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = "https://www.googleapis.com/genomics/v1beta2/annotations/{annotationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{annotationId}", "annotationId")].iter() {
@@ -15291,24 +15484,36 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -15354,13 +15559,22 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The ID of the annotation set to be retrieved.
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: &Annotation) -> AnnotationPatchCall<'a, C, A> {
+        self._request = new_value.clone();
+        self
+    }
+    /// The ID of the annotation set to be updated.
     ///
     /// Sets the *annotation id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn annotation_id(mut self, new_value: &str) -> AnnotationGetCall<'a, C, A> {
+    pub fn annotation_id(mut self, new_value: &str) -> AnnotationPatchCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
@@ -15370,7 +15584,7 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15391,7 +15605,7 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15400,7 +15614,7 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Identifies the authorization scope for the method you are building.
     /// 
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// `Scope::Full`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15408,7 +15622,7 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationGetCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15443,7 +15657,7 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Annotation = Default::default();
+/// let mut req = Annotation::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -15509,16 +15723,20 @@ impl<'a, C, A> AnnotationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -15664,7 +15882,7 @@ impl<'a, C, A> AnnotationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: BatchCreateAnnotationsRequest = Default::default();
+/// let mut req = BatchCreateAnnotationsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -15730,16 +15948,20 @@ impl<'a, C, A> AnnotationBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -15882,7 +16104,7 @@ impl<'a, C, A> AnnotationBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ExperimentalCreateJobRequest = Default::default();
+/// let mut req = ExperimentalCreateJobRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -15948,16 +16170,20 @@ impl<'a, C, A> ExperimentalJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -16100,7 +16326,7 @@ impl<'a, C, A> ExperimentalJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: VariantSet = Default::default();
+/// let mut req = VariantSet::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -16192,16 +16418,20 @@ impl<'a, C, A> VariantsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -16354,7 +16584,7 @@ impl<'a, C, A> VariantsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ExportVariantSetRequest = Default::default();
+/// let mut req = ExportVariantSetRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -16446,16 +16676,20 @@ impl<'a, C, A> VariantsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -16608,7 +16842,7 @@ impl<'a, C, A> VariantsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: VariantSet = Default::default();
+/// let mut req = VariantSet::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -16700,16 +16934,20 @@ impl<'a, C, A> VariantsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -16864,7 +17102,7 @@ impl<'a, C, A> VariantsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SearchVariantSetsRequest = Default::default();
+/// let mut req = SearchVariantSetsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -16930,16 +17168,20 @@ impl<'a, C, A> VariantsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -17163,16 +17405,20 @@ impl<'a, C, A> VariantsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -17314,7 +17560,7 @@ impl<'a, C, A> VariantsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: MergeVariantsRequest = Default::default();
+/// let mut req = MergeVariantsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -17405,16 +17651,20 @@ impl<'a, C, A> VariantsetMergeVariantCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -17637,16 +17887,20 @@ impl<'a, C, A> VariantsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -17778,7 +18032,7 @@ impl<'a, C, A> VariantsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ImportVariantsRequest = Default::default();
+/// let mut req = ImportVariantsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -17870,16 +18124,20 @@ impl<'a, C, A> VariantsetImportVariantCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

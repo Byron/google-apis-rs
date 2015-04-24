@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-fitness1` library allows access to all features of the *Google fitness* service.
 
-This documentation was generated from *fitness* crate version *0.1.5+20150222*, where *20150222* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *fitness* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 
 Everything else about the *fitness* *v1* API can be found at the
 [official documentation site](https://developers.google.com/fit/rest/).
@@ -14,7 +14,7 @@ Everything else about the *fitness* *v1* API can be found at the
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_fitness1/struct.Fitness.html) ... 
 
 * users
- * [*data sources create*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceCreateCall.html), [*data sources datasets delete*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceDatasetDeleteCall.html), [*data sources datasets get*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceDatasetGetCall.html), [*data sources datasets patch*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceDatasetPatchCall.html), [*data sources get*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceGetCall.html), [*data sources list*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceListCall.html), [*data sources patch*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourcePatchCall.html), [*data sources update*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceUpdateCall.html), [*sessions delete*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserSessionDeleteCall.html), [*sessions list*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserSessionListCall.html) and [*sessions update*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserSessionUpdateCall.html)
+ * [*data sources create*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceCreateCall.html), [*data sources datasets delete*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceDatasetDeleteCall.html), [*data sources datasets get*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceDatasetGetCall.html), [*data sources datasets patch*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceDatasetPatchCall.html), [*data sources delete*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceDeleteCall.html), [*data sources get*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceGetCall.html), [*data sources list*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceListCall.html), [*data sources patch*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourcePatchCall.html), [*data sources update*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserDataSourceUpdateCall.html), [*sessions delete*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserSessionDeleteCall.html), [*sessions list*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserSessionListCall.html) and [*sessions update*](http://byron.github.io/google-apis-rs/google_fitness1/struct.UserSessionUpdateCall.html)
 
 
 
@@ -51,6 +51,7 @@ let r = hub.users().data_sources_get(...).doit()
 let r = hub.users().data_sources_update(...).doit()
 let r = hub.users().data_sources_create(...).doit()
 let r = hub.users().data_sources_patch(...).doit()
+let r = hub.users().data_sources_delete(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -96,7 +97,7 @@ let mut hub = Fitness::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req: DataSource = Default::default();
+let mut req = DataSource::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.

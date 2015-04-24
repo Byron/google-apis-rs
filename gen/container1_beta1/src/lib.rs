@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *container* crate version *0.1.5+20150318*, where *20150318* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *container* crate version *0.1.5+20150420*, where *20150420* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *container* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-engine/docs/v1beta1/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Container.html) ... 
 //! 
 //! * projects
-//!  * [*clusters list*](struct.ProjectClusterListCall.html), [*operations list*](struct.ProjectOperationListCall.html), [*zones clusters create*](struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](struct.ProjectZoneClusterGetCall.html), [*zones clusters list*](struct.ProjectZoneClusterListCall.html), [*zones operations get*](struct.ProjectZoneOperationGetCall.html) and [*zones operations list*](struct.ProjectZoneOperationListCall.html)
+//!  * [*clusters list*](struct.ProjectClusterListCall.html), [*operations list*](struct.ProjectOperationListCall.html), [*zones clusters create*](struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](struct.ProjectZoneClusterGetCall.html), [*zones clusters list*](struct.ProjectZoneClusterListCall.html), [*zones operations get*](struct.ProjectZoneOperationGetCall.html), [*zones operations list*](struct.ProjectZoneOperationListCall.html) and [*zones tokens get*](struct.ProjectZoneTokenGetCall.html)
 //! 
 //! 
 //! 
@@ -334,7 +334,7 @@ impl<'a, C, A> Container<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListOperationsResponse {
     /// A list of operations in the project in the specified zone.
-    pub operations: Vec<Operation>,
+    pub operations: Option<Vec<Operation>>,
 }
 
 impl ResponseResult for ListOperationsResponse {}
@@ -352,7 +352,7 @@ impl ResponseResult for ListOperationsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAggregatedClustersResponse {
     /// A list of clusters in the project, across all zones.
-    pub clusters: Vec<Cluster>,
+    pub clusters: Option<Vec<Cluster>>,
 }
 
 impl ResponseResult for ListAggregatedClustersResponse {}
@@ -370,22 +370,25 @@ impl ResponseResult for ListAggregatedClustersResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListClustersResponse {
     /// A list of clusters in the project in the specified zone.
-    pub clusters: Vec<Cluster>,
+    pub clusters: Option<Vec<Cluster>>,
 }
 
 impl ResponseResult for ListClustersResponse {}
 
 
-/// There is no detailed description.
+/// The authentication information for accessing the master. Authentication is either done using HTTP basic authentication or using a bearer token.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MasterAuth {
-    /// The password to use when accessing the Kubernetes master endpoint.
-    pub password: String,
-    /// The username to use when accessing the Kubernetes master endpoint.
-    pub user: String,
+    /// The token used to authenticate API requests to the master. The token is be included in an HTTP Authorization Header included in all requests to the master endpoint. The format of the header is: "Authorization: Bearer ".
+    #[serde(rename="bearerToken")]
+    pub bearer_token: Option<String>,
+    /// The password to use for HTTP basic authentication when accessing the Kubernetes master endpoint. Because the master endpoint is open to the internet, you should create a strong password.
+    pub password: Option<String>,
+    /// The username to use for HTTP basic authentication when accessing the Kubernetes master endpoint.
+    pub user: Option<String>,
 }
 
 impl Part for MasterAuth {}
@@ -403,58 +406,80 @@ impl Part for MasterAuth {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Cluster {
     /// [Output only] The current status of this cluster.
-    pub status: String,
-    /// [Output only] The IP addresses of the container pods in this cluster, in  CIDR notation (e.g. 1.2.3.4/29).
+    pub status: Option<String>,
+    /// The IP addresses of the container pods in this cluster, in  CIDR notation (e.g. 10.96.0.0/14). Leave blank to have one automatically chosen or specify a /14 block in 10.0.0.0/8 or 172.16.0.0/12.
     #[serde(rename="containerIpv4Cidr")]
-    pub container_ipv4_cidr: String,
+    pub container_ipv4_cidr: Option<String>,
     /// An optional description of this cluster.
-    pub description: String,
+    pub description: Option<String>,
     /// [Output only] The size of the address space on each node for hosting containers.
     #[serde(rename="nodeRoutingPrefixSize")]
-    pub node_routing_prefix_size: i32,
-    /// The HTTP basic authentication information for accessing the master. Because the master endpoint is open to the internet, you should create a strong password.
+    pub node_routing_prefix_size: Option<i32>,
+    /// The authentication information for accessing the master.
     #[serde(rename="masterAuth")]
-    pub master_auth: MasterAuth,
+    pub master_auth: Option<MasterAuth>,
     /// The API version of the Kubernetes master and kubelets running in this cluster. Leave blank to pick up the latest stable release, or specify a version of the form "x.y.z". The Google Container Engine release notes lists the currently supported versions. If an incorrect version is specified, the server returns an error listing the currently supported versions.
     #[serde(rename="clusterApiVersion")]
-    pub cluster_api_version: String,
+    pub cluster_api_version: Option<String>,
     /// [Output only] The time the cluster was created, in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
-    pub creation_timestamp: String,
+    pub creation_timestamp: Option<String>,
     /// The name of this cluster. The name must be unique within this project and zone, and can be up to 40 characters with the following restrictions:  
     /// - Lowercase letters, numbers, and hyphens only.
     /// - Must start with a letter.
     /// - Must end with a number or a letter.
-    pub name: String,
+    pub name: Option<String>,
     /// [Output only] The IP address of this cluster's Kubernetes master. The endpoint can be accessed from the internet at https://username:password@endpoint/.
     /// 
     /// See the masterAuth property of this resource for username and password information.
-    pub endpoint: String,
+    pub endpoint: Option<String>,
     /// The name of the Google Compute Engine network to which the cluster is connected.
-    pub network: String,
+    pub network: Option<String>,
     /// [Output only] The name of the Google Compute Engine zone in which the cluster resides.
-    pub zone: String,
+    pub zone: Option<String>,
     /// The number of nodes to create in this cluster. You must ensure that your Compute Engine resource quota is sufficient for this number of instances plus one (to include the master). You must also have available firewall and routes quota.
     #[serde(rename="numNodes")]
-    pub num_nodes: i32,
+    pub num_nodes: Option<i32>,
     /// The machine type and image to use for all nodes in this cluster. See the descriptions of the child properties of nodeConfig.
     #[serde(rename="nodeConfig")]
-    pub node_config: NodeConfig,
+    pub node_config: Option<NodeConfig>,
     /// [Output only] Server-defined URL for the resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// Whether logs from the cluster should be made available via the Google Cloud Logging service. This includes both logs from your applications running in the cluster as well as logs from the Kubernetes components themselves.
     #[serde(rename="enableCloudLogging")]
-    pub enable_cloud_logging: bool,
+    pub enable_cloud_logging: Option<bool>,
     /// [Output only] Additional information about the current status of this cluster, if available.
     #[serde(rename="statusMessage")]
-    pub status_message: String,
+    pub status_message: Option<String>,
     /// [Output only] The IP addresses of the Kubernetes services in this cluster, in  CIDR notation (e.g. 1.2.3.4/29). Service addresses are always in the 10.0.0.0/16 range.
     #[serde(rename="servicesIpv4Cidr")]
-    pub services_ipv4_cidr: String,
+    pub services_ipv4_cidr: Option<String>,
 }
 
 impl ResponseResult for Cluster {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones tokens get projects](struct.ProjectZoneTokenGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Token {
+    /// The expiration time of the token in seconds since the unix epoch.
+    #[serde(rename="expiryTimeSeconds")]
+    pub expiry_time_seconds: Option<String>,
+    /// The OAuth2 access token
+    #[serde(rename="accessToken")]
+    pub access_token: Option<String>,
+}
+
+impl ResponseResult for Token {}
 
 
 /// There is no detailed description.
@@ -467,17 +492,17 @@ pub struct NodeConfig {
     /// - https://www.googleapis.com/auth/compute,
     /// - https://www.googleapis.com/auth/devstorage.read_only
     #[serde(rename="serviceAccounts")]
-    pub service_accounts: Vec<ServiceAccount>,
+    pub service_accounts: Option<Vec<ServiceAccount>>,
     /// The name of a Google Compute Engine machine type (e.g. n1-standard-1).
     /// 
     /// If unspecified, the default machine type is n1-standard-1.
     #[serde(rename="machineType")]
-    pub machine_type: String,
+    pub machine_type: Option<String>,
     /// The fully-specified name of a Google Compute Engine image. For example: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/backports-debian-7-wheezy-vYYYYMMDD (where YYYMMDD is the version date).
     /// 
     /// If specifying an image, you are responsible for ensuring its compatibility with the Debian 7 backports image. We recommend leaving this field blank to accept the default backports-debian-7-wheezy value.
     #[serde(rename="sourceImage")]
-    pub source_image: String,
+    pub source_image: Option<String>,
 }
 
 impl Part for NodeConfig {}
@@ -490,9 +515,9 @@ impl Part for NodeConfig {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccount {
     /// The list of scopes to be made available for this service account.
-    pub scopes: Vec<String>,
+    pub scopes: Option<Vec<String>>,
     /// Email address of the service account.
-    pub email: String,
+    pub email: Option<String>,
 }
 
 impl Part for ServiceAccount {}
@@ -512,25 +537,25 @@ impl Part for ServiceAccount {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// The current status of the operation.
-    pub status: String,
+    pub status: Option<String>,
     /// The server-assigned ID for this operation. If the operation is fulfilled upfront, it may not have a resource name.
-    pub name: String,
+    pub name: Option<String>,
     /// The name of the Google Compute Engine zone in which the operation is taking place.
-    pub zone: String,
+    pub zone: Option<String>,
     /// If an error has occurred, a textual description of the error.
     #[serde(rename="errorMessage")]
-    pub error_message: String,
+    pub error_message: Option<String>,
     /// Server-defined URL for the target of the operation.
     #[serde(rename="targetLink")]
-    pub target_link: String,
+    pub target_link: Option<String>,
     /// The operation type.
     #[serde(rename="operationType")]
-    pub operation_type: String,
+    pub operation_type: Option<String>,
     /// Server-defined URL for the resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// [Optional] The URL of the cluster resource that this operation is associated with.
-    pub target: String,
+    pub target: Option<String>,
 }
 
 impl ResponseResult for Operation {}
@@ -548,7 +573,7 @@ impl ResponseResult for Operation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAggregatedOperationsResponse {
     /// A list of operations in the project, across all zones.
-    pub operations: Vec<Operation>,
+    pub operations: Option<Vec<Operation>>,
 }
 
 impl ResponseResult for ListAggregatedOperationsResponse {}
@@ -600,7 +625,7 @@ impl RequestValue for CreateClusterRequest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Container::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `clusters_list(...)`, `operations_list(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_list(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
+/// // like `clusters_list(...)`, `operations_list(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_list(...)`, `zones_operations_get(...)`, `zones_operations_list(...)` and `zones_tokens_get(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -649,6 +674,29 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _project_id: project_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a compute-rw scoped OAuth2 access token for
+    /// . Authentication is performed to ensure that the caller is a member of  and that the request is coming from the expected master VM for the specified cluster. See go/gke-cross-project-auth for more details.
+    /// 
+    /// # Arguments
+    ///
+    /// * `masterProjectId` - The hosted master project from which this request is coming.
+    /// * `zoneId` - The zone of the specified cluster.
+    /// * `projectNumber` - The project number for which the access token is being requested.
+    /// * `clusterName` - The name of the specified cluster.
+    pub fn zones_tokens_get(&self, master_project_id: &str, zone_id: &str, project_number: &str, cluster_name: &str) -> ProjectZoneTokenGetCall<'a, C, A> {
+        ProjectZoneTokenGetCall {
+            hub: self.hub,
+            _master_project_id: master_project_id.to_string(),
+            _zone_id: zone_id.to_string(),
+            _project_number: project_number.to_string(),
+            _cluster_name: cluster_name.to_string(),
+            _delegate: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -900,16 +948,20 @@ impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1150,16 +1202,20 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1269,6 +1325,254 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
+}
+
+
+/// Gets a compute-rw scoped OAuth2 access token for
+/// . Authentication is performed to ensure that the caller is a member of  and that the request is coming from the expected master VM for the specified cluster. See go/gke-cross-project-auth for more details.
+///
+/// A builder for the *zones.tokens.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_container1_beta1 as container1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use container1_beta1::Container;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Container::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().zones_tokens_get("masterProjectId", "zoneId", "projectNumber", "clusterName")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectZoneTokenGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Container<C, A>,
+    _master_project_id: String,
+    _zone_id: String,
+    _project_number: String,
+    _cluster_name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, C, A> CallBuilder for ProjectZoneTokenGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectZoneTokenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Token)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "container.projects.zones.tokens.get", 
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("masterProjectId", self._master_project_id.to_string()));
+        params.push(("zoneId", self._zone_id.to_string()));
+        params.push(("projectNumber", self._project_number.to_string()));
+        params.push(("clusterName", self._cluster_name.to_string()));
+        for &field in ["alt", "masterProjectId", "zoneId", "projectNumber", "clusterName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/container/v1beta1/projects/{masterProjectId}/zones/{zoneId}/tokens/{projectNumber}/{clusterName}".to_string();
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{masterProjectId}", "masterProjectId"), ("{zoneId}", "zoneId"), ("{projectNumber}", "projectNumber"), ("{clusterName}", "clusterName")].iter() {
+                        let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(4);
+            for param_name in ["masterProjectId", "zoneId", "projectNumber", "clusterName"].iter() {
+                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
+                    if name == param_name {
+                        indices_for_removal.push(params.len() - index - 1);
+                        break;
+                    }
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()));
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The hosted master project from which this request is coming.
+    ///
+    /// Sets the *master project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn master_project_id(mut self, new_value: &str) -> ProjectZoneTokenGetCall<'a, C, A> {
+        self._master_project_id = new_value.to_string();
+        self
+    }
+    /// The zone of the specified cluster.
+    ///
+    /// Sets the *zone id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneTokenGetCall<'a, C, A> {
+        self._zone_id = new_value.to_string();
+        self
+    }
+    /// The project number for which the access token is being requested.
+    ///
+    /// Sets the *project number* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn project_number(mut self, new_value: &str) -> ProjectZoneTokenGetCall<'a, C, A> {
+        self._project_number = new_value.to_string();
+        self
+    }
+    /// The name of the specified cluster.
+    ///
+    /// Sets the *cluster name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn cluster_name(mut self, new_value: &str) -> ProjectZoneTokenGetCall<'a, C, A> {
+        self._cluster_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneTokenGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneTokenGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
 }
 
 
@@ -1386,16 +1690,20 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -1636,16 +1944,20 @@ impl<'a, C, A> ProjectClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1870,16 +2182,20 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2122,16 +2438,20 @@ impl<'a, C, A> ProjectZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2364,16 +2684,20 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2529,7 +2853,7 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CreateClusterRequest = Default::default();
+/// let mut req = CreateClusterRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2623,16 +2947,20 @@ impl<'a, C, A> ProjectZoneClusterCreateCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

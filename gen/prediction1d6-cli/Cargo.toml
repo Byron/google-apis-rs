@@ -5,7 +5,7 @@
 
 name = "google-prediction1d6-cli"
 version = "0.0.1+20140522"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with prediction (protocol v1.6)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/prediction1d6-cli"
 homepage = "https://developers.google.com/prediction/docs/developer-guide"
@@ -23,6 +23,7 @@ yup-oauth2 = "*"
 docopt = "*"
 docopt_macros = "*"
 rustc-serialize = "*"
+yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
 

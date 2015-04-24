@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -44,6 +45,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -67,7 +74,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.achievement_configurations().delete(&self.opt.arg_achievement_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -98,7 +105,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -109,7 +115,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.achievement_configurations().get(&self.opt.arg_achievement_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -141,8 +147,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -151,10 +156,10 @@ impl Engine {
 
     fn _achievement_configurations_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AchievementConfiguration = Default::default();
+        let mut request = api::AchievementConfiguration::default();
         let mut call = self.hub.achievement_configurations().insert(&request, &self.opt.arg_application_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -174,21 +179,50 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_draft_description_init(request: &mut api::AchievementConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().description.is_none() {
+                    request.draft.as_mut().unwrap().description = Some(Default::default());
+                }
+            }
+            
             fn request_draft_init(request: &mut api::AchievementConfiguration) {
                 if request.draft.is_none() {
                     request.draft = Some(Default::default());
                 }
             }
             
+            fn request_draft_name_init(request: &mut api::AchievementConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().name.is_none() {
+                    request.draft.as_mut().unwrap().name = Some(Default::default());
+                }
+            }
+            
+            fn request_published_description_init(request: &mut api::AchievementConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().description.is_none() {
+                    request.published.as_mut().unwrap().description = Some(Default::default());
+                }
+            }
+            
             fn request_published_init(request: &mut api::AchievementConfiguration) {
                 if request.published.is_none() {
                     request.published = Some(Default::default());
+                }
+            }
+            
+            fn request_published_name_init(request: &mut api::AchievementConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().name.is_none() {
+                    request.published.as_mut().unwrap().name = Some(Default::default());
                 }
             }
             
@@ -210,51 +244,51 @@ impl Engine {
                     },
                 "draft.kind" => {
                         request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.draft.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.description.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().description.kind = value.unwrap_or("").to_string();
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().description.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.icon-url" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "draft.point-value" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().point_value = arg_from_str(value.unwrap_or("-0"), err, "draft.point-value", "integer");
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().point_value = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.point-value", "integer"));
                     },
                 "draft.sort-rank" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer");
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer"));
                     },
                 "draft.name.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_draft_name_init(&mut request);
+                        request.draft.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.kind" => {
                         request_published_init(&mut request);
-                        request.published.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.published.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.description.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().description.kind = value.unwrap_or("").to_string();
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().description.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.icon-url" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "published.point-value" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().point_value = arg_from_str(value.unwrap_or("-0"), err, "published.point-value", "integer");
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().point_value = Some(arg_from_str(value.unwrap_or("-0"), err, "published.point-value", "integer"));
                     },
                 "published.sort-rank" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer");
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer"));
                     },
                 "published.name.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_published_name_init(&mut request);
+                        request.published.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_published_init(&mut request);
@@ -277,8 +311,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -289,7 +322,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.achievement_configurations().list(&self.opt.arg_application_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -327,8 +360,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -337,10 +369,10 @@ impl Engine {
 
     fn _achievement_configurations_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AchievementConfiguration = Default::default();
+        let mut request = api::AchievementConfiguration::default();
         let mut call = self.hub.achievement_configurations().patch(&request, &self.opt.arg_achievement_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -360,21 +392,50 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_draft_description_init(request: &mut api::AchievementConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().description.is_none() {
+                    request.draft.as_mut().unwrap().description = Some(Default::default());
+                }
+            }
+            
             fn request_draft_init(request: &mut api::AchievementConfiguration) {
                 if request.draft.is_none() {
                     request.draft = Some(Default::default());
                 }
             }
             
+            fn request_draft_name_init(request: &mut api::AchievementConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().name.is_none() {
+                    request.draft.as_mut().unwrap().name = Some(Default::default());
+                }
+            }
+            
+            fn request_published_description_init(request: &mut api::AchievementConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().description.is_none() {
+                    request.published.as_mut().unwrap().description = Some(Default::default());
+                }
+            }
+            
             fn request_published_init(request: &mut api::AchievementConfiguration) {
                 if request.published.is_none() {
                     request.published = Some(Default::default());
+                }
+            }
+            
+            fn request_published_name_init(request: &mut api::AchievementConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().name.is_none() {
+                    request.published.as_mut().unwrap().name = Some(Default::default());
                 }
             }
             
@@ -396,51 +457,51 @@ impl Engine {
                     },
                 "draft.kind" => {
                         request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.draft.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.description.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().description.kind = value.unwrap_or("").to_string();
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().description.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.icon-url" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "draft.point-value" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().point_value = arg_from_str(value.unwrap_or("-0"), err, "draft.point-value", "integer");
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().point_value = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.point-value", "integer"));
                     },
                 "draft.sort-rank" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer");
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer"));
                     },
                 "draft.name.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_draft_name_init(&mut request);
+                        request.draft.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.kind" => {
                         request_published_init(&mut request);
-                        request.published.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.published.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.description.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().description.kind = value.unwrap_or("").to_string();
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().description.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.icon-url" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "published.point-value" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().point_value = arg_from_str(value.unwrap_or("-0"), err, "published.point-value", "integer");
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().point_value = Some(arg_from_str(value.unwrap_or("-0"), err, "published.point-value", "integer"));
                     },
                 "published.sort-rank" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer");
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer"));
                     },
                 "published.name.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_published_name_init(&mut request);
+                        request.published.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_published_init(&mut request);
@@ -463,8 +524,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -473,10 +533,10 @@ impl Engine {
 
     fn _achievement_configurations_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AchievementConfiguration = Default::default();
+        let mut request = api::AchievementConfiguration::default();
         let mut call = self.hub.achievement_configurations().update(&request, &self.opt.arg_achievement_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -496,21 +556,50 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_draft_description_init(request: &mut api::AchievementConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().description.is_none() {
+                    request.draft.as_mut().unwrap().description = Some(Default::default());
+                }
+            }
+            
             fn request_draft_init(request: &mut api::AchievementConfiguration) {
                 if request.draft.is_none() {
                     request.draft = Some(Default::default());
                 }
             }
             
+            fn request_draft_name_init(request: &mut api::AchievementConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().name.is_none() {
+                    request.draft.as_mut().unwrap().name = Some(Default::default());
+                }
+            }
+            
+            fn request_published_description_init(request: &mut api::AchievementConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().description.is_none() {
+                    request.published.as_mut().unwrap().description = Some(Default::default());
+                }
+            }
+            
             fn request_published_init(request: &mut api::AchievementConfiguration) {
                 if request.published.is_none() {
                     request.published = Some(Default::default());
+                }
+            }
+            
+            fn request_published_name_init(request: &mut api::AchievementConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().name.is_none() {
+                    request.published.as_mut().unwrap().name = Some(Default::default());
                 }
             }
             
@@ -532,51 +621,51 @@ impl Engine {
                     },
                 "draft.kind" => {
                         request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.draft.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.description.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().description.kind = value.unwrap_or("").to_string();
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().description.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.icon-url" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "draft.point-value" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().point_value = arg_from_str(value.unwrap_or("-0"), err, "draft.point-value", "integer");
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().point_value = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.point-value", "integer"));
                     },
                 "draft.sort-rank" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer");
+                        request_draft_description_init(&mut request);
+                        request.draft.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer"));
                     },
                 "draft.name.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_draft_name_init(&mut request);
+                        request.draft.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.kind" => {
                         request_published_init(&mut request);
-                        request.published.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request.published.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.description.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().description.kind = value.unwrap_or("").to_string();
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().description.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.icon-url" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "published.point-value" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().point_value = arg_from_str(value.unwrap_or("-0"), err, "published.point-value", "integer");
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().point_value = Some(arg_from_str(value.unwrap_or("-0"), err, "published.point-value", "integer"));
                     },
                 "published.sort-rank" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer");
+                        request_published_description_init(&mut request);
+                        request.published.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer"));
                     },
                 "published.name.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_published_name_init(&mut request);
+                        request.published.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "id" => {
                         request_published_init(&mut request);
@@ -599,8 +688,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -611,7 +699,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.image_configurations().upload(&self.opt.arg_resource_id, &self.opt.arg_image_type);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -653,8 +741,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -665,7 +752,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.leaderboard_configurations().delete(&self.opt.arg_leaderboard_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -696,7 +783,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -707,7 +793,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.leaderboard_configurations().get(&self.opt.arg_leaderboard_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -739,8 +825,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -749,10 +834,10 @@ impl Engine {
 
     fn _leaderboard_configurations_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::LeaderboardConfiguration = Default::default();
+        let mut request = api::LeaderboardConfiguration::default();
         let mut call = self.hub.leaderboard_configurations().insert(&request, &self.opt.arg_application_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -772,9 +857,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -784,9 +870,135 @@ impl Engine {
                 }
             }
             
+            fn request_draft_name_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().name.is_none() {
+                    request.draft.as_mut().unwrap().name = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().score_format.is_none() {
+                    request.draft.as_mut().unwrap().score_format = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_few_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_many_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_one_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_other_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_two_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_zero_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero = Some(Default::default());
+                }
+            }
+            
             fn request_published_init(request: &mut api::LeaderboardConfiguration) {
                 if request.published.is_none() {
                     request.published = Some(Default::default());
+                }
+            }
+            
+            fn request_published_name_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().name.is_none() {
+                    request.published.as_mut().unwrap().name = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().score_format.is_none() {
+                    request.published.as_mut().unwrap().score_format = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_few_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_many_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_one_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_other_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_two_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_zero_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero = Some(Default::default());
                 }
             }
             
@@ -807,108 +1019,108 @@ impl Engine {
                         request.score_max = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.currency-code" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.currency_code = value.unwrap_or("").to_string();
+                        request_published_score_format_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.many.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.many.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_many_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.two.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.two.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_two_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.one.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.one.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_one_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.few.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.few.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_few_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.zero.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.zero.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_zero_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.other.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.other.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_other_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.number-format-type" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.number_format_type = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().number_format_type = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.num-decimal-places" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.num_decimal_places = arg_from_str(value.unwrap_or("-0"), err, "published.score-format.num-decimal-places", "integer");
+                        request_published_score_format_suffix_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().num_decimal_places = Some(arg_from_str(value.unwrap_or("-0"), err, "published.score-format.num-decimal-places", "integer"));
                     },
                 "published.icon-url" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_published_score_format_init(&mut request);
+                        request.published.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "published.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request_published_score_format_init(&mut request);
+                        request.published.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.name.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_published_name_init(&mut request);
+                        request.published.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.sort-rank" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer");
+                        request_published_name_init(&mut request);
+                        request.published.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer"));
                     },
                 "draft.score-format.currency-code" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.currency_code = value.unwrap_or("").to_string();
+                        request_draft_score_format_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.many.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.many.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_many_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.two.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.two.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_two_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.one.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.one.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_one_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.few.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.few.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_few_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.zero.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.zero.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_zero_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.other.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.other.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_other_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.number-format-type" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.number_format_type = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().number_format_type = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.num-decimal-places" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.num_decimal_places = arg_from_str(value.unwrap_or("-0"), err, "draft.score-format.num-decimal-places", "integer");
+                        request_draft_score_format_suffix_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().num_decimal_places = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.score-format.num-decimal-places", "integer"));
                     },
                 "draft.icon-url" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_draft_score_format_init(&mut request);
+                        request.draft.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "draft.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_init(&mut request);
+                        request.draft.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.name.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_draft_name_init(&mut request);
+                        request.draft.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.sort-rank" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer");
+                        request_draft_name_init(&mut request);
+                        request.draft.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer"));
                     },
                 "id" => {
                         request_draft_init(&mut request);
@@ -931,8 +1143,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -943,7 +1154,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.leaderboard_configurations().list(&self.opt.arg_application_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -981,8 +1192,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -991,10 +1201,10 @@ impl Engine {
 
     fn _leaderboard_configurations_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::LeaderboardConfiguration = Default::default();
+        let mut request = api::LeaderboardConfiguration::default();
         let mut call = self.hub.leaderboard_configurations().patch(&request, &self.opt.arg_leaderboard_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1014,9 +1224,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1026,9 +1237,135 @@ impl Engine {
                 }
             }
             
+            fn request_draft_name_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().name.is_none() {
+                    request.draft.as_mut().unwrap().name = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().score_format.is_none() {
+                    request.draft.as_mut().unwrap().score_format = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_few_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_many_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_one_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_other_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_two_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_zero_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero = Some(Default::default());
+                }
+            }
+            
             fn request_published_init(request: &mut api::LeaderboardConfiguration) {
                 if request.published.is_none() {
                     request.published = Some(Default::default());
+                }
+            }
+            
+            fn request_published_name_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().name.is_none() {
+                    request.published.as_mut().unwrap().name = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().score_format.is_none() {
+                    request.published.as_mut().unwrap().score_format = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_few_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_many_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_one_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_other_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_two_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_zero_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero = Some(Default::default());
                 }
             }
             
@@ -1049,108 +1386,108 @@ impl Engine {
                         request.score_max = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.currency-code" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.currency_code = value.unwrap_or("").to_string();
+                        request_published_score_format_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.many.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.many.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_many_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.two.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.two.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_two_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.one.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.one.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_one_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.few.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.few.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_few_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.zero.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.zero.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_zero_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.other.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.other.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_other_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.number-format-type" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.number_format_type = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().number_format_type = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.num-decimal-places" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.num_decimal_places = arg_from_str(value.unwrap_or("-0"), err, "published.score-format.num-decimal-places", "integer");
+                        request_published_score_format_suffix_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().num_decimal_places = Some(arg_from_str(value.unwrap_or("-0"), err, "published.score-format.num-decimal-places", "integer"));
                     },
                 "published.icon-url" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_published_score_format_init(&mut request);
+                        request.published.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "published.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request_published_score_format_init(&mut request);
+                        request.published.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.name.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_published_name_init(&mut request);
+                        request.published.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.sort-rank" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer");
+                        request_published_name_init(&mut request);
+                        request.published.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer"));
                     },
                 "draft.score-format.currency-code" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.currency_code = value.unwrap_or("").to_string();
+                        request_draft_score_format_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.many.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.many.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_many_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.two.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.two.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_two_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.one.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.one.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_one_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.few.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.few.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_few_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.zero.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.zero.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_zero_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.other.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.other.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_other_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.number-format-type" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.number_format_type = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().number_format_type = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.num-decimal-places" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.num_decimal_places = arg_from_str(value.unwrap_or("-0"), err, "draft.score-format.num-decimal-places", "integer");
+                        request_draft_score_format_suffix_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().num_decimal_places = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.score-format.num-decimal-places", "integer"));
                     },
                 "draft.icon-url" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_draft_score_format_init(&mut request);
+                        request.draft.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "draft.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_init(&mut request);
+                        request.draft.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.name.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_draft_name_init(&mut request);
+                        request.draft.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.sort-rank" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer");
+                        request_draft_name_init(&mut request);
+                        request.draft.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer"));
                     },
                 "id" => {
                         request_draft_init(&mut request);
@@ -1173,8 +1510,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1183,10 +1519,10 @@ impl Engine {
 
     fn _leaderboard_configurations_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::LeaderboardConfiguration = Default::default();
+        let mut request = api::LeaderboardConfiguration::default();
         let mut call = self.hub.leaderboard_configurations().update(&request, &self.opt.arg_leaderboard_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1206,9 +1542,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1218,9 +1555,135 @@ impl Engine {
                 }
             }
             
+            fn request_draft_name_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().name.is_none() {
+                    request.draft.as_mut().unwrap().name = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_init(request);
+                if request.draft.as_mut().unwrap().score_format.is_none() {
+                    request.draft.as_mut().unwrap().score_format = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_few_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_many_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_one_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_other_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_two_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two = Some(Default::default());
+                }
+            }
+            
+            fn request_draft_score_format_suffix_zero_init(request: &mut api::LeaderboardConfiguration) {
+                request_draft_score_format_suffix_init(request);
+                if request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.is_none() {
+                    request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero = Some(Default::default());
+                }
+            }
+            
             fn request_published_init(request: &mut api::LeaderboardConfiguration) {
                 if request.published.is_none() {
                     request.published = Some(Default::default());
+                }
+            }
+            
+            fn request_published_name_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().name.is_none() {
+                    request.published.as_mut().unwrap().name = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_init(request);
+                if request.published.as_mut().unwrap().score_format.is_none() {
+                    request.published.as_mut().unwrap().score_format = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_few_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_many_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_one_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_other_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_two_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two = Some(Default::default());
+                }
+            }
+            
+            fn request_published_score_format_suffix_zero_init(request: &mut api::LeaderboardConfiguration) {
+                request_published_score_format_suffix_init(request);
+                if request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.is_none() {
+                    request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero = Some(Default::default());
                 }
             }
             
@@ -1241,108 +1704,108 @@ impl Engine {
                         request.score_max = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.currency-code" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.currency_code = value.unwrap_or("").to_string();
+                        request_published_score_format_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.many.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.many.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_many_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.two.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.two.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_two_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.one.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.one.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_one_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.few.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.few.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_few_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.zero.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.zero.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_zero_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.suffix.other.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.suffix.other.kind = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_other_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.number-format-type" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.number_format_type = value.unwrap_or("").to_string();
+                        request_published_score_format_suffix_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().number_format_type = Some(value.unwrap_or("").to_string());
                     },
                 "published.score-format.num-decimal-places" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().score_format.num_decimal_places = arg_from_str(value.unwrap_or("-0"), err, "published.score-format.num-decimal-places", "integer");
+                        request_published_score_format_suffix_init(&mut request);
+                        request.published.as_mut().unwrap().score_format.as_mut().unwrap().num_decimal_places = Some(arg_from_str(value.unwrap_or("-0"), err, "published.score-format.num-decimal-places", "integer"));
                     },
                 "published.icon-url" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_published_score_format_init(&mut request);
+                        request.published.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "published.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request_published_score_format_init(&mut request);
+                        request.published.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.name.kind" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_published_name_init(&mut request);
+                        request.published.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "published.sort-rank" => {
-                        request_published_init(&mut request);
-                        request.published.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer");
+                        request_published_name_init(&mut request);
+                        request.published.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "published.sort-rank", "integer"));
                     },
                 "draft.score-format.currency-code" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.currency_code = value.unwrap_or("").to_string();
+                        request_draft_score_format_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.many.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.many.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_many_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().many.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.two.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.two.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_two_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().two.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.one.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.one.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_one_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().one.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.few.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.few.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_few_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().few.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.zero.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.zero.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_zero_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().zero.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.suffix.other.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.suffix.other.kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_other_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().suffix.as_mut().unwrap().other.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.number-format-type" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.number_format_type = value.unwrap_or("").to_string();
+                        request_draft_score_format_suffix_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().number_format_type = Some(value.unwrap_or("").to_string());
                     },
                 "draft.score-format.num-decimal-places" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().score_format.num_decimal_places = arg_from_str(value.unwrap_or("-0"), err, "draft.score-format.num-decimal-places", "integer");
+                        request_draft_score_format_suffix_init(&mut request);
+                        request.draft.as_mut().unwrap().score_format.as_mut().unwrap().num_decimal_places = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.score-format.num-decimal-places", "integer"));
                     },
                 "draft.icon-url" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().icon_url = value.unwrap_or("").to_string();
+                        request_draft_score_format_init(&mut request);
+                        request.draft.as_mut().unwrap().icon_url = Some(value.unwrap_or("").to_string());
                     },
                 "draft.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().kind = value.unwrap_or("").to_string();
+                        request_draft_score_format_init(&mut request);
+                        request.draft.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.name.kind" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().name.kind = value.unwrap_or("").to_string();
+                        request_draft_name_init(&mut request);
+                        request.draft.as_mut().unwrap().name.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "draft.sort-rank" => {
-                        request_draft_init(&mut request);
-                        request.draft.as_mut().unwrap().sort_rank = arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer");
+                        request_draft_name_init(&mut request);
+                        request.draft.as_mut().unwrap().sort_rank = Some(arg_from_str(value.unwrap_or("-0"), err, "draft.sort-rank", "integer"));
                     },
                 "id" => {
                         request_draft_init(&mut request);
@@ -1365,8 +1828,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1394,13 +1856,15 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_image_configurations {
+        }
+ else if self.opt.cmd_image_configurations {
             if self.opt.cmd_upload {
                 call_result = self._image_configurations_upload(dry_run, &mut err);
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_leaderboard_configurations {
+        }
+ else if self.opt.cmd_leaderboard_configurations {
             if self.opt.cmd_delete {
                 call_result = self._leaderboard_configurations_delete(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -1436,21 +1900,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "gamesconfiguration1-configuration-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "gamesconfiguration1-configuration-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "gamesconfiguration1-configuration",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "gamesconfiguration1-configuration",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::GamesConfiguration::new(hyper::Client::new(), auth),
+            hub: api::GamesConfiguration::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -1470,12 +1950,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

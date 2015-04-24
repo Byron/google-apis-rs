@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-youtube3` library allows access to all features of the *Google YouTube* service.
 
-This documentation was generated from *YouTube* crate version *0.1.5+20150327*, where *20150327* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *YouTube* crate version *0.1.5+20150414*, where *20150414* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 
 Everything else about the *YouTube* *v3* API can be found at the
 [official documentation site](https://developers.google.com/youtube/v3).
@@ -23,6 +23,10 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.ChannelSectionDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.ChannelSectionInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.ChannelSectionListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.ChannelSectionUpdateCall.html)
 * [channels](http://byron.github.io/google-apis-rs/google_youtube3/struct.Channel.html)
  * [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.ChannelListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.ChannelUpdateCall.html)
+* [comment threads](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentThread.html)
+ * [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentThreadInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentThreadListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentThreadUpdateCall.html)
+* [comments](http://byron.github.io/google-apis-rs/google_youtube3/struct.Comment.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentListCall.html), [*mark as spam*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentMarkAsSpamCall.html), [*set moderation status*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentSetModerationStatuCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.CommentUpdateCall.html)
 * [guide categories](http://byron.github.io/google-apis-rs/google_youtube3/struct.GuideCategory.html)
  * [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.GuideCategoryListCall.html)
 * [i18n languages](http://byron.github.io/google-apis-rs/google_youtube3/struct.I18nLanguage.html)
@@ -43,10 +47,12 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.SubscriptionDeleteCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.SubscriptionInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.SubscriptionListCall.html)
 * [thumbnails](http://byron.github.io/google-apis-rs/google_youtube3/struct.Thumbnail.html)
  * [*set*](http://byron.github.io/google-apis-rs/google_youtube3/struct.ThumbnailSetCall.html)
+* [video abuse report reasons](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoAbuseReportReason.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoAbuseReportReasonListCall.html)
 * [video categories](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoCategory.html)
  * [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoCategoryListCall.html)
 * [videos](http://byron.github.io/google-apis-rs/google_youtube3/struct.Video.html)
- * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoDeleteCall.html), [*get rating*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoGetRatingCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoListCall.html), [*rate*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoRateCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoUpdateCall.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoDeleteCall.html), [*get rating*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoGetRatingCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoListCall.html), [*rate*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoRateCall.html), [*report abuse*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoReportAbuseCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_youtube3/struct.VideoUpdateCall.html)
 * watermarks
  * [*set*](http://byron.github.io/google-apis-rs/google_youtube3/struct.WatermarkSetCall.html) and [*unset*](http://byron.github.io/google-apis-rs/google_youtube3/struct.WatermarkUnsetCall.html)
 
@@ -98,13 +104,13 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.live_broadcasts().control(...).doit()
-let r = hub.live_broadcasts().insert(...).doit()
-let r = hub.live_broadcasts().list(...).doit()
-let r = hub.live_broadcasts().transition(...).doit()
-let r = hub.live_broadcasts().update(...).doit()
-let r = hub.live_broadcasts().delete(...).doit()
-let r = hub.live_broadcasts().bind(...).doit()
+let r = hub.videos().rate(...).doit()
+let r = hub.videos().report_abuse(...).doit()
+let r = hub.videos().get_rating(...).doit()
+let r = hub.videos().list(...).doit()
+let r = hub.videos().insert(...).doit()
+let r = hub.videos().update(...).doit()
+let r = hub.videos().delete(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -149,14 +155,17 @@ let mut hub = YouTube::new(hyper::Client::new(), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.live_broadcasts().list("part")
-             .page_token("sit")
-             .on_behalf_of_content_owner_channel("Stet")
-             .on_behalf_of_content_owner("sed")
-             .mine(false)
-             .max_results(83)
-             .id("kasd")
-             .broadcast_status("accusam")
+let result = hub.videos().list("part")
+             .video_category_id("sit")
+             .region_code("Stet")
+             .page_token("sed")
+             .on_behalf_of_content_owner("et")
+             .my_rating("dolores")
+             .max_results(38)
+             .locale("accusam")
+             .id("takimata")
+             .hl("justo")
+             .chart("amet.")
              .doit();
 
 match result {

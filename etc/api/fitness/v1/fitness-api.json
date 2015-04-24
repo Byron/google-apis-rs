@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/lDyElxcTuD_AINzagoHaFK_1_Y4\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/NViEYVhdyE08LWyL01EX31ABjdw\"",
  "discoveryVersion": "v1",
  "id": "fitness:v1",
  "name": "fitness",
  "version": "v1",
- "revision": "20150222",
+ "revision": "20150326",
  "title": "Fitness",
  "description": "Google Fit API",
  "ownerDomain": "google.com",
@@ -299,10 +299,18 @@
      "type": "string",
      "description": "The different supported formats for each field in a data type.",
      "enum": [
+      "floatList",
       "floatPoint",
-      "integer"
+      "integer",
+      "integerList",
+      "map",
+      "string"
      ],
      "enumDescriptions": [
+      "",
+      "",
+      "",
+      "",
       "",
       ""
      ],
@@ -495,6 +503,11 @@
    "type": "object",
    "description": "Sessions contain metadata, such as a user-friendly name and time interval information.",
    "properties": {
+    "activeTimeMillis": {
+     "type": "string",
+     "description": "Session active time. While start_time_millis and end_time_millis define the full session time, the active time can be shorter and specified by active_time_millis. If the inactive time during the session is known, it should also be inserted via a com.google.activity.segment data point with a STILL activity value",
+     "format": "int64"
+    },
     "activityType": {
      "type": "integer",
      "description": "The type of activity this session represents.",
@@ -605,6 +618,38 @@
        "request": {
         "$ref": "DataSource"
        },
+       "response": {
+        "$ref": "DataSource"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/fitness.activity.write",
+        "https://www.googleapis.com/auth/fitness.body.write",
+        "https://www.googleapis.com/auth/fitness.location.write"
+       ]
+      },
+      "delete": {
+       "id": "fitness.users.dataSources.delete",
+       "path": "{userId}/dataSources/{dataSourceId}",
+       "httpMethod": "DELETE",
+       "description": "Delete the data source if there are no datapoints associated with it",
+       "parameters": {
+        "dataSourceId": {
+         "type": "string",
+         "description": "The data stream ID of the data source to delete.",
+         "required": true,
+         "location": "path"
+        },
+        "userId": {
+         "type": "string",
+         "description": "Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "userId",
+        "dataSourceId"
+       ],
        "response": {
         "$ref": "DataSource"
        },

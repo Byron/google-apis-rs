@@ -5,7 +5,7 @@
 
 name = "google-discovery1"
 version = "0.1.5+00000000"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with discovery (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/discovery1"
 homepage = "https://developers.google.com/discovery/"

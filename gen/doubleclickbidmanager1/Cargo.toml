@@ -5,7 +5,7 @@
 
 name = "google-doubleclickbidmanager1"
 version = "0.1.5+20150326"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with DoubleClick Bid Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/doubleclickbidmanager1"
 homepage = "https://developers.google.com/bid-manager/"

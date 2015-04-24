@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/47HlVPVwrRZ1Vj_DsTzZ93ugWO8\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/1lytpOAcJYjccK3uufWMlKFi1ZU\"",
  "discoveryVersion": "v1",
  "id": "gamesConfiguration:v1configuration",
  "name": "gamesConfiguration",
  "canonicalName": "Games Configuration",
  "version": "v1configuration",
- "revision": "20150325",
+ "revision": "20150413",
  "title": "Google Play Game Services Publishing API",
  "description": "The Publishing API for Google Play Game Services.",
  "ownerDomain": "google.com",
@@ -71,7 +71,7 @@
   "oauth2": {
    "scopes": {
     "https://www.googleapis.com/auth/androidpublisher": {
-     "description": "View and manage your Google Play Android Developer account"
+     "description": "View and manage your Google Play Developer account"
     }
    }
   }

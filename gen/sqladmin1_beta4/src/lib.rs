@@ -130,7 +130,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: User = Default::default();
+//! let mut req = User::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -309,7 +309,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: User = Default::default();
+/// let mut req = User::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -393,6 +393,21 @@ impl<'a, C, A> SQLAdmin<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// Database instance operation errors list wrapper.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OperationErrors {
+    /// This is always sql#operationErrors.
+    pub kind: Option<String>,
+    /// The list of errors encountered while processing this operation.
+    pub errors: Option<Vec<OperationError>>,
+}
+
+impl Part for OperationErrors {}
+
+
 /// A database instance backup run resource.
 /// 
 /// # Activities
@@ -406,30 +421,30 @@ impl<'a, C, A> SQLAdmin<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupRun {
     /// The status of this run.
-    pub status: String,
+    pub status: Option<String>,
     /// This is always sql#backupRun.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The start time of the backup window during which this the backup was attempted in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="windowStartTime")]
-    pub window_start_time: String,
+    pub window_start_time: Option<String>,
     /// A unique identifier for this backup run. Note that this is unique only within the scope of a particular Cloud SQL instance.
-    pub id: String,
+    pub id: Option<String>,
     /// Name of the database instance.
-    pub instance: String,
+    pub instance: Option<String>,
     /// The time the backup operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
     /// Information about why the backup operation failed. This is only present if the run has the FAILED status.
-    pub error: OperationError,
+    pub error: Option<OperationError>,
     /// The time the backup operation completed in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// The time the run was enqueued in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="enqueuedTime")]
-    pub enqueued_time: String,
+    pub enqueued_time: Option<String>,
     /// The URI of this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl Resource for BackupRun {}
@@ -444,10 +459,10 @@ impl ResponseResult for BackupRun {}
 pub struct SslCertDetail {
     /// The public information about the cert.
     #[serde(rename="certInfo")]
-    pub cert_info: SslCert,
+    pub cert_info: Option<SslCert>,
     /// The private key for the client cert, in pem format. Keep private in order to protect your security.
     #[serde(rename="certPrivateKey")]
-    pub cert_private_key: String,
+    pub cert_private_key: Option<String>,
 }
 
 impl Part for SslCertDetail {}
@@ -469,28 +484,28 @@ impl Part for SslCertDetail {}
 pub struct SslCert {
     /// Serial number, as extracted from the certificate.
     #[serde(rename="certSerialNumber")]
-    pub cert_serial_number: String,
+    pub cert_serial_number: Option<String>,
     /// This is always sql#sslCert.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Sha1 Fingerprint.
     #[serde(rename="sha1Fingerprint")]
-    pub sha1_fingerprint: String,
+    pub sha1_fingerprint: Option<String>,
     /// User supplied name. Constrained to [a-zA-Z.-_ ]+.
     #[serde(rename="commonName")]
-    pub common_name: String,
+    pub common_name: Option<String>,
     /// Name of the database instance.
-    pub instance: String,
+    pub instance: Option<String>,
     /// PEM representation.
-    pub cert: String,
+    pub cert: Option<String>,
     /// The time when the certificate expires in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="expirationTime")]
-    pub expiration_time: String,
+    pub expiration_time: Option<String>,
     /// The time when the certificate was created in RFC 3339 format, for example 2012-11-15T16:19:00.094Z
     #[serde(rename="createTime")]
-    pub create_time: String,
+    pub create_time: Option<String>,
     /// no description provided
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl Resource for SslCert {}
@@ -504,10 +519,10 @@ impl ResponseResult for SslCert {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RestoreBackupContext {
     /// This is always sql#restoreBackupContext.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The ID of the backup run to restore from.
     #[serde(rename="backupRunId")]
-    pub backup_run_id: String,
+    pub backup_run_id: Option<String>,
 }
 
 impl Part for RestoreBackupContext {}
@@ -521,7 +536,7 @@ impl Part for RestoreBackupContext {}
 pub struct ExportContextCsvExportOptions {
     /// The select query used to extract the data.
     #[serde(rename="selectQuery")]
-    pub select_query: String,
+    pub select_query: Option<String>,
 }
 
 impl NestedType for ExportContextCsvExportOptions {}
@@ -535,15 +550,15 @@ impl Part for ExportContextCsvExportOptions {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupConfiguration {
     /// This is always sql#backupConfiguration.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Whether this configuration is enabled.
-    pub enabled: bool,
+    pub enabled: Option<bool>,
     /// Whether binary log is enabled. If backup configuration is disabled, binary log must be disabled as well.
     #[serde(rename="binaryLogEnabled")]
-    pub binary_log_enabled: bool,
+    pub binary_log_enabled: Option<bool>,
     /// Start time for the daily backup configuration in UTC timezone in the 24 hour format - HH:MM.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
 }
 
 impl Part for BackupConfiguration {}
@@ -575,10 +590,10 @@ impl RequestValue for InstancesCloneRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaConfiguration {
     /// This is always sql#replicaConfiguration.
-    pub kind: String,
-    /// MySQL specific configuration when replicating from a MySQL on-premises master.
+    pub kind: Option<String>,
+    /// MySQL specific configuration when replicating from a MySQL on-premises master. Replication configuration information such as the username, password, certificates, and keys are not stored in the instance metadata. The configuration information is used only to set up the replication connection and is stored by MySQL in a file named master.info in the data directory.
     #[serde(rename="mysqlReplicaConfiguration")]
-    pub mysql_replica_configuration: MySqlReplicaConfiguration,
+    pub mysql_replica_configuration: Option<MySqlReplicaConfiguration>,
 }
 
 impl Part for ReplicaConfiguration {}
@@ -596,13 +611,13 @@ impl Part for ReplicaConfiguration {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCertsInsertResponse {
     /// This is always sql#sslCertsInsert.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The new client certificate and private key. The new certificate will not work until the instance is restarted.
     #[serde(rename="clientCert")]
-    pub client_cert: SslCertDetail,
+    pub client_cert: Option<SslCertDetail>,
     /// The server Certificate Authority's certificate. If this is missing you can force a new one to be generated by calling resetSslConfig method on instances resource.
     #[serde(rename="serverCaCert")]
-    pub server_ca_cert: SslCert,
+    pub server_ca_cert: Option<SslCert>,
 }
 
 impl ResponseResult for SslCertsInsertResponse {}
@@ -621,11 +636,11 @@ impl ResponseResult for SslCertsInsertResponse {}
 pub struct OperationsListResponse {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// List of operation resources.
-    pub items: Vec<Operation>,
+    pub items: Option<Vec<Operation>>,
     /// This is always sql#operationsList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for OperationsListResponse {}
@@ -643,9 +658,9 @@ impl ResponseResult for OperationsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TiersListResponse {
     /// List of tiers.
-    pub items: Vec<Tier>,
+    pub items: Option<Vec<Tier>>,
     /// This is always sql#tiersList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for TiersListResponse {}
@@ -661,16 +676,16 @@ pub struct ImportContext {
     /// SQL: The file contains SQL statements.
     /// CSV: The file contains CSV data.
     #[serde(rename="fileType")]
-    pub file_type: String,
+    pub file_type: Option<String>,
     /// Options for importing data as CSV.
     #[serde(rename="csvImportOptions")]
-    pub csv_import_options: ImportContextCsvImportOptions,
+    pub csv_import_options: Option<ImportContextCsvImportOptions>,
     /// A path to the file in Google Cloud Storage from which the import is made. The URI is in the form gs://bucketName/fileName. Compressed gzip files (.gz) are supported when fileType is SQL.
-    pub uri: String,
+    pub uri: Option<String>,
     /// This is always sql#importContext.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The database (for example, guestbook) to which the import is made. If fileType is SQL and no database is specified, it is assumed that the database is specified in the file to be imported. If fileType is CSV, it must be specified.
-    pub database: String,
+    pub database: Option<String>,
 }
 
 impl Part for ImportContext {}
@@ -684,10 +699,10 @@ impl Part for ImportContext {}
 pub struct IpMapping {
     /// The due time for this IP to be retired in RFC 3339 format, for example 2012-11-15T16:19:00.094Z. This field is only available when the IP is scheduled to be retired.
     #[serde(rename="timeToRetire")]
-    pub time_to_retire: String,
+    pub time_to_retire: Option<String>,
     /// The IP address assigned.
     #[serde(rename="ipAddress")]
-    pub ip_address: String,
+    pub ip_address: Option<String>,
 }
 
 impl Part for IpMapping {}
@@ -701,21 +716,21 @@ impl Part for IpMapping {}
 pub struct ExportContext {
     /// Options for exporting data as CSV.
     #[serde(rename="csvExportOptions")]
-    pub csv_export_options: ExportContextCsvExportOptions,
+    pub csv_export_options: Option<ExportContextCsvExportOptions>,
     /// This is always sql#exportContext.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Databases (for example, guestbook) from which the export is made. If fileType is SQL and no database is specified, all databases are exported. If fileType is CSV, you can optionally specify at most one database to export. If csvExportOptions.selectQuery also specifies the database, this field will be ignored.
-    pub databases: Vec<String>,
+    pub databases: Option<Vec<String>>,
     /// The file type for the specified uri.
     /// SQL: The file contains SQL statements.
     /// CSV: The file contains CSV data.
     #[serde(rename="fileType")]
-    pub file_type: String,
+    pub file_type: Option<String>,
     /// Options for exporting data as SQL statements.
     #[serde(rename="sqlExportOptions")]
-    pub sql_export_options: ExportContextSqlExportOptions,
+    pub sql_export_options: Option<ExportContextSqlExportOptions>,
     /// The path to the file in Google Cloud Storage where the export will be stored. The URI is in the form gs://bucketName/fileName. If the file already exists, the operation fails. If fileType is SQL and the filename ends with .gz, the contents are compressed.
-    pub uri: String,
+    pub uri: Option<String>,
 }
 
 impl Part for ExportContext {}
@@ -734,11 +749,11 @@ impl Part for ExportContext {}
 pub struct BackupRunsListResponse {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of backup runs in reverse chronological order of the enqueued time.
-    pub items: Vec<BackupRun>,
+    pub items: Option<Vec<BackupRun>>,
     /// This is always sql#backupRunsList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for BackupRunsListResponse {}
@@ -791,9 +806,9 @@ impl ResponseResult for Database {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportContextCsvImportOptions {
     /// The table to which CSV data is imported.
-    pub table: String,
+    pub table: Option<String>,
     /// The columns to which CSV data is imported. If not specified, all columns of the database table are loaded with CSV data.
-    pub columns: Vec<String>,
+    pub columns: Option<Vec<String>>,
 }
 
 impl NestedType for ImportContextCsvImportOptions {}
@@ -808,13 +823,13 @@ impl Part for ImportContextCsvImportOptions {}
 pub struct IpConfiguration {
     /// Whether the mysqld should default to 'REQUIRE X509' for users connecting over IP.
     #[serde(rename="requireSsl")]
-    pub require_ssl: bool,
+    pub require_ssl: Option<bool>,
     /// Whether the instance should be assigned an IP address or not.
     #[serde(rename="ipv4Enabled")]
-    pub ipv4_enabled: bool,
+    pub ipv4_enabled: Option<bool>,
     /// The list of external networks that are allowed to connect to the instance using the IP. In CIDR notation, also known as 'slash' notation (e.g. 192.168.100.0/24).
     #[serde(rename="authorizedNetworks")]
-    pub authorized_networks: Vec<AclEntry>,
+    pub authorized_networks: Option<Vec<AclEntry>>,
 }
 
 impl Part for IpConfiguration {}
@@ -827,11 +842,11 @@ impl Part for IpConfiguration {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationError {
     /// This is always sql#operationError.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Identifies the specific error that occurred.
-    pub code: String,
+    pub code: Option<String>,
     /// Additional information about the error encountered.
-    pub message: String,
+    pub message: Option<String>,
 }
 
 impl Part for OperationError {}
@@ -942,12 +957,12 @@ impl Resource for Tier {}
 pub struct CloneContext {
     /// Binary log coordinates, if specified, indentify the the position up to which the source instance should be cloned. If not specified, the source instance is cloned up to the most recent binary log coordintes.
     #[serde(rename="binLogCoordinates")]
-    pub bin_log_coordinates: BinLogCoordinates,
+    pub bin_log_coordinates: Option<BinLogCoordinates>,
     /// This is always sql#cloneContext.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Name of the Cloud SQL instance to be created as a clone.
     #[serde(rename="destinationInstanceName")]
-    pub destination_instance_name: String,
+    pub destination_instance_name: Option<String>,
 }
 
 impl Part for CloneContext {}
@@ -979,9 +994,9 @@ impl RequestValue for InstancesRestoreBackupRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseFlags {
     /// The name of the flag. These flags are passed at instance startup, so include both MySQL server options and MySQL system variables. Flags should be specified with underscores, not hyphens. For more information, see Configuring MySQL Flags in the Google Cloud SQL documentation, as well as the official MySQL documentation for server options and system variables.
-    pub name: String,
+    pub name: Option<String>,
     /// The value of the flag. Booleans should be set to on for true and off for false. This field must be omitted if the flag doesn't take a value.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for DatabaseFlags {}
@@ -999,9 +1014,9 @@ impl Part for DatabaseFlags {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FlagsListResponse {
     /// List of flags.
-    pub items: Vec<Flag>,
+    pub items: Option<Vec<Flag>>,
     /// This is always sql#flagsList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for FlagsListResponse {}
@@ -1014,35 +1029,35 @@ impl ResponseResult for FlagsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MySqlReplicaConfiguration {
     /// The username for the replication connection.
-    pub username: String,
+    pub username: Option<String>,
     /// This is always sql#mysqlReplicaConfiguration.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The password for the replication connection.
-    pub password: String,
+    pub password: Option<String>,
     /// A list of permissible ciphers to use for SSL encryption.
     #[serde(rename="sslCipher")]
-    pub ssl_cipher: String,
+    pub ssl_cipher: Option<String>,
     /// PEM representation of the trusted CA's x509 certificate.
     #[serde(rename="caCertificate")]
-    pub ca_certificate: String,
+    pub ca_certificate: Option<String>,
     /// PEM representation of the slave's x509 certificate.
     #[serde(rename="clientCertificate")]
-    pub client_certificate: String,
+    pub client_certificate: Option<String>,
     /// Interval in milliseconds between replication heartbeats.
     #[serde(rename="masterHeartbeatPeriod")]
-    pub master_heartbeat_period: String,
+    pub master_heartbeat_period: Option<String>,
     /// Whether or not to check the master's Common Name value in the certificate that it sends during the SSL handshake.
     #[serde(rename="verifyServerCertificate")]
-    pub verify_server_certificate: bool,
+    pub verify_server_certificate: Option<bool>,
     /// Path to a SQL dump file in Google Cloud Storage from which the slave instance is to be created. The URI is in the form gs://bucketName/fileName. Compressed gzip files (.gz) are also supported. Dumps should have the binlog co-ordinates from which replication should begin. This can be accomplished by setting --master-data to 1 when using mysqldump.
     #[serde(rename="dumpFilePath")]
-    pub dump_file_path: String,
+    pub dump_file_path: Option<String>,
     /// Seconds to wait between connect retries. MySQL's default is 60 seconds.
     #[serde(rename="connectRetryInterval")]
-    pub connect_retry_interval: i32,
+    pub connect_retry_interval: Option<i32>,
     /// PEM representation of the slave's private key. The corresponsing public key is encoded in the client's certificate.
     #[serde(rename="clientKey")]
-    pub client_key: String,
+    pub client_key: Option<String>,
 }
 
 impl Part for MySqlReplicaConfiguration {}
@@ -1056,44 +1071,44 @@ impl Part for MySqlReplicaConfiguration {}
 pub struct Settings {
     /// The database flags passed to the instance at startup.
     #[serde(rename="databaseFlags")]
-    pub database_flags: Vec<DatabaseFlags>,
+    pub database_flags: Option<Vec<DatabaseFlags>>,
     /// This is always sql#settings.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The App Engine app IDs that can access this instance.
     #[serde(rename="authorizedGaeApplications")]
-    pub authorized_gae_applications: Vec<String>,
+    pub authorized_gae_applications: Option<Vec<String>>,
     /// The activation policy for this instance. This specifies when the instance should be activated and is applicable only when the instance state is RUNNABLE. This can be one of the following.
     /// ALWAYS: The instance should always be active.
     /// NEVER: The instance should never be activated.
     /// ON_DEMAND: The instance is activated upon receiving requests.
     #[serde(rename="activationPolicy")]
-    pub activation_policy: String,
+    pub activation_policy: Option<String>,
     /// The daily backup configuration for the instance.
     #[serde(rename="backupConfiguration")]
-    pub backup_configuration: BackupConfiguration,
+    pub backup_configuration: Option<BackupConfiguration>,
     /// The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance.
     #[serde(rename="ipConfiguration")]
-    pub ip_configuration: IpConfiguration,
-    /// no description provided
+    pub ip_configuration: Option<IpConfiguration>,
+    /// Configuration specific to read replica instances. Indicates whether database flags for crash-safe replication are enabled.
     #[serde(rename="crashSafeReplicationEnabled")]
-    pub crash_safe_replication_enabled: bool,
+    pub crash_safe_replication_enabled: Option<bool>,
     /// Configuration specific to read replica instances. Indicates whether replication is enabled or not.
     #[serde(rename="databaseReplicationEnabled")]
-    pub database_replication_enabled: bool,
+    pub database_replication_enabled: Option<bool>,
     /// The type of replication this instance uses. This can be either ASYNCHRONOUS or SYNCHRONOUS.
     #[serde(rename="replicationType")]
-    pub replication_type: String,
+    pub replication_type: Option<String>,
     /// The tier of service for this instance, for example D1, D2. For more information, see pricing.
-    pub tier: String,
+    pub tier: Option<String>,
     /// The pricing plan for this instance. This can be either PER_USE or PACKAGE.
     #[serde(rename="pricingPlan")]
-    pub pricing_plan: String,
+    pub pricing_plan: Option<String>,
     /// The version of instance settings. This is a required field for update method to make sure concurrent updates are handled properly. During update, use the most recent settingsVersion value for this instance and do not try to update this value.
     #[serde(rename="settingsVersion")]
-    pub settings_version: String,
+    pub settings_version: Option<String>,
     /// The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or GCE zone for better performance.
     #[serde(rename="locationPreference")]
-    pub location_preference: LocationPreference,
+    pub location_preference: Option<LocationPreference>,
 }
 
 impl Part for Settings {}
@@ -1130,9 +1145,9 @@ impl RequestValue for SslCertsInsertRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCertsListResponse {
     /// List of client certificates for the instance.
-    pub items: Vec<SslCert>,
+    pub items: Option<Vec<SslCert>>,
     /// This is always sql#sslCertsList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for SslCertsListResponse {}
@@ -1146,13 +1161,13 @@ impl ResponseResult for SslCertsListResponse {}
 pub struct AclEntry {
     /// The time when this access control entry expires in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="expirationTime")]
-    pub expiration_time: String,
+    pub expiration_time: Option<String>,
     /// This is always sql#aclEntry.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The whitelisted value for the access control list.
-    pub value: String,
+    pub value: Option<String>,
     /// An optional label to identify this entry.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for AclEntry {}
@@ -1171,28 +1186,14 @@ impl Part for AclEntry {}
 pub struct InstancesListResponse {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// List of database instance resources.
-    pub items: Vec<DatabaseInstance>,
+    pub items: Option<Vec<DatabaseInstance>>,
     /// This is always sql#instancesList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for InstancesListResponse {}
-
-
-/// If errors occurred during processing of this operation, this field will be populated.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OperationErrorNested {
-    /// The list of errors encountered while processing this operation.
-    pub errors: Vec<OperationError>,
-}
-
-impl NestedType for OperationErrorNested {}
-impl Part for OperationErrorNested {}
 
 
 /// Database instance export request.
@@ -1227,11 +1228,11 @@ impl RequestValue for InstancesExportRequest {}
 pub struct UsersListResponse {
     /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// List of user resources in the instance.
-    pub items: Vec<User>,
+    pub items: Option<Vec<User>>,
     /// This is always sql#usersList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for UsersListResponse {}
@@ -1349,9 +1350,9 @@ impl RequestValue for InstancesImportRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabasesListResponse {
     /// List of database resources in the instance.
-    pub items: Vec<Database>,
+    pub items: Option<Vec<Database>>,
     /// This is always sql#databasesList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for DatabasesListResponse {}
@@ -1365,12 +1366,12 @@ impl ResponseResult for DatabasesListResponse {}
 pub struct BinLogCoordinates {
     /// Position (offset) within the binary log file.
     #[serde(rename="binLogPosition")]
-    pub bin_log_position: String,
+    pub bin_log_position: Option<String>,
     /// This is always sql#binLogCoordinates.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Name of the binary log file for a Cloud SQL instance.
     #[serde(rename="binLogFileName")]
-    pub bin_log_file_name: String,
+    pub bin_log_file_name: Option<String>,
 }
 
 impl Part for BinLogCoordinates {}
@@ -1410,45 +1411,45 @@ impl Part for BinLogCoordinates {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// The status of an operation. Valid values are PENDING, RUNNING, DONE, UNKNOWN.
-    pub status: String,
+    pub status: Option<String>,
     /// The context for import operation, if applicable.
     #[serde(rename="importContext")]
-    pub import_context: ImportContext,
+    pub import_context: Option<ImportContext>,
     /// This is always sql#operation.
-    pub kind: String,
+    pub kind: Option<String>,
     /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.
-    pub name: String,
+    pub name: Option<String>,
     /// The context for export operation, if applicable.
     #[serde(rename="exportContext")]
-    pub export_context: ExportContext,
+    pub export_context: Option<ExportContext>,
     /// The project ID of the target instance related to this operation.
     #[serde(rename="targetProject")]
-    pub target_project: String,
+    pub target_project: Option<String>,
     /// Name of the database instance related to this operation.
     #[serde(rename="targetId")]
-    pub target_id: String,
+    pub target_id: Option<String>,
     /// The type of the operation. Valid values are CREATE, DELETE, UPDATE, RESTART, IMPORT, EXPORT, BACKUP_VOLUME, RESTORE_VOLUME, CREATE_USER, DELETE_USER, CREATE_DATABASE, DELETE_DATABASE .
     #[serde(rename="operationType")]
-    pub operation_type: String,
+    pub operation_type: Option<String>,
     /// The time this operation was enqueued in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="insertTime")]
-    pub insert_time: String,
+    pub insert_time: Option<String>,
     /// The URI of the instance related to the operation.
     #[serde(rename="targetLink")]
-    pub target_link: String,
+    pub target_link: Option<String>,
     /// The time this operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="startTime")]
-    pub start_time: String,
-    /// If errors occurred during processing of this operation, this field will be populated.
-    pub error: OperationErrorNested,
+    pub start_time: Option<String>,
+    /// no description provided
+    pub error: Option<OperationErrors>,
     /// The time this operation finished in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// The URI of this resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// The email address of the user who initiated this operation.
-    pub user: String,
+    pub user: Option<String>,
 }
 
 impl Resource for Operation {}
@@ -1462,12 +1463,12 @@ impl ResponseResult for Operation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationPreference {
     /// This is always sql#locationPreference.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The AppEngine application to follow, it must be in the same region as the Cloud SQL instance.
     #[serde(rename="followGaeApplication")]
-    pub follow_gae_application: String,
+    pub follow_gae_application: Option<String>,
     /// The preferred Compute Engine zone (e.g. us-centra1-a, us-central1-b, etc.).
-    pub zone: String,
+    pub zone: Option<String>,
 }
 
 impl Part for LocationPreference {}
@@ -1480,7 +1481,7 @@ impl Part for LocationPreference {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContextSqlExportOptions {
     /// Tables to export, or that were exported, from the specified database. If you specify tables, specify one and only one database.
-    pub tables: Vec<String>,
+    pub tables: Option<Vec<String>>,
 }
 
 impl NestedType for ExportContextSqlExportOptions {}
@@ -1494,10 +1495,10 @@ impl Part for ExportContextSqlExportOptions {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OnPremisesConfiguration {
     /// This is always sql#onPremisesConfiguration.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The host and port of the on-premises instance in host:port format
     #[serde(rename="hostPort")]
-    pub host_port: String,
+    pub host_port: Option<String>,
 }
 
 impl Part for OnPremisesConfiguration {}
@@ -2668,16 +2669,20 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2924,16 +2929,20 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3164,16 +3173,20 @@ impl<'a, C, A> TierListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3396,16 +3409,20 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3642,16 +3659,20 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -3821,7 +3842,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: User = Default::default();
+/// let mut req = User::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3919,16 +3940,20 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4111,7 +4136,7 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: User = Default::default();
+/// let mut req = User::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -4205,16 +4230,20 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4460,16 +4489,20 @@ impl<'a, C, A> InstanceResetSslConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -4702,16 +4735,20 @@ impl<'a, C, A> InstancePromoteReplicaCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -4944,16 +4981,20 @@ impl<'a, C, A> InstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5103,7 +5144,7 @@ impl<'a, C, A> InstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: DatabaseInstance = Default::default();
+/// let mut req = DatabaseInstance::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -5197,16 +5238,20 @@ impl<'a, C, A> InstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -5452,16 +5497,20 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -5694,16 +5743,20 @@ impl<'a, C, A> InstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -5936,16 +5989,20 @@ impl<'a, C, A> InstanceStopReplicaCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -6178,16 +6235,20 @@ impl<'a, C, A> InstanceStartReplicaCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -6337,7 +6398,7 @@ impl<'a, C, A> InstanceStartReplicaCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: DatabaseInstance = Default::default();
+/// let mut req = DatabaseInstance::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6429,16 +6490,20 @@ impl<'a, C, A> InstanceInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -6682,16 +6747,20 @@ impl<'a, C, A> InstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6845,7 +6914,7 @@ impl<'a, C, A> InstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InstancesImportRequest = Default::default();
+/// let mut req = InstancesImportRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6939,16 +7008,20 @@ impl<'a, C, A> InstanceImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7111,7 +7184,7 @@ impl<'a, C, A> InstanceImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: DatabaseInstance = Default::default();
+/// let mut req = DatabaseInstance::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7205,16 +7278,20 @@ impl<'a, C, A> InstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7377,7 +7454,7 @@ impl<'a, C, A> InstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InstancesCloneRequest = Default::default();
+/// let mut req = InstancesCloneRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7471,16 +7548,20 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7643,7 +7724,7 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InstancesExportRequest = Default::default();
+/// let mut req = InstancesExportRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7737,16 +7818,20 @@ impl<'a, C, A> InstanceExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7909,7 +7994,7 @@ impl<'a, C, A> InstanceExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InstancesRestoreBackupRequest = Default::default();
+/// let mut req = InstancesRestoreBackupRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -8003,16 +8088,20 @@ impl<'a, C, A> InstanceRestoreBackupCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8230,16 +8319,20 @@ impl<'a, C, A> FlagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8454,16 +8547,20 @@ impl<'a, C, A> DatabaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -8623,7 +8720,7 @@ impl<'a, C, A> DatabaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Database = Default::default();
+/// let mut req = Database::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -8719,16 +8816,20 @@ impl<'a, C, A> DatabasePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8984,16 +9085,20 @@ impl<'a, C, A> DatabaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9143,7 +9248,7 @@ impl<'a, C, A> DatabaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Database = Default::default();
+/// let mut req = Database::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -9237,16 +9342,20 @@ impl<'a, C, A> DatabaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -9494,16 +9603,20 @@ impl<'a, C, A> DatabaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9663,7 +9776,7 @@ impl<'a, C, A> DatabaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Database = Default::default();
+/// let mut req = Database::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -9759,16 +9872,20 @@ impl<'a, C, A> DatabaseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -9941,7 +10058,7 @@ impl<'a, C, A> DatabaseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: SslCertsInsertRequest = Default::default();
+/// let mut req = SslCertsInsertRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -10035,16 +10152,20 @@ impl<'a, C, A> SslCertInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10292,16 +10413,20 @@ impl<'a, C, A> SslCertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -10546,16 +10671,20 @@ impl<'a, C, A> SslCertGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -10798,16 +10927,20 @@ impl<'a, C, A> SslCertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11050,16 +11183,20 @@ impl<'a, C, A> BackupRunListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11308,16 +11445,20 @@ impl<'a, C, A> BackupRunGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

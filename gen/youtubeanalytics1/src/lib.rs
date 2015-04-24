@@ -377,9 +377,9 @@ impl<'a, C, A> YouTubeAnalytics<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchReportDefinitionList {
     /// A list of batchReportDefinition resources that match the request criteria.
-    pub items: Vec<BatchReportDefinition>,
+    pub items: Option<Vec<BatchReportDefinition>>,
     /// This value specifies the type of data included in the API response. For the list method, the kind property value is youtubeAnalytics#batchReportDefinitionList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for BatchReportDefinitionList {}
@@ -425,10 +425,10 @@ impl ResponseResult for Group {}
 pub struct GroupContentDetails {
     /// no description provided
     #[serde(rename="itemCount")]
-    pub item_count: i64,
+    pub item_count: Option<i64>,
     /// no description provided
     #[serde(rename="itemType")]
-    pub item_type: String,
+    pub item_type: Option<String>,
 }
 
 impl NestedType for GroupContentDetails {}
@@ -447,11 +447,11 @@ impl Part for GroupContentDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupListResponse {
     /// no description provided
-    pub items: Vec<Group>,
+    pub items: Option<Vec<Group>>,
     /// no description provided
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub etag: String,
+    pub etag: Option<String>,
 }
 
 impl ResponseResult for GroupListResponse {}
@@ -465,12 +465,12 @@ impl ResponseResult for GroupListResponse {}
 pub struct ResultTableColumnHeaders {
     /// The type of the data in the column (STRING, INTEGER, FLOAT, etc.).
     #[serde(rename="dataType")]
-    pub data_type: String,
+    pub data_type: Option<String>,
     /// The type of the column (DIMENSION or METRIC).
     #[serde(rename="columnType")]
-    pub column_type: String,
+    pub column_type: Option<String>,
     /// The name of the dimension or metric.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for ResultTableColumnHeaders {}
@@ -489,11 +489,11 @@ impl Part for ResultTableColumnHeaders {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupItemListResponse {
     /// no description provided
-    pub items: Vec<GroupItem>,
+    pub items: Option<Vec<GroupItem>>,
     /// no description provided
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub etag: String,
+    pub etag: Option<String>,
 }
 
 impl ResponseResult for GroupItemListResponse {}
@@ -507,12 +507,12 @@ impl ResponseResult for GroupItemListResponse {}
 pub struct BatchReportOutputs {
     /// Cloud storage URL to download this report. This URL is valid for 30 minutes.
     #[serde(rename="downloadUrl")]
-    pub download_url: String,
+    pub download_url: Option<String>,
     /// Type of the output.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Format of the output.
-    pub format: String,
+    pub format: Option<String>,
 }
 
 impl NestedType for BatchReportOutputs {}
@@ -527,9 +527,9 @@ impl Part for BatchReportOutputs {}
 pub struct GroupSnippet {
     /// no description provided
     #[serde(rename="publishedAt")]
-    pub published_at: String,
+    pub published_at: Option<String>,
     /// no description provided
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl NestedType for GroupSnippet {}
@@ -574,9 +574,9 @@ impl ResponseResult for GroupItem {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupItemResource {
     /// no description provided
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl NestedType for GroupItemResource {}
@@ -622,12 +622,12 @@ impl Resource for BatchReportDefinition {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultTable {
     /// This value specifies the type of data included in the API response. For the query method, the kind property value will be youtubeAnalytics#resultTable.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The list contains all rows of the result table. Each item in the list is an array that contains comma-delimited data corresponding to a single row of data. The order of the comma-delimited data fields will match the order of the columns listed in the columnHeaders field. If no data is available for the given query, the rows element will be omitted from the response. The response for a query with the day dimension will not contain rows for the most recent days.
-    pub rows: Vec<Vec<String>>,
+    pub rows: Option<Vec<Vec<String>>>,
     /// This value specifies information about the data returned in the rows fields. Each item in the columnHeaders list identifies a field returned in the rows value, which contains a list of comma-delimited data. The columnHeaders list will begin with the dimensions specified in the API request, which will be followed by the metrics specified in the API request. The order of both dimensions and metrics will match the ordering in the API request. For example, if the API request contains the parameters dimensions=ageGroup,gender&metrics=viewerPercentage, the API response will return columns in this order: ageGroup,gender,viewerPercentage.
     #[serde(rename="columnHeaders")]
-    pub column_headers: Vec<ResultTableColumnHeaders>,
+    pub column_headers: Option<Vec<ResultTableColumnHeaders>>,
 }
 
 impl ResponseResult for ResultTable {}
@@ -672,10 +672,10 @@ impl Resource for BatchReport {}
 pub struct BatchReportTimeSpan {
     /// End of the period included in the report. Inclusive. For reports containing all entities endTime is not set.
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// Start of the period included in the report. Inclusive.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
 }
 
 impl NestedType for BatchReportTimeSpan {}
@@ -694,9 +694,9 @@ impl Part for BatchReportTimeSpan {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchReportList {
     /// A list of batchReport resources that match the request criteria.
-    pub items: Vec<BatchReport>,
+    pub items: Option<Vec<BatchReport>>,
     /// This value specifies the type of data included in the API response. For the list method, the kind property value is youtubeAnalytics#batchReportList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for BatchReportList {}
@@ -1228,16 +1228,20 @@ impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1508,16 +1512,20 @@ impl<'a, C, A> BatchReportDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1657,7 +1665,7 @@ impl<'a, C, A> BatchReportDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: GroupItem = Default::default();
+/// let mut req = GroupItem::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1728,16 +1736,20 @@ impl<'a, C, A> GroupItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1951,16 +1963,20 @@ impl<'a, C, A> GroupItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2170,16 +2186,20 @@ impl<'a, C, A> GroupItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2379,16 +2399,20 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2527,7 +2551,7 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Group = Default::default();
+/// let mut req = Group::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2598,16 +2622,20 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2829,16 +2857,20 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2991,7 +3023,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Group = Default::default();
+/// let mut req = Group::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3062,16 +3094,20 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3282,16 +3318,20 @@ impl<'a, C, A> BatchReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

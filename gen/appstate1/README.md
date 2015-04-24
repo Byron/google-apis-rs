@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-appstate1` library allows access to all features of the *Google App State* service.
 
-This documentation was generated from *App State* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *appstate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *App State* crate version *0.1.5+20150414*, where *20150414* is the exact revision of the *appstate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 
 Everything else about the *App State* *v1* API can be found at the
 [official documentation site](https://developers.google.com/games/services/web/api/states).
@@ -94,7 +94,7 @@ let mut hub = AppState::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req: UpdateRequest = Default::default();
+let mut req = UpdateRequest::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.

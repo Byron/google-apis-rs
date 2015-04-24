@@ -5,7 +5,7 @@
 
 name = "google-tagmanager1"
 version = "0.1.5+20150121"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Tag Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tagmanager1"
 homepage = "https://developers.google.com/tag-manager/api/v1/"

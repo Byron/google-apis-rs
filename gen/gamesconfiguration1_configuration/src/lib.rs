@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games Configuration* crate version *0.1.5+20150325*, where *20150325* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *Games Configuration* crate version *0.1.5+20150413*, where *20150413* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Games Configuration* *v1_configuration* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services).
@@ -222,7 +222,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View and manage your Google Play Android Developer account
+    /// View and manage your Google Play Developer account
     Androidpublisher,
 }
 
@@ -351,19 +351,19 @@ impl<'a, C, A> GamesConfiguration<C, A>
 pub struct GamesNumberFormatConfiguration {
     /// The curreny code string. Only used for CURRENCY format type.
     #[serde(rename="currencyCode")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
     /// The formatting for the number.
     /// Possible values are:  
     /// - "NUMERIC" - Numbers are formatted to have no digits or a fixed number of digits after the decimal point according to locale. An optional custom unit can be added.
     /// - "TIME_DURATION" - Numbers are formatted to hours, minutes and seconds.
     /// - "CURRENCY" - Numbers are formatted to currency according to locale.
     #[serde(rename="numberFormatType")]
-    pub number_format_type: String,
+    pub number_format_type: Option<String>,
     /// The number of decimal places for number. Only used for NUMERIC format type.
     #[serde(rename="numDecimalPlaces")]
-    pub num_decimal_places: i32,
+    pub num_decimal_places: Option<i32>,
     /// An optional suffix for the NUMERIC format type. These strings follow the same  plural rules as all Android string resources.
-    pub suffix: GamesNumberAffixConfiguration,
+    pub suffix: Option<GamesNumberAffixConfiguration>,
 }
 
 impl Part for GamesNumberFormatConfiguration {}
@@ -376,9 +376,9 @@ impl Part for GamesNumberFormatConfiguration {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedStringBundle {
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#localizedStringBundle.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The locale strings.
-    pub translations: Vec<LocalizedString>,
+    pub translations: Option<Vec<LocalizedString>>,
 }
 
 impl Part for LocalizedStringBundle {}
@@ -391,11 +391,11 @@ impl Part for LocalizedStringBundle {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedString {
     /// The locale string.
-    pub locale: String,
+    pub locale: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#localizedString.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The string value.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for LocalizedString {}
@@ -414,11 +414,11 @@ impl Part for LocalizedString {}
 pub struct AchievementConfigurationListResponse {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The achievement configurations.
-    pub items: Vec<AchievementConfiguration>,
+    pub items: Option<Vec<AchievementConfiguration>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementConfigurationListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for AchievementConfigurationListResponse {}
@@ -436,15 +436,15 @@ impl ResponseResult for AchievementConfigurationListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImageConfiguration {
     /// The url for this image.
-    pub url: String,
+    pub url: Option<String>,
     /// The resource ID of resource which the image belongs to.
     #[serde(rename="resourceId")]
-    pub resource_id: String,
+    pub resource_id: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#imageConfiguration.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The image type for the image.
     #[serde(rename="imageType")]
-    pub image_type: String,
+    pub image_type: Option<String>,
 }
 
 impl Resource for ImageConfiguration {}
@@ -458,17 +458,17 @@ impl ResponseResult for ImageConfiguration {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GamesNumberAffixConfiguration {
     /// When the language requires special treatment of "small" numbers (as with 2, 3, and 4 in Czech; or numbers ending 2, 3, or 4 but not 12, 13, or 14 in Polish).
-    pub few: LocalizedStringBundle,
+    pub few: Option<LocalizedStringBundle>,
     /// When the language requires special treatment of the number 0 (as in Arabic).
-    pub zero: LocalizedStringBundle,
+    pub zero: Option<LocalizedStringBundle>,
     /// When the language does not require special treatment of the given quantity (as with all numbers in Chinese, or 42 in English).
-    pub other: LocalizedStringBundle,
+    pub other: Option<LocalizedStringBundle>,
     /// When the language requires special treatment of "large" numbers (as with numbers ending 11-99 in Maltese).
-    pub many: LocalizedStringBundle,
+    pub many: Option<LocalizedStringBundle>,
     /// When the language requires special treatment of numbers like two (as with 2 in Welsh, or 102 in Slovenian).
-    pub two: LocalizedStringBundle,
+    pub two: Option<LocalizedStringBundle>,
     /// When the language requires special treatment of numbers like one (as with the number 1 in English and most other languages; in Russian, any number ending in 1 but not ending in 11 is in this class).
-    pub one: LocalizedStringBundle,
+    pub one: Option<LocalizedStringBundle>,
 }
 
 impl Part for GamesNumberAffixConfiguration {}
@@ -581,11 +581,11 @@ impl ResponseResult for LeaderboardConfiguration {}
 pub struct LeaderboardConfigurationListResponse {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The leaderboard configurations.
-    pub items: Vec<LeaderboardConfiguration>,
+    pub items: Option<Vec<LeaderboardConfiguration>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardConfigurationListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for LeaderboardConfigurationListResponse {}
@@ -599,19 +599,19 @@ impl ResponseResult for LeaderboardConfigurationListResponse {}
 pub struct AchievementConfigurationDetail {
     /// The icon url of this achievement. Writes to this field are ignored.
     #[serde(rename="iconUrl")]
-    pub icon_url: String,
+    pub icon_url: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#achievementConfigurationDetail.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Localized strings for the achievement name.
-    pub name: LocalizedStringBundle,
+    pub name: Option<LocalizedStringBundle>,
     /// Point value for the achievement.
     #[serde(rename="pointValue")]
-    pub point_value: i32,
+    pub point_value: Option<i32>,
     /// The sort rank of this achievement. Writes to this field are ignored.
     #[serde(rename="sortRank")]
-    pub sort_rank: i32,
+    pub sort_rank: Option<i32>,
     /// Localized strings for the achievement description.
-    pub description: LocalizedStringBundle,
+    pub description: Option<LocalizedStringBundle>,
 }
 
 impl Part for AchievementConfigurationDetail {}
@@ -625,17 +625,17 @@ impl Part for AchievementConfigurationDetail {}
 pub struct LeaderboardConfigurationDetail {
     /// The score formatting for the leaderboard.
     #[serde(rename="scoreFormat")]
-    pub score_format: GamesNumberFormatConfiguration,
+    pub score_format: Option<GamesNumberFormatConfiguration>,
     /// The icon url of this leaderboard. Writes to this field are ignored.
     #[serde(rename="iconUrl")]
-    pub icon_url: String,
+    pub icon_url: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#leaderboardConfigurationDetail.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Localized strings for the leaderboard name.
-    pub name: LocalizedStringBundle,
+    pub name: Option<LocalizedStringBundle>,
     /// The sort rank of this leaderboard. Writes to this field are ignored.
     #[serde(rename="sortRank")]
-    pub sort_rank: i32,
+    pub sort_rank: Option<i32>,
 }
 
 impl Part for LeaderboardConfigurationDetail {}
@@ -1136,16 +1136,20 @@ impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::
         let mut upload_url: Option<String> = None;
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
@@ -1484,16 +1488,20 @@ impl<'a, C, A> AchievementConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1647,7 +1655,7 @@ impl<'a, C, A> AchievementConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AchievementConfiguration = Default::default();
+/// let mut req = AchievementConfiguration::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1739,16 +1747,20 @@ impl<'a, C, A> AchievementConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1901,7 +1913,7 @@ impl<'a, C, A> AchievementConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AchievementConfiguration = Default::default();
+/// let mut req = AchievementConfiguration::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1993,16 +2005,20 @@ impl<'a, C, A> AchievementConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2236,16 +2252,20 @@ impl<'a, C, A> AchievementConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2385,7 +2405,7 @@ impl<'a, C, A> AchievementConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AchievementConfiguration = Default::default();
+/// let mut req = AchievementConfiguration::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2477,16 +2497,20 @@ impl<'a, C, A> AchievementConfigurationPatchCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2719,16 +2743,20 @@ impl<'a, C, A> AchievementConfigurationDeleteCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2858,7 +2886,7 @@ impl<'a, C, A> AchievementConfigurationDeleteCall<'a, C, A> where C: BorrowMut<h
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LeaderboardConfiguration = Default::default();
+/// let mut req = LeaderboardConfiguration::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2950,16 +2978,20 @@ impl<'a, C, A> LeaderboardConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3193,16 +3225,20 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3342,7 +3378,7 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LeaderboardConfiguration = Default::default();
+/// let mut req = LeaderboardConfiguration::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3434,16 +3470,20 @@ impl<'a, C, A> LeaderboardConfigurationPatchCall<'a, C, A> where C: BorrowMut<hy
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3596,7 +3636,7 @@ impl<'a, C, A> LeaderboardConfigurationPatchCall<'a, C, A> where C: BorrowMut<hy
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LeaderboardConfiguration = Default::default();
+/// let mut req = LeaderboardConfiguration::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3688,16 +3728,20 @@ impl<'a, C, A> LeaderboardConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3941,16 +3985,20 @@ impl<'a, C, A> LeaderboardConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4184,16 +4232,20 @@ impl<'a, C, A> LeaderboardConfigurationDeleteCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())

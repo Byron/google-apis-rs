@@ -4,8 +4,8 @@
 [package]
 
 name = "google-datastore1_beta2"
-version = "0.1.5+20140916"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+version = "0.1.5+20150402"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with datastore (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/datastore1_beta2"
 homepage = "https://developers.google.com/datastore/"

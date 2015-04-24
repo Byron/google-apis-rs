@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.5+20150323*, where *20150323* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Ad Exchange Buyer* *v1d3* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -109,7 +109,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: PretargetingConfig = Default::default();
+//! let mut req = PretargetingConfig::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -284,7 +284,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PretargetingConfig = Default::default();
+/// let mut req = PretargetingConfig::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -372,10 +372,10 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PretargetingConfigExcludedPlacements {
     /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.
-    pub token: String,
+    pub token: Option<String>,
     /// The type of the placement.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for PretargetingConfigExcludedPlacements {}
@@ -389,9 +389,9 @@ impl Part for PretargetingConfigExcludedPlacements {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeDisapprovalReasons {
     /// The categorized reason for disapproval.
-    pub reason: String,
+    pub reason: Option<String>,
     /// Additional details about the reason for disapproval.
-    pub details: Vec<String>,
+    pub details: Option<Vec<String>>,
 }
 
 impl NestedType for CreativeDisapprovalReasons {}
@@ -453,24 +453,24 @@ impl ResponseResult for Account {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PretargetingConfigList {
     /// A list of pretargeting configs
-    pub items: Vec<PretargetingConfig>,
+    pub items: Option<Vec<PretargetingConfig>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for PretargetingConfigList {}
 
 
-/// The filtering reasons for the creative. If this feature is not enabled, please ask your technical account manager. Read-only. This field should not be set in requests.
+/// The filtering reasons for the creative. Read-only. This field should not be set in requests.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeFilteringReasons {
     /// The date in ISO 8601 format for the data. The data is collected from 00:00:00 to 23:59:59 in PST.
-    pub date: String,
+    pub date: Option<String>,
     /// The filtering reasons.
-    pub reasons: Vec<CreativeFilteringReasonsReasons>,
+    pub reasons: Option<Vec<CreativeFilteringReasonsReasons>>,
 }
 
 impl NestedType for CreativeFilteringReasons {}
@@ -489,16 +489,16 @@ impl Part for CreativeFilteringReasons {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BillingInfo {
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of adgroup IDs associated with this particular account. These IDs may show up as part of a realtime bidding BidRequest, which indicates a bid request for this account.
     #[serde(rename="billingId")]
-    pub billing_id: Vec<String>,
+    pub billing_id: Option<Vec<String>>,
     /// Account id.
     #[serde(rename="accountId")]
-    pub account_id: i32,
+    pub account_id: Option<i32>,
     /// Account name.
     #[serde(rename="accountName")]
-    pub account_name: String,
+    pub account_name: Option<String>,
 }
 
 impl ResponseResult for BillingInfo {}
@@ -516,10 +516,10 @@ impl ResponseResult for BillingInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectDealsList {
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of direct deals relevant for your account.
     #[serde(rename="directDeals")]
-    pub direct_deals: Vec<DirectDeal>,
+    pub direct_deals: Option<Vec<DirectDeal>>,
 }
 
 impl ResponseResult for DirectDealsList {}
@@ -537,9 +537,9 @@ impl ResponseResult for DirectDealsList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountsList {
     /// A list of accounts.
-    pub items: Vec<Account>,
+    pub items: Option<Vec<Account>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for AccountsList {}
@@ -558,11 +558,11 @@ impl ResponseResult for AccountsList {}
 pub struct CreativesList {
     /// Continuation token used to page through creatives. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// A list of creatives.
-    pub items: Vec<Creative>,
+    pub items: Option<Vec<Creative>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for CreativesList {}
@@ -661,7 +661,7 @@ pub struct Creative {
     /// All vendor types for the ads that may be shown from this snippet.
     #[serde(rename="vendorType")]
     pub vendor_type: Option<Vec<i32>>,
-    /// The filtering reasons for the creative. If this feature is not enabled, please ask your technical account manager. Read-only. This field should not be set in requests.
+    /// The filtering reasons for the creative. Read-only. This field should not be set in requests.
     #[serde(rename="filteringReasons")]
     pub filtering_reasons: Option<CreativeFilteringReasons>,
     /// The reasons for disapproval, if any. Note that not all disapproval reasons may be categorized, so it is possible for the creative to have a status of DISAPPROVED with an empty list for disapproval_reasons. In this case, please reach out to your TAM to help debug the issue. Read-only. This field should not be set in requests.
@@ -689,10 +689,10 @@ impl ResponseResult for Creative {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PerformanceReportList {
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of performance reports relevant for the account.
     #[serde(rename="performanceReport")]
-    pub performance_report: Vec<PerformanceReport>,
+    pub performance_report: Option<Vec<PerformanceReport>>,
 }
 
 impl ResponseResult for PerformanceReportList {}
@@ -706,10 +706,10 @@ impl ResponseResult for PerformanceReportList {}
 pub struct CreativeFilteringReasonsReasons {
     /// The number of times the creative was filtered for the status. The count is aggregated across all publishers on the exchange.
     #[serde(rename="filteringCount")]
-    pub filtering_count: i64,
+    pub filtering_count: Option<i64>,
     /// The filtering status code. Please refer to the creative-status-codes.txt file for different statuses.
     #[serde(rename="filteringStatus")]
-    pub filtering_status: i32,
+    pub filtering_status: Option<i32>,
 }
 
 impl NestedType for CreativeFilteringReasonsReasons {}
@@ -723,10 +723,10 @@ impl Part for CreativeFilteringReasonsReasons {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PretargetingConfigPlacements {
     /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.
-    pub token: String,
+    pub token: Option<String>,
     /// The type of the placement.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl NestedType for PretargetingConfigPlacements {}
@@ -740,9 +740,9 @@ impl Part for PretargetingConfigPlacements {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PretargetingConfigDimensions {
     /// Width in pixels.
-    pub width: String,
+    pub width: Option<String>,
     /// Height in pixels.
-    pub height: String,
+    pub height: Option<String>,
 }
 
 impl NestedType for PretargetingConfigDimensions {}
@@ -757,49 +757,49 @@ impl Part for PretargetingConfigDimensions {}
 pub struct PerformanceReport {
     /// Average QPS for cookie matcher operations.
     #[serde(rename="cookieMatcherStatusRate")]
-    pub cookie_matcher_status_rate: Vec<String>,
+    pub cookie_matcher_status_rate: Option<Vec<String>>,
     /// Rate of various prefiltering statuses per match. Please refer to the callout-status-codes.txt file for different statuses.
     #[serde(rename="calloutStatusRate")]
-    pub callout_status_rate: Vec<String>,
+    pub callout_status_rate: Option<Vec<String>>,
     /// Average QPS for hosted match operations.
     #[serde(rename="hostedMatchStatusRate")]
-    pub hosted_match_status_rate: Vec<String>,
+    pub hosted_match_status_rate: Option<Vec<String>>,
     /// The unix timestamp of the starting time of this performance data.
-    pub timestamp: String,
+    pub timestamp: Option<String>,
     /// The 50th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
     #[serde(rename="latency50thPercentile")]
-    pub latency50th_percentile: f64,
+    pub latency50th_percentile: Option<f64>,
     /// The 85th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
     #[serde(rename="latency85thPercentile")]
-    pub latency85th_percentile: f64,
+    pub latency85th_percentile: Option<f64>,
     /// Average QPS for pixel match responses from clients.
     #[serde(rename="pixelMatchResponses")]
-    pub pixel_match_responses: f64,
+    pub pixel_match_responses: Option<f64>,
     /// Rate of ads with a given status. Please refer to the creative-status-codes.txt file for different statuses.
     #[serde(rename="creativeStatusRate")]
-    pub creative_status_rate: Vec<String>,
+    pub creative_status_rate: Option<Vec<String>>,
     /// The 95th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
     #[serde(rename="latency95thPercentile")]
-    pub latency95th_percentile: f64,
+    pub latency95th_percentile: Option<f64>,
     /// Rate of various quota account statuses per quota check.
     #[serde(rename="noQuotaInRegion")]
-    pub no_quota_in_region: f64,
+    pub no_quota_in_region: Option<f64>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The trading location of this data.
-    pub region: String,
+    pub region: Option<String>,
     /// The configured quota limits for this account.
     #[serde(rename="quotaConfiguredLimit")]
-    pub quota_configured_limit: f64,
+    pub quota_configured_limit: Option<f64>,
     /// Rate of various quota account statuses per quota check.
     #[serde(rename="outOfQuota")]
-    pub out_of_quota: f64,
+    pub out_of_quota: Option<f64>,
     /// The throttled quota limits for this account.
     #[serde(rename="quotaThrottledLimit")]
-    pub quota_throttled_limit: f64,
+    pub quota_throttled_limit: Option<f64>,
     /// Average QPS for pixel match requests from clients.
     #[serde(rename="pixelMatchRequests")]
-    pub pixel_match_requests: f64,
+    pub pixel_match_requests: Option<f64>,
 }
 
 impl Part for PerformanceReport {}
@@ -812,9 +812,9 @@ impl Part for PerformanceReport {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeCorrections {
     /// The type of correction that was applied to the creative.
-    pub reason: String,
+    pub reason: Option<String>,
     /// Additional details about the correction.
-    pub details: Vec<String>,
+    pub details: Option<Vec<String>>,
 }
 
 impl NestedType for CreativeCorrections {}
@@ -833,9 +833,9 @@ impl Part for CreativeCorrections {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BillingInfoList {
     /// A list of billing info relevant for your account.
-    pub items: Vec<BillingInfo>,
+    pub items: Option<Vec<BillingInfo>>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for BillingInfoList {}
@@ -854,37 +854,37 @@ impl ResponseResult for BillingInfoList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectDeal {
     /// The name of the advertiser this deal is for.
-    pub advertiser: String,
+    pub advertiser: Option<String>,
     /// Resource type.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Deal name.
-    pub name: String,
+    pub name: Option<String>,
     /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.
     #[serde(rename="currencyCode")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
     /// The account id of the buyer this deal is for.
     #[serde(rename="accountId")]
-    pub account_id: i32,
+    pub account_id: Option<i32>,
     /// The fixed price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the fixed price tier of buying (highest priority, pay exactly the configured fixed price).
     #[serde(rename="fixedCpm")]
-    pub fixed_cpm: String,
+    pub fixed_cpm: Option<String>,
     /// Start time for when this deal becomes active. If not set then this deal is active immediately upon creation. In seconds since the epoch.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
     /// If true, the publisher has opted to have their blocks ignored when a creative is bid with for this deal.
     #[serde(rename="publisherBlocksOverriden")]
-    pub publisher_blocks_overriden: bool,
+    pub publisher_blocks_overriden: Option<bool>,
     /// End time for when this deal stops being active. If not set then this deal is valid until manually disabled by the publisher. In seconds since the epoch.
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// The name of the publisher offering this direct deal.
     #[serde(rename="sellerNetwork")]
-    pub seller_network: String,
+    pub seller_network: Option<String>,
     /// Deal id.
-    pub id: String,
+    pub id: Option<String>,
     /// The minimum price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the private exchange tier of buying (below fixed price priority, run as a second price auction).
     #[serde(rename="privateExchangeMinCpm")]
-    pub private_exchange_min_cpm: String,
+    pub private_exchange_min_cpm: Option<String>,
 }
 
 impl Resource for DirectDeal {}
@@ -981,16 +981,16 @@ impl ResponseResult for PretargetingConfig {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountBidderLocation {
     /// The URL to which the Ad Exchange will send bid requests.
-    pub url: String,
+    pub url: Option<String>,
     /// The geographical region the Ad Exchange should send requests from. Only used by some quota systems, but always setting the value is recommended. Allowed values:  
     /// - ASIA 
     /// - EUROPE 
     /// - US_EAST 
     /// - US_WEST
-    pub region: String,
+    pub region: Option<String>,
     /// The maximum queries per second the Ad Exchange will send.
     #[serde(rename="maximumQps")]
-    pub maximum_qps: i32,
+    pub maximum_qps: Option<i32>,
 }
 
 impl NestedType for AccountBidderLocation {}
@@ -1781,16 +1781,20 @@ impl<'a, C, A> BillingInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1985,16 +1989,20 @@ impl<'a, C, A> BillingInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2179,16 +2187,20 @@ impl<'a, C, A> DirectDealListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2399,16 +2411,20 @@ impl<'a, C, A> DirectDealGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2548,7 +2564,7 @@ impl<'a, C, A> DirectDealGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Budget = Default::default();
+/// let mut req = Budget::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2642,16 +2658,20 @@ impl<'a, C, A> BudgetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2814,7 +2834,7 @@ impl<'a, C, A> BudgetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Budget = Default::default();
+/// let mut req = Budget::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2908,16 +2928,20 @@ impl<'a, C, A> BudgetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3163,16 +3187,20 @@ impl<'a, C, A> BudgetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3322,7 +3350,7 @@ impl<'a, C, A> BudgetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Creative = Default::default();
+/// let mut req = Creative::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3388,16 +3416,20 @@ impl<'a, C, A> CreativeInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3628,16 +3660,20 @@ impl<'a, C, A> CreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3887,16 +3923,20 @@ impl<'a, C, A> CreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4046,7 +4086,7 @@ impl<'a, C, A> CreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Account = Default::default();
+/// let mut req = Account::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -4138,16 +4178,20 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4300,7 +4344,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Account = Default::default();
+/// let mut req = Account::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -4392,16 +4436,20 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4609,16 +4657,20 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4829,16 +4881,20 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5049,16 +5105,20 @@ impl<'a, C, A> PerformanceReportListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5314,16 +5374,20 @@ impl<'a, C, A> PretargetingConfigDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -5463,7 +5527,7 @@ impl<'a, C, A> PretargetingConfigDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PretargetingConfig = Default::default();
+/// let mut req = PretargetingConfig::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -5557,16 +5621,20 @@ impl<'a, C, A> PretargetingConfigPatchCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -5812,16 +5880,20 @@ impl<'a, C, A> PretargetingConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5971,7 +6043,7 @@ impl<'a, C, A> PretargetingConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PretargetingConfig = Default::default();
+/// let mut req = PretargetingConfig::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6063,16 +6135,20 @@ impl<'a, C, A> PretargetingConfigInsertCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -6306,16 +6382,20 @@ impl<'a, C, A> PretargetingConfigListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6455,7 +6535,7 @@ impl<'a, C, A> PretargetingConfigListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PretargetingConfig = Default::default();
+/// let mut req = PretargetingConfig::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6549,16 +6629,20 @@ impl<'a, C, A> PretargetingConfigUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

@@ -1,4 +1,4 @@
-site_name: fitness v0.0.1+20150222
+site_name: fitness v0.0.1+20150326
 site_url: http://byron.github.io/google-apis-rs/google-fitness1-cli
 site_description: Write integrating applications with bcore
 
@@ -13,6 +13,7 @@ pages:
 - ['users_data-sources-datasets-delete.md', 'Users', 'Data Sources Datasets Delete']
 - ['users_data-sources-datasets-get.md', 'Users', 'Data Sources Datasets Get']
 - ['users_data-sources-datasets-patch.md', 'Users', 'Data Sources Datasets Patch']
+- ['users_data-sources-delete.md', 'Users', 'Data Sources Delete']
 - ['users_data-sources-get.md', 'Users', 'Data Sources Get']
 - ['users_data-sources-list.md', 'Users', 'Data Sources List']
 - ['users_data-sources-patch.md', 'Users', 'Data Sources Patch']

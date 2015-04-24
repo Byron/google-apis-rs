@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *oauth2* crate version *0.1.5+20150319*, where *20150319* is the exact revision of the *oauth2:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *oauth2* crate version *0.1.5+20150416*, where *20150416* is the exact revision of the *oauth2:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *oauth2* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/accounts/docs/OAuth2).
@@ -348,17 +348,17 @@ impl<'a, C, A> Oauth2<C, A>
 pub struct JwkKeys {
     /// no description provided
     #[serde(rename="use")]
-    pub use_: String,
+    pub use_: Option<String>,
     /// no description provided
-    pub e: String,
+    pub e: Option<String>,
     /// no description provided
-    pub kty: String,
+    pub kty: Option<String>,
     /// no description provided
-    pub alg: String,
+    pub alg: Option<String>,
     /// no description provided
-    pub kid: String,
+    pub kid: Option<String>,
     /// no description provided
-    pub n: String,
+    pub n: Option<String>,
 }
 
 impl NestedType for JwkKeys {}
@@ -377,7 +377,7 @@ impl Part for JwkKeys {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Jwk {
     /// no description provided
-    pub keys: Vec<JwkKeys>,
+    pub keys: Option<Vec<JwkKeys>>,
 }
 
 impl ResponseResult for Jwk {}
@@ -396,27 +396,27 @@ impl ResponseResult for Jwk {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Userinfoplus {
     /// The user's last name.
-    pub family_name: String,
+    pub family_name: Option<String>,
     /// The user's full name.
-    pub name: String,
+    pub name: Option<String>,
     /// URL of the user's picture image.
-    pub picture: String,
+    pub picture: Option<String>,
     /// The user's preferred locale.
-    pub locale: String,
+    pub locale: Option<String>,
     /// The user's gender.
-    pub gender: String,
+    pub gender: Option<String>,
     /// The obfuscated ID of the user.
-    pub id: String,
+    pub id: Option<String>,
     /// URL of the profile page.
-    pub link: String,
+    pub link: Option<String>,
     /// The user's first name.
-    pub given_name: String,
+    pub given_name: Option<String>,
     /// The user's email address.
-    pub email: String,
+    pub email: Option<String>,
     /// The hosted domain e.g. example.com if the user is Google apps user.
-    pub hd: String,
+    pub hd: Option<String>,
     /// Boolean flag which is true if the email address is verified. Always verified because we only return the user's primary email address.
-    pub verified_email: bool,
+    pub verified_email: Option<bool>,
 }
 
 impl ResponseResult for Userinfoplus {}
@@ -434,23 +434,23 @@ impl ResponseResult for Userinfoplus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tokeninfo {
     /// To whom was the token issued to. In general the same as audience.
-    pub issued_to: String,
+    pub issued_to: Option<String>,
     /// The token handle associated with this token.
-    pub token_handle: String,
+    pub token_handle: Option<String>,
     /// The expiry time of the token, as number of seconds left until expiry.
-    pub expires_in: i32,
+    pub expires_in: Option<i32>,
     /// The access type granted with this token. It can be offline or online.
-    pub access_type: String,
+    pub access_type: Option<String>,
     /// Who is the intended audience for this token. In general the same as issued_to.
-    pub audience: String,
+    pub audience: Option<String>,
     /// The space separated list of scopes granted to this token.
-    pub scope: String,
+    pub scope: Option<String>,
     /// The obfuscated user id.
-    pub user_id: String,
+    pub user_id: Option<String>,
     /// The email address of the user. Present only if the email scope is present in the request.
-    pub email: String,
+    pub email: Option<String>,
     /// Boolean flag which is true if the email address is verified. Present only if the email scope is present in the request.
-    pub verified_email: bool,
+    pub verified_email: Option<bool>,
 }
 
 impl ResponseResult for Tokeninfo {}
@@ -666,16 +666,20 @@ impl<'a, C, A> UserinfoV2MeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -858,16 +862,20 @@ impl<'a, C, A> UserinfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

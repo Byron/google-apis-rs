@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *datastore* crate version *0.1.5+20140916*, where *20140916* is the exact revision of the *datastore:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *datastore* crate version *0.1.5+20150402*, where *20150402* is the exact revision of the *datastore:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *datastore* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/datastore/).
@@ -94,7 +94,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: LookupRequest = Default::default();
+//! let mut req = LookupRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -277,7 +277,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LookupRequest = Default::default();
+/// let mut req = LookupRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -349,10 +349,10 @@ impl<'a, C, A> Datastore<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PartitionId {
     /// The namespace.
-    pub namespace: String,
+    pub namespace: Option<String>,
     /// The dataset ID.
     #[serde(rename="datasetId")]
-    pub dataset_id: String,
+    pub dataset_id: Option<String>,
 }
 
 impl Part for PartitionId {}
@@ -370,9 +370,9 @@ impl Part for PartitionId {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AllocateIdsResponse {
     /// The keys specified in the request (in the same order), each with its key path completed with a newly allocated ID.
-    pub keys: Vec<Key>,
+    pub keys: Option<Vec<Key>>,
     /// no description provided
-    pub header: ResponseHeader,
+    pub header: Option<ResponseHeader>,
 }
 
 impl ResponseResult for AllocateIdsResponse {}
@@ -411,9 +411,9 @@ impl RequestValue for LookupRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BeginTransactionResponse {
     /// no description provided
-    pub header: ResponseHeader,
+    pub header: Option<ResponseHeader>,
     /// The transaction identifier (always present).
-    pub transaction: String,
+    pub transaction: Option<String>,
 }
 
 impl ResponseResult for BeginTransactionResponse {}
@@ -449,9 +449,9 @@ impl RequestValue for AllocateIdsRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RunQueryResponse {
     /// no description provided
-    pub header: ResponseHeader,
+    pub header: Option<ResponseHeader>,
     /// A batch of query results (always present).
-    pub batch: QueryResultBatch,
+    pub batch: Option<QueryResultBatch>,
 }
 
 impl ResponseResult for RunQueryResponse {}
@@ -464,18 +464,18 @@ impl ResponseResult for RunQueryResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Mutation {
     /// Entities to insert. Each inserted entity's key must have a complete path and must not be reserved/read-only.
-    pub insert: Vec<Entity>,
+    pub insert: Option<Vec<Entity>>,
     /// Ignore a user specified read-only period. Optional.
-    pub force: bool,
+    pub force: Option<bool>,
     /// Insert entities with a newly allocated ID. Each inserted entity's key must omit the final identifier in its path and must not be reserved/read-only.
     #[serde(rename="insertAutoId")]
-    pub insert_auto_id: Vec<Entity>,
+    pub insert_auto_id: Option<Vec<Entity>>,
     /// Keys of entities to delete. Each key must have a complete key path and must not be reserved/read-only.
-    pub delete: Vec<Key>,
+    pub delete: Option<Vec<Key>>,
     /// Entities to update. Each updated entity's key must have a complete path and must not be reserved/read-only.
-    pub update: Vec<Entity>,
+    pub update: Option<Vec<Entity>>,
     /// Entities to upsert. Each upserted entity's key must have a complete path and must not be reserved/read-only.
-    pub upsert: Vec<Entity>,
+    pub upsert: Option<Vec<Entity>>,
 }
 
 impl Part for Mutation {}
@@ -493,10 +493,10 @@ impl Part for Mutation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommitResponse {
     /// no description provided
-    pub header: ResponseHeader,
+    pub header: Option<ResponseHeader>,
     /// The result of performing the mutation (if any).
     #[serde(rename="mutationResult")]
-    pub mutation_result: MutationResult,
+    pub mutation_result: Option<MutationResult>,
 }
 
 impl ResponseResult for CommitResponse {}
@@ -510,19 +510,19 @@ impl ResponseResult for CommitResponse {}
 pub struct QueryResultBatch {
     /// The state of the query after the current batch. One of notFinished, moreResultsAfterLimit, noMoreResults.
     #[serde(rename="moreResults")]
-    pub more_results: String,
+    pub more_results: Option<String>,
     /// The number of results skipped because of Query.offset.
     #[serde(rename="skippedResults")]
-    pub skipped_results: i32,
+    pub skipped_results: Option<i32>,
     /// A cursor that points to the position after the last result in the batch. May be absent. TODO(arfuller): Once all plans produce cursors update documentation here.
     #[serde(rename="endCursor")]
-    pub end_cursor: String,
+    pub end_cursor: Option<String>,
     /// The results for this batch.
     #[serde(rename="entityResults")]
-    pub entity_results: Vec<EntityResult>,
+    pub entity_results: Option<Vec<EntityResult>>,
     /// The result type for every entity in entityResults. full for full entities, projection for entities with only projected properties, keyOnly for entities with only a key.
     #[serde(rename="entityResultType")]
-    pub entity_result_type: String,
+    pub entity_result_type: Option<String>,
 }
 
 impl Part for QueryResultBatch {}
@@ -535,7 +535,7 @@ impl Part for QueryResultBatch {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PropertyReference {
     /// The name of the property.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for PropertyReference {}
@@ -548,7 +548,7 @@ impl Part for PropertyReference {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityResult {
     /// The resulting entity.
-    pub entity: Entity,
+    pub entity: Option<Entity>,
 }
 
 impl Part for EntityResult {}
@@ -566,7 +566,7 @@ impl Part for EntityResult {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollbackResponse {
     /// no description provided
-    pub header: ResponseHeader,
+    pub header: Option<ResponseHeader>,
 }
 
 impl ResponseResult for RollbackResponse {}
@@ -580,16 +580,16 @@ impl ResponseResult for RollbackResponse {}
 pub struct GqlQuery {
     /// When false, the query string must not contain a literal.
     #[serde(rename="allowLiteral")]
-    pub allow_literal: bool,
+    pub allow_literal: Option<bool>,
     /// A named argument must set field GqlQueryArg.name. No two named arguments may have the same name. For each non-reserved named binding site in the query string, there must be a named argument with that name, but not necessarily the inverse.
     #[serde(rename="nameArgs")]
-    pub name_args: Vec<GqlQueryArg>,
+    pub name_args: Option<Vec<GqlQueryArg>>,
     /// The query string.
     #[serde(rename="queryString")]
-    pub query_string: String,
+    pub query_string: Option<String>,
     /// Numbered binding site @1 references the first numbered argument, effectively using 1-based indexing, rather than the usual 0. A numbered argument must NOT set field GqlQueryArg.name. For each binding site numbered i in query_string, there must be an ith numbered argument. The inverse must also be true.
     #[serde(rename="numberArgs")]
-    pub number_args: Vec<GqlQueryArg>,
+    pub number_args: Option<Vec<GqlQueryArg>>,
 }
 
 impl Part for GqlQuery {}
@@ -602,10 +602,10 @@ impl Part for GqlQuery {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Key {
     /// The entity path. An entity path consists of one or more elements composed of a kind and a string or numerical identifier, which identify entities. The first element identifies a root entity, the second element identifies a child of the root entity, the third element a child of the second entity, and so forth. The entities identified by all prefixes of the path are called the element's ancestors. An entity path is always fully complete: ALL of the entity's ancestors are required to be in the path along with the entity identifier itself. The only exception is that in some documented cases, the identifier in the last path element (for the entity) itself may be omitted. A path can never be empty. The path can have at most 100 elements.
-    pub path: Vec<KeyPathElement>,
+    pub path: Option<Vec<KeyPathElement>>,
     /// Entities are partitioned into subsets, currently identified by a dataset (usually implicitly specified by the project) and namespace ID. Queries are scoped to a single partition.
     #[serde(rename="partitionId")]
-    pub partition_id: PartitionId,
+    pub partition_id: Option<PartitionId>,
 }
 
 impl Part for Key {}
@@ -619,9 +619,9 @@ impl Part for Key {}
 pub struct PropertyExpression {
     /// The aggregation function to apply to the property. Optional. Can only be used when grouping by at least one property. Must then be set on all properties in the projection that are not being grouped by. Aggregation functions: first selects the first result as determined by the query's order.
     #[serde(rename="aggregationFunction")]
-    pub aggregation_function: String,
+    pub aggregation_function: Option<String>,
     /// The property to project.
-    pub property: PropertyReference,
+    pub property: Option<PropertyReference>,
 }
 
 impl Part for PropertyExpression {}
@@ -635,10 +635,10 @@ impl Part for PropertyExpression {}
 pub struct MutationResult {
     /// Keys for insertAutoId entities. One per entity from the request, in the same order.
     #[serde(rename="insertAutoIdKeys")]
-    pub insert_auto_id_keys: Vec<Key>,
+    pub insert_auto_id_keys: Option<Vec<Key>>,
     /// Number of index writes.
     #[serde(rename="indexUpdates")]
-    pub index_updates: i32,
+    pub index_updates: Option<i32>,
 }
 
 impl Part for MutationResult {}
@@ -651,10 +651,10 @@ impl Part for MutationResult {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ReadOptions {
     /// The transaction to use. Optional.
-    pub transaction: String,
+    pub transaction: Option<String>,
     /// The read consistency to use. One of default, strong, or eventual. Cannot be set when transaction is set. Lookup and ancestor queries default to strong, global queries default to eventual and cannot be set to strong. Optional. Default is default.
     #[serde(rename="readConsistency")]
-    pub read_consistency: String,
+    pub read_consistency: Option<String>,
 }
 
 impl Part for ReadOptions {}
@@ -667,11 +667,11 @@ impl Part for ReadOptions {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PropertyFilter {
     /// The operator to filter by. One of lessThan, lessThanOrEqual, greaterThan, greaterThanOrEqual, equal, or hasAncestor.
-    pub operator: String,
+    pub operator: Option<String>,
     /// The property to filter by.
-    pub property: PropertyReference,
+    pub property: Option<PropertyReference>,
     /// The value to compare the property to.
-    pub value: Value,
+    pub value: Option<Value>,
 }
 
 impl Part for PropertyFilter {}
@@ -684,7 +684,7 @@ impl Part for PropertyFilter {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResponseHeader {
     /// Identifies what kind of resource this is. Value: the fixed string "datastore#responseHeader".
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl Part for ResponseHeader {}
@@ -698,40 +698,40 @@ impl Part for ResponseHeader {}
 pub struct Value {
     /// An entity value. May have no key. May have a key with an incomplete key path. May have a reserved/read-only key.
     #[serde(rename="entityValue")]
-    pub entity_value: Entity,
+    pub entity_value: Option<Entity>,
     /// A double value.
     #[serde(rename="doubleValue")]
-    pub double_value: f64,
+    pub double_value: Option<f64>,
     /// A blob key value.
     #[serde(rename="blobKeyValue")]
-    pub blob_key_value: String,
+    pub blob_key_value: Option<String>,
     /// The meaning field is reserved and should not be used.
-    pub meaning: i32,
+    pub meaning: Option<i32>,
     /// A timestamp value.
     #[serde(rename="dateTimeValue")]
-    pub date_time_value: String,
+    pub date_time_value: Option<String>,
     /// A key value.
     #[serde(rename="keyValue")]
-    pub key_value: Key,
-    /// A blob value. May be a maximum of 1,000,000 bytes.
+    pub key_value: Option<Key>,
+    /// A blob value. May be a maximum of 1,000,000 bytes. When indexed is true, may have at most 500 bytes.
     #[serde(rename="blobValue")]
-    pub blob_value: String,
+    pub blob_value: Option<String>,
     /// If the value should be indexed.
     /// 
     /// The indexed property may be set for a null value. When indexed is true, stringValue is limited to 500 characters and the blob value is limited to 500 bytes. Input values by default have indexed set to true; however, you can explicitly set indexed to true if you want. (An output value never has indexed explicitly set to true.) If a value is itself an entity, it cannot have indexed set to true.
-    pub indexed: bool,
-    /// A UTF-8 encoded string value.
+    pub indexed: Option<bool>,
+    /// A UTF-8 encoded string value. When indexed is true, may have at most 500 characters.
     #[serde(rename="stringValue")]
-    pub string_value: String,
-    /// A list value. Cannot contain another list value. Cannot also have a meaning and indexing set.
+    pub string_value: Option<String>,
+    /// A list value. Cannot contain another list value. A Value instance that sets field list_value must not set field meaning or field indexed.
     #[serde(rename="listValue")]
-    pub list_value: Vec<Value>,
+    pub list_value: Option<Vec<Value>>,
     /// A boolean value.
     #[serde(rename="booleanValue")]
-    pub boolean_value: bool,
+    pub boolean_value: Option<bool>,
     /// An integer value.
     #[serde(rename="integerValue")]
-    pub integer_value: String,
+    pub integer_value: Option<String>,
 }
 
 impl Part for Value {}
@@ -745,10 +745,10 @@ impl Part for Value {}
 pub struct Filter {
     /// A composite filter.
     #[serde(rename="compositeFilter")]
-    pub composite_filter: CompositeFilter,
+    pub composite_filter: Option<CompositeFilter>,
     /// A filter on a property.
     #[serde(rename="propertyFilter")]
-    pub property_filter: PropertyFilter,
+    pub property_filter: Option<PropertyFilter>,
 }
 
 impl Part for Filter {}
@@ -763,11 +763,11 @@ impl Part for Filter {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct KeyPathElement {
     /// The kind of the entity. A kind matching regex "__.*__" is reserved/read-only. A kind must not contain more than 500 characters. Cannot be "".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The ID of the entity. Never equal to zero. Values less than zero are discouraged and will not be supported in the future.
-    pub id: String,
+    pub id: Option<String>,
     /// The name of the entity. A name matching regex "__.*__" is reserved/read-only. A name must not be more than 500 characters. Cannot be "".
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for KeyPathElement {}
@@ -781,40 +781,40 @@ impl Part for KeyPathElement {}
 pub struct Property {
     /// An entity value. May have no key. May have a key with an incomplete key path. May have a reserved/read-only key.
     #[serde(rename="entityValue")]
-    pub entity_value: Entity,
+    pub entity_value: Option<Entity>,
     /// A double value.
     #[serde(rename="doubleValue")]
-    pub double_value: f64,
+    pub double_value: Option<f64>,
     /// A blob key value.
     #[serde(rename="blobKeyValue")]
-    pub blob_key_value: String,
+    pub blob_key_value: Option<String>,
     /// The meaning field is reserved and should not be used.
-    pub meaning: i32,
+    pub meaning: Option<i32>,
     /// A timestamp value.
     #[serde(rename="dateTimeValue")]
-    pub date_time_value: String,
+    pub date_time_value: Option<String>,
     /// A key value.
     #[serde(rename="keyValue")]
-    pub key_value: Key,
-    /// A blob value. May be a maximum of 1,000,000 bytes.
+    pub key_value: Option<Key>,
+    /// A blob value. May be a maximum of 1,000,000 bytes. When indexed is true, may have at most 500 bytes.
     #[serde(rename="blobValue")]
-    pub blob_value: String,
+    pub blob_value: Option<String>,
     /// If the value should be indexed.
     /// 
     /// The indexed property may be set for a null value. When indexed is true, stringValue is limited to 500 characters and the blob value is limited to 500 bytes. Input values by default have indexed set to true; however, you can explicitly set indexed to true if you want. (An output value never has indexed explicitly set to true.) If a value is itself an entity, it cannot have indexed set to true.
-    pub indexed: bool,
-    /// A UTF-8 encoded string value.
+    pub indexed: Option<bool>,
+    /// A UTF-8 encoded string value. When indexed is true, may have at most 500 characters.
     #[serde(rename="stringValue")]
-    pub string_value: String,
-    /// A list value. Cannot contain another list value. Cannot also have a meaning and indexing set.
+    pub string_value: Option<String>,
+    /// A list value. Cannot contain another list value. A Value instance that sets field list_value must not set field meaning or field indexed.
     #[serde(rename="listValue")]
-    pub list_value: Vec<Value>,
+    pub list_value: Option<Vec<Value>>,
     /// A boolean value.
     #[serde(rename="booleanValue")]
-    pub boolean_value: bool,
+    pub boolean_value: Option<bool>,
     /// An integer value.
     #[serde(rename="integerValue")]
-    pub integer_value: String,
+    pub integer_value: Option<String>,
 }
 
 impl Part for Property {}
@@ -832,13 +832,13 @@ impl Part for Property {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LookupResponse {
     /// Entities found.
-    pub found: Vec<EntityResult>,
+    pub found: Option<Vec<EntityResult>>,
     /// no description provided
-    pub header: ResponseHeader,
+    pub header: Option<ResponseHeader>,
     /// A list of keys that were not looked up due to resource constraints.
-    pub deferred: Vec<Key>,
+    pub deferred: Option<Vec<Key>>,
     /// Entities not found, with only the key populated.
-    pub missing: Vec<EntityResult>,
+    pub missing: Option<Vec<EntityResult>>,
 }
 
 impl ResponseResult for LookupResponse {}
@@ -851,9 +851,9 @@ impl ResponseResult for LookupResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct CompositeFilter {
     /// The operator for combining multiple filters. Only "and" is currently supported.
-    pub operator: String,
+    pub operator: Option<String>,
     /// The list of filters to combine. Must contain at least one filter.
-    pub filters: Vec<Filter>,
+    pub filters: Option<Vec<Filter>>,
 }
 
 impl Part for CompositeFilter {}
@@ -918,7 +918,7 @@ impl RequestValue for RunQueryRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct KindExpression {
     /// The name of the kind.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for KindExpression {}
@@ -931,11 +931,11 @@ impl Part for KindExpression {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct GqlQueryArg {
     /// no description provided
-    pub cursor: String,
+    pub cursor: Option<String>,
     /// Must match regex "[A-Za-z_$][A-Za-z_$0-9]*". Must not match regex "__.*__". Must not be "".
-    pub name: String,
+    pub name: Option<String>,
     /// no description provided
-    pub value: Value,
+    pub value: Option<Value>,
 }
 
 impl Part for GqlQueryArg {}
@@ -948,11 +948,11 @@ impl Part for GqlQueryArg {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Entity {
     /// The entity's properties.
-    pub properties: HashMap<String, Property>,
+    pub properties: Option<HashMap<String, Property>>,
     /// The entity's key.
     /// 
     /// An entity must have a key, unless otherwise documented (for example, an entity in Value.entityValue may have no key). An entity's kind is its key's path's last element's kind, or null if it has no key.
-    pub key: Key,
+    pub key: Option<Key>,
 }
 
 impl Part for Entity {}
@@ -1002,9 +1002,9 @@ impl RequestValue for BeginTransactionRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PropertyOrder {
     /// The direction to order by. One of ascending or descending. Optional, defaults to ascending.
-    pub direction: String,
+    pub direction: Option<String>,
     /// The property to order by.
-    pub property: PropertyReference,
+    pub property: Option<PropertyReference>,
 }
 
 impl Part for PropertyOrder {}
@@ -1018,25 +1018,25 @@ impl Part for PropertyOrder {}
 pub struct Query {
     /// A starting point for the query results. Optional. Query cursors are returned in query result batches.
     #[serde(rename="startCursor")]
-    pub start_cursor: String,
+    pub start_cursor: Option<String>,
     /// The kinds to query (if empty, returns entities from all kinds).
-    pub kinds: Vec<KindExpression>,
+    pub kinds: Option<Vec<KindExpression>>,
     /// The projection to return. If not set the entire entity is returned.
-    pub projection: Vec<PropertyExpression>,
+    pub projection: Option<Vec<PropertyExpression>>,
     /// The properties to group by (if empty, no grouping is applied to the result set).
     #[serde(rename="groupBy")]
-    pub group_by: Vec<PropertyReference>,
+    pub group_by: Option<Vec<PropertyReference>>,
     /// The filter to apply (optional).
-    pub filter: Filter,
+    pub filter: Option<Filter>,
     /// The maximum number of results to return. Applies after all other constraints. Optional.
-    pub limit: i32,
+    pub limit: Option<i32>,
     /// The number of results to skip. Applies before limit, but after all other constraints (optional, defaults to 0).
-    pub offset: i32,
+    pub offset: Option<i32>,
     /// An ending point for the query results. Optional. Query cursors are returned in query result batches.
     #[serde(rename="endCursor")]
-    pub end_cursor: String,
+    pub end_cursor: Option<String>,
     /// The order to apply to the query results (if empty, order is unspecified).
-    pub order: Vec<PropertyOrder>,
+    pub order: Option<Vec<PropertyOrder>>,
 }
 
 impl Part for Query {}
@@ -1235,7 +1235,7 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: CommitRequest = Default::default();
+/// let mut req = CommitRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1327,16 +1327,20 @@ impl<'a, C, A> DatasetCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1489,7 +1493,7 @@ impl<'a, C, A> DatasetCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AllocateIdsRequest = Default::default();
+/// let mut req = AllocateIdsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1581,16 +1585,20 @@ impl<'a, C, A> DatasetAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1743,7 +1751,7 @@ impl<'a, C, A> DatasetAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: RollbackRequest = Default::default();
+/// let mut req = RollbackRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1835,16 +1843,20 @@ impl<'a, C, A> DatasetRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1997,7 +2009,7 @@ impl<'a, C, A> DatasetRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: LookupRequest = Default::default();
+/// let mut req = LookupRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2089,16 +2101,20 @@ impl<'a, C, A> DatasetLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2251,7 +2267,7 @@ impl<'a, C, A> DatasetLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: RunQueryRequest = Default::default();
+/// let mut req = RunQueryRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2343,16 +2359,20 @@ impl<'a, C, A> DatasetRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2505,7 +2525,7 @@ impl<'a, C, A> DatasetRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: BeginTransactionRequest = Default::default();
+/// let mut req = BeginTransactionRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2597,16 +2617,20 @@ impl<'a, C, A> DatasetBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

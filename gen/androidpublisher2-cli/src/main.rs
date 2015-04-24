@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -82,6 +83,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -106,7 +113,7 @@ impl Engine {
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
         let mut call = self.hub.edits().apklistings_delete(&self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -137,7 +144,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -149,7 +155,7 @@ impl Engine {
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
         let mut call = self.hub.edits().apklistings_deleteall(&self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -180,7 +186,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -192,7 +197,7 @@ impl Engine {
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
         let mut call = self.hub.edits().apklistings_get(&self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -224,8 +229,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -237,7 +241,7 @@ impl Engine {
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
         let mut call = self.hub.edits().apklistings_list(&self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -269,8 +273,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -279,11 +282,11 @@ impl Engine {
 
     fn _edits_apklistings_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ApkListing = Default::default();
+        let mut request = api::ApkListing::default();
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
         let mut call = self.hub.edits().apklistings_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -303,9 +306,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -333,8 +337,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -343,11 +346,11 @@ impl Engine {
 
     fn _edits_apklistings_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ApkListing = Default::default();
+        let mut request = api::ApkListing::default();
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
         let mut call = self.hub.edits().apklistings_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -367,9 +370,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -397,8 +401,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -407,10 +410,10 @@ impl Engine {
 
     fn _edits_apks_addexternallyhosted(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ApksAddExternallyHostedRequest = Default::default();
+        let mut request = api::ApksAddExternallyHostedRequest::default();
         let mut call = self.hub.edits().apks_addexternallyhosted(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -430,9 +433,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -445,59 +449,68 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "externally-hosted-apk.icon-base64" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().icon_base64 = value.unwrap_or("").to_string();
+                        request.externally_hosted_apk.as_mut().unwrap().icon_base64 = Some(value.unwrap_or("").to_string());
                     },
                 "externally-hosted-apk.certificate-base64s" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().certificate_base64s.push(value.unwrap_or("").to_string());
+                        if request.externally_hosted_apk.as_mut().unwrap().certificate_base64s.is_none() {
+                           request.externally_hosted_apk.as_mut().unwrap().certificate_base64s = Some(Default::default());
+                        }
+                                        request.externally_hosted_apk.as_mut().unwrap().certificate_base64s.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "externally-hosted-apk.externally-hosted-url" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().externally_hosted_url = value.unwrap_or("").to_string();
+                        request.externally_hosted_apk.as_mut().unwrap().externally_hosted_url = Some(value.unwrap_or("").to_string());
                     },
                 "externally-hosted-apk.maximum-sdk" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().maximum_sdk = arg_from_str(value.unwrap_or("-0"), err, "externally-hosted-apk.maximum-sdk", "integer");
+                        request.externally_hosted_apk.as_mut().unwrap().maximum_sdk = Some(arg_from_str(value.unwrap_or("-0"), err, "externally-hosted-apk.maximum-sdk", "integer"));
                     },
                 "externally-hosted-apk.file-sha256-base64" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().file_sha256_base64 = value.unwrap_or("").to_string();
+                        request.externally_hosted_apk.as_mut().unwrap().file_sha256_base64 = Some(value.unwrap_or("").to_string());
                     },
                 "externally-hosted-apk.file-sha1-base64" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().file_sha1_base64 = value.unwrap_or("").to_string();
+                        request.externally_hosted_apk.as_mut().unwrap().file_sha1_base64 = Some(value.unwrap_or("").to_string());
                     },
                 "externally-hosted-apk.uses-features" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().uses_features.push(value.unwrap_or("").to_string());
+                        if request.externally_hosted_apk.as_mut().unwrap().uses_features.is_none() {
+                           request.externally_hosted_apk.as_mut().unwrap().uses_features = Some(Default::default());
+                        }
+                                        request.externally_hosted_apk.as_mut().unwrap().uses_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "externally-hosted-apk.file-size" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().file_size = value.unwrap_or("").to_string();
+                        request.externally_hosted_apk.as_mut().unwrap().file_size = Some(value.unwrap_or("").to_string());
                     },
                 "externally-hosted-apk.version-name" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().version_name = value.unwrap_or("").to_string();
+                        request.externally_hosted_apk.as_mut().unwrap().version_name = Some(value.unwrap_or("").to_string());
                     },
                 "externally-hosted-apk.version-code" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().version_code = arg_from_str(value.unwrap_or("-0"), err, "externally-hosted-apk.version-code", "integer");
+                        request.externally_hosted_apk.as_mut().unwrap().version_code = Some(arg_from_str(value.unwrap_or("-0"), err, "externally-hosted-apk.version-code", "integer"));
                     },
                 "externally-hosted-apk.package-name" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().package_name = value.unwrap_or("").to_string();
+                        request.externally_hosted_apk.as_mut().unwrap().package_name = Some(value.unwrap_or("").to_string());
                     },
                 "externally-hosted-apk.minimum-sdk" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().minimum_sdk = arg_from_str(value.unwrap_or("-0"), err, "externally-hosted-apk.minimum-sdk", "integer");
+                        request.externally_hosted_apk.as_mut().unwrap().minimum_sdk = Some(arg_from_str(value.unwrap_or("-0"), err, "externally-hosted-apk.minimum-sdk", "integer"));
                     },
                 "externally-hosted-apk.application-label" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().application_label = value.unwrap_or("").to_string();
+                        request.externally_hosted_apk.as_mut().unwrap().application_label = Some(value.unwrap_or("").to_string());
                     },
                 "externally-hosted-apk.native-codes" => {
                         request_externally_hosted_apk_init(&mut request);
-                        request.externally_hosted_apk.as_mut().unwrap().native_codes.push(value.unwrap_or("").to_string());
+                        if request.externally_hosted_apk.as_mut().unwrap().native_codes.is_none() {
+                           request.externally_hosted_apk.as_mut().unwrap().native_codes = Some(Default::default());
+                        }
+                                        request.externally_hosted_apk.as_mut().unwrap().native_codes.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -516,8 +529,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -528,7 +540,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().apks_list(&self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -560,8 +572,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -572,7 +583,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().apks_upload(&self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -614,8 +625,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -626,7 +636,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().commit(&self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -658,8 +668,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -670,7 +679,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().delete(&self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -701,7 +710,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -712,7 +720,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().details_get(&self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -744,8 +752,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -754,10 +761,10 @@ impl Engine {
 
     fn _edits_details_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AppDetails = Default::default();
+        let mut request = api::AppDetails::default();
         let mut call = self.hub.edits().details_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -777,9 +784,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -813,8 +821,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -823,10 +830,10 @@ impl Engine {
 
     fn _edits_details_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AppDetails = Default::default();
+        let mut request = api::AppDetails::default();
         let mut call = self.hub.edits().details_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -846,9 +853,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -882,8 +890,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -895,7 +902,7 @@ impl Engine {
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
         let mut call = self.hub.edits().expansionfiles_get(&self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_expansion_file_type);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -927,8 +934,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -937,11 +943,11 @@ impl Engine {
 
     fn _edits_expansionfiles_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ExpansionFile = Default::default();
+        let mut request = api::ExpansionFile::default();
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
         let mut call = self.hub.edits().expansionfiles_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_expansion_file_type);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -961,9 +967,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -991,8 +998,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1001,11 +1007,11 @@ impl Engine {
 
     fn _edits_expansionfiles_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::ExpansionFile = Default::default();
+        let mut request = api::ExpansionFile::default();
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
         let mut call = self.hub.edits().expansionfiles_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_expansion_file_type);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1025,9 +1031,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1055,8 +1062,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1068,7 +1074,7 @@ impl Engine {
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
         let mut call = self.hub.edits().expansionfiles_upload(&self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_expansion_file_type);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1110,8 +1116,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1122,7 +1127,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().get(&self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1154,8 +1159,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1166,7 +1170,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().images_delete(&self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language, &self.opt.arg_image_type, &self.opt.arg_image_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1197,7 +1201,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1208,7 +1211,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().images_deleteall(&self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language, &self.opt.arg_image_type);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1240,8 +1243,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1252,7 +1254,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().images_list(&self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language, &self.opt.arg_image_type);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1284,8 +1286,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1296,7 +1297,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().images_upload(&self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language, &self.opt.arg_image_type);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1338,8 +1339,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1348,10 +1348,10 @@ impl Engine {
 
     fn _edits_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::AppEdit = Default::default();
+        let mut request = api::AppEdit::default();
         let mut call = self.hub.edits().insert(&request, &self.opt.arg_package_name);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1371,9 +1371,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1401,8 +1402,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1413,7 +1413,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().listings_delete(&self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1444,7 +1444,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1455,7 +1454,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().listings_deleteall(&self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1486,7 +1485,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1497,7 +1495,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().listings_get(&self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1529,8 +1527,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1541,7 +1538,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().listings_list(&self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1573,8 +1570,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1583,10 +1579,10 @@ impl Engine {
 
     fn _edits_listings_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Listing = Default::default();
+        let mut request = api::Listing::default();
         let mut call = self.hub.edits().listings_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1606,9 +1602,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1645,8 +1642,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1655,10 +1651,10 @@ impl Engine {
 
     fn _edits_listings_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Listing = Default::default();
+        let mut request = api::Listing::default();
         let mut call = self.hub.edits().listings_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1678,9 +1674,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1717,8 +1714,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1729,7 +1725,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().testers_get(&self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1761,8 +1757,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1771,10 +1766,10 @@ impl Engine {
 
     fn _edits_testers_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Testers = Default::default();
+        let mut request = api::Testers::default();
         let mut call = self.hub.edits().testers_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1794,24 +1789,25 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "google-groups" => {
                         if request.google_groups.is_none() {
-                            request.google_groups = Some(Default::default());
+                           request.google_groups = Some(Default::default());
                         }
-                        request.google_groups.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.google_groups.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "google-plus-communities" => {
                         if request.google_plus_communities.is_none() {
-                            request.google_plus_communities = Some(Default::default());
+                           request.google_plus_communities = Some(Default::default());
                         }
-                        request.google_plus_communities.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.google_plus_communities.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -1830,8 +1826,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1840,10 +1835,10 @@ impl Engine {
 
     fn _edits_testers_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Testers = Default::default();
+        let mut request = api::Testers::default();
         let mut call = self.hub.edits().testers_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1863,24 +1858,25 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
             match &field_name.to_string()[..] {
                 "google-groups" => {
                         if request.google_groups.is_none() {
-                            request.google_groups = Some(Default::default());
+                           request.google_groups = Some(Default::default());
                         }
-                        request.google_groups.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.google_groups.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "google-plus-communities" => {
                         if request.google_plus_communities.is_none() {
-                            request.google_plus_communities = Some(Default::default());
+                           request.google_plus_communities = Some(Default::default());
                         }
-                        request.google_plus_communities.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.google_plus_communities.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -1899,8 +1895,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1911,7 +1906,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().tracks_get(&self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1943,8 +1938,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1955,7 +1949,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().tracks_list(&self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1987,8 +1981,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1997,10 +1990,10 @@ impl Engine {
 
     fn _edits_tracks_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Track = Default::default();
+        let mut request = api::Track::default();
         let mut call = self.hub.edits().tracks_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2020,9 +2013,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2035,9 +2029,9 @@ impl Engine {
                     },
                 "version-codes" => {
                         if request.version_codes.is_none() {
-                            request.version_codes = Some(Default::default());
+                           request.version_codes = Some(Default::default());
                         }
-                        request.version_codes.as_mut().unwrap().push(arg_from_str(value.unwrap_or("-0"), err, "version-codes", "integer"));
+                                        request.version_codes.as_mut().unwrap().push(arg_from_str(value.unwrap_or("-0"), err, "version-codes", "integer"));
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -2056,8 +2050,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2066,10 +2059,10 @@ impl Engine {
 
     fn _edits_tracks_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Track = Default::default();
+        let mut request = api::Track::default();
         let mut call = self.hub.edits().tracks_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2089,9 +2082,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2104,9 +2098,9 @@ impl Engine {
                     },
                 "version-codes" => {
                         if request.version_codes.is_none() {
-                            request.version_codes = Some(Default::default());
+                           request.version_codes = Some(Default::default());
                         }
-                        request.version_codes.as_mut().unwrap().push(arg_from_str(value.unwrap_or("-0"), err, "version-codes", "integer"));
+                                        request.version_codes.as_mut().unwrap().push(arg_from_str(value.unwrap_or("-0"), err, "version-codes", "integer"));
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -2125,8 +2119,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2137,7 +2130,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.edits().validate(&self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2169,8 +2162,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2179,10 +2171,10 @@ impl Engine {
 
     fn _inappproducts_batch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::InappproductsBatchRequest = Default::default();
+        let mut request = api::InappproductsBatchRequest::default();
         let mut call = self.hub.inappproducts().batch(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2202,9 +2194,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2226,8 +2219,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2238,7 +2230,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.inappproducts().delete(&self.opt.arg_package_name, &self.opt.arg_sku);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2269,7 +2261,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2280,7 +2271,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.inappproducts().get(&self.opt.arg_package_name, &self.opt.arg_sku);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2312,8 +2303,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2322,10 +2312,10 @@ impl Engine {
 
     fn _inappproducts_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::InAppProduct = Default::default();
+        let mut request = api::InAppProduct::default();
         let mut call = self.hub.inappproducts().insert(&request, &self.opt.arg_package_name);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "auto-convert-missing-prices" => {
                     call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
@@ -2348,9 +2338,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2360,9 +2351,23 @@ impl Engine {
                 }
             }
             
+            fn request_season_end_init(request: &mut api::InAppProduct) {
+                request_season_init(request);
+                if request.season.as_mut().unwrap().end.is_none() {
+                    request.season.as_mut().unwrap().end = Some(Default::default());
+                }
+            }
+            
             fn request_season_init(request: &mut api::InAppProduct) {
                 if request.season.is_none() {
                     request.season = Some(Default::default());
+                }
+            }
+            
+            fn request_season_start_init(request: &mut api::InAppProduct) {
+                request_season_init(request);
+                if request.season.as_mut().unwrap().start.is_none() {
+                    request.season.as_mut().unwrap().start = Some(Default::default());
                 }
             }
             
@@ -2377,20 +2382,20 @@ impl Engine {
                         request.subscription_period = Some(value.unwrap_or("").to_string());
                     },
                 "season.start.day" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().start.day = arg_from_str(value.unwrap_or("-0"), err, "season.start.day", "integer");
+                        request_season_start_init(&mut request);
+                        request.season.as_mut().unwrap().start.as_mut().unwrap().day = Some(arg_from_str(value.unwrap_or("-0"), err, "season.start.day", "integer"));
                     },
                 "season.start.month" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().start.month = arg_from_str(value.unwrap_or("-0"), err, "season.start.month", "integer");
+                        request_season_start_init(&mut request);
+                        request.season.as_mut().unwrap().start.as_mut().unwrap().month = Some(arg_from_str(value.unwrap_or("-0"), err, "season.start.month", "integer"));
                     },
                 "season.end.day" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().end.day = arg_from_str(value.unwrap_or("-0"), err, "season.end.day", "integer");
+                        request_season_end_init(&mut request);
+                        request.season.as_mut().unwrap().end.as_mut().unwrap().day = Some(arg_from_str(value.unwrap_or("-0"), err, "season.end.day", "integer"));
                     },
                 "season.end.month" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().end.month = arg_from_str(value.unwrap_or("-0"), err, "season.end.month", "integer");
+                        request_season_end_init(&mut request);
+                        request.season.as_mut().unwrap().end.as_mut().unwrap().month = Some(arg_from_str(value.unwrap_or("-0"), err, "season.end.month", "integer"));
                     },
                 "package-name" => {
                         request_season_init(&mut request);
@@ -2410,11 +2415,11 @@ impl Engine {
                     },
                 "default-price.currency" => {
                         request_default_price_init(&mut request);
-                        request.default_price.as_mut().unwrap().currency = value.unwrap_or("").to_string();
+                        request.default_price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
                     },
                 "default-price.price-micros" => {
                         request_default_price_init(&mut request);
-                        request.default_price.as_mut().unwrap().price_micros = value.unwrap_or("").to_string();
+                        request.default_price.as_mut().unwrap().price_micros = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -2433,8 +2438,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2445,7 +2449,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.inappproducts().list(&self.opt.arg_package_name);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "token" => {
                     call = call.token(value.unwrap_or(""));
@@ -2486,8 +2490,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2496,10 +2499,10 @@ impl Engine {
 
     fn _inappproducts_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::InAppProduct = Default::default();
+        let mut request = api::InAppProduct::default();
         let mut call = self.hub.inappproducts().patch(&request, &self.opt.arg_package_name, &self.opt.arg_sku);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "auto-convert-missing-prices" => {
                     call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
@@ -2522,9 +2525,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2534,9 +2538,23 @@ impl Engine {
                 }
             }
             
+            fn request_season_end_init(request: &mut api::InAppProduct) {
+                request_season_init(request);
+                if request.season.as_mut().unwrap().end.is_none() {
+                    request.season.as_mut().unwrap().end = Some(Default::default());
+                }
+            }
+            
             fn request_season_init(request: &mut api::InAppProduct) {
                 if request.season.is_none() {
                     request.season = Some(Default::default());
+                }
+            }
+            
+            fn request_season_start_init(request: &mut api::InAppProduct) {
+                request_season_init(request);
+                if request.season.as_mut().unwrap().start.is_none() {
+                    request.season.as_mut().unwrap().start = Some(Default::default());
                 }
             }
             
@@ -2551,20 +2569,20 @@ impl Engine {
                         request.subscription_period = Some(value.unwrap_or("").to_string());
                     },
                 "season.start.day" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().start.day = arg_from_str(value.unwrap_or("-0"), err, "season.start.day", "integer");
+                        request_season_start_init(&mut request);
+                        request.season.as_mut().unwrap().start.as_mut().unwrap().day = Some(arg_from_str(value.unwrap_or("-0"), err, "season.start.day", "integer"));
                     },
                 "season.start.month" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().start.month = arg_from_str(value.unwrap_or("-0"), err, "season.start.month", "integer");
+                        request_season_start_init(&mut request);
+                        request.season.as_mut().unwrap().start.as_mut().unwrap().month = Some(arg_from_str(value.unwrap_or("-0"), err, "season.start.month", "integer"));
                     },
                 "season.end.day" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().end.day = arg_from_str(value.unwrap_or("-0"), err, "season.end.day", "integer");
+                        request_season_end_init(&mut request);
+                        request.season.as_mut().unwrap().end.as_mut().unwrap().day = Some(arg_from_str(value.unwrap_or("-0"), err, "season.end.day", "integer"));
                     },
                 "season.end.month" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().end.month = arg_from_str(value.unwrap_or("-0"), err, "season.end.month", "integer");
+                        request_season_end_init(&mut request);
+                        request.season.as_mut().unwrap().end.as_mut().unwrap().month = Some(arg_from_str(value.unwrap_or("-0"), err, "season.end.month", "integer"));
                     },
                 "package-name" => {
                         request_season_init(&mut request);
@@ -2584,11 +2602,11 @@ impl Engine {
                     },
                 "default-price.currency" => {
                         request_default_price_init(&mut request);
-                        request.default_price.as_mut().unwrap().currency = value.unwrap_or("").to_string();
+                        request.default_price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
                     },
                 "default-price.price-micros" => {
                         request_default_price_init(&mut request);
-                        request.default_price.as_mut().unwrap().price_micros = value.unwrap_or("").to_string();
+                        request.default_price.as_mut().unwrap().price_micros = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -2607,8 +2625,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2617,10 +2634,10 @@ impl Engine {
 
     fn _inappproducts_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::InAppProduct = Default::default();
+        let mut request = api::InAppProduct::default();
         let mut call = self.hub.inappproducts().update(&request, &self.opt.arg_package_name, &self.opt.arg_sku);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "auto-convert-missing-prices" => {
                     call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
@@ -2643,9 +2660,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2655,9 +2673,23 @@ impl Engine {
                 }
             }
             
+            fn request_season_end_init(request: &mut api::InAppProduct) {
+                request_season_init(request);
+                if request.season.as_mut().unwrap().end.is_none() {
+                    request.season.as_mut().unwrap().end = Some(Default::default());
+                }
+            }
+            
             fn request_season_init(request: &mut api::InAppProduct) {
                 if request.season.is_none() {
                     request.season = Some(Default::default());
+                }
+            }
+            
+            fn request_season_start_init(request: &mut api::InAppProduct) {
+                request_season_init(request);
+                if request.season.as_mut().unwrap().start.is_none() {
+                    request.season.as_mut().unwrap().start = Some(Default::default());
                 }
             }
             
@@ -2672,20 +2704,20 @@ impl Engine {
                         request.subscription_period = Some(value.unwrap_or("").to_string());
                     },
                 "season.start.day" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().start.day = arg_from_str(value.unwrap_or("-0"), err, "season.start.day", "integer");
+                        request_season_start_init(&mut request);
+                        request.season.as_mut().unwrap().start.as_mut().unwrap().day = Some(arg_from_str(value.unwrap_or("-0"), err, "season.start.day", "integer"));
                     },
                 "season.start.month" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().start.month = arg_from_str(value.unwrap_or("-0"), err, "season.start.month", "integer");
+                        request_season_start_init(&mut request);
+                        request.season.as_mut().unwrap().start.as_mut().unwrap().month = Some(arg_from_str(value.unwrap_or("-0"), err, "season.start.month", "integer"));
                     },
                 "season.end.day" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().end.day = arg_from_str(value.unwrap_or("-0"), err, "season.end.day", "integer");
+                        request_season_end_init(&mut request);
+                        request.season.as_mut().unwrap().end.as_mut().unwrap().day = Some(arg_from_str(value.unwrap_or("-0"), err, "season.end.day", "integer"));
                     },
                 "season.end.month" => {
-                        request_season_init(&mut request);
-                        request.season.as_mut().unwrap().end.month = arg_from_str(value.unwrap_or("-0"), err, "season.end.month", "integer");
+                        request_season_end_init(&mut request);
+                        request.season.as_mut().unwrap().end.as_mut().unwrap().month = Some(arg_from_str(value.unwrap_or("-0"), err, "season.end.month", "integer"));
                     },
                 "package-name" => {
                         request_season_init(&mut request);
@@ -2705,11 +2737,11 @@ impl Engine {
                     },
                 "default-price.currency" => {
                         request_default_price_init(&mut request);
-                        request.default_price.as_mut().unwrap().currency = value.unwrap_or("").to_string();
+                        request.default_price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
                     },
                 "default-price.price-micros" => {
                         request_default_price_init(&mut request);
-                        request.default_price.as_mut().unwrap().price_micros = value.unwrap_or("").to_string();
+                        request.default_price.as_mut().unwrap().price_micros = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -2728,8 +2760,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2740,7 +2771,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.purchases().products_get(&self.opt.arg_package_name, &self.opt.arg_product_id, &self.opt.arg_token);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2772,8 +2803,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2784,7 +2814,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.purchases().subscriptions_cancel(&self.opt.arg_package_name, &self.opt.arg_subscription_id, &self.opt.arg_token);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2815,7 +2845,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2824,10 +2853,10 @@ impl Engine {
 
     fn _purchases_subscriptions_defer(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::SubscriptionPurchasesDeferRequest = Default::default();
+        let mut request = api::SubscriptionPurchasesDeferRequest::default();
         let mut call = self.hub.purchases().subscriptions_defer(&request, &self.opt.arg_package_name, &self.opt.arg_subscription_id, &self.opt.arg_token);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2847,9 +2876,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2862,11 +2892,11 @@ impl Engine {
             match &field_name.to_string()[..] {
                 "deferral-info.expected-expiry-time-millis" => {
                         request_deferral_info_init(&mut request);
-                        request.deferral_info.as_mut().unwrap().expected_expiry_time_millis = value.unwrap_or("").to_string();
+                        request.deferral_info.as_mut().unwrap().expected_expiry_time_millis = Some(value.unwrap_or("").to_string());
                     },
                 "deferral-info.desired-expiry-time-millis" => {
                         request_deferral_info_init(&mut request);
-                        request.deferral_info.as_mut().unwrap().desired_expiry_time_millis = value.unwrap_or("").to_string();
+                        request.deferral_info.as_mut().unwrap().desired_expiry_time_millis = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
                     err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
@@ -2885,8 +2915,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2897,7 +2926,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.purchases().subscriptions_get(&self.opt.arg_package_name, &self.opt.arg_subscription_id, &self.opt.arg_token);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2929,8 +2958,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2941,7 +2969,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.purchases().subscriptions_refund(&self.opt.arg_package_name, &self.opt.arg_subscription_id, &self.opt.arg_token);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2972,7 +3000,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2983,7 +3010,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.purchases().subscriptions_revoke(&self.opt.arg_package_name, &self.opt.arg_subscription_id, &self.opt.arg_token);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -3014,7 +3041,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -3106,7 +3132,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_inappproducts {
+        }
+ else if self.opt.cmd_inappproducts {
             if self.opt.cmd_batch {
                 call_result = self._inappproducts_batch(dry_run, &mut err);
             } else if self.opt.cmd_delete {
@@ -3124,7 +3151,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_purchases {
+        }
+ else if self.opt.cmd_purchases {
             if self.opt.cmd_products_get {
                 call_result = self._purchases_products_get(dry_run, &mut err);
             } else if self.opt.cmd_subscriptions_cancel {
@@ -3160,21 +3188,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "androidpublisher2-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "androidpublisher2-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "androidpublisher2",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "androidpublisher2",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::AndroidPublisher::new(hyper::Client::new(), auth),
+            hub: api::AndroidPublisher::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -3194,12 +3238,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

@@ -7,6 +7,7 @@
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
+extern crate yup_hyper_mock as mock;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
@@ -64,6 +65,12 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed into 
+            the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
+            the same stream.
 ");
 
 mod cmn;
@@ -87,7 +94,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.column().delete(&self.opt.arg_table_id, &self.opt.arg_column_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -118,7 +125,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -129,7 +135,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.column().get(&self.opt.arg_table_id, &self.opt.arg_column_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -161,8 +167,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -171,10 +176,10 @@ impl Engine {
 
     fn _column_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Column = Default::default();
+        let mut request = api::Column::default();
         let mut call = self.hub.column().insert(&request, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -194,9 +199,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -215,20 +221,20 @@ impl Engine {
                     },
                 "valid-values" => {
                         if request.valid_values.is_none() {
-                            request.valid_values = Some(Default::default());
+                           request.valid_values = Some(Default::default());
                         }
-                        request.valid_values.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.valid_values.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "description" => {
                         request.description = Some(value.unwrap_or("").to_string());
                     },
                 "base-column.table-index" => {
                         request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().table_index = arg_from_str(value.unwrap_or("-0"), err, "base-column.table-index", "integer");
+                        request.base_column.as_mut().unwrap().table_index = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.table-index", "integer"));
                     },
                 "base-column.column-id" => {
                         request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().column_id = arg_from_str(value.unwrap_or("-0"), err, "base-column.column-id", "integer");
+                        request.base_column.as_mut().unwrap().column_id = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.column-id", "integer"));
                     },
                 "name" => {
                         request_base_column_init(&mut request);
@@ -275,8 +281,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -287,7 +292,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.column().list(&self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -325,8 +330,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -335,10 +339,10 @@ impl Engine {
 
     fn _column_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Column = Default::default();
+        let mut request = api::Column::default();
         let mut call = self.hub.column().patch(&request, &self.opt.arg_table_id, &self.opt.arg_column_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -358,9 +362,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -379,20 +384,20 @@ impl Engine {
                     },
                 "valid-values" => {
                         if request.valid_values.is_none() {
-                            request.valid_values = Some(Default::default());
+                           request.valid_values = Some(Default::default());
                         }
-                        request.valid_values.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.valid_values.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "description" => {
                         request.description = Some(value.unwrap_or("").to_string());
                     },
                 "base-column.table-index" => {
                         request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().table_index = arg_from_str(value.unwrap_or("-0"), err, "base-column.table-index", "integer");
+                        request.base_column.as_mut().unwrap().table_index = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.table-index", "integer"));
                     },
                 "base-column.column-id" => {
                         request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().column_id = arg_from_str(value.unwrap_or("-0"), err, "base-column.column-id", "integer");
+                        request.base_column.as_mut().unwrap().column_id = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.column-id", "integer"));
                     },
                 "name" => {
                         request_base_column_init(&mut request);
@@ -439,8 +444,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -449,10 +453,10 @@ impl Engine {
 
     fn _column_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Column = Default::default();
+        let mut request = api::Column::default();
         let mut call = self.hub.column().update(&request, &self.opt.arg_table_id, &self.opt.arg_column_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -472,9 +476,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -493,20 +498,20 @@ impl Engine {
                     },
                 "valid-values" => {
                         if request.valid_values.is_none() {
-                            request.valid_values = Some(Default::default());
+                           request.valid_values = Some(Default::default());
                         }
-                        request.valid_values.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.valid_values.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "description" => {
                         request.description = Some(value.unwrap_or("").to_string());
                     },
                 "base-column.table-index" => {
                         request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().table_index = arg_from_str(value.unwrap_or("-0"), err, "base-column.table-index", "integer");
+                        request.base_column.as_mut().unwrap().table_index = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.table-index", "integer"));
                     },
                 "base-column.column-id" => {
                         request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().column_id = arg_from_str(value.unwrap_or("-0"), err, "base-column.column-id", "integer");
+                        request.base_column.as_mut().unwrap().column_id = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.column-id", "integer"));
                     },
                 "name" => {
                         request_base_column_init(&mut request);
@@ -553,8 +558,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -566,7 +570,7 @@ impl Engine {
         let mut download_mode = false;
         let mut call = self.hub.query().sql(&self.opt.arg_sql);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "typed" => {
                     call = call.typed(arg_from_str(value.unwrap_or("false"), err, "typed", "boolean"));
@@ -607,9 +611,8 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     if !download_mode {
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
@@ -624,7 +627,7 @@ impl Engine {
         let mut download_mode = false;
         let mut call = self.hub.query().sql_get(&self.opt.arg_sql);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "typed" => {
                     call = call.typed(arg_from_str(value.unwrap_or("false"), err, "typed", "boolean"));
@@ -665,9 +668,8 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     if !download_mode {
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
@@ -682,7 +684,7 @@ impl Engine {
         let style_id: i32 = arg_from_str(&self.opt.arg_style_id, err, "<style-id>", "integer");
         let mut call = self.hub.style().delete(&self.opt.arg_table_id, style_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -713,7 +715,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -725,7 +726,7 @@ impl Engine {
         let style_id: i32 = arg_from_str(&self.opt.arg_style_id, err, "<style-id>", "integer");
         let mut call = self.hub.style().get(&self.opt.arg_table_id, style_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -757,8 +758,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -767,10 +767,10 @@ impl Engine {
 
     fn _style_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::StyleSetting = Default::default();
+        let mut request = api::StyleSetting::default();
         let mut call = self.hub.style().insert(&request, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -790,15 +790,44 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_marker_options_icon_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_marker_options_icon_styler_init(request);
+                if request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.is_none() {
+                    request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_marker_options_icon_styler_init(request: &mut api::StyleSetting) {
+                request_marker_options_init(request);
+                if request.marker_options.as_mut().unwrap().icon_styler.is_none() {
+                    request.marker_options.as_mut().unwrap().icon_styler = Some(Default::default());
+                }
+            }
+            
             fn request_marker_options_init(request: &mut api::StyleSetting) {
                 if request.marker_options.is_none() {
                     request.marker_options = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_fill_color_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polygon_options_fill_color_styler_init(request);
+                if request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_fill_color_styler_init(request: &mut api::StyleSetting) {
+                request_polygon_options_init(request);
+                if request.polygon_options.as_mut().unwrap().fill_color_styler.is_none() {
+                    request.polygon_options.as_mut().unwrap().fill_color_styler = Some(Default::default());
                 }
             }
             
@@ -808,32 +837,88 @@ impl Engine {
                 }
             }
             
+            fn request_polygon_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polygon_options_stroke_color_styler_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
+                request_polygon_options_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_color_styler.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polygon_options_stroke_weight_styler_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
+                request_polygon_options_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
+                }
+            }
+            
             fn request_polyline_options_init(request: &mut api::StyleSetting) {
                 if request.polyline_options.is_none() {
                     request.polyline_options = Some(Default::default());
                 }
             }
             
+            fn request_polyline_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polyline_options_stroke_color_styler_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polyline_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
+                request_polyline_options_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_color_styler.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
+                }
+            }
+            
+            fn request_polyline_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polyline_options_stroke_weight_styler_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polyline_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
+                request_polyline_options_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
+                }
+            }
+            
             match &field_name.to_string()[..] {
                 "marker-options.icon-styler.gradient.max" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.max", "number");
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.max", "number"));
                     },
                 "marker-options.icon-styler.gradient.min" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.min", "number");
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.min", "number"));
                     },
                 "marker-options.icon-styler.column-name" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.column_name = value.unwrap_or("").to_string();
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "marker-options.icon-styler.kind" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.kind = value.unwrap_or("").to_string();
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "marker-options.icon-name" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_name = value.unwrap_or("").to_string();
+                        request_marker_options_icon_styler_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_name = Some(value.unwrap_or("").to_string());
                     },
                 "kind" => {
                         request_marker_options_init(&mut request);
@@ -844,116 +929,116 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-color-styler.gradient.max" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.max", "number");
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.max", "number"));
                     },
                 "polygon-options.stroke-color-styler.gradient.min" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.min", "number");
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.min", "number"));
                     },
                 "polygon-options.stroke-color-styler.column-name" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.column_name = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-color-styler.kind" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.kind = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-weight" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight = arg_from_str(value.unwrap_or("-0"), err, "polygon-options.stroke-weight", "integer");
+                        request_polygon_options_stroke_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polygon-options.stroke-weight", "integer"));
                     },
                 "polygon-options.stroke-opacity" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_opacity = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-opacity", "number");
+                        request_polygon_options_stroke_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-opacity", "number"));
                     },
                 "polygon-options.stroke-weight-styler.gradient.max" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.max", "number");
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.max", "number"));
                     },
                 "polygon-options.stroke-weight-styler.gradient.min" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.min", "number");
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.min", "number"));
                     },
                 "polygon-options.stroke-weight-styler.column-name" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.column_name = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-weight-styler.kind" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.kind = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-color-styler.gradient.max" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.max", "number");
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.max", "number"));
                     },
                 "polygon-options.fill-color-styler.gradient.min" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.min", "number");
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.min", "number"));
                     },
                 "polygon-options.fill-color-styler.column-name" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.column_name = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-color-styler.kind" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.kind = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-color" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-color" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-opacity" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_opacity = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-opacity", "number");
+                        request_polygon_options_fill_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-opacity", "number"));
                     },
                 "polyline-options.stroke-weight" => {
                         request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight = arg_from_str(value.unwrap_or("-0"), err, "polyline-options.stroke-weight", "integer");
+                        request.polyline_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polyline-options.stroke-weight", "integer"));
                     },
                 "polyline-options.stroke-weight-styler.gradient.max" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.max", "number");
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.max", "number"));
                     },
                 "polyline-options.stroke-weight-styler.gradient.min" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.min", "number");
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.min", "number"));
                     },
                 "polyline-options.stroke-weight-styler.column-name" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.column_name = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-weight-styler.kind" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.kind = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-color" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_weight_styler_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-opacity" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_opacity = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-opacity", "number");
+                        request_polyline_options_stroke_weight_styler_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-opacity", "number"));
                     },
                 "polyline-options.stroke-color-styler.gradient.max" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.max", "number");
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.max", "number"));
                     },
                 "polyline-options.stroke-color-styler.gradient.min" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.min", "number");
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.min", "number"));
                     },
                 "polyline-options.stroke-color-styler.column-name" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.column_name = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-color-styler.kind" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.kind = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "table-id" => {
                         request_polyline_options_init(&mut request);
@@ -980,8 +1065,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -992,7 +1076,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.style().list(&self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1030,8 +1114,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1040,11 +1123,11 @@ impl Engine {
 
     fn _style_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::StyleSetting = Default::default();
+        let mut request = api::StyleSetting::default();
         let style_id: i32 = arg_from_str(&self.opt.arg_style_id, err, "<style-id>", "integer");
         let mut call = self.hub.style().patch(&request, &self.opt.arg_table_id, style_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1064,15 +1147,44 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_marker_options_icon_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_marker_options_icon_styler_init(request);
+                if request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.is_none() {
+                    request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_marker_options_icon_styler_init(request: &mut api::StyleSetting) {
+                request_marker_options_init(request);
+                if request.marker_options.as_mut().unwrap().icon_styler.is_none() {
+                    request.marker_options.as_mut().unwrap().icon_styler = Some(Default::default());
+                }
+            }
+            
             fn request_marker_options_init(request: &mut api::StyleSetting) {
                 if request.marker_options.is_none() {
                     request.marker_options = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_fill_color_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polygon_options_fill_color_styler_init(request);
+                if request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_fill_color_styler_init(request: &mut api::StyleSetting) {
+                request_polygon_options_init(request);
+                if request.polygon_options.as_mut().unwrap().fill_color_styler.is_none() {
+                    request.polygon_options.as_mut().unwrap().fill_color_styler = Some(Default::default());
                 }
             }
             
@@ -1082,32 +1194,88 @@ impl Engine {
                 }
             }
             
+            fn request_polygon_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polygon_options_stroke_color_styler_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
+                request_polygon_options_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_color_styler.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polygon_options_stroke_weight_styler_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
+                request_polygon_options_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
+                }
+            }
+            
             fn request_polyline_options_init(request: &mut api::StyleSetting) {
                 if request.polyline_options.is_none() {
                     request.polyline_options = Some(Default::default());
                 }
             }
             
+            fn request_polyline_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polyline_options_stroke_color_styler_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polyline_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
+                request_polyline_options_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_color_styler.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
+                }
+            }
+            
+            fn request_polyline_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polyline_options_stroke_weight_styler_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polyline_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
+                request_polyline_options_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
+                }
+            }
+            
             match &field_name.to_string()[..] {
                 "marker-options.icon-styler.gradient.max" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.max", "number");
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.max", "number"));
                     },
                 "marker-options.icon-styler.gradient.min" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.min", "number");
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.min", "number"));
                     },
                 "marker-options.icon-styler.column-name" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.column_name = value.unwrap_or("").to_string();
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "marker-options.icon-styler.kind" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.kind = value.unwrap_or("").to_string();
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "marker-options.icon-name" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_name = value.unwrap_or("").to_string();
+                        request_marker_options_icon_styler_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_name = Some(value.unwrap_or("").to_string());
                     },
                 "kind" => {
                         request_marker_options_init(&mut request);
@@ -1118,116 +1286,116 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-color-styler.gradient.max" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.max", "number");
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.max", "number"));
                     },
                 "polygon-options.stroke-color-styler.gradient.min" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.min", "number");
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.min", "number"));
                     },
                 "polygon-options.stroke-color-styler.column-name" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.column_name = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-color-styler.kind" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.kind = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-weight" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight = arg_from_str(value.unwrap_or("-0"), err, "polygon-options.stroke-weight", "integer");
+                        request_polygon_options_stroke_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polygon-options.stroke-weight", "integer"));
                     },
                 "polygon-options.stroke-opacity" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_opacity = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-opacity", "number");
+                        request_polygon_options_stroke_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-opacity", "number"));
                     },
                 "polygon-options.stroke-weight-styler.gradient.max" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.max", "number");
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.max", "number"));
                     },
                 "polygon-options.stroke-weight-styler.gradient.min" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.min", "number");
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.min", "number"));
                     },
                 "polygon-options.stroke-weight-styler.column-name" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.column_name = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-weight-styler.kind" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.kind = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-color-styler.gradient.max" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.max", "number");
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.max", "number"));
                     },
                 "polygon-options.fill-color-styler.gradient.min" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.min", "number");
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.min", "number"));
                     },
                 "polygon-options.fill-color-styler.column-name" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.column_name = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-color-styler.kind" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.kind = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-color" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-color" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-opacity" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_opacity = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-opacity", "number");
+                        request_polygon_options_fill_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-opacity", "number"));
                     },
                 "polyline-options.stroke-weight" => {
                         request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight = arg_from_str(value.unwrap_or("-0"), err, "polyline-options.stroke-weight", "integer");
+                        request.polyline_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polyline-options.stroke-weight", "integer"));
                     },
                 "polyline-options.stroke-weight-styler.gradient.max" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.max", "number");
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.max", "number"));
                     },
                 "polyline-options.stroke-weight-styler.gradient.min" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.min", "number");
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.min", "number"));
                     },
                 "polyline-options.stroke-weight-styler.column-name" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.column_name = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-weight-styler.kind" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.kind = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-color" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_weight_styler_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-opacity" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_opacity = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-opacity", "number");
+                        request_polyline_options_stroke_weight_styler_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-opacity", "number"));
                     },
                 "polyline-options.stroke-color-styler.gradient.max" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.max", "number");
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.max", "number"));
                     },
                 "polyline-options.stroke-color-styler.gradient.min" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.min", "number");
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.min", "number"));
                     },
                 "polyline-options.stroke-color-styler.column-name" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.column_name = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-color-styler.kind" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.kind = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "table-id" => {
                         request_polyline_options_init(&mut request);
@@ -1254,8 +1422,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1264,11 +1431,11 @@ impl Engine {
 
     fn _style_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::StyleSetting = Default::default();
+        let mut request = api::StyleSetting::default();
         let style_id: i32 = arg_from_str(&self.opt.arg_style_id, err, "<style-id>", "integer");
         let mut call = self.hub.style().update(&request, &self.opt.arg_table_id, style_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1288,15 +1455,44 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
+            fn request_marker_options_icon_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_marker_options_icon_styler_init(request);
+                if request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.is_none() {
+                    request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_marker_options_icon_styler_init(request: &mut api::StyleSetting) {
+                request_marker_options_init(request);
+                if request.marker_options.as_mut().unwrap().icon_styler.is_none() {
+                    request.marker_options.as_mut().unwrap().icon_styler = Some(Default::default());
+                }
+            }
+            
             fn request_marker_options_init(request: &mut api::StyleSetting) {
                 if request.marker_options.is_none() {
                     request.marker_options = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_fill_color_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polygon_options_fill_color_styler_init(request);
+                if request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_fill_color_styler_init(request: &mut api::StyleSetting) {
+                request_polygon_options_init(request);
+                if request.polygon_options.as_mut().unwrap().fill_color_styler.is_none() {
+                    request.polygon_options.as_mut().unwrap().fill_color_styler = Some(Default::default());
                 }
             }
             
@@ -1306,32 +1502,88 @@ impl Engine {
                 }
             }
             
+            fn request_polygon_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polygon_options_stroke_color_styler_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
+                request_polygon_options_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_color_styler.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polygon_options_stroke_weight_styler_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polygon_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
+                request_polygon_options_init(request);
+                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.is_none() {
+                    request.polygon_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
+                }
+            }
+            
             fn request_polyline_options_init(request: &mut api::StyleSetting) {
                 if request.polyline_options.is_none() {
                     request.polyline_options = Some(Default::default());
                 }
             }
             
+            fn request_polyline_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polyline_options_stroke_color_styler_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polyline_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
+                request_polyline_options_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_color_styler.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
+                }
+            }
+            
+            fn request_polyline_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
+                request_polyline_options_stroke_weight_styler_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
+                }
+            }
+            
+            fn request_polyline_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
+                request_polyline_options_init(request);
+                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.is_none() {
+                    request.polyline_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
+                }
+            }
+            
             match &field_name.to_string()[..] {
                 "marker-options.icon-styler.gradient.max" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.max", "number");
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.max", "number"));
                     },
                 "marker-options.icon-styler.gradient.min" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.min", "number");
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.min", "number"));
                     },
                 "marker-options.icon-styler.column-name" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.column_name = value.unwrap_or("").to_string();
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "marker-options.icon-styler.kind" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.kind = value.unwrap_or("").to_string();
+                        request_marker_options_icon_styler_gradient_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "marker-options.icon-name" => {
-                        request_marker_options_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_name = value.unwrap_or("").to_string();
+                        request_marker_options_icon_styler_init(&mut request);
+                        request.marker_options.as_mut().unwrap().icon_name = Some(value.unwrap_or("").to_string());
                     },
                 "kind" => {
                         request_marker_options_init(&mut request);
@@ -1342,116 +1594,116 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-color-styler.gradient.max" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.max", "number");
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.max", "number"));
                     },
                 "polygon-options.stroke-color-styler.gradient.min" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.min", "number");
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.min", "number"));
                     },
                 "polygon-options.stroke-color-styler.column-name" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.column_name = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-color-styler.kind" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.kind = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-weight" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight = arg_from_str(value.unwrap_or("-0"), err, "polygon-options.stroke-weight", "integer");
+                        request_polygon_options_stroke_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polygon-options.stroke-weight", "integer"));
                     },
                 "polygon-options.stroke-opacity" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_opacity = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-opacity", "number");
+                        request_polygon_options_stroke_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-opacity", "number"));
                     },
                 "polygon-options.stroke-weight-styler.gradient.max" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.max", "number");
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.max", "number"));
                     },
                 "polygon-options.stroke-weight-styler.gradient.min" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.min", "number");
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.min", "number"));
                     },
                 "polygon-options.stroke-weight-styler.column-name" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.column_name = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-weight-styler.kind" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.kind = value.unwrap_or("").to_string();
+                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-color-styler.gradient.max" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.max", "number");
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.max", "number"));
                     },
                 "polygon-options.fill-color-styler.gradient.min" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.min", "number");
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.min", "number"));
                     },
                 "polygon-options.fill-color-styler.column-name" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.column_name = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-color-styler.kind" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.kind = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-color" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_color = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.stroke-color" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color = value.unwrap_or("").to_string();
+                        request_polygon_options_fill_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
                     },
                 "polygon-options.fill-opacity" => {
-                        request_polygon_options_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_opacity = arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-opacity", "number");
+                        request_polygon_options_fill_color_styler_init(&mut request);
+                        request.polygon_options.as_mut().unwrap().fill_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-opacity", "number"));
                     },
                 "polyline-options.stroke-weight" => {
                         request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight = arg_from_str(value.unwrap_or("-0"), err, "polyline-options.stroke-weight", "integer");
+                        request.polyline_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polyline-options.stroke-weight", "integer"));
                     },
                 "polyline-options.stroke-weight-styler.gradient.max" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.max", "number");
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.max", "number"));
                     },
                 "polyline-options.stroke-weight-styler.gradient.min" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.min", "number");
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.min", "number"));
                     },
                 "polyline-options.stroke-weight-styler.column-name" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.column_name = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-weight-styler.kind" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.kind = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-color" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_weight_styler_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-opacity" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_opacity = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-opacity", "number");
+                        request_polyline_options_stroke_weight_styler_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-opacity", "number"));
                     },
                 "polyline-options.stroke-color-styler.gradient.max" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.gradient.max = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.max", "number");
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.max", "number"));
                     },
                 "polyline-options.stroke-color-styler.gradient.min" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.gradient.min = arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.min", "number");
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.min", "number"));
                     },
                 "polyline-options.stroke-color-styler.column-name" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.column_name = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
                     },
                 "polyline-options.stroke-color-styler.kind" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.kind = value.unwrap_or("").to_string();
+                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
+                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
                     },
                 "table-id" => {
                         request_polyline_options_init(&mut request);
@@ -1478,8 +1730,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1490,7 +1741,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.table().copy(&self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "copy-presentation" => {
                     call = call.copy_presentation(arg_from_str(value.unwrap_or("false"), err, "copy-presentation", "boolean"));
@@ -1525,8 +1776,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1537,7 +1787,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.table().delete(&self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1568,7 +1818,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -1579,7 +1828,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.table().get(&self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1611,8 +1860,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1623,7 +1871,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.table().import_rows(&self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-line" => {
                     call = call.start_line(arg_from_str(value.unwrap_or("-0"), err, "start-line", "integer"));
@@ -1680,8 +1928,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1692,7 +1939,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.table().import_table(&self.opt.arg_name);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "encoding" => {
                     call = call.encoding(value.unwrap_or(""));
@@ -1740,8 +1987,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1750,10 +1996,10 @@ impl Engine {
 
     fn _table_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Table = Default::default();
+        let mut request = api::Table::default();
         let mut call = self.hub.table().insert(&request);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -1773,9 +2019,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1800,9 +2047,9 @@ impl Engine {
                     },
                 "base-table-ids" => {
                         if request.base_table_ids.is_none() {
-                            request.base_table_ids = Some(Default::default());
+                           request.base_table_ids = Some(Default::default());
                         }
-                        request.base_table_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.base_table_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "table-properties-json" => {
                         request.table_properties_json = Some(value.unwrap_or("").to_string());
@@ -1836,8 +2083,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1848,7 +2094,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.table().list();
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -1886,8 +2132,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1896,10 +2141,10 @@ impl Engine {
 
     fn _table_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Table = Default::default();
+        let mut request = api::Table::default();
         let mut call = self.hub.table().patch(&request, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "replace-view-definition" => {
                     call = call.replace_view_definition(arg_from_str(value.unwrap_or("false"), err, "replace-view-definition", "boolean"));
@@ -1922,9 +2167,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -1949,9 +2195,9 @@ impl Engine {
                     },
                 "base-table-ids" => {
                         if request.base_table_ids.is_none() {
-                            request.base_table_ids = Some(Default::default());
+                           request.base_table_ids = Some(Default::default());
                         }
-                        request.base_table_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.base_table_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "table-properties-json" => {
                         request.table_properties_json = Some(value.unwrap_or("").to_string());
@@ -1985,8 +2231,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -1997,7 +2242,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.table().replace_rows(&self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-line" => {
                     call = call.start_line(arg_from_str(value.unwrap_or("-0"), err, "start-line", "integer"));
@@ -2054,8 +2299,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2064,10 +2308,10 @@ impl Engine {
 
     fn _table_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Table = Default::default();
+        let mut request = api::Table::default();
         let mut call = self.hub.table().update(&request, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "replace-view-definition" => {
                     call = call.replace_view_definition(arg_from_str(value.unwrap_or("false"), err, "replace-view-definition", "boolean"));
@@ -2090,9 +2334,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2117,9 +2362,9 @@ impl Engine {
                     },
                 "base-table-ids" => {
                         if request.base_table_ids.is_none() {
-                            request.base_table_ids = Some(Default::default());
+                           request.base_table_ids = Some(Default::default());
                         }
-                        request.base_table_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.base_table_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "table-properties-json" => {
                         request.table_properties_json = Some(value.unwrap_or("").to_string());
@@ -2153,8 +2398,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2165,7 +2409,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.task().delete(&self.opt.arg_table_id, &self.opt.arg_task_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2196,7 +2440,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2207,7 +2450,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.task().get(&self.opt.arg_table_id, &self.opt.arg_task_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2239,8 +2482,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2251,7 +2493,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.task().list(&self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
                     call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
@@ -2292,8 +2534,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2305,7 +2546,7 @@ impl Engine {
         let template_id: i32 = arg_from_str(&self.opt.arg_template_id, err, "<template-id>", "integer");
         let mut call = self.hub.template().delete(&self.opt.arg_table_id, template_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2336,7 +2577,6 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok(mut response) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
                     None
                 }
             }
@@ -2348,7 +2588,7 @@ impl Engine {
         let template_id: i32 = arg_from_str(&self.opt.arg_template_id, err, "<template-id>", "integer");
         let mut call = self.hub.template().get(&self.opt.arg_table_id, template_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2380,8 +2620,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2390,10 +2629,10 @@ impl Engine {
 
     fn _template_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Template = Default::default();
+        let mut request = api::Template::default();
         let mut call = self.hub.template().insert(&request, &self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2413,9 +2652,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2431,9 +2671,9 @@ impl Engine {
                     },
                 "automatic-column-names" => {
                         if request.automatic_column_names.is_none() {
-                            request.automatic_column_names = Some(Default::default());
+                           request.automatic_column_names = Some(Default::default());
                         }
-                        request.automatic_column_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.automatic_column_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "table-id" => {
                         request.table_id = Some(value.unwrap_or("").to_string());
@@ -2458,8 +2698,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2470,7 +2709,7 @@ impl Engine {
                                                     -> Option<api::Error> {
         let mut call = self.hub.template().list(&self.opt.arg_table_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -2508,8 +2747,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2518,11 +2756,11 @@ impl Engine {
 
     fn _template_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Template = Default::default();
+        let mut request = api::Template::default();
         let template_id: i32 = arg_from_str(&self.opt.arg_template_id, err, "<template-id>", "integer");
         let mut call = self.hub.template().patch(&request, &self.opt.arg_table_id, template_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2542,9 +2780,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2560,9 +2799,9 @@ impl Engine {
                     },
                 "automatic-column-names" => {
                         if request.automatic_column_names.is_none() {
-                            request.automatic_column_names = Some(Default::default());
+                           request.automatic_column_names = Some(Default::default());
                         }
-                        request.automatic_column_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.automatic_column_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "table-id" => {
                         request.table_id = Some(value.unwrap_or("").to_string());
@@ -2587,8 +2826,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2597,11 +2835,11 @@ impl Engine {
 
     fn _template_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-            let mut request: api::Template = Default::default();
+        let mut request = api::Template::default();
         let template_id: i32 = arg_from_str(&self.opt.arg_template_id, err, "<template-id>", "integer");
         let mut call = self.hub.template().update(&request, &self.opt.arg_table_id, template_id);
         for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err);
+            let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "alt"
                 |"fields"
@@ -2621,9 +2859,10 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        let mut field_name: FieldCursor = Default::default();
+        
+        let mut field_name = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err);
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
             if let Err(field_err) = field_name.set(&*key) {
                 err.issues.push(field_err);
             }
@@ -2639,9 +2878,9 @@ impl Engine {
                     },
                 "automatic-column-names" => {
                         if request.automatic_column_names.is_none() {
-                            request.automatic_column_names = Some(Default::default());
+                           request.automatic_column_names = Some(Default::default());
                         }
-                        request.automatic_column_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                                        request.automatic_column_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 "table-id" => {
                         request.table_id = Some(value.unwrap_or("").to_string());
@@ -2666,8 +2905,7 @@ impl Engine {
             } {
                 Err(api_err) => Some(api_err),
                 Ok((mut response, output_schema)) => {
-                    println!("DEBUG: REMOVE ME {:?}", response);
-                    serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
                     None
                 }
             }
@@ -2695,7 +2933,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_query {
+        }
+ else if self.opt.cmd_query {
             if self.opt.cmd_sql {
                 call_result = self._query_sql(dry_run, &mut err);
             } else if self.opt.cmd_sql_get {
@@ -2703,7 +2942,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_style {
+        }
+ else if self.opt.cmd_style {
             if self.opt.cmd_delete {
                 call_result = self._style_delete(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -2719,7 +2959,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_table {
+        }
+ else if self.opt.cmd_table {
             if self.opt.cmd_copy {
                 call_result = self._table_copy(dry_run, &mut err);
             } else if self.opt.cmd_delete {
@@ -2743,7 +2984,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_task {
+        }
+ else if self.opt.cmd_task {
             if self.opt.cmd_delete {
                 call_result = self._task_delete(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -2753,7 +2995,8 @@ impl Engine {
             } else {
                 unreachable!();
             }
-        } else if self.opt.cmd_template {
+        }
+ else if self.opt.cmd_template {
             if self.opt.cmd_delete {
                 call_result = self._template_delete(dry_run, &mut err);
             } else if self.opt.cmd_get {
@@ -2789,21 +3032,37 @@ impl Engine {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "fusiontables2-secret.json") {
+            match cmn::application_secret_from_directory(&config_dir, "fusiontables2-secret.json", 
+                                                         "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                                      hyper::Client::new(),
-                                      JsonTokenStorage {
-                                        program_name: "fusiontables2",
-                                        db_dir: config_dir.clone(),
-                                      }, None);
+        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
+                                        if opt.flag_debug_auth {
+                                            hyper::Client::with_connector(mock::TeeConnector {
+                                                    connector: hyper::net::HttpConnector(None) 
+                                                })
+                                        } else {
+                                            hyper::Client::new()
+                                        },
+                                        JsonTokenStorage {
+                                          program_name: "fusiontables2",
+                                          db_dir: config_dir.clone(),
+                                        }, None);
+
+        let client = 
+            if opt.flag_debug {
+                hyper::Client::with_connector(mock::TeeConnector {
+                        connector: hyper::net::HttpConnector(None) 
+                    })
+            } else {
+                hyper::Client::new()
+            };
         let engine = Engine {
             opt: opt,
-            hub: api::Fusiontables::new(hyper::Client::new(), auth),
+            hub: api::Fusiontables::new(client, auth),
         };
 
         match engine._doit(true) {
@@ -2823,12 +3082,13 @@ fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
     match Engine::new(opts) {
         Err(err) => {
-            write!(io::stderr(), "{}", err).ok();
+            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "{}", err).ok();
+                writeln!(io::stderr(), "{:?}", err).ok();
+                writeln!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }

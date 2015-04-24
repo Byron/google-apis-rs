@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-calendar3` library allows access to all features of the *Google calendar* service.
 
-This documentation was generated from *calendar* crate version *0.1.5+20150303*, where *20150303* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *calendar* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 
 Everything else about the *calendar* *v3* API can be found at the
 [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -129,7 +129,7 @@ let mut hub = CalendarHub::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req: Channel = Default::default();
+let mut req = Channel::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fitness* crate version *0.1.5+20150222*, where *20150222* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *fitness* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *fitness* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fit/rest/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Fitness.html) ... 
 //! 
 //! * users
-//!  * [*data sources create*](struct.UserDataSourceCreateCall.html), [*data sources datasets delete*](struct.UserDataSourceDatasetDeleteCall.html), [*data sources datasets get*](struct.UserDataSourceDatasetGetCall.html), [*data sources datasets patch*](struct.UserDataSourceDatasetPatchCall.html), [*data sources get*](struct.UserDataSourceGetCall.html), [*data sources list*](struct.UserDataSourceListCall.html), [*data sources patch*](struct.UserDataSourcePatchCall.html), [*data sources update*](struct.UserDataSourceUpdateCall.html), [*sessions delete*](struct.UserSessionDeleteCall.html), [*sessions list*](struct.UserSessionListCall.html) and [*sessions update*](struct.UserSessionUpdateCall.html)
+//!  * [*data sources create*](struct.UserDataSourceCreateCall.html), [*data sources datasets delete*](struct.UserDataSourceDatasetDeleteCall.html), [*data sources datasets get*](struct.UserDataSourceDatasetGetCall.html), [*data sources datasets patch*](struct.UserDataSourceDatasetPatchCall.html), [*data sources delete*](struct.UserDataSourceDeleteCall.html), [*data sources get*](struct.UserDataSourceGetCall.html), [*data sources list*](struct.UserDataSourceListCall.html), [*data sources patch*](struct.UserDataSourcePatchCall.html), [*data sources update*](struct.UserDataSourceUpdateCall.html), [*sessions delete*](struct.UserSessionDeleteCall.html), [*sessions list*](struct.UserSessionListCall.html) and [*sessions update*](struct.UserSessionUpdateCall.html)
 //! 
 //! 
 //! 
@@ -51,6 +51,7 @@
 //! let r = hub.users().data_sources_update(...).doit()
 //! let r = hub.users().data_sources_create(...).doit()
 //! let r = hub.users().data_sources_patch(...).doit()
+//! let r = hub.users().data_sources_delete(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -97,7 +98,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: DataSource = Default::default();
+//! let mut req = DataSource::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -292,7 +293,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: DataSource = Default::default();
+/// let mut req = DataSource::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -362,9 +363,9 @@ impl<'a, C, A> Fitness<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataType {
     /// A field represents one dimension of a data type.
-    pub field: Vec<DataTypeField>,
+    pub field: Option<Vec<DataTypeField>>,
     /// Each data type has a unique, namespaced, name. All data types in the com.google namespace are shared as part of the platform.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for DataType {}
@@ -380,10 +381,10 @@ impl Part for DataType {}
 pub struct Value {
     /// Floating point value. When this is set, intVal must not be set.
     #[serde(rename="fpVal")]
-    pub fp_val: f64,
+    pub fp_val: Option<f64>,
     /// Integer value. When this is set, fpVal must not be set.
     #[serde(rename="intVal")]
-    pub int_val: i32,
+    pub int_val: Option<i32>,
 }
 
 impl Part for Value {}
@@ -434,7 +435,7 @@ impl ResponseResult for Dataset {}
 pub struct ListDataSourcesResponse {
     /// A previously created data source.
     #[serde(rename="dataSource")]
-    pub data_source: Vec<DataSource>,
+    pub data_source: Option<Vec<DataSource>>,
 }
 
 impl ResponseResult for ListDataSourcesResponse {}
@@ -448,14 +449,14 @@ impl ResponseResult for ListDataSourcesResponse {}
 pub struct Application {
     /// Package name for this application. This is used as a unique identifier when created by Android applications, but cannot be specified by REST clients. REST clients will have their developer project number reflected into the Data Source data stream IDs, instead of the packageName.
     #[serde(rename="packageName")]
-    pub package_name: String,
+    pub package_name: Option<String>,
     /// Version of the application. You should update this field whenever the application changes in a way that affects the computation of the data.
-    pub version: String,
+    pub version: Option<String>,
     /// The name of this application. This is required for REST clients, but we do not enforce uniqueness of this name. It is provided as a matter of convenience for other developers who would like to identify which REST created an Application or Data Source.
-    pub name: String,
+    pub name: Option<String>,
     /// An optional URI that can be used to link back to the application.
     #[serde(rename="detailsUrl")]
-    pub details_url: String,
+    pub details_url: Option<String>,
 }
 
 impl Part for Application {}
@@ -488,6 +489,9 @@ pub struct Session {
     /// A start time, in milliseconds since epoch, inclusive.
     #[serde(rename="startTimeMillis")]
     pub start_time_millis: Option<String>,
+    /// Session active time. While start_time_millis and end_time_millis define the full session time, the active time can be shorter and specified by active_time_millis. If the inactive time during the session is known, it should also be inserted via a com.google.activity.segment data point with a STILL activity value
+    #[serde(rename="activeTimeMillis")]
+    pub active_time_millis: Option<String>,
     /// A client-generated identifier that is unique across all sessions owned by this particular user.
     pub id: Option<String>,
     /// A human readable name of the session.
@@ -511,12 +515,12 @@ impl ResponseResult for Session {}
 pub struct ListSessionsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// If includeDeleted is set to true in the request, this list will contain sessions deleted with original end times that are within the startTime and endTime frame.
     #[serde(rename="deletedSession")]
-    pub deleted_session: Vec<Session>,
+    pub deleted_session: Option<Vec<Session>>,
     /// Sessions with an end time that is between startTime and endTime of the request.
-    pub session: Vec<Session>,
+    pub session: Option<Vec<Session>>,
 }
 
 impl ResponseResult for ListSessionsResponse {}
@@ -535,16 +539,16 @@ impl ResponseResult for ListSessionsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Device {
     /// End-user visible model name for the device.
-    pub model: String,
+    pub model: Option<String>,
     /// Version string for the device hardware/software.
-    pub version: String,
+    pub version: Option<String>,
     /// A constant representing the type of the device.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form.
-    pub uid: String,
+    pub uid: Option<String>,
     /// Manufacturer of the product/hardware.
-    pub manufacturer: String,
+    pub manufacturer: Option<String>,
 }
 
 impl Part for Device {}
@@ -559,11 +563,11 @@ impl Part for Device {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataTypeField {
     /// no description provided
-    pub optional: bool,
+    pub optional: Option<bool>,
     /// Defines the name and format of data. Unlike data type names, field names are not namespaced, and only need to be unique within the data type.
-    pub name: String,
+    pub name: Option<String>,
     /// The different supported formats for each field in a data type.
-    pub format: String,
+    pub format: Option<String>,
 }
 
 impl Part for DataTypeField {}
@@ -581,29 +585,29 @@ impl Part for DataTypeField {}
 pub struct DataPoint {
     /// Used for version checking during transformation; that is, a datapoint can only replace another datapoint that has an older computation time stamp.
     #[serde(rename="computationTimeMillis")]
-    pub computation_time_millis: String,
+    pub computation_time_millis: Option<String>,
     /// Indicates the last time this data point was modified. Useful only in contexts where we are listing the data changes, rather than representing the current state of the data.
     #[serde(rename="modifiedTimeMillis")]
-    pub modified_time_millis: String,
+    pub modified_time_millis: Option<String>,
     /// The start time of the interval represented by this data point, in nanoseconds since epoch.
     #[serde(rename="startTimeNanos")]
-    pub start_time_nanos: String,
+    pub start_time_nanos: Option<String>,
     /// The data type defining the format of the values in this data point.
     #[serde(rename="dataTypeName")]
-    pub data_type_name: String,
+    pub data_type_name: Option<String>,
     /// Values of each data type field for the data point. It is expected that each value corresponding to a data type field will occur in the same order that the field is listed with in the data type specified in a data source.
     /// 
     /// Only one of integer and floating point fields will be populated, depending on the format enum value within data source's type field.
-    pub value: Vec<Value>,
+    pub value: Option<Vec<Value>>,
     /// The end time of the interval represented by this data point, in nanoseconds since epoch.
     #[serde(rename="endTimeNanos")]
-    pub end_time_nanos: String,
+    pub end_time_nanos: Option<String>,
     /// If the data point is contained in a dataset for a derived data source, this field will be populated with the data source stream ID that created the data point originally.
     #[serde(rename="originDataSourceId")]
-    pub origin_data_source_id: String,
+    pub origin_data_source_id: Option<String>,
     /// The raw timestamp from the original SensorEvent.
     #[serde(rename="rawTimestampNanos")]
-    pub raw_timestamp_nanos: String,
+    pub raw_timestamp_nanos: Option<String>,
 }
 
 impl Part for DataPoint {}
@@ -624,6 +628,7 @@ impl Part for DataPoint {}
 /// * [data sources update users](struct.UserDataSourceUpdateCall.html) (request|response)
 /// * [data sources create users](struct.UserDataSourceCreateCall.html) (request|response)
 /// * [data sources patch users](struct.UserDataSourcePatchCall.html) (request|response)
+/// * [data sources delete users](struct.UserDataSourceDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataSource {
@@ -693,7 +698,7 @@ impl ResponseResult for DataSource {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Fitness::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `data_sources_create(...)`, `data_sources_datasets_delete(...)`, `data_sources_datasets_get(...)`, `data_sources_datasets_patch(...)`, `data_sources_get(...)`, `data_sources_list(...)`, `data_sources_patch(...)`, `data_sources_update(...)`, `sessions_delete(...)`, `sessions_list(...)` and `sessions_update(...)`
+/// // like `data_sources_create(...)`, `data_sources_datasets_delete(...)`, `data_sources_datasets_get(...)`, `data_sources_datasets_patch(...)`, `data_sources_delete(...)`, `data_sources_get(...)`, `data_sources_list(...)`, `data_sources_patch(...)`, `data_sources_update(...)`, `sessions_delete(...)`, `sessions_list(...)` and `sessions_update(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
@@ -707,6 +712,25 @@ pub struct UserMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for UserMethods<'a, C, A> {}
 
 impl<'a, C, A> UserMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Delete the data source if there are no datapoints associated with it
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `dataSourceId` - The data stream ID of the data source to delete.
+    pub fn data_sources_delete(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDeleteCall<'a, C, A> {
+        UserDataSourceDeleteCall {
+            hub: self.hub,
+            _user_id: user_id.to_string(),
+            _data_source_id: data_source_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -952,6 +976,252 @@ impl<'a, C, A> UserMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
+/// Delete the data source if there are no datapoints associated with it
+///
+/// A builder for the *dataSources.delete* method supported by a *user* resource.
+/// It is not used directly, but through a `UserMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_fitness1 as fitness1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use fitness1::Fitness;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Fitness::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.users().data_sources_delete("userId", "dataSourceId")
+///              .doit();
+/// # }
+/// ```
+pub struct UserDataSourceDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Fitness<C, A>,
+    _user_id: String,
+    _data_source_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserDataSourceDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> UserDataSourceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, DataSource)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "fitness.users.dataSources.delete", 
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("userId", self._user_id.to_string()));
+        params.push(("dataSourceId", self._data_source_id.to_string()));
+        for &field in ["alt", "userId", "dataSourceId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/fitness/v1/users/{userId}/dataSources/{dataSourceId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{userId}", "userId"), ("{dataSourceId}", "dataSourceId")].iter() {
+                        let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["userId", "dataSourceId"].iter() {
+                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
+                    if name == param_name {
+                        indices_for_removal.push(params.len() - index - 1);
+                        break;
+                    }
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return Err(Error::Failure(res))
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    ///
+    /// Sets the *user id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDeleteCall<'a, C, A> {
+        self._user_id = new_value.to_string();
+        self
+    }
+    /// The data stream ID of the data source to delete.
+    ///
+    /// Sets the *data source id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDeleteCall<'a, C, A> {
+        self._data_source_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityWrite`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceDeleteCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Returns a dataset containing all data points whose start and end times overlap with the specified range of the dataset minimum start time and maximum end time. Specifically, any data point whose start time is less than or equal to the dataset end time and whose end time is greater than or equal to the dataset start time.
 ///
 /// A builder for the *dataSources.datasets.get* method supported by a *user* resource.
@@ -979,8 +1249,8 @@ impl<'a, C, A> UserMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().data_sources_datasets_get("userId", "dataSourceId", "datasetId")
-///              .page_token("justo")
-///              .limit(-1)
+///              .page_token("erat")
+///              .limit(-35)
 ///              .doit();
 /// # }
 /// ```
@@ -1074,16 +1344,20 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1257,7 +1531,7 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: DataSource = Default::default();
+/// let mut req = DataSource::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1349,16 +1623,20 @@ impl<'a, C, A> UserDataSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1511,8 +1789,8 @@ impl<'a, C, A> UserDataSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().data_sources_datasets_delete("userId", "dataSourceId", "datasetId")
-///              .modified_time_millis("dolores")
-///              .current_time_millis("gubergren")
+///              .modified_time_millis("sadipscing")
+///              .current_time_millis("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -1605,16 +1883,20 @@ impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hype
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -1778,13 +2060,13 @@ impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hype
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Dataset = Default::default();
+/// let mut req = Dataset::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().data_sources_datasets_patch(&req, "userId", "dataSourceId", "datasetId")
-///              .current_time_millis("no")
+///              .current_time_millis("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -1879,16 +2161,20 @@ impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2068,7 +2354,7 @@ impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().sessions_delete("userId", "sessionId")
-///              .current_time_millis("et")
+///              .current_time_millis("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -2155,16 +2441,20 @@ impl<'a, C, A> UserSessionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2394,16 +2684,20 @@ impl<'a, C, A> UserDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2555,7 +2849,7 @@ impl<'a, C, A> UserDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: DataSource = Default::default();
+/// let mut req = DataSource::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2649,16 +2943,20 @@ impl<'a, C, A> UserDataSourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2821,10 +3119,10 @@ impl<'a, C, A> UserDataSourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().sessions_list("userId")
-///              .start_time("duo")
-///              .page_token("aliquyam")
-///              .include_deleted(true)
-///              .end_time("Lorem")
+///              .start_time("sea")
+///              .page_token("Lorem")
+///              .include_deleted(false)
+///              .end_time("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -2922,16 +3220,20 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3099,13 +3401,13 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Session = Default::default();
+/// let mut req = Session::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().sessions_update(&req, "userId", "sessionId")
-///              .current_time_millis("sadipscing")
+///              .current_time_millis("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -3198,16 +3500,20 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3379,7 +3685,7 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: DataSource = Default::default();
+/// let mut req = DataSource::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3473,16 +3779,20 @@ impl<'a, C, A> UserDataSourcePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3645,7 +3955,7 @@ impl<'a, C, A> UserDataSourcePatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().data_sources_list("userId")
-///              .add_data_type_name("amet")
+///              .add_data_type_name("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -3735,16 +4045,20 @@ impl<'a, C, A> UserDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

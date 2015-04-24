@@ -345,9 +345,9 @@ impl Resource for Webfont {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebfontList {
     /// The list of fonts currently served by the Google Fonts API.
-    pub items: Vec<Webfont>,
+    pub items: Option<Vec<Webfont>>,
     /// This kind represents a list of webfont objects in the webfonts service.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for WebfontList {}

@@ -5,7 +5,7 @@
 
 name = "google-mirror1-cli"
 version = "0.0.1+20150220"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with mirror (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/mirror1-cli"
 homepage = "https://developers.google.com/glass"
@@ -23,6 +23,7 @@ yup-oauth2 = "*"
 docopt = "*"
 docopt_macros = "*"
 rustc-serialize = "*"
+yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
 

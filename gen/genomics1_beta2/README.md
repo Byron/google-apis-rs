@@ -33,8 +33,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*bases list*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.ReferenceBaseListCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.ReferenceGetCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.ReferenceSearchCall.html)
 * referencesets
  * [*get*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.ReferencesetGetCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.ReferencesetSearchCall.html)
-* streaming variant store
- * [*streamvariants*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.StreamingVariantStoreStreamvariantCall.html)
+* streaming readstore
+ * [*streamreads*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.StreamingReadstoreStreamreadCall.html)
 * [variants](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.Variant.html)
  * [*create*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.VariantCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.VariantDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.VariantGetCall.html), [*search*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.VariantSearchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_genomics1_beta2/struct.VariantUpdateCall.html)
 * variantsets
@@ -123,7 +123,7 @@ let mut hub = Genomics::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req: Annotation = Default::default();
+let mut req = Annotation::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.

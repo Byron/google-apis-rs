@@ -351,7 +351,7 @@ impl<'a, C, A> Webmasters<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SitemapsListResponse {
     /// Information about a sitemap entry.
-    pub sitemap: Vec<WmxSitemap>,
+    pub sitemap: Option<Vec<WmxSitemap>>,
 }
 
 impl ResponseResult for SitemapsListResponse {}
@@ -364,12 +364,12 @@ impl ResponseResult for SitemapsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WmxSitemapContent {
     /// The number of URLs from the sitemap that were indexed (of the content type).
-    pub indexed: String,
+    pub indexed: Option<String>,
     /// The specific type of content in this sitemap (for example "web", "images").
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The number of URLs in the sitemap (of the content type).
-    pub submitted: String,
+    pub submitted: Option<String>,
 }
 
 impl Part for WmxSitemapContent {}
@@ -382,11 +382,11 @@ impl Part for WmxSitemapContent {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlCrawlErrorCountsPerType {
     /// The crawl error type.
-    pub category: String,
+    pub category: Option<String>,
     /// Corresponding to the user agent that made the request.
-    pub platform: String,
+    pub platform: Option<String>,
     /// The error count entries time series.
-    pub entries: Vec<UrlCrawlErrorCount>,
+    pub entries: Option<Vec<UrlCrawlErrorCount>>,
 }
 
 impl Part for UrlCrawlErrorCountsPerType {}
@@ -405,10 +405,10 @@ impl Part for UrlCrawlErrorCountsPerType {}
 pub struct WmxSite {
     /// The user's permission level for the site.
     #[serde(rename="permissionLevel")]
-    pub permission_level: String,
+    pub permission_level: Option<String>,
     /// The URL of the site.
     #[serde(rename="siteUrl")]
-    pub site_url: String,
+    pub site_url: Option<String>,
 }
 
 impl ResponseResult for WmxSite {}
@@ -427,7 +427,7 @@ impl ResponseResult for WmxSite {}
 pub struct UrlCrawlErrorsCountsQueryResponse {
     /// The time series of the number of URL crawl errors for per error category and platform.
     #[serde(rename="countPerTypes")]
-    pub count_per_types: Vec<UrlCrawlErrorCountsPerType>,
+    pub count_per_types: Option<Vec<UrlCrawlErrorCountsPerType>>,
 }
 
 impl ResponseResult for UrlCrawlErrorsCountsQueryResponse {}
@@ -440,9 +440,9 @@ impl ResponseResult for UrlCrawlErrorsCountsQueryResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlCrawlErrorCount {
     /// The error count at the given timestamp.
-    pub count: String,
+    pub count: Option<String>,
     /// The time (well, date) when errors were detected, in RFC 3339 format.
-    pub timestamp: String,
+    pub timestamp: Option<String>,
 }
 
 impl Part for UrlCrawlErrorCount {}
@@ -460,28 +460,28 @@ impl Part for UrlCrawlErrorCount {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WmxSitemap {
     /// Number of errors in the sitemap - issues with the sitemap itself, that needs to be fixed before it can be processed correctly.
-    pub errors: String,
+    pub errors: Option<String>,
     /// Number of warnings for the sitemap - issues with URLs in the sitemaps.
-    pub warnings: String,
+    pub warnings: Option<String>,
     /// If true, the sitemap has not been processed.
     #[serde(rename="isPending")]
-    pub is_pending: bool,
+    pub is_pending: Option<bool>,
     /// Date & time in which this sitemap was submitted. Date format is in RFC 3339 format (yyyy-mm-dd).
     #[serde(rename="lastSubmitted")]
-    pub last_submitted: String,
+    pub last_submitted: Option<String>,
     /// If true, the sitemap is a collection of sitemaps.
     #[serde(rename="isSitemapsIndex")]
-    pub is_sitemaps_index: bool,
+    pub is_sitemaps_index: Option<bool>,
     /// Date & time in which this sitemap was last downloaded. Date format is in RFC 3339 format (yyyy-mm-dd).
     #[serde(rename="lastDownloaded")]
-    pub last_downloaded: String,
+    pub last_downloaded: Option<String>,
     /// The url of the sitemap.
-    pub path: String,
+    pub path: Option<String>,
     /// The type of the sitemap (for example "sitemap").
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The various content types in the sitemap.
-    pub contents: Vec<WmxSitemapContent>,
+    pub contents: Option<Vec<WmxSitemapContent>>,
 }
 
 impl ResponseResult for WmxSitemap {}
@@ -500,7 +500,7 @@ impl ResponseResult for WmxSitemap {}
 pub struct SitesListResponse {
     /// Access level information for a Webmaster Tools site.
     #[serde(rename="siteEntry")]
-    pub site_entry: Vec<WmxSite>,
+    pub site_entry: Option<Vec<WmxSite>>,
 }
 
 impl ResponseResult for SitesListResponse {}
@@ -519,17 +519,17 @@ impl ResponseResult for SitesListResponse {}
 pub struct UrlCrawlErrorsSample {
     /// Additional details about the URL, set only when calling get().
     #[serde(rename="urlDetails")]
-    pub url_details: UrlSampleDetails,
+    pub url_details: Option<UrlSampleDetails>,
     /// The URL of an error, relative to the site.
     #[serde(rename="pageUrl")]
-    pub page_url: String,
+    pub page_url: Option<String>,
     /// The time when the URL was last crawled, in RFC 3339 format.
-    pub last_crawled: String,
+    pub last_crawled: Option<String>,
     /// The HTTP response code, if any.
     #[serde(rename="responseCode")]
-    pub response_code: i32,
+    pub response_code: Option<i32>,
     /// The time the error was first detected, in RFC 3339 format.
-    pub first_detected: String,
+    pub first_detected: Option<String>,
 }
 
 impl Resource for UrlCrawlErrorsSample {}
@@ -544,10 +544,10 @@ impl ResponseResult for UrlCrawlErrorsSample {}
 pub struct UrlSampleDetails {
     /// List of sitemaps pointing at this URL.
     #[serde(rename="containingSitemaps")]
-    pub containing_sitemaps: Vec<String>,
+    pub containing_sitemaps: Option<Vec<String>>,
     /// A sample set of URLs linking to this URL.
     #[serde(rename="linkedFromUrls")]
-    pub linked_from_urls: Vec<String>,
+    pub linked_from_urls: Option<Vec<String>>,
 }
 
 impl Part for UrlSampleDetails {}
@@ -566,7 +566,7 @@ impl Part for UrlSampleDetails {}
 pub struct UrlCrawlErrorsSamplesListResponse {
     /// Information about the sample URL and its crawl error.
     #[serde(rename="urlCrawlErrorSample")]
-    pub url_crawl_error_sample: Vec<UrlCrawlErrorsSample>,
+    pub url_crawl_error_sample: Option<Vec<UrlCrawlErrorsSample>>,
 }
 
 impl ResponseResult for UrlCrawlErrorsSamplesListResponse {}
@@ -1081,16 +1081,20 @@ impl<'a, C, A> SitemapDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -1312,16 +1316,20 @@ impl<'a, C, A> SitemapSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
@@ -1544,16 +1552,20 @@ impl<'a, C, A> SitemapGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1789,16 +1801,20 @@ impl<'a, C, A> SitemapListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2026,16 +2042,20 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2255,16 +2275,20 @@ impl<'a, C, A> SiteAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
@@ -2449,16 +2473,20 @@ impl<'a, C, A> SiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2668,16 +2696,20 @@ impl<'a, C, A> SiteDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2903,16 +2935,20 @@ impl<'a, C, A> UrlcrawlerrorscountQueryCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3160,16 +3196,20 @@ impl<'a, C, A> UrlcrawlerrorssampleGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3424,16 +3464,20 @@ impl<'a, C, A> UrlcrawlerrorssampleListCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3679,16 +3723,20 @@ impl<'a, C, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())

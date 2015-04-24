@@ -321,15 +321,15 @@ impl<'a, C, A> Freebase<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReconcileCandidate {
     /// Language code that candidate and notable names are displayed in.
-    pub lang: String,
+    pub lang: Option<String>,
     /// Percentage likelihood that this candidate is the unique matching entity. Value will be between 0.0 and 1.0
-    pub confidence: f32,
+    pub confidence: Option<f32>,
     /// Type or profession the candidate is notable for.
-    pub notable: ReconcileCandidateNotable,
+    pub notable: Option<ReconcileCandidateNotable>,
     /// Freebase MID of candidate entity.
-    pub mid: String,
+    pub mid: Option<String>,
     /// Freebase name of matching entity in specified language.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for ReconcileCandidate {}
@@ -342,11 +342,11 @@ impl Part for ReconcileCandidate {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReconcileGetWarning {
     /// Code for identifying classes of warnings.
-    pub reason: String,
+    pub reason: Option<String>,
     /// Warning message to display to the user.
-    pub message: String,
+    pub message: Option<String>,
     /// Location of warning in the request e.g. invalid predicate.
-    pub location: String,
+    pub location: Option<String>,
 }
 
 impl NestedType for ReconcileGetWarning {}
@@ -360,9 +360,9 @@ impl Part for ReconcileGetWarning {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReconcileGetCosts {
     /// Total number of hits found.
-    pub hits: i32,
+    pub hits: Option<i32>,
     /// Total milliseconds spent.
-    pub ms: i32,
+    pub ms: Option<i32>,
 }
 
 impl NestedType for ReconcileGetCosts {}
@@ -381,14 +381,14 @@ impl Part for ReconcileGetCosts {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReconcileGet {
     /// Server costs for reconciling.
-    pub costs: ReconcileGetCosts,
+    pub costs: Option<ReconcileGetCosts>,
     /// If filled, then there were recoverable problems that affected the request. For example, some of the properties were ignored because they either are not valid Freebase predicates or are not indexed for reconciliation. The candidates returned should be considered valid results, with the caveat that sections of the request were ignored as specified by the warning text.
-    pub warning: Vec<ReconcileGetWarning>,
+    pub warning: Option<Vec<ReconcileGetWarning>>,
     /// If filled, then the listed candidates are potential matches, and such should be evaluated by a more discerning algorithm or human. The matches are ordered by confidence.
-    pub candidate: Vec<ReconcileCandidate>,
+    pub candidate: Option<Vec<ReconcileCandidate>>,
     /// If filled, this entity is guaranteed to match at requested confidence probability (default 99%).
     #[serde(rename="match")]
-    pub match_: ReconcileCandidate,
+    pub match_: Option<ReconcileCandidate>,
 }
 
 impl ResponseResult for ReconcileGet {}
@@ -401,9 +401,9 @@ impl ResponseResult for ReconcileGet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReconcileCandidateNotable {
     /// MID of notable category.
-    pub id: String,
+    pub id: Option<String>,
     /// Name of notable category in specified language.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for ReconcileCandidateNotable {}

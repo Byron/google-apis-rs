@@ -344,9 +344,9 @@ impl<'a, C, A> Doubleclicksearch<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDimension {
     /// Custom dimension name.
-    pub name: String,
+    pub name: Option<String>,
     /// Custom dimension value.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for CustomDimension {}
@@ -359,9 +359,9 @@ impl Part for CustomDimension {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomMetric {
     /// Custom metric name.
-    pub name: String,
+    pub name: Option<String>,
     /// Custom metric numeric value.
-    pub value: f64,
+    pub value: Option<f64>,
 }
 
 impl Part for CustomMetric {}
@@ -375,78 +375,78 @@ impl Part for CustomMetric {}
 pub struct Conversion {
     /// Custom dimensions for the conversion, which can be used to filter data in a report.
     #[serde(rename="customDimension")]
-    pub custom_dimension: Vec<CustomDimension>,
+    pub custom_dimension: Option<Vec<CustomDimension>>,
     /// DS ad group ID.
     #[serde(rename="adGroupId")]
-    pub ad_group_id: String,
+    pub ad_group_id: Option<String>,
     /// The numeric segmentation identifier (for example, DoubleClick Search Floodlight activity ID).
     #[serde(rename="segmentationId")]
-    pub segmentation_id: String,
+    pub segmentation_id: Option<String>,
     /// Attribution model name. This field is ignored.
     #[serde(rename="attributionModel")]
-    pub attribution_model: String,
+    pub attribution_model: Option<String>,
     /// DS campaign ID.
     #[serde(rename="campaignId")]
-    pub campaign_id: String,
+    pub campaign_id: Option<String>,
     /// The revenue amount of this TRANSACTION conversion, in micros.
     #[serde(rename="revenueMicros")]
-    pub revenue_micros: String,
+    pub revenue_micros: Option<String>,
     /// DS advertiser ID.
     #[serde(rename="advertiserId")]
-    pub advertiser_id: String,
+    pub advertiser_id: Option<String>,
     /// The quantity of this conversion, in millis.
     #[serde(rename="quantityMillis")]
-    pub quantity_millis: String,
+    pub quantity_millis: Option<String>,
     /// The number of conversions, formatted in millis (conversions multiplied by 1000). This field is ignored.
     #[serde(rename="countMillis")]
-    pub count_millis: String,
+    pub count_millis: Option<String>,
     /// DS criterion (keyword) ID.
     #[serde(rename="criterionId")]
-    pub criterion_id: String,
+    pub criterion_id: Option<String>,
     /// The time at which the conversion took place, in epoch millis UTC.
     #[serde(rename="conversionTimestamp")]
-    pub conversion_timestamp: String,
+    pub conversion_timestamp: Option<String>,
     /// The advertiser-provided order id for the conversion.
     #[serde(rename="floodlightOrderId")]
-    pub floodlight_order_id: String,
+    pub floodlight_order_id: Option<String>,
     /// The segmentation type of this conversion (for example, FLOODLIGHT).
     #[serde(rename="segmentationType")]
-    pub segmentation_type: String,
+    pub segmentation_type: Option<String>,
     /// DS click ID for the conversion.
     #[serde(rename="clickId")]
-    pub click_id: String,
+    pub click_id: Option<String>,
     /// Custom metrics for the conversion.
     #[serde(rename="customMetric")]
-    pub custom_metric: Vec<CustomMetric>,
+    pub custom_metric: Option<Vec<CustomMetric>>,
     /// DS conversion ID.
     #[serde(rename="dsConversionId")]
-    pub ds_conversion_id: String,
+    pub ds_conversion_id: Option<String>,
     /// DS engine account ID.
     #[serde(rename="engineAccountId")]
-    pub engine_account_id: String,
+    pub engine_account_id: Option<String>,
     /// The time at which the conversion was last modified, in epoch millis UTC.
     #[serde(rename="conversionModifiedTimestamp")]
-    pub conversion_modified_timestamp: String,
+    pub conversion_modified_timestamp: Option<String>,
     /// The currency code for the conversion's revenue. Should be in ISO 4217 alphabetic (3-char) format.
     #[serde(rename="currencyCode")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
     /// The friendly segmentation identifier (for example, DoubleClick Search Floodlight activity name).
     #[serde(rename="segmentationName")]
-    pub segmentation_name: String,
+    pub segmentation_name: Option<String>,
     /// The state of the conversion, that is, either ACTIVE or REMOVED. Note: state DELETED is deprecated.
-    pub state: String,
+    pub state: Option<String>,
     /// DS ad ID.
     #[serde(rename="adId")]
-    pub ad_id: String,
+    pub ad_id: Option<String>,
     /// DS agency ID.
     #[serde(rename="agencyId")]
-    pub agency_id: String,
+    pub agency_id: Option<String>,
     /// Advertiser-provided ID for the conversion, also known as the order ID.
     #[serde(rename="conversionId")]
-    pub conversion_id: String,
+    pub conversion_id: Option<String>,
     /// The type of the conversion, that is, either ACTION or TRANSACTION. An ACTION conversion is an action by the user that has no monetarily quantifiable value, while a TRANSACTION conversion is an action that does have a monetarily quantifiable value. Examples are email list signups (ACTION) versus ecommerce purchases (TRANSACTION).
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl Part for Conversion {}
@@ -457,7 +457,7 @@ impl Part for Conversion {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReportRow(HashMap<String, String>);
+pub struct ReportRow(Option<HashMap<String, String>>);
 
 impl Part for ReportRow {}
 
@@ -469,10 +469,10 @@ impl Part for ReportRow {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportFiles {
     /// Use this url to download the report file.
-    pub url: String,
+    pub url: Option<String>,
     /// The size of this report file in bytes.
     #[serde(rename="byteCount")]
-    pub byte_count: i64,
+    pub byte_count: Option<i64>,
 }
 
 impl NestedType for ReportFiles {}
@@ -487,25 +487,25 @@ impl Part for ReportFiles {}
 pub struct ReportRequestReportScope {
     /// DS advertiser ID.
     #[serde(rename="advertiserId")]
-    pub advertiser_id: String,
+    pub advertiser_id: Option<String>,
     /// DS ad group ID.
     #[serde(rename="adGroupId")]
-    pub ad_group_id: String,
+    pub ad_group_id: Option<String>,
     /// DS keyword ID.
     #[serde(rename="keywordId")]
-    pub keyword_id: String,
+    pub keyword_id: Option<String>,
     /// DS ad ID.
     #[serde(rename="adId")]
-    pub ad_id: String,
+    pub ad_id: Option<String>,
     /// DS agency ID.
     #[serde(rename="agencyId")]
-    pub agency_id: String,
+    pub agency_id: Option<String>,
     /// DS engine account ID.
     #[serde(rename="engineAccountId")]
-    pub engine_account_id: String,
+    pub engine_account_id: Option<String>,
     /// DS campaign ID.
     #[serde(rename="campaignId")]
-    pub campaign_id: String,
+    pub campaign_id: Option<String>,
 }
 
 impl NestedType for ReportRequestReportScope {}
@@ -519,11 +519,11 @@ impl Part for ReportRequestReportScope {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRequestFilters {
     /// Column to perform the filter on. This can be a DoubleClick Search column or a saved column.
-    pub column: ReportApiColumnSpec,
+    pub column: Option<ReportApiColumnSpec>,
     /// Operator to use in the filter. See the filter reference for a list of available operators.
-    pub operator: String,
+    pub operator: Option<String>,
     /// A list of values to filter the column value against.
-    pub values: Vec<String>,
+    pub values: Option<Vec<String>>,
 }
 
 impl NestedType for ReportRequestFilters {}
@@ -537,10 +537,10 @@ impl Part for ReportRequestFilters {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRequestOrderBy {
     /// Column to perform the sort on. This can be a DoubleClick Search-defined column or a saved column.
-    pub column: ReportApiColumnSpec,
+    pub column: Option<ReportApiColumnSpec>,
     /// The sort direction, which is either ascending or descending.
     #[serde(rename="sortOrder")]
-    pub sort_order: String,
+    pub sort_order: Option<String>,
 }
 
 impl NestedType for ReportRequestOrderBy {}
@@ -555,32 +555,32 @@ impl Part for ReportRequestOrderBy {}
 pub struct ReportApiColumnSpec {
     /// Synchronous report only. Set to true to group by this column. Defaults to false.
     #[serde(rename="groupByColumn")]
-    pub group_by_column: bool,
+    pub group_by_column: Option<bool>,
     /// Inclusive day in YYYY-MM-DD format. When provided, this overrides the overall time range of the report for this column only. Must be provided together with startDate.
     #[serde(rename="endDate")]
-    pub end_date: String,
+    pub end_date: Option<String>,
     /// Name of a saved column to include in the report. The report must be scoped at advertiser or lower, and this saved column must already be created in the DoubleClick Search UI.
     #[serde(rename="savedColumnName")]
-    pub saved_column_name: String,
+    pub saved_column_name: Option<String>,
     /// Segments a report by a custom dimension. The report must be scoped to an advertiser or lower, and the custom dimension must already be set up in DoubleClick Search. The custom dimension name, which appears in DoubleClick Search, is case sensitive.
     /// If used in a conversion report, returns the value of the specified custom dimension for the given conversion, if set. This column does not segment the conversion report.
     #[serde(rename="customDimensionName")]
-    pub custom_dimension_name: String,
+    pub custom_dimension_name: Option<String>,
     /// Text used to identify this column in the report output; defaults to columnName or savedColumnName when not specified. This can be used to prevent collisions between DoubleClick Search columns and saved columns with the same name.
     #[serde(rename="headerText")]
-    pub header_text: String,
+    pub header_text: Option<String>,
     /// Name of a DoubleClick Search column to include in the report.
     #[serde(rename="columnName")]
-    pub column_name: String,
+    pub column_name: Option<String>,
     /// The platform that is used to provide data for the custom dimension. Acceptable values are "Floodlight".
     #[serde(rename="platformSource")]
-    pub platform_source: String,
+    pub platform_source: Option<String>,
     /// Inclusive date in YYYY-MM-DD format. When provided, this overrides the overall time range of the report for this column only. Must be provided together with endDate.
     #[serde(rename="startDate")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     /// Name of a custom metric to include in the report. The report must be scoped to an advertiser or lower, and the custom metric must already be set up in DoubleClick Search. The custom metric name, which appears in DoubleClick Search, is case sensitive.
     #[serde(rename="customMetricName")]
-    pub custom_metric_name: String,
+    pub custom_metric_name: Option<String>,
 }
 
 impl Part for ReportApiColumnSpec {}
@@ -594,22 +594,22 @@ impl Part for ReportApiColumnSpec {}
 pub struct Availability {
     /// DS advertiser ID.
     #[serde(rename="advertiserId")]
-    pub advertiser_id: String,
+    pub advertiser_id: Option<String>,
     /// The numeric segmentation identifier (for example, DoubleClick Search Floodlight activity ID).
     #[serde(rename="segmentationId")]
-    pub segmentation_id: String,
+    pub segmentation_id: Option<String>,
     /// The segmentation type that this availability is for (its default value is FLOODLIGHT).
     #[serde(rename="segmentationType")]
-    pub segmentation_type: String,
+    pub segmentation_type: Option<String>,
     /// DS agency ID.
     #[serde(rename="agencyId")]
-    pub agency_id: String,
+    pub agency_id: Option<String>,
     /// The friendly segmentation identifier (for example, DoubleClick Search Floodlight activity name).
     #[serde(rename="segmentationName")]
-    pub segmentation_name: String,
+    pub segmentation_name: Option<String>,
     /// The time by which all conversions have been uploaded, in epoch millis UTC.
     #[serde(rename="availabilityTimestamp")]
-    pub availability_timestamp: String,
+    pub availability_timestamp: Option<String>,
 }
 
 impl Part for Availability {}
@@ -687,27 +687,27 @@ impl RequestValue for ReportRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Report {
     /// Asynchronous report only. Contains a list of generated report files once the report has succesfully completed.
-    pub files: Vec<ReportFiles>,
+    pub files: Option<Vec<ReportFiles>>,
     /// Identifies this as a Report resource. Value: the fixed string doubleclicksearch#report.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Synchronous report only. Generated report rows.
-    pub rows: Vec<ReportRow>,
+    pub rows: Option<Vec<ReportRow>>,
     /// The request that created the report. Optional fields not specified in the original request are filled with default values.
-    pub request: ReportRequest,
+    pub request: Option<ReportRequest>,
     /// Asynchronous report only. True if and only if the report has completed successfully and the report files are ready to be downloaded.
     #[serde(rename="isReportReady")]
-    pub is_report_ready: bool,
+    pub is_report_ready: Option<bool>,
     /// The number of report rows generated by the report, not including headers.
     #[serde(rename="rowCount")]
-    pub row_count: i32,
+    pub row_count: Option<i32>,
     /// If all statistics of the report are sourced from the same time zone, this would be it. Otherwise the field is unset.
     #[serde(rename="statisticsTimeZone")]
-    pub statistics_time_zone: String,
+    pub statistics_time_zone: Option<String>,
     /// The currency code of all monetary values produced in the report, including values that are set by users (e.g., keyword bid settings) and metrics (e.g., cost and revenue). The currency code of a report is determined by the statisticsCurrency field of the report request.
     #[serde(rename="statisticsCurrencyCode")]
-    pub statistics_currency_code: String,
+    pub statistics_currency_code: Option<String>,
     /// Asynchronous report only. Id of the report.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Resource for Report {}
@@ -722,16 +722,16 @@ impl ResponseResult for Report {}
 pub struct ReportRequestTimeRange {
     /// Inclusive UTC timestamp in RFC format, e.g., 2013-07-16T10:16:23.555Z. See additional references on how changed metrics reports work.
     #[serde(rename="changedMetricsSinceTimestamp")]
-    pub changed_metrics_since_timestamp: String,
+    pub changed_metrics_since_timestamp: Option<String>,
     /// Inclusive date in YYYY-MM-DD format.
     #[serde(rename="endDate")]
-    pub end_date: String,
+    pub end_date: Option<String>,
     /// Inclusive UTC timestamp in RFC format, e.g., 2013-07-16T10:16:23.555Z. See additional references on how changed attribute reports work.
     #[serde(rename="changedAttributesSinceTimestamp")]
-    pub changed_attributes_since_timestamp: String,
+    pub changed_attributes_since_timestamp: Option<String>,
     /// Inclusive date in YYYY-MM-DD format.
     #[serde(rename="startDate")]
-    pub start_date: String,
+    pub start_date: Option<String>,
 }
 
 impl NestedType for ReportRequestTimeRange {}
@@ -750,9 +750,9 @@ impl Part for ReportRequestTimeRange {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SavedColumnList {
     /// The saved columns being requested.
-    pub items: Vec<SavedColumn>,
+    pub items: Option<Vec<SavedColumn>>,
     /// Identifies this as a SavedColumnList resource. Value: the fixed string doubleclicksearch#savedColumnList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for SavedColumnList {}
@@ -812,7 +812,7 @@ impl RequestValue for UpdateAvailabilityRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateAvailabilityResponse {
     /// The availabilities being returned.
-    pub availabilities: Vec<Availability>,
+    pub availabilities: Option<Vec<Availability>>,
 }
 
 impl ResponseResult for UpdateAvailabilityResponse {}
@@ -1207,7 +1207,7 @@ impl<'a, C, A> ReportMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ConversionList = Default::default();
+/// let mut req = ConversionList::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1273,16 +1273,20 @@ impl<'a, C, A> ConversionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1538,16 +1542,20 @@ impl<'a, C, A> ConversionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1775,7 +1783,7 @@ impl<'a, C, A> ConversionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: UpdateAvailabilityRequest = Default::default();
+/// let mut req = UpdateAvailabilityRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1841,16 +1849,20 @@ impl<'a, C, A> ConversionUpdateAvailabilityCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1993,7 +2005,7 @@ impl<'a, C, A> ConversionUpdateAvailabilityCall<'a, C, A> where C: BorrowMut<hyp
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ConversionList = Default::default();
+/// let mut req = ConversionList::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2073,16 +2085,20 @@ impl<'a, C, A> ConversionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2295,7 +2311,7 @@ impl<'a, C, A> ConversionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ConversionList = Default::default();
+/// let mut req = ConversionList::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2361,16 +2377,20 @@ impl<'a, C, A> ConversionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2596,16 +2616,20 @@ impl<'a, C, A> SavedColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2840,16 +2864,20 @@ impl<'a, C, A> ReportGetFileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2989,7 +3017,7 @@ impl<'a, C, A> ReportGetFileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ReportRequest = Default::default();
+/// let mut req = ReportRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3055,16 +3083,20 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3288,16 +3320,20 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -3437,7 +3473,7 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ReportRequest = Default::default();
+/// let mut req = ReportRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -3503,16 +3539,20 @@ impl<'a, C, A> ReportRequestCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

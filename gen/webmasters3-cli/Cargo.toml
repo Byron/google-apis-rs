@@ -5,7 +5,7 @@
 
 name = "google-webmasters3-cli"
 version = "0.0.1+20140908"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with webmasters (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/webmasters3-cli"
 homepage = "https://developers.google.com/webmaster-tools/v3/welcome"
@@ -23,6 +23,7 @@ yup-oauth2 = "*"
 docopt = "*"
 docopt_macros = "*"
 rustc-serialize = "*"
+yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
 

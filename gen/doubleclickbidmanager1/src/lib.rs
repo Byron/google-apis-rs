@@ -341,7 +341,7 @@ impl RequestValue for DownloadLineItemsRequest {}
 pub struct ReportFailure {
     /// Error code that shows why the report was not created.
     #[serde(rename="errorCode")]
-    pub error_code: String,
+    pub error_code: Option<String>,
 }
 
 impl Part for ReportFailure {}
@@ -354,18 +354,18 @@ impl Part for ReportFailure {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Parameters {
     /// Metrics to include as columns in your report.
-    pub metrics: Vec<String>,
+    pub metrics: Option<Vec<String>>,
     /// Filters used to match traffic data in your report.
-    pub filters: Vec<FilterPair>,
+    pub filters: Option<Vec<FilterPair>>,
     /// Report type.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Data is grouped by the filters listed in this field.
     #[serde(rename="groupBys")]
-    pub group_bys: Vec<String>,
+    pub group_bys: Option<Vec<String>>,
     /// Whether to include data from Invite Media.
     #[serde(rename="includeInviteData")]
-    pub include_invite_data: bool,
+    pub include_invite_data: Option<bool>,
 }
 
 impl Part for Parameters {}
@@ -379,10 +379,10 @@ impl Part for Parameters {}
 pub struct ReportKey {
     /// Query ID.
     #[serde(rename="queryId")]
-    pub query_id: String,
+    pub query_id: Option<String>,
     /// Report ID.
     #[serde(rename="reportId")]
-    pub report_id: String,
+    pub report_id: Option<String>,
 }
 
 impl Part for ReportKey {}
@@ -424,9 +424,9 @@ impl RequestValue for UploadLineItemsRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListQueriesResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "doubleclickbidmanager#listQueriesResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Retrieved queries.
-    pub queries: Vec<Query>,
+    pub queries: Option<Vec<Query>>,
 }
 
 impl ResponseResult for ListQueriesResponse {}
@@ -439,16 +439,16 @@ impl ResponseResult for ListQueriesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportMetadata {
     /// Report status.
-    pub status: ReportStatus,
+    pub status: Option<ReportStatus>,
     /// The ending time for the data that is shown in the report.
     #[serde(rename="reportDataEndTimeMs")]
-    pub report_data_end_time_ms: String,
+    pub report_data_end_time_ms: Option<String>,
     /// The path to the location in Google Cloud Storage where the report is stored.
     #[serde(rename="googleCloudStoragePath")]
-    pub google_cloud_storage_path: String,
+    pub google_cloud_storage_path: Option<String>,
     /// The starting time for the data that is shown in the report.
     #[serde(rename="reportDataStartTimeMs")]
-    pub report_data_start_time_ms: String,
+    pub report_data_start_time_ms: Option<String>,
 }
 
 impl Part for ReportMetadata {}
@@ -462,15 +462,15 @@ impl Part for ReportMetadata {}
 pub struct QuerySchedule {
     /// Datetime to periodically run the query until.
     #[serde(rename="endTimeMs")]
-    pub end_time_ms: String,
+    pub end_time_ms: Option<String>,
     /// How often the query is run.
-    pub frequency: String,
+    pub frequency: Option<String>,
     /// Time of day at which a new report will be generated, represented as minutes past midnight. Range is 0 to 1439. Only applies to scheduled reports.
     #[serde(rename="nextRunMinuteOfDay")]
-    pub next_run_minute_of_day: i32,
+    pub next_run_minute_of_day: Option<i32>,
     /// Canonical timezone code for report generation time. Defaults to America/New_York.
     #[serde(rename="nextRunTimezoneCode")]
-    pub next_run_timezone_code: String,
+    pub next_run_timezone_code: Option<String>,
 }
 
 impl Part for QuerySchedule {}
@@ -517,7 +517,7 @@ impl RequestValue for RunQueryRequest {}
 pub struct UploadLineItemsResponse {
     /// Status of upload.
     #[serde(rename="uploadStatus")]
-    pub upload_status: UploadStatus,
+    pub upload_status: Option<UploadStatus>,
 }
 
 impl ResponseResult for UploadLineItemsResponse {}
@@ -531,35 +531,35 @@ impl ResponseResult for UploadLineItemsResponse {}
 pub struct QueryMetadata {
     /// The path to the location in Google Cloud Storage where the latest report is stored.
     #[serde(rename="googleCloudStoragePathForLatestReport")]
-    pub google_cloud_storage_path_for_latest_report: String,
+    pub google_cloud_storage_path_for_latest_report: Option<String>,
     /// Range of report data.
     #[serde(rename="dataRange")]
-    pub data_range: String,
+    pub data_range: Option<String>,
     /// Whether to send an email notification when a report is ready. Default to false.
     #[serde(rename="sendNotification")]
-    pub send_notification: bool,
+    pub send_notification: Option<bool>,
     /// Locale of the generated reports. Valid values are cs CZECH de GERMAN en ENGLISH es SPANISH fr FRENCH it ITALIAN ja JAPANESE ko KOREAN pl POLISH pt-BR BRAZILIAN_PORTUGUESE ru RUSSIAN tr TURKISH uk UKRAINIAN zh-CN CHINA_CHINESE zh-TW TAIWAN_CHINESE
     /// 
     /// An locale string not in the list above will generate reports in English.
-    pub locale: String,
+    pub locale: Option<String>,
     /// The path in Google Drive for the latest report.
     #[serde(rename="googleDrivePathForLatestReport")]
-    pub google_drive_path_for_latest_report: String,
+    pub google_drive_path_for_latest_report: Option<String>,
     /// Format of the generated report.
-    pub format: String,
+    pub format: Option<String>,
     /// List of email addresses which are sent email notifications when the report is finished. Separate from sendNotification.
     #[serde(rename="shareEmailAddress")]
-    pub share_email_address: Vec<String>,
+    pub share_email_address: Option<Vec<String>>,
     /// Number of reports that have been generated for the query.
     #[serde(rename="reportCount")]
-    pub report_count: i32,
+    pub report_count: Option<i32>,
     /// Whether the latest report is currently running.
-    pub running: bool,
+    pub running: Option<bool>,
     /// The time when the latest report started to run.
     #[serde(rename="latestReportRunTimeMs")]
-    pub latest_report_run_time_ms: String,
+    pub latest_report_run_time_ms: Option<String>,
     /// Query title. It is used to name the reports generated from this query.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for QueryMetadata {}
@@ -572,14 +572,14 @@ impl Part for QueryMetadata {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportStatus {
     /// If the report failed, this records the cause.
-    pub failure: ReportFailure,
+    pub failure: Option<ReportFailure>,
     /// The state of the report.
-    pub state: String,
+    pub state: Option<String>,
     /// The time when this report either completed successfully or failed.
     #[serde(rename="finishTimeMs")]
-    pub finish_time_ms: String,
+    pub finish_time_ms: Option<String>,
     /// The file type of the report.
-    pub format: String,
+    pub format: Option<String>,
 }
 
 impl Part for ReportStatus {}
@@ -597,9 +597,9 @@ impl Part for ReportStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListReportsResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "doubleclickbidmanager#listReportsResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Retrieved reports.
-    pub reports: Vec<Report>,
+    pub reports: Option<Vec<Report>>,
 }
 
 impl ResponseResult for ListReportsResponse {}
@@ -612,20 +612,20 @@ impl ResponseResult for ListReportsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RowStatus {
     /// Whether the entity is persisted.
-    pub persisted: bool,
+    pub persisted: Option<bool>,
     /// Reasons why the entity can't be uploaded.
-    pub errors: Vec<String>,
+    pub errors: Option<Vec<String>>,
     /// Entity name.
     #[serde(rename="entityName")]
-    pub entity_name: String,
+    pub entity_name: Option<String>,
     /// Whether the stored entity is changed as a result of upload.
-    pub changed: bool,
+    pub changed: Option<bool>,
     /// Entity Id.
     #[serde(rename="entityId")]
-    pub entity_id: String,
+    pub entity_id: Option<String>,
     /// Row number.
     #[serde(rename="rowNumber")]
-    pub row_number: i32,
+    pub row_number: Option<i32>,
 }
 
 impl Part for RowStatus {}
@@ -704,7 +704,7 @@ impl ResponseResult for Query {}
 pub struct DownloadLineItemsResponse {
     /// Retrieved line items in CSV format. Refer to  Entity Write File Format for more information on file format.
     #[serde(rename="lineItems")]
-    pub line_items: String,
+    pub line_items: Option<String>,
 }
 
 impl ResponseResult for DownloadLineItemsResponse {}
@@ -718,9 +718,9 @@ impl ResponseResult for DownloadLineItemsResponse {}
 pub struct FilterPair {
     /// Filter type.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Filter value.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for FilterPair {}
@@ -733,10 +733,10 @@ impl Part for FilterPair {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UploadStatus {
     /// Reasons why upload can't be completed.
-    pub errors: Vec<String>,
+    pub errors: Option<Vec<String>>,
     /// Per-row upload status.
     #[serde(rename="rowStatus")]
-    pub row_status: Vec<RowStatus>,
+    pub row_status: Option<Vec<RowStatus>>,
 }
 
 impl Part for UploadStatus {}
@@ -1028,7 +1028,7 @@ impl<'a, C, A> QueryMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: UploadLineItemsRequest = Default::default();
+/// let mut req = UploadLineItemsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1227,7 +1227,7 @@ impl<'a, C, A> LineitemUploadlineitemCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: DownloadLineItemsRequest = Default::default();
+/// let mut req = DownloadLineItemsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2023,7 +2023,7 @@ impl<'a, C, A> QueryGetqueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Query = Default::default();
+/// let mut req = Query::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2422,7 +2422,7 @@ impl<'a, C, A> QueryDeletequeryCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: RunQueryRequest = Default::default();
+/// let mut req = RunQueryRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.

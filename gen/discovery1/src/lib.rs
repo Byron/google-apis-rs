@@ -305,7 +305,7 @@ impl<'a, C, A> Discovery<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestDescriptionAuthOauth2 {
     /// Available OAuth 2.0 scopes.
-    pub scopes: HashMap<String, RestDescriptionAuthOauth2Scopes>,
+    pub scopes: Option<HashMap<String, RestDescriptionAuthOauth2Scopes>>,
 }
 
 impl NestedType for RestDescriptionAuthOauth2 {}
@@ -320,7 +320,7 @@ impl Part for RestDescriptionAuthOauth2 {}
 pub struct RestMethodResponse {
     /// Schema ID for the response schema.
     #[serde(rename="$ref")]
-    pub ref_: String,
+    pub ref_: Option<String>,
 }
 
 impl NestedType for RestMethodResponse {}
@@ -334,9 +334,9 @@ impl Part for RestMethodResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JsonSchemaVariant {
     /// The map of discriminant value to schema to use for parsing..
-    pub map: Vec<JsonSchemaVariantMap>,
+    pub map: Option<Vec<JsonSchemaVariantMap>>,
     /// The name of the type discriminant property.
-    pub discriminant: String,
+    pub discriminant: Option<String>,
 }
 
 impl NestedType for JsonSchemaVariant {}
@@ -350,9 +350,9 @@ impl Part for JsonSchemaVariant {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethodMediaUploadProtocols {
     /// Supports uploading as a single HTTP request.
-    pub simple: RestMethodMediaUploadProtocolsSimple,
+    pub simple: Option<RestMethodMediaUploadProtocolsSimple>,
     /// Supports the Resumable Media Upload protocol.
-    pub resumable: RestMethodMediaUploadProtocolsResumable,
+    pub resumable: Option<RestMethodMediaUploadProtocolsResumable>,
 }
 
 impl NestedType for RestMethodMediaUploadProtocols {}
@@ -366,9 +366,9 @@ impl Part for RestMethodMediaUploadProtocols {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethodMediaUploadProtocolsResumable {
     /// The URI path to be used for upload. Should be used in conjunction with the basePath property at the api-level.
-    pub path: String,
+    pub path: Option<String>,
     /// True if this endpoint supports uploading multipart media.
-    pub multipart: bool,
+    pub multipart: Option<bool>,
 }
 
 impl NestedType for RestMethodMediaUploadProtocolsResumable {}
@@ -382,7 +382,7 @@ impl Part for RestMethodMediaUploadProtocolsResumable {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JsonSchemaAnnotations {
     /// A list of methods for which this property is required on requests.
-    pub required: Vec<String>,
+    pub required: Option<Vec<String>>,
 }
 
 impl NestedType for JsonSchemaAnnotations {}
@@ -396,10 +396,10 @@ impl Part for JsonSchemaAnnotations {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JsonSchemaVariantMap {
     /// no description provided
-    pub type_value: String,
+    pub type_value: Option<String>,
     /// no description provided
     #[serde(rename="$ref")]
-    pub ref_: String,
+    pub ref_: Option<String>,
 }
 
 impl NestedType for JsonSchemaVariantMap {}
@@ -413,9 +413,9 @@ impl Part for JsonSchemaVariantMap {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestDescriptionIcons {
     /// The URL of the 32x32 icon.
-    pub x32: String,
+    pub x32: Option<String>,
     /// The URL of the 16x16 icon.
-    pub x16: String,
+    pub x16: Option<String>,
 }
 
 impl NestedType for RestDescriptionIcons {}
@@ -429,43 +429,43 @@ impl Part for RestDescriptionIcons {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethod {
     /// OAuth 2.0 scopes applicable to this method.
-    pub scopes: Vec<String>,
+    pub scopes: Option<Vec<String>>,
     /// Description of this method.
-    pub description: String,
+    pub description: Option<String>,
     /// Details for all parameters in this method.
-    pub parameters: HashMap<String, JsonSchema>,
+    pub parameters: Option<HashMap<String, JsonSchema>>,
     /// Whether this method supports media uploads.
     #[serde(rename="supportsMediaUpload")]
-    pub supports_media_upload: bool,
+    pub supports_media_upload: Option<bool>,
     /// Whether this method requires an ETag to be specified. The ETag is sent as an HTTP If-Match or If-None-Match header.
     #[serde(rename="etagRequired")]
-    pub etag_required: bool,
+    pub etag_required: Option<bool>,
     /// Media upload parameters.
     #[serde(rename="mediaUpload")]
-    pub media_upload: RestMethodMediaUpload,
+    pub media_upload: Option<RestMethodMediaUpload>,
     /// The schema for the request.
-    pub request: RestMethodRequest,
+    pub request: Option<RestMethodRequest>,
     /// Indicates that downloads from this method should use the download service URL (i.e. "/download"). Only applies if the method supports media download.
     #[serde(rename="useMediaDownloadService")]
-    pub use_media_download_service: bool,
+    pub use_media_download_service: Option<bool>,
     /// HTTP method used by this method.
     #[serde(rename="httpMethod")]
-    pub http_method: String,
+    pub http_method: Option<String>,
     /// Whether this method supports subscriptions.
     #[serde(rename="supportsSubscription")]
-    pub supports_subscription: bool,
+    pub supports_subscription: Option<bool>,
     /// Ordered list of required parameters, serves as a hint to clients on how to structure their method signatures. The array is ordered such that the "most-significant" parameter appears first.
     #[serde(rename="parameterOrder")]
-    pub parameter_order: Vec<String>,
+    pub parameter_order: Option<Vec<String>>,
     /// A unique ID for this method. This property can be used to match methods between different versions of Discovery.
-    pub id: String,
+    pub id: Option<String>,
     /// The URI path of this REST method. Should be used in conjunction with the basePath property at the api-level.
-    pub path: String,
+    pub path: Option<String>,
     /// The schema for the response.
-    pub response: RestMethodResponse,
+    pub response: Option<RestMethodResponse>,
     /// Whether this method supports media downloads.
     #[serde(rename="supportsMediaDownload")]
-    pub supports_media_download: bool,
+    pub supports_media_download: Option<bool>,
 }
 
 impl Part for RestMethod {}
@@ -483,72 +483,72 @@ impl Part for RestMethod {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestDescription {
     /// The protocol described by this document.
-    pub protocol: String,
+    pub protocol: Option<String>,
     /// API-level methods for this API.
-    pub methods: HashMap<String, RestMethod>,
+    pub methods: Option<HashMap<String, RestMethod>>,
     /// Labels for the status of this API, such as labs or deprecated.
-    pub labels: Vec<String>,
+    pub labels: Option<Vec<String>>,
     /// The kind for this response.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Indicates how the API name should be capitalized and split into various parts. Useful for generating pretty class names.
     #[serde(rename="canonicalName")]
-    pub canonical_name: String,
+    pub canonical_name: Option<String>,
     /// The name of the owner of this API. See ownerDomain.
     #[serde(rename="ownerName")]
-    pub owner_name: String,
+    pub owner_name: Option<String>,
     /// A link to human readable documentation for the API.
     #[serde(rename="documentationLink")]
-    pub documentation_link: String,
+    pub documentation_link: Option<String>,
     /// Authentication information.
-    pub auth: RestDescriptionAuth,
+    pub auth: Option<RestDescriptionAuth>,
     /// The package of the owner of this API. See ownerDomain.
     #[serde(rename="packagePath")]
-    pub package_path: String,
+    pub package_path: Option<String>,
     /// The path for REST batch requests.
     #[serde(rename="batchPath")]
-    pub batch_path: String,
+    pub batch_path: Option<String>,
     /// The ID of this API.
-    pub id: String,
+    pub id: Option<String>,
     /// A list of supported features for this API.
-    pub features: Vec<String>,
+    pub features: Option<Vec<String>>,
     /// The domain of the owner of this API. Together with the ownerName and a packagePath values, this can be used to generate a library for this API which would have a unique fully qualified name.
     #[serde(rename="ownerDomain")]
-    pub owner_domain: String,
+    pub owner_domain: Option<String>,
     /// The root URL under which all API services live.
     #[serde(rename="rootUrl")]
-    pub root_url: String,
+    pub root_url: Option<String>,
     /// The name of this API.
-    pub name: String,
+    pub name: Option<String>,
     /// Common parameters that apply across all apis.
-    pub parameters: HashMap<String, JsonSchema>,
+    pub parameters: Option<HashMap<String, JsonSchema>>,
     /// Links to 16x16 and 32x32 icons representing the API.
-    pub icons: RestDescriptionIcons,
+    pub icons: Option<RestDescriptionIcons>,
     /// The description of this API.
-    pub description: String,
+    pub description: Option<String>,
     /// The title of this API.
-    pub title: String,
+    pub title: Option<String>,
     /// [DEPRECATED] The base URL for REST requests.
     #[serde(rename="baseUrl")]
-    pub base_url: String,
+    pub base_url: Option<String>,
     /// The ETag for this response.
-    pub etag: String,
+    pub etag: Option<String>,
     /// The version of this API.
-    pub version: String,
+    pub version: Option<String>,
     /// The base path for all REST requests.
     #[serde(rename="servicePath")]
-    pub service_path: String,
+    pub service_path: Option<String>,
     /// Indicate the version of the Discovery API used to generate this doc.
     #[serde(rename="discoveryVersion")]
-    pub discovery_version: String,
+    pub discovery_version: Option<String>,
     /// The schemas for this API.
-    pub schemas: HashMap<String, JsonSchema>,
+    pub schemas: Option<HashMap<String, JsonSchema>>,
     /// [DEPRECATED] The base path for REST requests.
     #[serde(rename="basePath")]
-    pub base_path: String,
+    pub base_path: Option<String>,
     /// The resources in this API.
-    pub resources: HashMap<String, RestResource>,
+    pub resources: Option<HashMap<String, RestResource>>,
     /// The version of this API.
-    pub revision: String,
+    pub revision: Option<String>,
 }
 
 impl ResponseResult for RestDescription {}
@@ -562,11 +562,11 @@ impl ResponseResult for RestDescription {}
 pub struct RestMethodMediaUpload {
     /// Maximum size of a media upload, such as "1MB", "2GB" or "3TB".
     #[serde(rename="maxSize")]
-    pub max_size: String,
+    pub max_size: Option<String>,
     /// MIME Media Ranges for acceptable media uploads to this method.
-    pub accept: Vec<String>,
+    pub accept: Option<Vec<String>>,
     /// Supported upload protocols.
-    pub protocols: RestMethodMediaUploadProtocols,
+    pub protocols: Option<RestMethodMediaUploadProtocols>,
 }
 
 impl NestedType for RestMethodMediaUpload {}
@@ -585,12 +585,12 @@ impl Part for RestMethodMediaUpload {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectoryList {
     /// The individual directory entries. One entry per api/version pair.
-    pub items: Vec<DirectoryListItems>,
+    pub items: Option<Vec<DirectoryListItems>>,
     /// Indicate the version of the Discovery API used to generate this doc.
     #[serde(rename="discoveryVersion")]
-    pub discovery_version: String,
+    pub discovery_version: Option<String>,
     /// The kind for this response.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for DirectoryList {}
@@ -603,51 +603,51 @@ impl ResponseResult for DirectoryList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JsonSchema {
     /// A description of this object.
-    pub description: String,
+    pub description: Option<String>,
     /// An additional regular expression or key that helps constrain the value. For more details see: http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.23
-    pub format: String,
+    pub format: Option<String>,
     /// Values this parameter may take (if it is an enum).
     #[serde(rename="enum")]
-    pub enum_: Vec<String>,
+    pub enum_: Option<Vec<String>>,
     /// In a variant data type, the value of one property is used to determine how to interpret the entire entity. Its value must exist in a map of descriminant values to schema names.
-    pub variant: JsonSchemaVariant,
+    pub variant: Option<JsonSchemaVariant>,
     /// The descriptions for the enums. Each position maps to the corresponding value in the "enum" array.
     #[serde(rename="enumDescriptions")]
-    pub enum_descriptions: Vec<String>,
+    pub enum_descriptions: Option<Vec<String>>,
     /// The value is read-only, generated by the service. The value cannot be modified by the client. If the value is included in a POST, PUT, or PATCH request, it is ignored by the service.
     #[serde(rename="readOnly")]
-    pub read_only: bool,
+    pub read_only: Option<bool>,
     /// The minimum value of this parameter.
-    pub minimum: String,
+    pub minimum: Option<String>,
     /// Whether this parameter may appear multiple times.
-    pub repeated: bool,
+    pub repeated: Option<bool>,
     /// Unique identifier for this schema.
-    pub id: String,
+    pub id: Option<String>,
     /// A reference to another schema. The value of this property is the "id" of another schema.
     #[serde(rename="$ref")]
-    pub ref_: String,
+    pub ref_: Option<String>,
     /// The default value of this property (if one exists).
-    pub default: String,
+    pub default: Option<String>,
     /// If this is a schema for an array, this property is the schema for each element in the array.
-    pub items: Option<Box<JsonSchema>>,
+    pub items: Option<Option<Box<JsonSchema>>>,
     /// Whether the parameter is required.
-    pub required: bool,
+    pub required: Option<bool>,
     /// The maximum value of this parameter.
-    pub maximum: String,
+    pub maximum: Option<String>,
     /// If this is a schema for an object, list the schema for each property of this object.
-    pub properties: HashMap<String, JsonSchema>,
+    pub properties: Option<HashMap<String, JsonSchema>>,
     /// Whether this parameter goes in the query or the path for REST requests.
-    pub location: String,
+    pub location: Option<String>,
     /// The regular expression this parameter must conform to. Uses Java 6 regex format: http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html
-    pub pattern: String,
+    pub pattern: Option<String>,
     /// If this is a schema for an object, this property is the schema for any additional properties with dynamic keys on this object.
     #[serde(rename="additionalProperties")]
-    pub additional_properties: Option<Box<JsonSchema>>,
+    pub additional_properties: Option<Option<Box<JsonSchema>>>,
     /// The value type for this schema. A list of values can be found here: http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.1
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Additional information about this property.
-    pub annotations: JsonSchemaAnnotations,
+    pub annotations: Option<JsonSchemaAnnotations>,
 }
 
 impl Part for JsonSchema {}
@@ -660,32 +660,32 @@ impl Part for JsonSchema {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectoryListItems {
     /// The kind for this response.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The URL for the discovery REST document.
     #[serde(rename="discoveryRestUrl")]
-    pub discovery_rest_url: String,
+    pub discovery_rest_url: Option<String>,
     /// The description of this API.
-    pub description: String,
+    pub description: Option<String>,
     /// Links to 16x16 and 32x32 icons representing the API.
-    pub icons: DirectoryListItemsIcons,
+    pub icons: Option<DirectoryListItemsIcons>,
     /// Labels for the status of this API, such as labs or deprecated.
-    pub labels: Vec<String>,
+    pub labels: Option<Vec<String>>,
     /// True if this version is the preferred version to use.
-    pub preferred: bool,
+    pub preferred: Option<bool>,
     /// A link to the discovery document.
     #[serde(rename="discoveryLink")]
-    pub discovery_link: String,
+    pub discovery_link: Option<String>,
     /// The version of the API.
-    pub version: String,
+    pub version: Option<String>,
     /// The title of this API.
-    pub title: String,
+    pub title: Option<String>,
     /// A link to human readable documentation for the API.
     #[serde(rename="documentationLink")]
-    pub documentation_link: String,
+    pub documentation_link: Option<String>,
     /// The id of this API.
-    pub id: String,
+    pub id: Option<String>,
     /// The name of the API.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl NestedType for DirectoryListItems {}
@@ -699,7 +699,7 @@ impl Part for DirectoryListItems {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestDescriptionAuth {
     /// OAuth 2.0 authentication information.
-    pub oauth2: RestDescriptionAuthOauth2,
+    pub oauth2: Option<RestDescriptionAuthOauth2>,
 }
 
 impl NestedType for RestDescriptionAuth {}
@@ -713,7 +713,7 @@ impl Part for RestDescriptionAuth {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestDescriptionAuthOauth2Scopes {
     /// Description of scope.
-    pub description: String,
+    pub description: Option<String>,
 }
 
 impl NestedType for RestDescriptionAuthOauth2Scopes {}
@@ -727,9 +727,9 @@ impl Part for RestDescriptionAuthOauth2Scopes {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DirectoryListItemsIcons {
     /// The URL of the 32x32 icon.
-    pub x32: String,
+    pub x32: Option<String>,
     /// The URL of the 16x16 icon.
-    pub x16: String,
+    pub x16: Option<String>,
 }
 
 impl NestedType for DirectoryListItemsIcons {}
@@ -744,10 +744,10 @@ impl Part for DirectoryListItemsIcons {}
 pub struct RestMethodRequest {
     /// parameter name.
     #[serde(rename="parameterName")]
-    pub parameter_name: String,
+    pub parameter_name: Option<String>,
     /// Schema ID for the request schema.
     #[serde(rename="$ref")]
-    pub ref_: String,
+    pub ref_: Option<String>,
 }
 
 impl NestedType for RestMethodRequest {}
@@ -761,9 +761,9 @@ impl Part for RestMethodRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestResource {
     /// Methods on this resource.
-    pub methods: HashMap<String, RestMethod>,
+    pub methods: Option<HashMap<String, RestMethod>>,
     /// Sub-resources on this resource.
-    pub resources: HashMap<String, RestResource>,
+    pub resources: Option<HashMap<String, RestResource>>,
 }
 
 impl Part for RestResource {}
@@ -776,9 +776,9 @@ impl Part for RestResource {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethodMediaUploadProtocolsSimple {
     /// The URI path to be used for upload. Should be used in conjunction with the basePath property at the api-level.
-    pub path: String,
+    pub path: Option<String>,
     /// True if this endpoint supports upload multipart media.
-    pub multipart: bool,
+    pub multipart: Option<bool>,
 }
 
 impl NestedType for RestMethodMediaUploadProtocolsSimple {}
@@ -940,18 +940,6 @@ impl<'a, C, A> ApiGetRestCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/discovery/v1/apis/{api}/{version}/rest".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
-        }
 
         for &(find_this, param_name) in [("{api}", "api"), ("{version}", "version")].iter() {
                         let mut replace_with: Option<&str> = None;
@@ -1169,18 +1157,6 @@ impl<'a, C, A> ApiListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/discovery/v1/apis".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
-        }
 
         
         if params.len() > 0 {

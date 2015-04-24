@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *0.1.5+20150317*, where *20150317* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *Shopping Content* crate version *0.1.5+20150421*, where *20150421* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content/v2/).
@@ -117,7 +117,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: Account = Default::default();
+//! let mut req = Account::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -292,7 +292,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Account = Default::default();
+/// let mut req = Account::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -386,11 +386,11 @@ impl<'a, C, A> ShoppingContent<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Errors {
     /// The message of the first error in errors.
-    pub message: String,
+    pub message: Option<String>,
     /// The HTTP status of the first error in errors.
-    pub code: u32,
+    pub code: Option<u32>,
     /// A list of errors.
-    pub errors: Vec<ErrorType>,
+    pub errors: Option<Vec<ErrorType>>,
 }
 
 impl Part for Errors {}
@@ -403,13 +403,13 @@ impl Part for Errors {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductAspect {
     /// Whether the aspect is required, excluded or should be validated.
-    pub intention: String,
+    pub intention: Option<String>,
     /// The name of the aspect.
     #[serde(rename="aspectName")]
-    pub aspect_name: String,
+    pub aspect_name: Option<String>,
     /// The name of the destination. Leave out to apply to all destinations.
     #[serde(rename="destinationName")]
-    pub destination_name: String,
+    pub destination_name: Option<String>,
 }
 
 impl Part for ProductAspect {}
@@ -423,13 +423,13 @@ impl Part for ProductAspect {}
 pub struct ProductsCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productsCustomBatchResponseEntry".
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of errors defined if and only if the request failed.
-    pub errors: Errors,
+    pub errors: Option<Errors>,
     /// The inserted product. Only defined if the method is insert and if the request was successful.
-    pub product: Product,
+    pub product: Option<Product>,
 }
 
 impl Part for ProductsCustomBatchResponseEntry {}
@@ -447,9 +447,9 @@ impl Part for ProductsCustomBatchResponseEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccounttaxCustomBatchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxCustomBatchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The result of the execution of the batch requests.
-    pub entries: Vec<AccounttaxCustomBatchResponseEntry>,
+    pub entries: Option<Vec<AccounttaxCustomBatchResponseEntry>>,
 }
 
 impl ResponseResult for AccounttaxCustomBatchResponse {}
@@ -467,9 +467,9 @@ impl ResponseResult for AccounttaxCustomBatchResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountshippingCustomBatchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingCustomBatchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The result of the execution of the batch requests.
-    pub entries: Vec<AccountshippingCustomBatchResponseEntry>,
+    pub entries: Option<Vec<AccountshippingCustomBatchResponseEntry>>,
 }
 
 impl ResponseResult for AccountshippingCustomBatchResponse {}
@@ -487,9 +487,9 @@ impl ResponseResult for AccountshippingCustomBatchResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InventoryCustomBatchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#inventoryCustomBatchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The result of the execution of the batch requests.
-    pub entries: Vec<InventoryCustomBatchResponseEntry>,
+    pub entries: Option<Vec<InventoryCustomBatchResponseEntry>>,
 }
 
 impl ResponseResult for InventoryCustomBatchResponse {}
@@ -502,10 +502,10 @@ impl ResponseResult for InventoryCustomBatchResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountUser {
     /// Whether user is an admin.
-    pub admin: bool,
+    pub admin: Option<bool>,
     /// User's email address.
     #[serde(rename="emailAddress")]
-    pub email_address: String,
+    pub email_address: Option<String>,
 }
 
 impl Part for AccountUser {}
@@ -518,9 +518,9 @@ impl Part for AccountUser {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingRateTableCell {
     /// The rate applicable if the cell conditions are matched.
-    pub rate: Price,
+    pub rate: Option<Price>,
     /// Conditions for which the cell is valid. All cells in a table must use the same dimension or pair of dimensions among price, weight, shipping label or delivery location. If no condition is specified, the cell acts as a catch-all and matches all the elements that are not matched by other cells in this dimension.
-    pub condition: AccountShippingCondition,
+    pub condition: Option<AccountShippingCondition>,
 }
 
 impl Part for AccountShippingRateTableCell {}
@@ -556,9 +556,9 @@ impl RequestValue for ProductstatusesCustomBatchRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatafeedsCustomBatchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedsCustomBatchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The result of the execution of the batch requests.
-    pub entries: Vec<DatafeedsCustomBatchResponseEntry>,
+    pub entries: Option<Vec<DatafeedsCustomBatchResponseEntry>>,
 }
 
 impl ResponseResult for DatafeedsCustomBatchResponse {}
@@ -572,19 +572,19 @@ impl ResponseResult for DatafeedsCustomBatchResponse {}
 pub struct AccountShippingLocationGroup {
     /// A postal code range representing a city or a set of cities.
     #[serde(rename="postalCodeRanges")]
-    pub postal_code_ranges: Vec<AccountShippingPostalCodeRange>,
+    pub postal_code_ranges: Option<Vec<AccountShippingPostalCodeRange>>,
     /// The country in which this location group is, represented as ISO 3166-1 Alpha-2 code.
-    pub country: String,
+    pub country: Option<String>,
     /// A location ID (also called criteria ID) representing administrative areas, smaller country subdivisions (counties), or cities.
     #[serde(rename="locationIds")]
-    pub location_ids: Vec<String>,
+    pub location_ids: Option<Vec<String>>,
     /// The name of the location group.
-    pub name: String,
+    pub name: Option<String>,
     /// A postal code representing a city or a set of cities.  
     /// - A single postal code (e.g., 12345)
     /// - A postal code prefix followed by a star (e.g., 1234*)
     #[serde(rename="postalCodes")]
-    pub postal_codes: Vec<String>,
+    pub postal_codes: Option<Vec<String>>,
 }
 
 impl Part for AccountShippingLocationGroup {}
@@ -602,7 +602,7 @@ impl Part for AccountShippingLocationGroup {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InventorySetResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#inventorySetResponse".
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for InventorySetResponse {}
@@ -621,28 +621,28 @@ impl ResponseResult for InventorySetResponse {}
 pub struct ProductStatus {
     /// Date on which the item expires in Google Shopping, in ISO 8601 format.
     #[serde(rename="googleExpirationDate")]
-    pub google_expiration_date: String,
+    pub google_expiration_date: Option<String>,
     /// The intended destinations for the product.
     #[serde(rename="destinationStatuses")]
-    pub destination_statuses: Vec<ProductStatusDestinationStatus>,
+    pub destination_statuses: Option<Vec<ProductStatusDestinationStatus>>,
     /// The title of the product.
-    pub title: String,
+    pub title: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productStatus".
-    pub kind: String,
+    pub kind: Option<String>,
     /// Date on which the item has been last updated, in ISO 8601 format.
     #[serde(rename="lastUpdateDate")]
-    pub last_update_date: String,
+    pub last_update_date: Option<String>,
     /// The link to the product.
-    pub link: String,
+    pub link: Option<String>,
     /// Date on which the item has been created, in ISO 8601 format.
     #[serde(rename="creationDate")]
-    pub creation_date: String,
+    pub creation_date: Option<String>,
     /// A list of data quality issues associated with the product.
     #[serde(rename="dataQualityIssues")]
-    pub data_quality_issues: Vec<ProductStatusDataQualityIssue>,
+    pub data_quality_issues: Option<Vec<ProductStatusDataQualityIssue>>,
     /// The id of the product for which status is reported.
     #[serde(rename="productId")]
-    pub product_id: String,
+    pub product_id: Option<String>,
 }
 
 impl ResponseResult for ProductStatus {}
@@ -655,22 +655,22 @@ impl ResponseResult for ProductStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatafeedFetchSchedule {
     /// An optional user name for fetch_url.
-    pub username: String,
+    pub username: Option<String>,
     /// An optional password for fetch_url.
-    pub password: String,
+    pub password: Option<String>,
     /// The day of the week the feed file should be fetched.
-    pub weekday: String,
+    pub weekday: Option<String>,
     /// The hour of the day the feed file should be fetched (0-24).
-    pub hour: u32,
+    pub hour: Option<u32>,
     /// Time zone used for schedule. UTC by default. E.g., "America/Los_Angeles".
     #[serde(rename="timeZone")]
-    pub time_zone: String,
+    pub time_zone: Option<String>,
     /// The URL where the feed file can be fetched. Google Merchant Center will support automatic scheduled uploads using the HTTP, HTTPS, FTP, or SFTP protocols, so the value will need to be a valid link using one of those four protocols.
     #[serde(rename="fetchUrl")]
-    pub fetch_url: String,
+    pub fetch_url: Option<String>,
     /// The day of the month the feed file should be fetched (1-31).
     #[serde(rename="dayOfMonth")]
-    pub day_of_month: u32,
+    pub day_of_month: Option<u32>,
 }
 
 impl Part for DatafeedFetchSchedule {}
@@ -687,24 +687,27 @@ impl Part for DatafeedFetchSchedule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatafeedStatus {
-    /// The number of items in the feed that were valid.
-    #[serde(rename="itemsValid")]
-    pub items_valid: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedStatus".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The list of errors occurring in the feed.
-    pub errors: Vec<DatafeedStatusError>,
-    /// The processing status of the feed.
-    #[serde(rename="processingStatus")]
-    pub processing_status: String,
+    pub errors: Option<Vec<DatafeedStatusError>>,
+    /// The list of errors occurring in the feed.
+    pub warnings: Option<Vec<DatafeedStatusError>>,
     /// The number of items in the feed that were processed.
     #[serde(rename="itemsTotal")]
-    pub items_total: String,
+    pub items_total: Option<String>,
+    /// The processing status of the feed.
+    #[serde(rename="processingStatus")]
+    pub processing_status: Option<String>,
+    /// The last date at which the feed was uploaded.
+    #[serde(rename="lastUploadDate")]
+    pub last_upload_date: Option<String>,
+    /// The number of items in the feed that were valid.
+    #[serde(rename="itemsValid")]
+    pub items_valid: Option<String>,
     /// The ID of the feed for which the status is reported.
     #[serde(rename="datafeedId")]
-    pub datafeed_id: String,
-    /// The list of errors occurring in the feed.
-    pub warnings: Vec<DatafeedStatusError>,
+    pub datafeed_id: Option<String>,
 }
 
 impl ResponseResult for DatafeedStatus {}
@@ -718,15 +721,15 @@ impl ResponseResult for DatafeedStatus {}
 pub struct DatafeedstatusesCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The ID of the data feed to get or delete.
     #[serde(rename="datafeedId")]
-    pub datafeed_id: String,
+    pub datafeed_id: Option<String>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
-    pub merchant_id: String,
+    pub merchant_id: Option<String>,
     /// no description provided
-    pub method: String,
+    pub method: Option<String>,
 }
 
 impl Part for DatafeedstatusesCustomBatchRequestEntry {}
@@ -740,14 +743,14 @@ impl Part for DatafeedstatusesCustomBatchRequestEntry {}
 pub struct AccounttaxCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The retrieved or updated account tax settings.
     #[serde(rename="accountTax")]
-    pub account_tax: AccountTax,
+    pub account_tax: Option<AccountTax>,
     /// A list of errors defined if and only if the request failed.
-    pub errors: Errors,
+    pub errors: Option<Errors>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxCustomBatchResponseEntry".
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl Part for AccounttaxCustomBatchResponseEntry {}
@@ -783,11 +786,11 @@ impl RequestValue for AccountstatusesCustomBatchRequest {}
 pub struct AccountShippingShippingServiceCostRule {
     /// Final calculation method to be used only in leaf nodes.
     #[serde(rename="calculationMethod")]
-    pub calculation_method: AccountShippingShippingServiceCalculationMethod,
+    pub calculation_method: Option<AccountShippingShippingServiceCalculationMethod>,
     /// Condition for this rule to be applicable. If no condition is specified, the rule acts as a catch-all.
-    pub condition: AccountShippingCondition,
+    pub condition: Option<AccountShippingCondition>,
     /// Subsequent rules to be applied, only for inner nodes. The last child must not specify a condition and acts as a catch-all.
-    pub children: Vec<AccountShippingShippingServiceCostRule>,
+    pub children: Option<Vec<AccountShippingShippingServiceCostRule>>,
 }
 
 impl Part for AccountShippingShippingServiceCostRule {}
@@ -821,7 +824,7 @@ pub struct Account {
     /// Indicates whether the merchant sells adult content.
     #[serde(rename="adultContent")]
     pub adult_content: Option<bool>,
-    /// List of linked AdWords accounts.
+    /// List of linked AdWords accounts, active or pending approval. To create a new link request, add a new link with status active to the list. It will remain is state pending until approved or rejected in the AdWords interface. To delete an active link or to cancel a link request, remove it from the list.
     #[serde(rename="adwordsLinks")]
     pub adwords_links: Option<Vec<AccountAdwordsLink>>,
     /// The merchant's website.
@@ -849,10 +852,10 @@ impl ResponseResult for Account {}
 pub struct AccountIdentifier {
     /// The aggregator ID, set for aggregators and subaccounts (in that case, it represents the aggregator of the subaccount).
     #[serde(rename="aggregatorId")]
-    pub aggregator_id: String,
+    pub aggregator_id: Option<String>,
     /// The merchant account ID, set for individual accounts and subaccounts.
     #[serde(rename="merchantId")]
-    pub merchant_id: String,
+    pub merchant_id: Option<String>,
 }
 
 impl Part for AccountIdentifier {}
@@ -866,11 +869,11 @@ impl Part for AccountIdentifier {}
 pub struct InventoryCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#inventoryCustomBatchResponseEntry".
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of errors defined if and only if the request failed.
-    pub errors: Errors,
+    pub errors: Option<Errors>,
 }
 
 impl Part for InventoryCustomBatchResponseEntry {}
@@ -883,9 +886,9 @@ impl Part for InventoryCustomBatchResponseEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductCustomGroup {
     /// The sub-attributes.
-    pub attributes: Vec<ProductCustomAttribute>,
+    pub attributes: Option<Vec<ProductCustomAttribute>>,
     /// The name of the group. Underscores will be replaced by spaces upon insertion.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for ProductCustomGroup {}
@@ -902,9 +905,9 @@ pub struct ProductShippingDimension {
     /// Acceptable values are:  
     /// - "cm" 
     /// - "in"
-    pub unit: String,
+    pub unit: Option<String>,
     /// The dimension of the product used to calculate the shipping cost of the item.
-    pub value: f64,
+    pub value: Option<f64>,
 }
 
 impl Part for ProductShippingDimension {}
@@ -918,12 +921,12 @@ impl Part for ProductShippingDimension {}
 pub struct AccountstatusesCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// A list of errors defined if and only if the request failed.
-    pub errors: Errors,
+    pub errors: Option<Errors>,
     /// The requested account status. Defined if and only if the request was successful.
     #[serde(rename="accountStatus")]
-    pub account_status: AccountStatus,
+    pub account_status: Option<AccountStatus>,
 }
 
 impl Part for AccountstatusesCustomBatchResponseEntry {}
@@ -937,15 +940,15 @@ impl Part for AccountstatusesCustomBatchResponseEntry {}
 pub struct AccountstatusesCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The ID of the (sub-)account whose status to get.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
-    pub merchant_id: String,
+    pub merchant_id: Option<String>,
     /// The method (get).
-    pub method: String,
+    pub method: Option<String>,
 }
 
 impl Part for AccountstatusesCustomBatchRequestEntry {}
@@ -964,11 +967,11 @@ impl Part for AccountstatusesCustomBatchRequestEntry {}
 pub struct AccounttaxListResponse {
     /// The token for the retrieval of the next page of account tax settings.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub resources: Vec<AccountTax>,
+    pub resources: Option<Vec<AccountTax>>,
 }
 
 impl ResponseResult for AccounttaxListResponse {}
@@ -999,11 +1002,11 @@ impl RequestValue for DatafeedstatusesCustomBatchRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorType {
     /// The error code.
-    pub reason: String,
+    pub reason: Option<String>,
     /// A description of the error.
-    pub message: String,
+    pub message: Option<String>,
     /// The domain of the error.
-    pub domain: String,
+    pub domain: Option<String>,
 }
 
 impl Part for ErrorType {}
@@ -1017,11 +1020,11 @@ impl Part for ErrorType {}
 pub struct DatafeedsCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// A list of errors defined if and only if the request failed.
-    pub errors: Errors,
+    pub errors: Option<Errors>,
     /// The requested data feed. Defined if and only if the request was successful.
-    pub datafeed: Datafeed,
+    pub datafeed: Option<Datafeed>,
 }
 
 impl Part for DatafeedsCustomBatchResponseEntry {}
@@ -1035,18 +1038,18 @@ impl Part for DatafeedsCustomBatchResponseEntry {}
 pub struct AccountshippingCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The ID of the account for which to get/update account shipping settings.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
     /// The account shipping settings to update. Only defined if the method is update.
     #[serde(rename="accountShipping")]
-    pub account_shipping: AccountShipping,
+    pub account_shipping: Option<AccountShipping>,
     /// no description provided
-    pub method: String,
+    pub method: Option<String>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
-    pub merchant_id: String,
+    pub merchant_id: Option<String>,
 }
 
 impl Part for AccountshippingCustomBatchRequestEntry {}
@@ -1065,11 +1068,11 @@ impl Part for AccountshippingCustomBatchRequestEntry {}
 pub struct DatafeedsListResponse {
     /// The token for the retrieval of the next page of datafeeds.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedsListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub resources: Vec<Datafeed>,
+    pub resources: Option<Vec<Datafeed>>,
 }
 
 impl ResponseResult for DatafeedsListResponse {}
@@ -1083,21 +1086,21 @@ impl ResponseResult for DatafeedsListResponse {}
 pub struct ProductShipping {
     /// The numeric id of a location that the shipping rate applies to as defined in the AdWords API.
     #[serde(rename="locationId")]
-    pub location_id: String,
+    pub location_id: Option<String>,
     /// A free-form description of the service class or delivery speed.
-    pub service: String,
+    pub service: Option<String>,
     /// The postal code range that the shipping rate applies to, represented by a postal code, a postal code prefix followed by a * wildcard, a range between two postal codes or two postal code prefixes of equal length.
     #[serde(rename="postalCode")]
-    pub postal_code: String,
+    pub postal_code: Option<String>,
     /// The two-letter ISO 3166 country code for the country to which an item will ship.
-    pub country: String,
+    pub country: Option<String>,
     /// Fixed shipping price, represented as a number.
-    pub price: Price,
+    pub price: Option<Price>,
     /// The geographic region to which a shipping rate applies (e.g. zip code).
-    pub region: String,
+    pub region: Option<String>,
     /// The location where the shipping is applicable, represented by a location group name.
     #[serde(rename="locationGroupName")]
-    pub location_group_name: String,
+    pub location_group_name: Option<String>,
 }
 
 impl Part for ProductShipping {}
@@ -1137,17 +1140,17 @@ impl ResponseResult for AccountTax {}
 pub struct ProductsCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The product to insert. Only required if the method is insert.
-    pub product: Product,
+    pub product: Option<Product>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
-    pub merchant_id: String,
+    pub merchant_id: Option<String>,
     /// no description provided
-    pub method: String,
+    pub method: Option<String>,
     /// The ID of the product to get or delete. Only defined if the method is get or delete.
     #[serde(rename="productId")]
-    pub product_id: String,
+    pub product_id: Option<String>,
 }
 
 impl Part for ProductsCustomBatchRequestEntry {}
@@ -1161,13 +1164,13 @@ impl Part for ProductsCustomBatchRequestEntry {}
 pub struct AccountsCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The retrieved, created, or updated account. Not defined if the method was delete.
-    pub account: Account,
+    pub account: Option<Account>,
     /// A list of errors defined if and only if the request failed.
-    pub errors: Errors,
+    pub errors: Option<Errors>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountsCustomBatchResponseEntry".
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl Part for AccountsCustomBatchResponseEntry {}
@@ -1203,9 +1206,9 @@ impl RequestValue for AccountsCustomBatchRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductstatusesCustomBatchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesCustomBatchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The result of the execution of the batch requests.
-    pub entries: Vec<ProductstatusesCustomBatchResponseEntry>,
+    pub entries: Option<Vec<ProductstatusesCustomBatchResponseEntry>>,
 }
 
 impl ResponseResult for ProductstatusesCustomBatchResponse {}
@@ -1219,23 +1222,23 @@ impl ResponseResult for ProductstatusesCustomBatchResponse {}
 pub struct AccountShippingCarrierRate {
     /// Shipping origin represented as a postal code.
     #[serde(rename="shippingOrigin")]
-    pub shipping_origin: String,
+    pub shipping_origin: Option<String>,
     /// The carrier that is responsible for the shipping, such as "UPS", "FedEx", or "USPS".
-    pub carrier: String,
+    pub carrier: Option<String>,
     /// The name of the carrier rate.
-    pub name: String,
+    pub name: Option<String>,
     /// Sale country for which this carrier rate is valid, represented as an ISO 3166-1 Alpha-2 code.
     #[serde(rename="saleCountry")]
-    pub sale_country: i64,
+    pub sale_country: Option<i64>,
     /// The carrier service, such as "Ground" or "2Day".
     #[serde(rename="carrierService")]
-    pub carrier_service: String,
+    pub carrier_service: Option<String>,
     /// Additive shipping rate modifier.
     #[serde(rename="modifierFlatRate")]
-    pub modifier_flat_rate: Price,
+    pub modifier_flat_rate: Option<Price>,
     /// Multiplicative shipping rate modifier in percent. Represented as a floating point number without the percentage character.
     #[serde(rename="modifierPercent")]
-    pub modifier_percent: String,
+    pub modifier_percent: Option<String>,
 }
 
 impl Part for AccountShippingCarrierRate {}
@@ -1302,18 +1305,18 @@ impl ResponseResult for Datafeed {}
 pub struct AccountShippingShippingServiceCalculationMethod {
     /// Percentage of the price, represented as a floating point number without the percentage character.
     #[serde(rename="percentageRate")]
-    pub percentage_rate: String,
+    pub percentage_rate: Option<String>,
     /// Name of the carrier rate to use for the calculation.
     #[serde(rename="carrierRate")]
-    pub carrier_rate: String,
+    pub carrier_rate: Option<String>,
     /// Name of the rate table to use for the calculation.
     #[serde(rename="rateTable")]
-    pub rate_table: String,
+    pub rate_table: Option<String>,
     /// Delivery is excluded. Valid only within cost rules tree.
-    pub excluded: bool,
+    pub excluded: Option<bool>,
     /// Fixed price shipping, represented as a floating point number associated with a currency.
     #[serde(rename="flatRate")]
-    pub flat_rate: Price,
+    pub flat_rate: Option<Price>,
 }
 
 impl Part for AccountShippingShippingServiceCalculationMethod {}
@@ -1326,20 +1329,20 @@ impl Part for AccountShippingShippingServiceCalculationMethod {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductTax {
     /// The percentage of tax rate that applies to the item price.
-    pub rate: f64,
+    pub rate: Option<f64>,
     /// The numeric id of a location that the tax rate applies to as defined in the AdWords API.
     #[serde(rename="locationId")]
-    pub location_id: String,
+    pub location_id: Option<String>,
     /// The postal code range that the tax rate applies to, represented by a ZIP code, a ZIP code prefix using * wildcard, a range between two ZIP codes or two ZIP code prefixes of equal length. Examples: 94114, 94*, 94002-95460, 94*-95*.
     #[serde(rename="postalCode")]
-    pub postal_code: String,
+    pub postal_code: Option<String>,
     /// The country within which the item is taxed, specified with a two-letter ISO 3166 country code.
-    pub country: String,
+    pub country: Option<String>,
     /// The geographic region to which the tax rate applies.
-    pub region: String,
+    pub region: Option<String>,
     /// Set to true if tax is charged on shipping.
     #[serde(rename="taxShip")]
-    pub tax_ship: bool,
+    pub tax_ship: Option<bool>,
 }
 
 impl Part for ProductTax {}
@@ -1357,9 +1360,9 @@ impl Part for ProductTax {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatafeedstatusesCustomBatchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedstatusesCustomBatchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The result of the execution of the batch requests.
-    pub entries: Vec<DatafeedstatusesCustomBatchResponseEntry>,
+    pub entries: Option<Vec<DatafeedstatusesCustomBatchResponseEntry>>,
 }
 
 impl ResponseResult for DatafeedstatusesCustomBatchResponse {}
@@ -1373,17 +1376,17 @@ impl ResponseResult for DatafeedstatusesCustomBatchResponse {}
 pub struct AccountsCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The account to create or update. Only defined if the method is insert or update.
-    pub account: Account,
+    pub account: Option<Account>,
     /// The ID of the account to get or delete. Only defined if the method is get or delete.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
-    pub merchant_id: String,
+    pub merchant_id: Option<String>,
     /// no description provided
-    pub method: String,
+    pub method: Option<String>,
 }
 
 impl Part for AccountsCustomBatchRequestEntry {}
@@ -1401,13 +1404,13 @@ impl Part for AccountsCustomBatchRequestEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountsAuthInfoResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountsAuthInfoResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The account identifiers corresponding to the authenticated user.
     /// - For an individual account: only the merchant ID is defined
     /// - For an aggregator: only the aggregator ID is defined
     /// - For a subaccount of an MCA: both the merchant ID and the aggregator ID are defined.
     #[serde(rename="accountIdentifiers")]
-    pub account_identifiers: Vec<AccountIdentifier>,
+    pub account_identifiers: Option<Vec<AccountIdentifier>>,
 }
 
 impl ResponseResult for AccountsAuthInfoResponse {}
@@ -1444,11 +1447,11 @@ impl RequestValue for ProductsCustomBatchRequest {}
 pub struct DatafeedstatusesListResponse {
     /// The token for the retrieval of the next page of datafeed statuses.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedstatusesListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub resources: Vec<DatafeedStatus>,
+    pub resources: Option<Vec<DatafeedStatus>>,
 }
 
 impl ResponseResult for DatafeedstatusesListResponse {}
@@ -1461,9 +1464,9 @@ impl ResponseResult for DatafeedstatusesListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductUnitPricingMeasure {
     /// The unit of the measure.
-    pub unit: String,
+    pub unit: Option<String>,
     /// The measure of an item.
-    pub value: f64,
+    pub value: Option<f64>,
 }
 
 impl Part for ProductUnitPricingMeasure {}
@@ -1481,9 +1484,9 @@ impl Part for ProductUnitPricingMeasure {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountstatusesCustomBatchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountstatusesCustomBatchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The result of the execution of the batch requests.
-    pub entries: Vec<AccountstatusesCustomBatchResponseEntry>,
+    pub entries: Option<Vec<AccountstatusesCustomBatchResponseEntry>>,
 }
 
 impl ResponseResult for AccountstatusesCustomBatchResponse {}
@@ -1501,13 +1504,13 @@ impl ResponseResult for AccountstatusesCustomBatchResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountStatus {
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountStatus".
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of data quality issues.
     #[serde(rename="dataQualityIssues")]
-    pub data_quality_issues: Vec<AccountStatusDataQualityIssue>,
+    pub data_quality_issues: Option<Vec<AccountStatusDataQualityIssue>>,
     /// The ID of the account for which the status is reported.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
 }
 
 impl ResponseResult for AccountStatus {}
@@ -1520,9 +1523,9 @@ impl ResponseResult for AccountStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductInstallment {
     /// The amount the buyer has to pay per month.
-    pub amount: Price,
+    pub amount: Option<Price>,
     /// The number of installments the buyer has to pay.
-    pub months: String,
+    pub months: Option<String>,
 }
 
 impl Part for ProductInstallment {}
@@ -1536,12 +1539,12 @@ impl Part for ProductInstallment {}
 pub struct DatafeedstatusesCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// A list of errors defined if and only if the request failed.
-    pub errors: Errors,
+    pub errors: Option<Errors>,
     /// The requested data feed status. Defined if and only if the request was successful.
     #[serde(rename="datafeedStatus")]
-    pub datafeed_status: DatafeedStatus,
+    pub datafeed_status: Option<DatafeedStatus>,
 }
 
 impl Part for DatafeedstatusesCustomBatchResponseEntry {}
@@ -1554,19 +1557,19 @@ impl Part for DatafeedstatusesCustomBatchResponseEntry {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Inventory {
     /// Identifies what kind of resource this is. Value: the fixed string "content#inventory".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
     #[serde(rename="salePrice")]
-    pub sale_price: Price,
+    pub sale_price: Option<Price>,
     /// A date range represented by a pair of ISO 8601 dates separated by a space, comma, or slash. Both dates might be specified as 'null' if undecided.
     #[serde(rename="salePriceEffectiveDate")]
-    pub sale_price_effective_date: String,
+    pub sale_price_effective_date: Option<String>,
     /// The price of the product.
-    pub price: Price,
+    pub price: Option<Price>,
     /// The availability of the product.
-    pub availability: String,
+    pub availability: Option<String>,
     /// The quantity of the product. Must be equal to or greater than zero. Supported only for local products.
-    pub quantity: u32,
+    pub quantity: Option<u32>,
 }
 
 impl Part for Inventory {}
@@ -1579,12 +1582,12 @@ impl Part for Inventory {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingRateTable {
     /// One-dimensional table cells define one condition along the same dimension. Bi-dimensional table cells use two dimensions with respectively M and N distinct values and must contain exactly M * N cells with distinct conditions (for each possible value pairs).
-    pub content: Vec<AccountShippingRateTableCell>,
+    pub content: Option<Vec<AccountShippingRateTableCell>>,
     /// Sale country for which this table is valid, represented as an ISO 3166-1 Alpha-2 code.
     #[serde(rename="saleCountry")]
-    pub sale_country: i64,
+    pub sale_country: Option<i64>,
     /// The name of the rate table.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for AccountShippingRateTable {}
@@ -1598,11 +1601,11 @@ impl Part for AccountShippingRateTable {}
 pub struct ProductStatusDestinationStatus {
     /// The destination's approval status.
     #[serde(rename="approvalStatus")]
-    pub approval_status: String,
+    pub approval_status: Option<String>,
     /// The name of the destination
-    pub destination: String,
+    pub destination: Option<String>,
     /// Whether the destination is required, excluded, selected by default or should be validated.
-    pub intention: String,
+    pub intention: Option<String>,
 }
 
 impl Part for ProductStatusDestinationStatus {}
@@ -1634,18 +1637,18 @@ impl RequestValue for AccounttaxCustomBatchRequest {}
 pub struct InventoryCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The code of the store for which to update price and availability. Use online to update price and availability of an online product.
     #[serde(rename="storeCode")]
-    pub store_code: String,
+    pub store_code: Option<String>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
-    pub merchant_id: String,
+    pub merchant_id: Option<String>,
     /// Price and availability of the product.
-    pub inventory: Inventory,
+    pub inventory: Option<Inventory>,
     /// The ID of the product for which to update price and availability.
     #[serde(rename="productId")]
-    pub product_id: String,
+    pub product_id: Option<String>,
 }
 
 impl Part for InventoryCustomBatchRequestEntry {}
@@ -1663,9 +1666,9 @@ impl Part for InventoryCustomBatchRequestEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductsCustomBatchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#productsCustomBatchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The result of the execution of the batch requests.
-    pub entries: Vec<ProductsCustomBatchResponseEntry>,
+    pub entries: Option<Vec<ProductsCustomBatchResponseEntry>>,
 }
 
 impl ResponseResult for ProductsCustomBatchResponse {}
@@ -1684,11 +1687,11 @@ impl ResponseResult for ProductsCustomBatchResponse {}
 pub struct AccountshippingListResponse {
     /// The token for the retrieval of the next page of account shipping settings.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub resources: Vec<AccountShipping>,
+    pub resources: Option<Vec<AccountShipping>>,
 }
 
 impl ResponseResult for AccountshippingListResponse {}
@@ -1702,17 +1705,17 @@ impl ResponseResult for AccountshippingListResponse {}
 pub struct AccountStatusExampleItem {
     /// Unique item ID as specified in the uploaded product data.
     #[serde(rename="itemId")]
-    pub item_id: String,
+    pub item_id: Option<String>,
     /// The item value that was submitted.
     #[serde(rename="submittedValue")]
-    pub submitted_value: String,
+    pub submitted_value: Option<String>,
     /// Landing page of the item.
-    pub link: String,
+    pub link: Option<String>,
     /// The actual value on the landing page.
     #[serde(rename="valueOnLandingPage")]
-    pub value_on_landing_page: String,
+    pub value_on_landing_page: Option<String>,
     /// Title of the item.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Part for AccountStatusExampleItem {}
@@ -1726,15 +1729,15 @@ impl Part for AccountStatusExampleItem {}
 pub struct ProductstatusesCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
-    pub merchant_id: String,
+    pub merchant_id: Option<String>,
     /// no description provided
-    pub method: String,
+    pub method: Option<String>,
     /// The ID of the product whose status to get.
     #[serde(rename="productId")]
-    pub product_id: String,
+    pub product_id: Option<String>,
 }
 
 impl Part for ProductstatusesCustomBatchRequestEntry {}
@@ -1747,9 +1750,9 @@ impl Part for ProductstatusesCustomBatchRequestEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Price {
     /// The currency of the price.
-    pub currency: String,
+    pub currency: Option<String>,
     /// The price represented as a number.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for Price {}
@@ -1762,13 +1765,13 @@ impl Part for Price {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatafeedStatusError {
     /// The number of occurrences of the error in the feed.
-    pub count: String,
+    pub count: Option<String>,
     /// The error message, e.g., "Invalid price".
-    pub message: String,
+    pub message: Option<String>,
     /// The code of the error, e.g., "validation/invalid_value".
-    pub code: String,
+    pub code: Option<String>,
     /// A list of example occurrences of the error, grouped by product.
-    pub examples: Vec<DatafeedStatusExample>,
+    pub examples: Option<Vec<DatafeedStatusExample>>,
 }
 
 impl Part for DatafeedStatusError {}
@@ -1782,12 +1785,12 @@ impl Part for DatafeedStatusError {}
 pub struct DatafeedStatusExample {
     /// The ID of the example item.
     #[serde(rename="itemId")]
-    pub item_id: String,
+    pub item_id: Option<String>,
     /// The problematic value.
-    pub value: String,
+    pub value: Option<String>,
     /// Line number in the data feed where the example is found.
     #[serde(rename="lineNumber")]
-    pub line_number: String,
+    pub line_number: Option<String>,
 }
 
 impl Part for DatafeedStatusExample {}
@@ -1800,9 +1803,9 @@ impl Part for DatafeedStatusExample {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductShippingWeight {
     /// The unit of value.
-    pub unit: String,
+    pub unit: Option<String>,
     /// The weight of the product used to calculate the shipping cost of the item.
-    pub value: f64,
+    pub value: Option<f64>,
 }
 
 impl Part for ProductShippingWeight {}
@@ -1816,18 +1819,18 @@ impl Part for ProductShippingWeight {}
 pub struct AccounttaxCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The account tax settings to update. Only defined if the method is update.
     #[serde(rename="accountTax")]
-    pub account_tax: AccountTax,
+    pub account_tax: Option<AccountTax>,
     /// The ID of the account for which to get/update account tax settings.
     #[serde(rename="accountId")]
-    pub account_id: String,
+    pub account_id: Option<String>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
-    pub merchant_id: String,
+    pub merchant_id: Option<String>,
     /// no description provided
-    pub method: String,
+    pub method: Option<String>,
 }
 
 impl Part for AccounttaxCustomBatchRequestEntry {}
@@ -1875,9 +1878,9 @@ impl ResponseResult for AccountShipping {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductUnitPricingBaseMeasure {
     /// The unit of the denominator.
-    pub unit: String,
+    pub unit: Option<String>,
     /// The denominator of the unit price.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for ProductUnitPricingBaseMeasure {}
@@ -1890,19 +1893,19 @@ impl Part for ProductUnitPricingBaseMeasure {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountTaxTaxRule {
     /// Country code in which tax is applicable.
-    pub country: String,
+    pub country: Option<String>,
     /// Explicit tax rate in percent, represented as a floating point number without the percentage character. Must not be negative.
     #[serde(rename="ratePercent")]
-    pub rate_percent: String,
+    pub rate_percent: Option<String>,
     /// If true, shipping charges are also taxed.
     #[serde(rename="shippingTaxed")]
-    pub shipping_taxed: bool,
+    pub shipping_taxed: Option<bool>,
     /// State (or province) is which the tax is applicable, described by its location id (also called criteria id).
     #[serde(rename="locationId")]
-    pub location_id: String,
+    pub location_id: Option<String>,
     /// Whether the tax rate is taken from a global tax table or specified explicitly.
     #[serde(rename="useGlobalRate")]
-    pub use_global_rate: bool,
+    pub use_global_rate: Option<bool>,
 }
 
 impl Part for AccountTaxTaxRule {}
@@ -1915,14 +1918,14 @@ impl Part for AccountTaxTaxRule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductCustomAttribute {
     /// Free-form unit of the attribute. Unit can only be used for values of type INT or FLOAT.
-    pub unit: String,
+    pub unit: Option<String>,
     /// The type of the attribute.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The name of the attribute. Underscores will be replaced by spaces upon insertion.
-    pub name: String,
+    pub name: Option<String>,
     /// The value of the attribute.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for ProductCustomAttribute {}
@@ -1941,11 +1944,11 @@ impl Part for ProductCustomAttribute {}
 pub struct AccountstatusesListResponse {
     /// The token for the retrieval of the next page of account statuses.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountstatusesListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub resources: Vec<AccountStatus>,
+    pub resources: Option<Vec<AccountStatus>>,
 }
 
 impl ResponseResult for AccountstatusesListResponse {}
@@ -1959,25 +1962,25 @@ impl ResponseResult for AccountstatusesListResponse {}
 pub struct AccountShippingCondition {
     /// Maximum shipping weight. Forms an interval between the maximum of smaller weight (exclusive) and this weight (inclusive).
     #[serde(rename="weightMax")]
-    pub weight_max: Weight,
+    pub weight_max: Option<Weight>,
     /// Delivery location in terms of a location ID. Can be used to represent administrative areas, smaller country subdivisions, or cities.
     #[serde(rename="deliveryLocationId")]
-    pub delivery_location_id: String,
+    pub delivery_location_id: Option<String>,
     /// Shipping label of the product. The products with the label are matched.
     #[serde(rename="shippingLabel")]
-    pub shipping_label: String,
+    pub shipping_label: Option<String>,
     /// Delivery location in terms of a location group name. A location group with this name must be specified among location groups.
     #[serde(rename="deliveryLocationGroup")]
-    pub delivery_location_group: String,
+    pub delivery_location_group: Option<String>,
     /// Delivery location in terms of a postal code.
     #[serde(rename="deliveryPostalCode")]
-    pub delivery_postal_code: String,
+    pub delivery_postal_code: Option<String>,
     /// Maximum shipping price. Forms an interval between the maximum of smaller prices (exclusive) and this price (inclusive).
     #[serde(rename="priceMax")]
-    pub price_max: Price,
+    pub price_max: Option<Price>,
     /// Delivery location in terms of a postal code range.
     #[serde(rename="deliveryPostalCodeRange")]
-    pub delivery_postal_code_range: AccountShippingPostalCodeRange,
+    pub delivery_postal_code_range: Option<AccountShippingPostalCodeRange>,
 }
 
 impl Part for AccountShippingCondition {}
@@ -2213,23 +2216,23 @@ impl ResponseResult for Product {}
 pub struct ProductStatusDataQualityIssue {
     /// The value the attribute had at time of evaluation.
     #[serde(rename="valueProvided")]
-    pub value_provided: String,
+    pub value_provided: Option<String>,
     /// The severity of the data quality issue.
-    pub severity: String,
+    pub severity: Option<String>,
     /// The time stamp of the data quality issue.
-    pub timestamp: String,
+    pub timestamp: Option<String>,
     /// A more detailed error string.
-    pub detail: String,
+    pub detail: Option<String>,
     /// The attribute name that is relevant for the issue.
-    pub location: String,
+    pub location: Option<String>,
     /// The value of that attribute that was found on the landing page
     #[serde(rename="valueOnLandingPage")]
-    pub value_on_landing_page: String,
+    pub value_on_landing_page: Option<String>,
     /// The id of the data quality issue.
-    pub id: String,
+    pub id: Option<String>,
     /// The fetch status for landing_page_errors.
     #[serde(rename="fetchStatus")]
-    pub fetch_status: String,
+    pub fetch_status: Option<String>,
 }
 
 impl Part for ProductStatusDataQualityIssue {}
@@ -2248,11 +2251,11 @@ impl Part for ProductStatusDataQualityIssue {}
 pub struct ProductsListResponse {
     /// The token for the retrieval of the next page of products.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productsListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub resources: Vec<Product>,
+    pub resources: Option<Vec<Product>>,
 }
 
 impl ResponseResult for ProductsListResponse {}
@@ -2265,18 +2268,18 @@ impl ResponseResult for ProductsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingShippingService {
     /// Whether the shipping service is available.
-    pub active: bool,
+    pub active: Option<bool>,
     /// Decision tree for "complicated" shipping cost calculation.
     #[serde(rename="costRuleTree")]
-    pub cost_rule_tree: AccountShippingShippingServiceCostRule,
+    pub cost_rule_tree: Option<AccountShippingShippingServiceCostRule>,
     /// Sale country for which this service can be used, represented as an ISO 3166-1 Alpha-2 code.
     #[serde(rename="saleCountry")]
-    pub sale_country: i64,
+    pub sale_country: Option<i64>,
     /// Calculation method for the "simple" case that needs no rules.
     #[serde(rename="calculationMethod")]
-    pub calculation_method: AccountShippingShippingServiceCalculationMethod,
+    pub calculation_method: Option<AccountShippingShippingServiceCalculationMethod>,
     /// The name of this shipping service.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Part for AccountShippingShippingService {}
@@ -2290,14 +2293,14 @@ impl Part for AccountShippingShippingService {}
 pub struct AccountshippingCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingCustomBatchResponseEntry".
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of errors defined if and only if the request failed.
-    pub errors: Errors,
+    pub errors: Option<Errors>,
     /// The retrieved or updated account shipping settings.
     #[serde(rename="accountShipping")]
-    pub account_shipping: AccountShipping,
+    pub account_shipping: Option<AccountShipping>,
 }
 
 impl Part for AccountshippingCustomBatchResponseEntry {}
@@ -2338,10 +2341,10 @@ impl RequestValue for InventorySetRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductDestination {
     /// Whether the destination is required, excluded or should be validated.
-    pub intention: String,
+    pub intention: Option<String>,
     /// The name of the destination.
     #[serde(rename="destinationName")]
-    pub destination_name: String,
+    pub destination_name: Option<String>,
 }
 
 impl Part for ProductDestination {}
@@ -2359,9 +2362,9 @@ impl Part for ProductDestination {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountsCustomBatchResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountsCustomBatchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The result of the execution of the batch requests.
-    pub entries: Vec<AccountsCustomBatchResponseEntry>,
+    pub entries: Option<Vec<AccountsCustomBatchResponseEntry>>,
 }
 
 impl ResponseResult for AccountsCustomBatchResponse {}
@@ -2375,17 +2378,17 @@ impl ResponseResult for AccountsCustomBatchResponse {}
 pub struct DatafeedsCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// The ID of the data feed to get or delete.
     #[serde(rename="datafeedId")]
-    pub datafeed_id: String,
+    pub datafeed_id: Option<String>,
     /// The data feed to insert.
-    pub datafeed: Datafeed,
+    pub datafeed: Option<Datafeed>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
-    pub merchant_id: String,
+    pub merchant_id: Option<String>,
     /// no description provided
-    pub method: String,
+    pub method: Option<String>,
 }
 
 impl Part for DatafeedsCustomBatchRequestEntry {}
@@ -2404,11 +2407,11 @@ impl Part for DatafeedsCustomBatchRequestEntry {}
 pub struct ProductstatusesListResponse {
     /// The token for the retrieval of the next page of products statuses.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub resources: Vec<ProductStatus>,
+    pub resources: Option<Vec<ProductStatus>>,
 }
 
 impl ResponseResult for ProductstatusesListResponse {}
@@ -2421,9 +2424,9 @@ impl ResponseResult for ProductstatusesListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Weight {
     /// The weight unit.
-    pub unit: String,
+    pub unit: Option<String>,
     /// The weight represented as a number.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for Weight {}
@@ -2437,25 +2440,25 @@ impl Part for Weight {}
 pub struct AccountStatusDataQualityIssue {
     /// Actual value displayed on the landing page.
     #[serde(rename="displayedValue")]
-    pub displayed_value: String,
+    pub displayed_value: Option<String>,
     /// Severity of the problem.
-    pub severity: String,
+    pub severity: Option<String>,
     /// Last time the account was checked for this issue.
     #[serde(rename="lastChecked")]
-    pub last_checked: String,
+    pub last_checked: Option<String>,
     /// Country for which this issue is reported.
-    pub country: String,
+    pub country: Option<String>,
     /// Example items featuring the issue.
     #[serde(rename="exampleItems")]
-    pub example_items: Vec<AccountStatusExampleItem>,
+    pub example_items: Option<Vec<AccountStatusExampleItem>>,
     /// Submitted value that causes the issue.
     #[serde(rename="submittedValue")]
-    pub submitted_value: String,
+    pub submitted_value: Option<String>,
     /// Number of items in the account found to have the said issue.
     #[serde(rename="numItems")]
-    pub num_items: u32,
+    pub num_items: Option<u32>,
     /// Issue identifier.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for AccountStatusDataQualityIssue {}
@@ -2474,11 +2477,11 @@ impl Part for AccountStatusDataQualityIssue {}
 pub struct AccountsListResponse {
     /// The token for the retrieval of the next page of accounts.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountsListResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// no description provided
-    pub resources: Vec<Account>,
+    pub resources: Option<Vec<Account>>,
 }
 
 impl ResponseResult for AccountsListResponse {}
@@ -2492,14 +2495,14 @@ impl ResponseResult for AccountsListResponse {}
 pub struct ProductstatusesCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
-    pub batch_id: u32,
+    pub batch_id: Option<u32>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesCustomBatchResponseEntry".
-    pub kind: String,
+    pub kind: Option<String>,
     /// A list of errors, if the request failed.
-    pub errors: Errors,
+    pub errors: Option<Errors>,
     /// The requested product status. Only defined if the request was successful.
     #[serde(rename="productStatus")]
-    pub product_status: ProductStatus,
+    pub product_status: Option<ProductStatus>,
 }
 
 impl Part for ProductstatusesCustomBatchResponseEntry {}
@@ -2530,12 +2533,12 @@ impl RequestValue for AccountshippingCustomBatchRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LoyaltyPoints {
     /// The ratio of a point when converted to currency. Google assumes currency based on Merchant Center settings. If ratio is left out, it defaults to 1.0.
-    pub ratio: f64,
+    pub ratio: Option<f64>,
     /// Name of loyalty points program. It is recommended to limit the name to 12 full-width characters or 24 Roman characters.
-    pub name: String,
+    pub name: Option<String>,
     /// The retailer's loyalty points in absolute value.
     #[serde(rename="pointsValue")]
-    pub points_value: String,
+    pub points_value: Option<String>,
 }
 
 impl Part for LoyaltyPoints {}
@@ -2567,13 +2570,13 @@ impl RequestValue for DatafeedsCustomBatchRequest {}
 pub struct DatafeedFormat {
     /// Character encoding scheme of the data feed. If not specified, the encoding will be auto-detected.
     #[serde(rename="fileEncoding")]
-    pub file_encoding: String,
+    pub file_encoding: Option<String>,
     /// Specifies how double quotes are interpreted. If not specified, the mode will be auto-detected. Ignored for non-DSV data feeds.
     #[serde(rename="quotingMode")]
-    pub quoting_mode: String,
+    pub quoting_mode: Option<String>,
     /// Delimiter for the separation of values in a delimiter-separated values feed. If not specified, the delimiter will be auto-detected. Ignored for non-DSV data feeds.
     #[serde(rename="columnDelimiter")]
-    pub column_delimiter: String,
+    pub column_delimiter: Option<String>,
 }
 
 impl Part for DatafeedFormat {}
@@ -2585,11 +2588,11 @@ impl Part for DatafeedFormat {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountAdwordsLink {
-    /// Status of the link between this Merchant Center account and the AdWords account.
-    pub status: String,
+    /// Status of the link between this Merchant Center account and the AdWords account. Upon retrieval, it represents the actual status of the link and can be either active if it was approved in Google AdWords or pending if it's pending approval. Upon insertion, it represents the intended status of the link. Re-uploading a link with status active when it's still pending or with status pending when it's already active will have no effect: the status will remain unchanged. Re-uploading a link with deprecated status inactive is equivalent to not submitting the link at all and will delete the link if it was active or cancel the link request if it was pending.
+    pub status: Option<String>,
     /// Customer ID of the AdWords account.
     #[serde(rename="adwordsId")]
-    pub adwords_id: String,
+    pub adwords_id: Option<String>,
 }
 
 impl Part for AccountAdwordsLink {}
@@ -2604,9 +2607,9 @@ impl Part for AccountAdwordsLink {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingPostalCodeRange {
     /// The first (inclusive) postal code or prefix of the range.
-    pub start: String,
+    pub start: Option<String>,
     /// The last (inclusive) postal code or prefix of the range.
-    pub end: String,
+    pub end: Option<String>,
 }
 
 impl Part for AccountShippingPostalCodeRange {}
@@ -2666,6 +2669,7 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
         AccounttaxCustombatchCall {
             hub: self.hub,
             _request: request.clone(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2687,6 +2691,7 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
             _request: request.clone(),
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2727,6 +2732,7 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
             _request: request.clone(),
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3688,6 +3694,7 @@ impl<'a, C, A> AccountshippingMethods<'a, C, A> {
             _request: request.clone(),
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3709,6 +3716,7 @@ impl<'a, C, A> AccountshippingMethods<'a, C, A> {
             _request: request.clone(),
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3726,6 +3734,7 @@ impl<'a, C, A> AccountshippingMethods<'a, C, A> {
         AccountshippingCustombatchCall {
             hub: self.hub,
             _request: request.clone(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3787,12 +3796,13 @@ impl<'a, C, A> AccountshippingMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AccounttaxCustomBatchRequest = Default::default();
+/// let mut req = AccounttaxCustomBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounttax().custombatch(&req)
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -3801,6 +3811,7 @@ pub struct AccounttaxCustombatchCall<'a, C, A>
 
     hub: &'a ShoppingContent<C, A>,
     _request: AccounttaxCustomBatchRequest,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3822,8 +3833,11 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "content.accounttax.custombatch", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3853,16 +3867,20 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -3924,6 +3942,13 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: &AccounttaxCustomBatchRequest) -> AccounttaxCustombatchCall<'a, C, A> {
         self._request = new_value.clone();
+        self
+    }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccounttaxCustombatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4005,12 +4030,13 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AccountTax = Default::default();
+/// let mut req = AccountTax::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounttax().patch(&req, "merchantId", "accountId")
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -4021,6 +4047,7 @@ pub struct AccounttaxPatchCall<'a, C, A>
     _request: AccountTax,
     _merchant_id: String,
     _account_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4042,10 +4069,13 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "content.accounttax.patch", 
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("accountId", self._account_id.to_string()));
-        for &field in ["alt", "merchantId", "accountId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "accountId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4099,16 +4129,20 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4192,6 +4226,13 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._account_id = new_value.to_string();
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccounttaxPatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -4271,8 +4312,8 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounttax().list("merchantId")
-///              .page_token("justo")
-///              .max_results(100)
+///              .page_token("erat")
+///              .max_results(66)
 ///              .doit();
 /// # }
 /// ```
@@ -4362,16 +4403,20 @@ impl<'a, C, A> AccounttaxListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -4525,12 +4570,13 @@ impl<'a, C, A> AccounttaxListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AccountTax = Default::default();
+/// let mut req = AccountTax::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounttax().update(&req, "merchantId", "accountId")
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -4541,6 +4587,7 @@ pub struct AccounttaxUpdateCall<'a, C, A>
     _request: AccountTax,
     _merchant_id: String,
     _account_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4562,10 +4609,13 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "content.accounttax.update", 
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("accountId", self._account_id.to_string()));
-        for &field in ["alt", "merchantId", "accountId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "accountId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4619,16 +4669,20 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -4710,6 +4764,13 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccounttaxUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
+        self
+    }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccounttaxUpdateCall<'a, C, A> {
+        self._dry_run = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4874,16 +4935,20 @@ impl<'a, C, A> AccounttaxGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5116,16 +5181,20 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5273,8 +5342,8 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeedstatuses().list("merchantId")
-///              .page_token("aliquyam")
-///              .max_results(35)
+///              .page_token("justo")
+///              .max_results(80)
 ///              .doit();
 /// # }
 /// ```
@@ -5364,16 +5433,20 @@ impl<'a, C, A> DatafeedstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5525,7 +5598,7 @@ impl<'a, C, A> DatafeedstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: DatafeedstatusesCustomBatchRequest = Default::default();
+/// let mut req = DatafeedstatusesCustomBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -5591,16 +5664,20 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -5741,7 +5818,7 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: DatafeedsCustomBatchRequest = Default::default();
+/// let mut req = DatafeedsCustomBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -5807,16 +5884,20 @@ impl<'a, C, A> DatafeedCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -6042,16 +6123,20 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6199,7 +6284,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Datafeed = Default::default();
+/// let mut req = Datafeed::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6293,16 +6378,20 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -6545,16 +6634,20 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -6692,7 +6785,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Datafeed = Default::default();
+/// let mut req = Datafeed::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6784,16 +6877,20 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -6945,8 +7042,8 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().list("merchantId")
-///              .page_token("et")
-///              .max_results(31)
+///              .page_token("sea")
+///              .max_results(46)
 ///              .doit();
 /// # }
 /// ```
@@ -7036,16 +7133,20 @@ impl<'a, C, A> DatafeedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7199,7 +7300,7 @@ impl<'a, C, A> DatafeedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Datafeed = Default::default();
+/// let mut req = Datafeed::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -7293,16 +7394,20 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7546,16 +7651,20 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7705,8 +7814,8 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.productstatuses().list("merchantId")
-///              .page_token("sadipscing")
-///              .max_results(53)
+///              .page_token("elitr")
+///              .max_results(4)
 ///              .doit();
 /// # }
 /// ```
@@ -7796,16 +7905,20 @@ impl<'a, C, A> ProductstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7959,7 +8072,7 @@ impl<'a, C, A> ProductstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ProductstatusesCustomBatchRequest = Default::default();
+/// let mut req = ProductstatusesCustomBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -8025,16 +8138,20 @@ impl<'a, C, A> ProductstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8232,16 +8349,20 @@ impl<'a, C, A> AccountAuthinfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8371,7 +8492,7 @@ impl<'a, C, A> AccountAuthinfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Account = Default::default();
+/// let mut req = Account::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -8465,16 +8586,20 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8720,16 +8845,20 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8879,7 +9008,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Account = Default::default();
+/// let mut req = Account::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -8973,16 +9102,20 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -9145,8 +9278,8 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().list("merchantId")
-///              .page_token("invidunt")
-///              .max_results(19)
+///              .page_token("Lorem")
+///              .max_results(92)
 ///              .doit();
 /// # }
 /// ```
@@ -9236,16 +9369,20 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9481,16 +9618,20 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -9630,7 +9771,7 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AccountsCustomBatchRequest = Default::default();
+/// let mut req = AccountsCustomBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -9696,16 +9837,20 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -9848,7 +9993,7 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Account = Default::default();
+/// let mut req = Account::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -9940,16 +10085,20 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10102,7 +10251,7 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InventorySetRequest = Default::default();
+/// let mut req = InventorySetRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -10198,16 +10347,20 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10380,7 +10533,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: InventoryCustomBatchRequest = Default::default();
+/// let mut req = InventoryCustomBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -10446,16 +10599,20 @@ impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10681,16 +10838,20 @@ impl<'a, C, A> AccountstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -10840,8 +11001,8 @@ impl<'a, C, A> AccountstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accountstatuses().list("merchantId")
-///              .page_token("amet")
-///              .max_results(78)
+///              .page_token("ut")
+///              .max_results(85)
 ///              .doit();
 /// # }
 /// ```
@@ -10931,16 +11092,20 @@ impl<'a, C, A> AccountstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11092,7 +11257,7 @@ impl<'a, C, A> AccountstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AccountstatusesCustomBatchRequest = Default::default();
+/// let mut req = AccountstatusesCustomBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -11158,16 +11323,20 @@ impl<'a, C, A> AccountstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -11310,8 +11479,8 @@ impl<'a, C, A> AccountstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().list("merchantId")
-///              .page_token("ut")
-///              .max_results(85)
+///              .page_token("dolor")
+///              .max_results(53)
 ///              .doit();
 /// # }
 /// ```
@@ -11401,16 +11570,20 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11647,16 +11820,20 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11893,16 +12070,20 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -12049,7 +12230,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ProductsCustomBatchRequest = Default::default();
+/// let mut req = ProductsCustomBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -12120,16 +12301,20 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12279,7 +12464,7 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Product = Default::default();
+/// let mut req = Product::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -12376,16 +12561,20 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12545,8 +12734,8 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accountshipping().list("merchantId")
-///              .page_token("gubergren")
-///              .max_results(81)
+///              .page_token("vero")
+///              .max_results(73)
 ///              .doit();
 /// # }
 /// ```
@@ -12636,16 +12825,20 @@ impl<'a, C, A> AccountshippingListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -12799,12 +12992,13 @@ impl<'a, C, A> AccountshippingListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AccountShipping = Default::default();
+/// let mut req = AccountShipping::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accountshipping().patch(&req, "merchantId", "accountId")
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -12815,6 +13009,7 @@ pub struct AccountshippingPatchCall<'a, C, A>
     _request: AccountShipping,
     _merchant_id: String,
     _account_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12836,10 +13031,13 @@ impl<'a, C, A> AccountshippingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "content.accountshipping.patch", 
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("accountId", self._account_id.to_string()));
-        for &field in ["alt", "merchantId", "accountId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "accountId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12893,16 +13091,20 @@ impl<'a, C, A> AccountshippingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12986,6 +13188,13 @@ impl<'a, C, A> AccountshippingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._account_id = new_value.to_string();
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccountshippingPatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -13065,12 +13274,13 @@ impl<'a, C, A> AccountshippingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AccountShipping = Default::default();
+/// let mut req = AccountShipping::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accountshipping().update(&req, "merchantId", "accountId")
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -13081,6 +13291,7 @@ pub struct AccountshippingUpdateCall<'a, C, A>
     _request: AccountShipping,
     _merchant_id: String,
     _account_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13102,10 +13313,13 @@ impl<'a, C, A> AccountshippingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "content.accountshipping.update", 
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("accountId", self._account_id.to_string()));
-        for &field in ["alt", "merchantId", "accountId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "accountId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13159,16 +13373,20 @@ impl<'a, C, A> AccountshippingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13252,6 +13470,13 @@ impl<'a, C, A> AccountshippingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._account_id = new_value.to_string();
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccountshippingUpdateCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -13331,12 +13556,13 @@ impl<'a, C, A> AccountshippingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AccountshippingCustomBatchRequest = Default::default();
+/// let mut req = AccountshippingCustomBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accountshipping().custombatch(&req)
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -13345,6 +13571,7 @@ pub struct AccountshippingCustombatchCall<'a, C, A>
 
     hub: &'a ShoppingContent<C, A>,
     _request: AccountshippingCustomBatchRequest,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13366,8 +13593,11 @@ impl<'a, C, A> AccountshippingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "content.accountshipping.custombatch", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13397,16 +13627,20 @@ impl<'a, C, A> AccountshippingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13468,6 +13702,13 @@ impl<'a, C, A> AccountshippingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: &AccountshippingCustomBatchRequest) -> AccountshippingCustombatchCall<'a, C, A> {
         self._request = new_value.clone();
+        self
+    }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccountshippingCustombatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13632,16 +13873,20 @@ impl<'a, C, A> AccountshippingGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

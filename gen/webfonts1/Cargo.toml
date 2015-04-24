@@ -5,7 +5,7 @@
 
 name = "google-webfonts1"
 version = "0.1.5+20140210"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with webfonts (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/webfonts1"
 homepage = "https://developers.google.com/fonts/docs/developer_api"

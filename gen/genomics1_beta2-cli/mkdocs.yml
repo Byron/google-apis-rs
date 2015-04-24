@@ -55,7 +55,7 @@ pages:
 - ['references_search.md', 'References', 'Search']
 - ['referencesets_get.md', 'Referencesets', 'Get']
 - ['referencesets_search.md', 'Referencesets', 'Search']
-- ['streaming-variant-store_streamvariants.md', 'Streaming Variant Store', 'Streamvariants']
+- ['streaming-readstore_streamreads.md', 'Streaming Readstore', 'Streamreads']
 - ['variants_create.md', 'Variants', 'Create']
 - ['variants_delete.md', 'Variants', 'Delete']
 - ['variants_get.md', 'Variants', 'Get']

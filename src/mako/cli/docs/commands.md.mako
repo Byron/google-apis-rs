@@ -104,6 +104,7 @@ This method supports the upload of data, using the following protocol${len(mc.me
         + the mime type, like 'application/octet-stream', which is the default
 % endif # have upload capabilities
 % if mc.response_schema or smd:
+
 # Optional Output Flags
 
 % if mc.response_schema:

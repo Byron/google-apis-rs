@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games* crate version *0.1.5+20150325*, where *20150325* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *Games* crate version *0.1.5+20150413*, where *20150413* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Games* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services/).
@@ -416,12 +416,12 @@ impl<'a, C, A> Games<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Category {
     /// The category name.
-    pub category: String,
+    pub category: Option<String>,
     /// Experience points earned in this category.
     #[serde(rename="experiencePoints")]
-    pub experience_points: String,
+    pub experience_points: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#category.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl Part for Category {}
@@ -440,11 +440,11 @@ impl Part for Category {}
 pub struct PlayerListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The players.
-    pub items: Vec<Player>,
+    pub items: Option<Vec<Player>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for PlayerListResponse {}
@@ -457,22 +457,22 @@ impl ResponseResult for PlayerListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerScore {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScore.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The numerical value for this player score.
-    pub score: String,
+    pub score: Option<String>,
     /// The formatted score for this player score.
     #[serde(rename="formattedScore")]
-    pub formatted_score: String,
+    pub formatted_score: Option<String>,
     /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     #[serde(rename="scoreTag")]
-    pub score_tag: String,
+    pub score_tag: Option<String>,
     /// The time span for this player score.
     /// Possible values are:  
     /// - "ALL_TIME" - The score is an all-time score. 
     /// - "WEEKLY" - The score is a weekly score. 
     /// - "DAILY" - The score is a daily score.
     #[serde(rename="timeSpan")]
-    pub time_span: String,
+    pub time_span: Option<String>,
 }
 
 impl Part for PlayerScore {}
@@ -485,34 +485,34 @@ impl Part for PlayerScore {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instance.
-    pub kind: String,
+    pub kind: Option<String>,
     /// URI which shows where a user can acquire this instance.
     #[serde(rename="acquisitionUri")]
-    pub acquisition_uri: String,
+    pub acquisition_uri: Option<String>,
     /// Localized display name.
-    pub name: String,
+    pub name: Option<String>,
     /// Flag to show if this game instance supports turn based play.
     #[serde(rename="turnBasedPlay")]
-    pub turn_based_play: bool,
+    pub turn_based_play: Option<bool>,
     /// Platform dependent details for Web.
     #[serde(rename="webInstance")]
-    pub web_instance: InstanceWebDetails,
+    pub web_instance: Option<InstanceWebDetails>,
     /// Platform dependent details for Android.
     #[serde(rename="androidInstance")]
-    pub android_instance: InstanceAndroidDetails,
+    pub android_instance: Option<InstanceAndroidDetails>,
     /// Platform dependent details for iOS.
     #[serde(rename="iosInstance")]
-    pub ios_instance: InstanceIosDetails,
+    pub ios_instance: Option<InstanceIosDetails>,
     /// The platform type.
     /// Possible values are:  
     /// - "ANDROID" - Instance is for Android. 
     /// - "IOS" - Instance is for iOS 
     /// - "WEB_APP" - Instance is for Web App.
     #[serde(rename="platformType")]
-    pub platform_type: String,
+    pub platform_type: Option<String>,
     /// Flag to show if this game instance supports realtime play.
     #[serde(rename="realtimePlay")]
-    pub realtime_play: bool,
+    pub realtime_play: Option<bool>,
 }
 
 impl Part for Instance {}
@@ -589,9 +589,9 @@ impl Resource for AchievementDefinition {}
 pub struct AchievementUnlockResponse {
     /// Whether this achievement was newly unlocked (that is, whether the unlock request for the achievement was the first for the player).
     #[serde(rename="newlyUnlocked")]
-    pub newly_unlocked: bool,
+    pub newly_unlocked: Option<bool>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUnlockResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for AchievementUnlockResponse {}
@@ -604,16 +604,16 @@ impl ResponseResult for AchievementUnlockResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomAutoMatchingCriteria {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomAutoMatchingCriteria.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The minimum number of players that should be added to the room by auto-matching.
     #[serde(rename="minAutoMatchingPlayers")]
-    pub min_auto_matching_players: i32,
+    pub min_auto_matching_players: Option<i32>,
     /// A bitmask indicating when auto-matches are valid. When ANDed with other exclusive bitmasks, the result must be zero. Can be used to support exclusive roles within a game.
     #[serde(rename="exclusiveBitmask")]
-    pub exclusive_bitmask: String,
+    pub exclusive_bitmask: Option<String>,
     /// The maximum number of players that should be added to the room by auto-matching.
     #[serde(rename="maxAutoMatchingPlayers")]
-    pub max_auto_matching_players: i32,
+    pub max_auto_matching_players: Option<i32>,
 }
 
 impl Part for RoomAutoMatchingCriteria {}
@@ -627,12 +627,12 @@ impl Part for RoomAutoMatchingCriteria {}
 pub struct EventUpdateRequest {
     /// The ID of the event being modified in this update.
     #[serde(rename="definitionId")]
-    pub definition_id: String,
+    pub definition_id: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventUpdateRequest.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The number of times this event occurred in this time period.
     #[serde(rename="updateCount")]
-    pub update_count: i64,
+    pub update_count: Option<i64>,
 }
 
 impl Part for EventUpdateRequest {}
@@ -651,11 +651,11 @@ impl Part for EventUpdateRequest {}
 pub struct TurnBasedMatchList {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The matches.
-    pub items: Vec<TurnBasedMatch>,
+    pub items: Option<Vec<TurnBasedMatch>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for TurnBasedMatchList {}
@@ -673,10 +673,10 @@ impl ResponseResult for TurnBasedMatchList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementUpdateMultipleResponse {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The updated state of the achievements.
     #[serde(rename="updatedAchievements")]
-    pub updated_achievements: Vec<AchievementUpdateResponse>,
+    pub updated_achievements: Option<Vec<AchievementUpdateResponse>>,
 }
 
 impl ResponseResult for AchievementUpdateMultipleResponse {}
@@ -689,10 +689,10 @@ impl ResponseResult for AchievementUpdateMultipleResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventChild {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventChild.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The ID of the child event.
     #[serde(rename="childId")]
-    pub child_id: String,
+    pub child_id: Option<String>,
 }
 
 impl Part for EventChild {}
@@ -706,15 +706,15 @@ impl Part for EventChild {}
 pub struct EventRecordFailure {
     /// The ID of the event that was not updated.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventRecordFailure.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The cause for the update failure.
     /// Possible values are:  
     /// - "NOT_FOUND" - An attempt was made to set an event that was not defined. 
     /// - "INVALID_UPDATE_VALUE" - An attempt was made to increment an event by a non-positive value.
     #[serde(rename="failureCause")]
-    pub failure_cause: String,
+    pub failure_cause: Option<String>,
 }
 
 impl Part for EventRecordFailure {}
@@ -728,25 +728,25 @@ impl Part for EventRecordFailure {}
 pub struct AchievementUpdateResponse {
     /// The current steps recorded for this achievement if it is incremental.
     #[serde(rename="currentSteps")]
-    pub current_steps: i32,
+    pub current_steps: Option<i32>,
     /// Whether this achievement was newly unlocked (that is, whether the unlock request for the achievement was the first for the player).
     #[serde(rename="newlyUnlocked")]
-    pub newly_unlocked: bool,
+    pub newly_unlocked: Option<bool>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateResponse.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The achievement this update is was applied to.
     #[serde(rename="achievementId")]
-    pub achievement_id: String,
+    pub achievement_id: Option<String>,
     /// Whether the requested updates actually affected the achievement.
     #[serde(rename="updateOccurred")]
-    pub update_occurred: bool,
+    pub update_occurred: Option<bool>,
     /// The current state of the achievement.
     /// Possible values are:  
     /// - "HIDDEN" - Achievement is hidden. 
     /// - "REVEALED" - Achievement is revealed. 
     /// - "UNLOCKED" - Achievement is unlocked.
     #[serde(rename="currentState")]
-    pub current_state: String,
+    pub current_state: Option<String>,
 }
 
 impl Part for AchievementUpdateResponse {}
@@ -759,13 +759,13 @@ impl Part for AchievementUpdateResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomModification {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomModification.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The timestamp at which they modified the room, in milliseconds since the epoch in UTC.
     #[serde(rename="modifiedTimestampMillis")]
-    pub modified_timestamp_millis: String,
+    pub modified_timestamp_millis: Option<String>,
     /// The ID of the participant that modified the room.
     #[serde(rename="participantId")]
-    pub participant_id: String,
+    pub participant_id: Option<String>,
 }
 
 impl Part for RoomModification {}
@@ -784,11 +784,11 @@ impl Part for RoomModification {}
 pub struct EventDefinitionListResponse {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The event definitions.
-    pub items: Vec<EventDefinition>,
+    pub items: Option<Vec<EventDefinition>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventDefinitionListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for EventDefinitionListResponse {}
@@ -806,26 +806,26 @@ impl ResponseResult for EventDefinitionListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerScoreResponse {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScoreResponse.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The time spans where the submitted score is better than the existing score for that time span.
     /// Possible values are:  
     /// - "ALL_TIME" - The score is an all-time score. 
     /// - "WEEKLY" - The score is a weekly score. 
     /// - "DAILY" - The score is a daily score.
     #[serde(rename="beatenScoreTimeSpans")]
-    pub beaten_score_time_spans: Vec<String>,
+    pub beaten_score_time_spans: Option<Vec<String>>,
     /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     #[serde(rename="scoreTag")]
-    pub score_tag: String,
+    pub score_tag: Option<String>,
     /// The scores in time spans that have not been beaten. As an example, the submitted score may be better than the player's DAILY score, but not better than the player's scores for the WEEKLY or ALL_TIME time spans.
     #[serde(rename="unbeatenScores")]
-    pub unbeaten_scores: Vec<PlayerScore>,
+    pub unbeaten_scores: Option<Vec<PlayerScore>>,
     /// The leaderboard ID that this score was submitted to.
     #[serde(rename="leaderboardId")]
-    pub leaderboard_id: String,
+    pub leaderboard_id: Option<String>,
     /// The formatted value of the submitted score.
     #[serde(rename="formattedScore")]
-    pub formatted_score: String,
+    pub formatted_score: Option<String>,
 }
 
 impl ResponseResult for PlayerScoreResponse {}
@@ -838,15 +838,15 @@ impl ResponseResult for PlayerScoreResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImageAsset {
     /// The URL of the asset.
-    pub url: String,
+    pub url: Option<String>,
     /// The width of the asset.
-    pub width: i32,
+    pub width: Option<i32>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#imageAsset.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The name of the asset.
-    pub name: String,
+    pub name: Option<String>,
     /// The height of the asset.
-    pub height: i32,
+    pub height: Option<i32>,
 }
 
 impl Part for ImageAsset {}
@@ -885,12 +885,12 @@ impl RequestValue for RoomP2PStatuses {}
 pub struct AchievementIncrementResponse {
     /// The current steps recorded for this incremental achievement.
     #[serde(rename="currentSteps")]
-    pub current_steps: i32,
+    pub current_steps: Option<i32>,
     /// Whether the the current steps for the achievement has reached the number of steps required to unlock.
     #[serde(rename="newlyUnlocked")]
-    pub newly_unlocked: bool,
+    pub newly_unlocked: Option<bool>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementIncrementResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for AchievementIncrementResponse {}
@@ -909,14 +909,14 @@ impl ResponseResult for AchievementIncrementResponse {}
 pub struct TurnBasedMatchSync {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The matches.
-    pub items: Vec<TurnBasedMatch>,
+    pub items: Option<Vec<TurnBasedMatch>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchSync.
-    pub kind: String,
+    pub kind: Option<String>,
     /// True if there were more matches available to fetch at the time the response was generated (which were not returned due to page size limits.)
     #[serde(rename="moreAvailable")]
-    pub more_available: bool,
+    pub more_available: Option<bool>,
 }
 
 impl ResponseResult for TurnBasedMatchSync {}
@@ -964,39 +964,39 @@ impl RequestValue for TurnBasedMatchCreateRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Quest {
     /// The description of the quest.
-    pub description: String,
+    pub description: Option<String>,
     /// The banner image URL for the quest.
     #[serde(rename="bannerUrl")]
-    pub banner_url: String,
+    pub banner_url: Option<String>,
     /// The timestamp at which the quest was last updated by the user in milliseconds since the epoch in UTC. Only present if the player has accepted the quest.
     #[serde(rename="lastUpdatedTimestampMillis")]
-    pub last_updated_timestamp_millis: String,
+    pub last_updated_timestamp_millis: Option<String>,
     /// The timestamp at which the user accepted the quest in milliseconds since the epoch in UTC. Only present if the player has accepted the quest.
     #[serde(rename="acceptedTimestampMillis")]
-    pub accepted_timestamp_millis: String,
+    pub accepted_timestamp_millis: Option<String>,
     /// The icon image URL for the quest.
     #[serde(rename="iconUrl")]
-    pub icon_url: String,
+    pub icon_url: Option<String>,
     /// The timestamp at which the user should be notified that the quest will end soon in milliseconds since the epoch in UTC.
     #[serde(rename="notifyTimestampMillis")]
-    pub notify_timestamp_millis: String,
+    pub notify_timestamp_millis: Option<String>,
     /// The ID of the application this quest is part of.
     #[serde(rename="applicationId")]
-    pub application_id: String,
+    pub application_id: Option<String>,
     /// The ID of the quest.
-    pub id: String,
+    pub id: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#quest.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The quest milestones.
-    pub milestones: Vec<QuestMilestone>,
+    pub milestones: Option<Vec<QuestMilestone>>,
     /// The name of the quest.
-    pub name: String,
+    pub name: Option<String>,
     /// The timestamp at which the quest becomes active in milliseconds since the epoch in UTC.
     #[serde(rename="startTimestampMillis")]
-    pub start_timestamp_millis: String,
+    pub start_timestamp_millis: Option<String>,
     /// The timestamp at which the quest ceases to be active in milliseconds since the epoch in UTC.
     #[serde(rename="endTimestampMillis")]
-    pub end_timestamp_millis: String,
+    pub end_timestamp_millis: Option<String>,
     /// The state of the quest.
     /// Possible values are:  
     /// - "UPCOMING": The quest is upcoming. The user can see the quest, but cannot accept it until it is open. 
@@ -1006,13 +1006,13 @@ pub struct Quest {
     /// - "FAILED": The quest was attempted but was not completed before the deadline expired. 
     /// - "EXPIRED": The quest has expired and was not accepted. 
     /// - "DELETED": The quest should be deleted from the local database.
-    pub state: String,
+    pub state: Option<String>,
     /// Indicates whether the banner image being returned is a default image, or is game-provided.
     #[serde(rename="isDefaultBannerUrl")]
-    pub is_default_banner_url: bool,
+    pub is_default_banner_url: Option<bool>,
     /// Indicates whether the icon image being returned is a default image, or is game-provided.
     #[serde(rename="isDefaultIconUrl")]
-    pub is_default_icon_url: bool,
+    pub is_default_icon_url: Option<bool>,
 }
 
 impl Resource for Quest {}
@@ -1026,15 +1026,15 @@ impl ResponseResult for Quest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AggregateStats {
     /// The number of messages sent between a pair of peers.
-    pub count: String,
+    pub count: Option<String>,
     /// The maximum amount.
-    pub max: String,
+    pub max: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#aggregateStats.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The total number of bytes sent for messages between a pair of peers.
-    pub sum: String,
+    pub sum: Option<String>,
     /// The minimum amount.
-    pub min: String,
+    pub min: Option<String>,
 }
 
 impl Part for AggregateStats {}
@@ -1053,12 +1053,12 @@ impl Part for AggregateStats {}
 pub struct AchievementSetStepsAtLeastResponse {
     /// The current steps recorded for this incremental achievement.
     #[serde(rename="currentSteps")]
-    pub current_steps: i32,
+    pub current_steps: Option<i32>,
     /// Whether the the current steps for the achievement has reached the number of steps required to unlock.
     #[serde(rename="newlyUnlocked")]
-    pub newly_unlocked: bool,
+    pub newly_unlocked: Option<bool>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementSetStepsAtLeastResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for AchievementSetStepsAtLeastResponse {}
@@ -1076,13 +1076,13 @@ impl ResponseResult for AchievementSetStepsAtLeastResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetagameConfig {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#metagameConfig.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Current version of the metagame configuration data. When this data is updated, the version number will be increased by one.
     #[serde(rename="currentVersion")]
-    pub current_version: i32,
+    pub current_version: Option<i32>,
     /// The list of player levels.
     #[serde(rename="playerLevels")]
-    pub player_levels: Vec<PlayerLevel>,
+    pub player_levels: Option<Vec<PlayerLevel>>,
 }
 
 impl ResponseResult for MetagameConfig {}
@@ -1101,11 +1101,11 @@ impl ResponseResult for MetagameConfig {}
 pub struct AchievementDefinitionsListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The achievement definitions.
-    pub items: Vec<AchievementDefinition>,
+    pub items: Option<Vec<AchievementDefinition>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementDefinitionsListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for AchievementDefinitionsListResponse {}
@@ -1119,18 +1119,18 @@ impl ResponseResult for AchievementDefinitionsListResponse {}
 pub struct PeerSessionDiagnostics {
     /// Unreliable channel diagnostics.
     #[serde(rename="unreliableChannel")]
-    pub unreliable_channel: PeerChannelDiagnostics,
+    pub unreliable_channel: Option<PeerChannelDiagnostics>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#peerSessionDiagnostics.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Reliable channel diagnostics.
     #[serde(rename="reliableChannel")]
-    pub reliable_channel: PeerChannelDiagnostics,
+    pub reliable_channel: Option<PeerChannelDiagnostics>,
     /// Connected time in milliseconds.
     #[serde(rename="connectedTimestampMillis")]
-    pub connected_timestamp_millis: String,
+    pub connected_timestamp_millis: Option<String>,
     /// The participant ID of the peer.
     #[serde(rename="participantId")]
-    pub participant_id: String,
+    pub participant_id: Option<String>,
 }
 
 impl Part for PeerSessionDiagnostics {}
@@ -1143,9 +1143,9 @@ impl Part for PeerSessionDiagnostics {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TurnBasedMatchDataRequest {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchDataRequest.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The byte representation of the data (limited to 128 kB), as a Base64-encoded string with the URL_SAFE encoding option.
-    pub data: String,
+    pub data: Option<String>,
 }
 
 impl Part for TurnBasedMatchDataRequest {}
@@ -1158,13 +1158,13 @@ impl Part for TurnBasedMatchDataRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventPeriodRange {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventPeriodRange.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The time when this update period begins, in millis, since 1970 UTC (Unix Epoch).
     #[serde(rename="periodStartMillis")]
-    pub period_start_millis: String,
+    pub period_start_millis: Option<String>,
     /// The time when this update period ends, in millis, since 1970 UTC (Unix Epoch).
     #[serde(rename="periodEndMillis")]
-    pub period_end_millis: String,
+    pub period_end_millis: Option<String>,
 }
 
 impl Part for EventPeriodRange {}
@@ -1177,12 +1177,12 @@ impl Part for EventPeriodRange {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ParticipantResult {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#participantResult.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The placement or ranking of the participant in the match results; a number from one to the number of participants in the match. Multiple participants may have the same placing value in case of a type.
-    pub placing: i32,
+    pub placing: Option<i32>,
     /// The ID of the participant.
     #[serde(rename="participantId")]
-    pub participant_id: String,
+    pub participant_id: Option<String>,
     /// The result of the participant for this match.
     /// Possible values are:  
     /// - "MATCH_RESULT_WIN" - The participant won the match. 
@@ -1191,7 +1191,7 @@ pub struct ParticipantResult {
     /// - "MATCH_RESULT_NONE" - There was no winner for the match (nobody wins or loses this kind of game.) 
     /// - "MATCH_RESULT_DISCONNECT" - The participant disconnected / left during the match. 
     /// - "MATCH_RESULT_DISAGREED" - Different clients reported different results for this participant.
-    pub result: String,
+    pub result: Option<String>,
 }
 
 impl Part for ParticipantResult {}
@@ -1204,25 +1204,25 @@ impl Part for ParticipantResult {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct NetworkDiagnostics {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#networkDiagnostics.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The name of the carrier of the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperatorName() On iOS: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html#//apple_ref/occ/instp/CTCarrier/carrierName
     #[serde(rename="networkOperatorName")]
-    pub network_operator_name: String,
+    pub network_operator_name: Option<String>,
     /// The amount of time in milliseconds it took for the client to establish a connection with the XMPP server.
     #[serde(rename="registrationLatencyMillis")]
-    pub registration_latency_millis: i32,
+    pub registration_latency_millis: Option<i32>,
     /// iOS network type as defined in Reachability.h.
     #[serde(rename="iosNetworkType")]
-    pub ios_network_type: i32,
+    pub ios_network_type: Option<i32>,
     /// The MCC+MNC code for the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperator() On iOS, see: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html
     #[serde(rename="networkOperatorCode")]
-    pub network_operator_code: String,
+    pub network_operator_code: Option<String>,
     /// The Android network subtype.
     #[serde(rename="androidNetworkSubtype")]
-    pub android_network_subtype: i32,
+    pub android_network_subtype: Option<i32>,
     /// The Android network type.
     #[serde(rename="androidNetworkType")]
-    pub android_network_type: i32,
+    pub android_network_type: Option<i32>,
 }
 
 impl Part for NetworkDiagnostics {}
@@ -1255,9 +1255,9 @@ impl RequestValue for PushTokenId {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventBatchRecordFailure {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventBatchRecordFailure.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The time range which was rejected; empty for a request-wide failure.
-    pub range: EventPeriodRange,
+    pub range: Option<EventPeriodRange>,
     /// The cause for the update failure.
     /// Possible values are:  
     /// - "TOO_LARGE": A batch request was issued with more events than are allowed in a single batch. 
@@ -1267,7 +1267,7 @@ pub struct EventBatchRecordFailure {
     /// - "ALREADY_UPDATED": An attempt was made to record a batch of data which was already seen. 
     /// - "RECORD_RATE_HIGH": An attempt was made to record data faster than the server will apply updates.
     #[serde(rename="failureCause")]
-    pub failure_cause: String,
+    pub failure_cause: Option<String>,
 }
 
 impl Part for EventBatchRecordFailure {}
@@ -1280,10 +1280,10 @@ impl Part for EventBatchRecordFailure {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomClientAddress {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomClientAddress.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The XMPP address of the client on the Google Games XMPP network.
     #[serde(rename="xmppAddress")]
-    pub xmpp_address: String,
+    pub xmpp_address: Option<String>,
 }
 
 impl Part for RoomClientAddress {}
@@ -1297,18 +1297,18 @@ impl Part for RoomClientAddress {}
 pub struct PlayerExperienceInfo {
     /// The current number of experience points for the player.
     #[serde(rename="currentExperiencePoints")]
-    pub current_experience_points: String,
+    pub current_experience_points: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerExperienceInfo.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The timestamp when the player was leveled up, in millis since Unix epoch UTC.
     #[serde(rename="lastLevelUpTimestampMillis")]
-    pub last_level_up_timestamp_millis: String,
+    pub last_level_up_timestamp_millis: Option<String>,
     /// The next level of the player. If the current level is the maximum level, this should be same as the current level.
     #[serde(rename="nextLevel")]
-    pub next_level: PlayerLevel,
+    pub next_level: Option<PlayerLevel>,
     /// The current level of the player.
     #[serde(rename="currentLevel")]
-    pub current_level: PlayerLevel,
+    pub current_level: Option<PlayerLevel>,
 }
 
 impl Part for PlayerExperienceInfo {}
@@ -1328,20 +1328,20 @@ impl Part for PlayerExperienceInfo {}
 pub struct LeaderboardScores {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardScores.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The pagination token for the previous page of results.
     #[serde(rename="prevPageToken")]
-    pub prev_page_token: String,
+    pub prev_page_token: Option<String>,
     /// The total number of scores in the leaderboard.
     #[serde(rename="numScores")]
-    pub num_scores: String,
+    pub num_scores: Option<String>,
     /// The scores in the leaderboard.
-    pub items: Vec<LeaderboardEntry>,
+    pub items: Option<Vec<LeaderboardEntry>>,
     /// The score of the requesting player on the leaderboard. The player's score may appear both here and in the list of scores above. If you are viewing a public leaderboard and the player is not sharing their gameplay information publicly, the scoreRank and formattedScoreRank values will not be present.
     #[serde(rename="playerScore")]
-    pub player_score: LeaderboardEntry,
+    pub player_score: Option<LeaderboardEntry>,
 }
 
 impl ResponseResult for LeaderboardScores {}
@@ -1355,26 +1355,26 @@ impl ResponseResult for LeaderboardScores {}
 pub struct RoomParticipant {
     /// True if this participant was auto-matched with the requesting player.
     #[serde(rename="autoMatched")]
-    pub auto_matched: bool,
+    pub auto_matched: Option<bool>,
     /// The status of the participant with respect to the room.
     /// Possible values are:  
     /// - "PARTICIPANT_INVITED" - The participant has been invited to join the room, but has not yet responded. 
     /// - "PARTICIPANT_JOINED" - The participant has joined the room (either after creating it or accepting an invitation.) 
     /// - "PARTICIPANT_DECLINED" - The participant declined an invitation to join the room. 
     /// - "PARTICIPANT_LEFT" - The participant joined the room and then left it.
-    pub status: String,
+    pub status: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomParticipant.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Information about a player that has been anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
     #[serde(rename="autoMatchedPlayer")]
-    pub auto_matched_player: AnonymousPlayer,
+    pub auto_matched_player: Option<AnonymousPlayer>,
     /// Client address for the participant.
     #[serde(rename="clientAddress")]
-    pub client_address: RoomClientAddress,
+    pub client_address: Option<RoomClientAddress>,
     /// The capabilities which can be used when communicating with this participant.
-    pub capabilities: Vec<String>,
+    pub capabilities: Option<Vec<String>>,
     /// Information about the player. Not populated if this player was anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
-    pub player: Player,
+    pub player: Option<Player>,
     /// The reason the participant left the room; populated if the participant status is PARTICIPANT_LEFT.
     /// Possible values are:  
     /// - "PLAYER_LEFT" - The player explicitly chose to leave the room. 
@@ -1385,11 +1385,11 @@ pub struct RoomParticipant {
     /// - "TIMEOUT" - The client timed out while waiting for players to join and connect. 
     /// - "PRESENCE_FAILURE" - The client's XMPP connection ended abruptly.
     #[serde(rename="leaveReason")]
-    pub leave_reason: String,
+    pub leave_reason: Option<String>,
     /// True if this participant is in the fully connected set of peers in the room.
-    pub connected: bool,
+    pub connected: Option<bool>,
     /// An identifier for the participant in the scope of the room. Cannot be used to identify a player across rooms or in other contexts.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for RoomParticipant {}
@@ -1408,36 +1408,36 @@ impl Part for RoomParticipant {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Snapshot {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#snapshot.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The description of this snapshot.
-    pub description: String,
+    pub description: Option<String>,
     /// The title of this snapshot.
-    pub title: String,
+    pub title: Option<String>,
     /// The cover image of this snapshot. May be absent if there is no image.
     #[serde(rename="coverImage")]
-    pub cover_image: SnapshotImage,
+    pub cover_image: Option<SnapshotImage>,
     /// The timestamp (in millis since Unix epoch) of the last modification to this snapshot.
     #[serde(rename="lastModifiedMillis")]
-    pub last_modified_millis: String,
+    pub last_modified_millis: Option<String>,
     /// The ID of the snapshot.
-    pub id: String,
+    pub id: Option<String>,
     /// The ID of the file underlying this snapshot in the Drive API. Only present if the snapshot is a view on a Drive file and the file is owned by the caller.
     #[serde(rename="driveId")]
-    pub drive_id: String,
+    pub drive_id: Option<String>,
     /// The duration associated with this snapshot, in millis.
     #[serde(rename="durationMillis")]
-    pub duration_millis: String,
+    pub duration_millis: Option<String>,
     /// The unique name provided when the snapshot was created.
     #[serde(rename="uniqueName")]
-    pub unique_name: String,
+    pub unique_name: Option<String>,
     /// The type of this snapshot.
     /// Possible values are:  
     /// - "SAVE_GAME" - A snapshot representing a save game.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The progress value (64-bit integer set by developer) associated with this snapshot.
     #[serde(rename="progressValue")]
-    pub progress_value: String,
+    pub progress_value: Option<String>,
 }
 
 impl Resource for Snapshot {}
@@ -1494,9 +1494,9 @@ impl RequestValue for RoomLeaveRequest {}
 pub struct PlayerScoreListResponse {
     /// The score submissions statuses.
     #[serde(rename="submittedScores")]
-    pub submitted_scores: Vec<PlayerScoreResponse>,
+    pub submitted_scores: Option<Vec<PlayerScoreResponse>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScoreListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for PlayerScoreListResponse {}
@@ -1509,28 +1509,28 @@ impl ResponseResult for PlayerScoreListResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RoomLeaveDiagnostics {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomLeaveDiagnostics.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Whether or not sockets were used.
     #[serde(rename="socketsUsed")]
-    pub sockets_used: bool,
+    pub sockets_used: Option<bool>,
     /// iOS network type as defined in Reachability.h.
     #[serde(rename="iosNetworkType")]
-    pub ios_network_type: i32,
+    pub ios_network_type: Option<i32>,
     /// The MCC+MNC code for the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperator() On iOS, see: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html
     #[serde(rename="networkOperatorCode")]
-    pub network_operator_code: String,
+    pub network_operator_code: Option<String>,
     /// Diagnostics about all peer sessions.
     #[serde(rename="peerSession")]
-    pub peer_session: Vec<PeerSessionDiagnostics>,
+    pub peer_session: Option<Vec<PeerSessionDiagnostics>>,
     /// Android network subtype. http://developer.android.com/reference/android/net/NetworkInfo.html#getSubtype()
     #[serde(rename="androidNetworkSubtype")]
-    pub android_network_subtype: i32,
+    pub android_network_subtype: Option<i32>,
     /// The name of the carrier of the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperatorName() On iOS: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html#//apple_ref/occ/instp/CTCarrier/carrierName
     #[serde(rename="networkOperatorName")]
-    pub network_operator_name: String,
+    pub network_operator_name: Option<String>,
     /// Android network type. http://developer.android.com/reference/android/net/NetworkInfo.html#getType()
     #[serde(rename="androidNetworkType")]
-    pub android_network_type: i32,
+    pub android_network_type: Option<i32>,
 }
 
 impl Part for RoomLeaveDiagnostics {}
@@ -1580,12 +1580,12 @@ impl Resource for QuestMilestone {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedMatchRematch {
     /// The newly created match; a rematch of the old match with the same participants.
-    pub rematch: TurnBasedMatch,
+    pub rematch: Option<TurnBasedMatch>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchRematch.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The old match that the rematch was created from; will be updated such that the rematchId field will point at the new match.
     #[serde(rename="previousMatch")]
-    pub previous_match: TurnBasedMatch,
+    pub previous_match: Option<TurnBasedMatch>,
 }
 
 impl ResponseResult for TurnBasedMatchRematch {}
@@ -1604,13 +1604,13 @@ impl ResponseResult for TurnBasedMatchRematch {}
 pub struct PlayerLeaderboardScoreListResponse {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The leaderboard scores.
-    pub items: Vec<PlayerLeaderboardScore>,
+    pub items: Option<Vec<PlayerLeaderboardScore>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLeaderboardScoreListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The Player resources for the owner of this score.
-    pub player: Player,
+    pub player: Option<Player>,
 }
 
 impl ResponseResult for PlayerLeaderboardScoreListResponse {}
@@ -1629,36 +1629,36 @@ impl ResponseResult for PlayerLeaderboardScoreListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Application {
     /// The category of the application.
-    pub category: ApplicationCategory,
+    pub category: Option<ApplicationCategory>,
     /// A hint to the client UI for what color to use as an app-themed color. The color is given as an RGB triplet (e.g. "E0E0E0").
     #[serde(rename="themeColor")]
-    pub theme_color: String,
+    pub theme_color: Option<String>,
     /// The description of the application.
-    pub description: String,
+    pub description: Option<String>,
     /// The author of the application.
-    pub author: String,
+    pub author: Option<String>,
     /// The last updated timestamp of the application.
     #[serde(rename="lastUpdatedTimestamp")]
-    pub last_updated_timestamp: String,
+    pub last_updated_timestamp: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#application.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The instances of the application.
-    pub instances: Vec<Instance>,
+    pub instances: Option<Vec<Instance>>,
     /// A list of features that have been enabled for the application.
     /// Possible values are:  
     /// - "SNAPSHOTS" - Snapshots has been enabled
     #[serde(rename="enabledFeatures")]
-    pub enabled_features: Vec<String>,
+    pub enabled_features: Option<Vec<String>>,
     /// The number of achievements visible to the currently authenticated player.
-    pub achievement_count: i32,
+    pub achievement_count: Option<i32>,
     /// The number of leaderboards visible to the currently authenticated player.
-    pub leaderboard_count: i32,
+    pub leaderboard_count: Option<i32>,
     /// The assets of the application.
-    pub assets: Vec<ImageAsset>,
+    pub assets: Option<Vec<ImageAsset>>,
     /// The ID of the application.
-    pub id: String,
+    pub id: Option<String>,
     /// The name of the application.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 impl Resource for Application {}
@@ -1673,12 +1673,12 @@ impl ResponseResult for Application {}
 pub struct Played {
     /// True if the player was auto-matched with the currently authenticated user.
     #[serde(rename="autoMatched")]
-    pub auto_matched: bool,
+    pub auto_matched: Option<bool>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#played.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The last time the player played the game in milliseconds since the epoch in UTC.
     #[serde(rename="timeMillis")]
-    pub time_millis: String,
+    pub time_millis: Option<String>,
 }
 
 impl Part for Played {}
@@ -1692,11 +1692,11 @@ impl Part for Played {}
 pub struct QuestContribution {
     /// The formatted value of the contribution as a string. Format depends on the configuration for the associated event definition in the Play Games Developer Console.
     #[serde(rename="formattedValue")]
-    pub formatted_value: String,
+    pub formatted_value: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#questContribution.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The value of the contribution.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl Part for QuestContribution {}
@@ -1710,20 +1710,20 @@ impl Part for QuestContribution {}
 pub struct QuestCriterion {
     /// The ID of the event the criterion corresponds to.
     #[serde(rename="eventId")]
-    pub event_id: String,
+    pub event_id: Option<String>,
     /// The total number of times the associated event must be incremented for the player to complete this quest.
     #[serde(rename="completionContribution")]
-    pub completion_contribution: QuestContribution,
+    pub completion_contribution: Option<QuestContribution>,
     /// The value of the event associated with this quest at the time that the quest was accepted. This value may change if event increments that took place before the start of quest are uploaded after the quest starts.
     /// There will be no initialPlayerProgress until the player has accepted the quest.
     #[serde(rename="initialPlayerProgress")]
-    pub initial_player_progress: QuestContribution,
+    pub initial_player_progress: Option<QuestContribution>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#questCriterion.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The number of increments the player has made toward the completion count event increments required to complete the quest. This value will not exceed the completion contribution.
     /// There will be no currentContribution until the player has accepted the quest.
     #[serde(rename="currentContribution")]
-    pub current_contribution: QuestContribution,
+    pub current_contribution: Option<QuestContribution>,
 }
 
 impl Part for QuestCriterion {}
@@ -1742,11 +1742,11 @@ impl Part for QuestCriterion {}
 pub struct RoomList {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The rooms.
-    pub items: Vec<Room>,
+    pub items: Option<Vec<Room>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomList.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for RoomList {}
@@ -1760,14 +1760,14 @@ impl ResponseResult for RoomList {}
 pub struct PlayerLevel {
     /// The maximum experience points for this level.
     #[serde(rename="maxExperiencePoints")]
-    pub max_experience_points: String,
+    pub max_experience_points: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLevel.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The minimum experience points for this level.
     #[serde(rename="minExperiencePoints")]
-    pub min_experience_points: String,
+    pub min_experience_points: Option<String>,
     /// The level for the user.
-    pub level: i32,
+    pub level: Option<i32>,
 }
 
 impl Part for PlayerLevel {}
@@ -1780,10 +1780,10 @@ impl Part for PlayerLevel {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomAutoMatchStatus {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomAutoMatchStatus.
-    pub kind: String,
+    pub kind: Option<String>,
     /// An estimate for the amount of time (in seconds) that auto-matching is expected to take to complete.
     #[serde(rename="waitEstimateSeconds")]
-    pub wait_estimate_seconds: i32,
+    pub wait_estimate_seconds: Option<i32>,
 }
 
 impl Part for RoomAutoMatchStatus {}
@@ -1796,12 +1796,12 @@ impl Part for RoomAutoMatchStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedMatchData {
     /// The byte representation of the data (limited to 128 kB), as a Base64-encoded string with the URL_SAFE encoding option.
-    pub data: String,
+    pub data: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchData.
-    pub kind: String,
+    pub kind: Option<String>,
     /// True if this match has data available but it wasn't returned in a list response; fetching the match individually will retrieve this data.
     #[serde(rename="dataAvailable")]
-    pub data_available: bool,
+    pub data_available: Option<bool>,
 }
 
 impl Part for TurnBasedMatchData {}
@@ -1815,27 +1815,27 @@ impl Part for TurnBasedMatchData {}
 pub struct EventDefinition {
     /// Indicates whether the icon image being returned is a default image, or is game-provided.
     #[serde(rename="isDefaultImageUrl")]
-    pub is_default_image_url: bool,
+    pub is_default_image_url: Option<bool>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventDefinition.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The name to display for the event.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// Description of what this event represents.
-    pub description: String,
+    pub description: Option<String>,
     /// The base URL for the image that represents the event.
     #[serde(rename="imageUrl")]
-    pub image_url: String,
+    pub image_url: Option<String>,
     /// The visibility of event being tracked in this definition.
     /// Possible values are:  
     /// - "REVEALED": This event should be visible to all users. 
     /// - "HIDDEN": This event should only be shown to users that have recorded this event at least once.
-    pub visibility: String,
+    pub visibility: Option<String>,
     /// A list of events that are a child of this event.
     #[serde(rename="childEvents")]
-    pub child_events: Vec<EventChild>,
+    pub child_events: Option<Vec<EventChild>>,
     /// The ID of the event.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for EventDefinition {}
@@ -1849,24 +1849,24 @@ impl Part for EventDefinition {}
 pub struct InstanceIosDetails {
     /// Indicates that this instance is the default for new installations on iPhone devices.
     #[serde(rename="preferredForIphone")]
-    pub preferred_for_iphone: bool,
+    pub preferred_for_iphone: Option<bool>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceIosDetails.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Flag to indicate if this instance supports iPhone.
     #[serde(rename="supportIphone")]
-    pub support_iphone: bool,
+    pub support_iphone: Option<bool>,
     /// Indicates that this instance is the default for new installations on iPad devices.
     #[serde(rename="preferredForIpad")]
-    pub preferred_for_ipad: bool,
+    pub preferred_for_ipad: Option<bool>,
     /// iTunes App ID.
     #[serde(rename="itunesAppId")]
-    pub itunes_app_id: String,
+    pub itunes_app_id: Option<String>,
     /// Bundle identifier.
     #[serde(rename="bundleIdentifier")]
-    pub bundle_identifier: String,
+    pub bundle_identifier: Option<String>,
     /// Flag to indicate if this instance supports iPad.
     #[serde(rename="supportIpad")]
-    pub support_ipad: bool,
+    pub support_ipad: Option<bool>,
 }
 
 impl Part for InstanceIosDetails {}
@@ -1879,15 +1879,15 @@ impl Part for InstanceIosDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceAndroidDetails {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceAndroidDetails.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Flag indicating whether the anti-piracy check is enabled.
     #[serde(rename="enablePiracyCheck")]
-    pub enable_piracy_check: bool,
+    pub enable_piracy_check: Option<bool>,
     /// Android package name which maps to Google Play URL.
     #[serde(rename="packageName")]
-    pub package_name: String,
+    pub package_name: Option<String>,
     /// Indicates that this instance is the default for new installations.
-    pub preferred: bool,
+    pub preferred: Option<bool>,
 }
 
 impl Part for InstanceAndroidDetails {}
@@ -1905,13 +1905,13 @@ impl Part for InstanceAndroidDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementRevealResponse {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementRevealResponse.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The current state of the achievement for which a reveal was attempted. This might be UNLOCKED if the achievement was already unlocked.
     /// Possible values are:  
     /// - "REVEALED" - Achievement is revealed. 
     /// - "UNLOCKED" - Achievement is unlocked.
     #[serde(rename="currentState")]
-    pub current_state: String,
+    pub current_state: Option<String>,
 }
 
 impl ResponseResult for AchievementRevealResponse {}
@@ -1942,39 +1942,39 @@ pub struct Room {
     /// - "ROOM_CONNECTING" - Players have joined and are connecting to each other (either before or after auto-matching). 
     /// - "ROOM_ACTIVE" - All players have joined and connected to each other. 
     /// - "ROOM_DELETED" - The room should no longer be shown on the client. Returned in sync calls when a player joins a room (as a tombstone), or for rooms where all joined participants have left.
-    pub status: String,
+    pub status: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#room.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Criteria for auto-matching players into this room.
     #[serde(rename="autoMatchingCriteria")]
-    pub auto_matching_criteria: RoomAutoMatchingCriteria,
+    pub auto_matching_criteria: Option<RoomAutoMatchingCriteria>,
     /// Details about the room creation.
     #[serde(rename="creationDetails")]
-    pub creation_details: RoomModification,
+    pub creation_details: Option<RoomModification>,
     /// This short description is generated by our servers and worded relative to the player requesting the room. It is intended to be displayed when the room is shown in a list (that is, an invitation to a room.)
-    pub description: String,
+    pub description: Option<String>,
     /// The version of the room status: an increasing counter, used by the client to ignore out-of-order updates to room status.
     #[serde(rename="roomStatusVersion")]
-    pub room_status_version: i32,
+    pub room_status_version: Option<i32>,
     /// Auto-matching status for this room. Not set if the room is not currently in the auto-matching queue.
     #[serde(rename="autoMatchingStatus")]
-    pub auto_matching_status: RoomAutoMatchStatus,
+    pub auto_matching_status: Option<RoomAutoMatchStatus>,
     /// Details about the last update to the room.
     #[serde(rename="lastUpdateDetails")]
-    pub last_update_details: RoomModification,
+    pub last_update_details: Option<RoomModification>,
     /// The variant / mode of the application being played; can be any integer value, or left blank.
-    pub variant: i32,
+    pub variant: Option<i32>,
     /// The participants involved in the room, along with their statuses. Includes participants who have left or declined invitations.
-    pub participants: Vec<RoomParticipant>,
+    pub participants: Option<Vec<RoomParticipant>>,
     /// Globally unique ID for a room.
     #[serde(rename="roomId")]
-    pub room_id: String,
+    pub room_id: Option<String>,
     /// The ID of the application being played.
     #[serde(rename="applicationId")]
-    pub application_id: String,
+    pub application_id: Option<String>,
     /// The ID of the participant that invited the user to the room. Not set if the user was not invited to the room.
     #[serde(rename="inviterId")]
-    pub inviter_id: String,
+    pub inviter_id: Option<String>,
 }
 
 impl Resource for Room {}
@@ -1988,34 +1988,34 @@ impl ResponseResult for Room {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardEntry {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardEntry.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The numerical value of this score.
     #[serde(rename="scoreValue")]
-    pub score_value: String,
+    pub score_value: Option<String>,
     /// Additional information about the score. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     #[serde(rename="scoreTag")]
-    pub score_tag: String,
+    pub score_tag: Option<String>,
     /// The time span of this high score.
     /// Possible values are:  
     /// - "ALL_TIME" - The score is an all-time high score. 
     /// - "WEEKLY" - The score is a weekly high score. 
     /// - "DAILY" - The score is a daily high score.
     #[serde(rename="timeSpan")]
-    pub time_span: String,
+    pub time_span: Option<String>,
     /// The localized string for the numerical value of this score.
     #[serde(rename="formattedScore")]
-    pub formatted_score: String,
+    pub formatted_score: Option<String>,
     /// The player who holds this score.
-    pub player: Player,
+    pub player: Option<Player>,
     /// The localized string for the rank of this score for this leaderboard.
     #[serde(rename="formattedScoreRank")]
-    pub formatted_score_rank: String,
+    pub formatted_score_rank: Option<String>,
     /// The rank of this score for this leaderboard.
     #[serde(rename="scoreRank")]
-    pub score_rank: String,
+    pub score_rank: Option<String>,
     /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.
     #[serde(rename="writeTimestampMillis")]
-    pub write_timestamp_millis: String,
+    pub write_timestamp_millis: Option<String>,
 }
 
 impl Part for LeaderboardEntry {}
@@ -2028,16 +2028,16 @@ impl Part for LeaderboardEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedAutoMatchingCriteria {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedAutoMatchingCriteria.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The minimum number of players that should be added to the match by auto-matching.
     #[serde(rename="minAutoMatchingPlayers")]
-    pub min_auto_matching_players: i32,
+    pub min_auto_matching_players: Option<i32>,
     /// A bitmask indicating when auto-matches are valid. When ANDed with other exclusive bitmasks, the result must be zero. Can be used to support exclusive roles within a game.
     #[serde(rename="exclusiveBitmask")]
-    pub exclusive_bitmask: String,
+    pub exclusive_bitmask: Option<String>,
     /// The maximum number of players that should be added to the match by auto-matching.
     #[serde(rename="maxAutoMatchingPlayers")]
-    pub max_auto_matching_players: i32,
+    pub max_auto_matching_players: Option<i32>,
 }
 
 impl Part for TurnBasedAutoMatchingCriteria {}
@@ -2093,11 +2093,11 @@ impl RequestValue for RoomCreateRequest {}
 pub struct QuestListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The quests.
-    pub items: Vec<Quest>,
+    pub items: Option<Vec<Quest>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#questListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for QuestListResponse {}
@@ -2116,11 +2116,11 @@ impl ResponseResult for QuestListResponse {}
 pub struct PlayerEventListResponse {
     /// The pagination token for the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The player events.
-    pub items: Vec<PlayerEvent>,
+    pub items: Option<Vec<PlayerEvent>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerEventListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for PlayerEventListResponse {}
@@ -2133,12 +2133,12 @@ impl ResponseResult for PlayerEventListResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct GamesAchievementIncrement {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#GamesAchievementIncrement.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The number of steps to be incremented.
-    pub steps: i32,
+    pub steps: Option<i32>,
     /// The requestId associated with an increment to an achievement.
     #[serde(rename="requestId")]
-    pub request_id: String,
+    pub request_id: Option<String>,
 }
 
 impl Part for GamesAchievementIncrement {}
@@ -2151,13 +2151,13 @@ impl Part for GamesAchievementIncrement {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedMatchModification {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchModification.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The timestamp at which they modified the match, in milliseconds since the epoch in UTC.
     #[serde(rename="modifiedTimestampMillis")]
-    pub modified_timestamp_millis: String,
+    pub modified_timestamp_millis: Option<String>,
     /// The ID of the participant that modified the match.
     #[serde(rename="participantId")]
-    pub participant_id: String,
+    pub participant_id: Option<String>,
 }
 
 impl Part for TurnBasedMatchModification {}
@@ -2176,11 +2176,11 @@ impl Part for TurnBasedMatchModification {}
 pub struct PlayerAchievementListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The achievements.
-    pub items: Vec<PlayerAchievement>,
+    pub items: Option<Vec<PlayerAchievement>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerAchievementListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for PlayerAchievementListResponse {}
@@ -2221,33 +2221,33 @@ impl Resource for PushToken {}
 pub struct PlayerLeaderboardScore {
     /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.
     #[serde(rename="writeTimestamp")]
-    pub write_timestamp: String,
+    pub write_timestamp: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLeaderboardScore.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The public rank of the score in this leaderboard. This object will not be present if the user is not sharing their scores publicly.
     #[serde(rename="publicRank")]
-    pub public_rank: LeaderboardScoreRank,
+    pub public_rank: Option<LeaderboardScoreRank>,
     /// Additional information about the score. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     #[serde(rename="scoreTag")]
-    pub score_tag: String,
+    pub score_tag: Option<String>,
     /// The time span of this score.
     /// Possible values are:  
     /// - "ALL_TIME" - The score is an all-time score. 
     /// - "WEEKLY" - The score is a weekly score. 
     /// - "DAILY" - The score is a daily score.
     #[serde(rename="timeSpan")]
-    pub time_span: String,
+    pub time_span: Option<String>,
     /// The formatted value of this score.
     #[serde(rename="scoreString")]
-    pub score_string: String,
+    pub score_string: Option<String>,
     /// The ID of the leaderboard this score is in.
-    pub leaderboard_id: String,
+    pub leaderboard_id: Option<String>,
     /// The numerical value of this score.
     #[serde(rename="scoreValue")]
-    pub score_value: String,
+    pub score_value: Option<String>,
     /// The social rank of the score in this leaderboard.
     #[serde(rename="socialRank")]
-    pub social_rank: LeaderboardScoreRank,
+    pub social_rank: Option<LeaderboardScoreRank>,
 }
 
 impl Part for PlayerLeaderboardScore {}
@@ -2280,15 +2280,15 @@ impl RequestValue for PlayerScoreSubmissionList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SnapshotImage {
     /// The URL of the image. This URL may be invalidated at any time and should not be cached.
-    pub url: String,
+    pub url: Option<String>,
     /// The width of the image.
-    pub width: i32,
+    pub width: Option<i32>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#snapshotImage.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The MIME type of the image.
-    pub mime_type: String,
+    pub mime_type: Option<String>,
     /// The height of the image.
-    pub height: i32,
+    pub height: Option<i32>,
 }
 
 impl Part for SnapshotImage {}
@@ -2301,13 +2301,13 @@ impl Part for SnapshotImage {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnonymousPlayer {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#anonymousPlayer.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The base URL for the image to display for the anonymous player.
     #[serde(rename="avatarImageUrl")]
-    pub avatar_image_url: String,
+    pub avatar_image_url: Option<String>,
     /// The name to display for the anonymous player.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
 }
 
 impl Part for AnonymousPlayer {}
@@ -2321,27 +2321,27 @@ impl Part for AnonymousPlayer {}
 pub struct PeerChannelDiagnostics {
     /// Number of bytes received.
     #[serde(rename="bytesReceived")]
-    pub bytes_received: AggregateStats,
+    pub bytes_received: Option<AggregateStats>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#peerChannelDiagnostics.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Number of bytes sent.
     #[serde(rename="bytesSent")]
-    pub bytes_sent: AggregateStats,
+    pub bytes_sent: Option<AggregateStats>,
     /// Number of send failures.
     #[serde(rename="numSendFailures")]
-    pub num_send_failures: i32,
+    pub num_send_failures: Option<i32>,
     /// Number of messages lost.
     #[serde(rename="numMessagesLost")]
-    pub num_messages_lost: i32,
+    pub num_messages_lost: Option<i32>,
     /// Number of messages received.
     #[serde(rename="numMessagesReceived")]
-    pub num_messages_received: i32,
+    pub num_messages_received: Option<i32>,
     /// Number of messages sent.
     #[serde(rename="numMessagesSent")]
-    pub num_messages_sent: i32,
+    pub num_messages_sent: Option<i32>,
     /// Roundtrip latency stats in milliseconds.
     #[serde(rename="roundtripLatencyMillis")]
-    pub roundtrip_latency_millis: AggregateStats,
+    pub roundtrip_latency_millis: Option<AggregateStats>,
 }
 
 impl Part for PeerChannelDiagnostics {}
@@ -2391,20 +2391,20 @@ pub struct RoomStatus {
     /// - "ROOM_CONNECTING" - Players have joined are connecting to each other (either before or after auto-matching). 
     /// - "ROOM_ACTIVE" - All players have joined and connected to each other. 
     /// - "ROOM_DELETED" - All joined players have left.
-    pub status: String,
+    pub status: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomStatus.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The version of the status for the room: an increasing counter, used by the client to ignore out-of-order updates to room status.
     #[serde(rename="statusVersion")]
-    pub status_version: i32,
+    pub status_version: Option<i32>,
     /// Globally unique ID for a room.
     #[serde(rename="roomId")]
-    pub room_id: String,
+    pub room_id: Option<String>,
     /// Auto-matching status for this room. Not set if the room is not currently in the automatching queue.
     #[serde(rename="autoMatchingStatus")]
-    pub auto_matching_status: RoomAutoMatchStatus,
+    pub auto_matching_status: Option<RoomAutoMatchStatus>,
     /// The participants involved in the room, along with their statuses. Includes participants who have left or declined invitations.
-    pub participants: Vec<RoomParticipant>,
+    pub participants: Option<Vec<RoomParticipant>>,
 }
 
 impl ResponseResult for RoomStatus {}
@@ -2417,9 +2417,9 @@ impl ResponseResult for RoomStatus {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PushTokenIdIos {
     /// Device token supplied by an iOS system call to register for remote notifications. Encode this field as web-safe base64.
-    pub apns_device_token: String,
+    pub apns_device_token: Option<String>,
     /// Indicates whether this token should be used for the production or sandbox APNS server.
-    pub apns_environment: String,
+    pub apns_environment: Option<String>,
 }
 
 impl NestedType for PushTokenIdIos {}
@@ -2440,21 +2440,21 @@ impl Part for PushTokenIdIos {}
 pub struct Leaderboard {
     /// The icon for the leaderboard.
     #[serde(rename="iconUrl")]
-    pub icon_url: String,
+    pub icon_url: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboard.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The name of the leaderboard.
-    pub name: String,
+    pub name: Option<String>,
     /// The leaderboard ID.
-    pub id: String,
+    pub id: Option<String>,
     /// Indicates whether the icon image being returned is a default image, or is game-provided.
     #[serde(rename="isIconUrlDefault")]
-    pub is_icon_url_default: bool,
+    pub is_icon_url_default: Option<bool>,
     /// How scores are ordered.
     /// Possible values are:  
     /// - "LARGER_IS_BETTER" - Larger values are better; scores are sorted in descending order. 
     /// - "SMALLER_IS_BETTER" - Smaller values are better; scores are sorted in ascending order.
-    pub order: String,
+    pub order: Option<String>,
 }
 
 impl Resource for Leaderboard {}
@@ -2469,7 +2469,7 @@ impl ResponseResult for Leaderboard {}
 pub struct TurnBasedMatchParticipant {
     /// True if this participant was auto-matched with the requesting player.
     #[serde(rename="autoMatched")]
-    pub auto_matched: bool,
+    pub auto_matched: Option<bool>,
     /// The status of the participant with respect to the match.
     /// Possible values are:  
     /// - "PARTICIPANT_NOT_INVITED_YET" - The participant is slated to be invited to the match, but the invitation has not been sent; the invite will be sent when it becomes their turn. 
@@ -2479,16 +2479,16 @@ pub struct TurnBasedMatchParticipant {
     /// - "PARTICIPANT_LEFT" - The participant joined the match and then left it. 
     /// - "PARTICIPANT_FINISHED" - The participant finished playing in the match. 
     /// - "PARTICIPANT_UNRESPONSIVE" - The participant did not take their turn in the allotted time.
-    pub status: String,
+    pub status: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchParticipant.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Information about a player that has been anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
     #[serde(rename="autoMatchedPlayer")]
-    pub auto_matched_player: AnonymousPlayer,
+    pub auto_matched_player: Option<AnonymousPlayer>,
     /// Information about the player. Not populated if this player was anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
-    pub player: Player,
+    pub player: Option<Player>,
     /// An identifier for the participant in the scope of the match. Cannot be used to identify a player across matches or in other contexts.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for TurnBasedMatchParticipant {}
@@ -2502,17 +2502,17 @@ impl Part for TurnBasedMatchParticipant {}
 pub struct LeaderboardScoreRank {
     /// The number of scores in the leaderboard.
     #[serde(rename="numScores")]
-    pub num_scores: String,
+    pub num_scores: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardScoreRank.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The rank in the leaderboard as a string.
     #[serde(rename="formattedRank")]
-    pub formatted_rank: String,
+    pub formatted_rank: Option<String>,
     /// The rank in the leaderboard.
-    pub rank: String,
+    pub rank: Option<String>,
     /// The number of scores in the leaderboard as a string.
     #[serde(rename="formattedNumScores")]
-    pub formatted_num_scores: String,
+    pub formatted_num_scores: Option<String>,
 }
 
 impl Part for LeaderboardScoreRank {}
@@ -2526,10 +2526,10 @@ impl Part for LeaderboardScoreRank {}
 pub struct PlayerName {
     /// The given name of this player. In some places, this is known as the first name.
     #[serde(rename="givenName")]
-    pub given_name: String,
+    pub given_name: Option<String>,
     /// The family name of this player. In some places, this is known as the last name.
     #[serde(rename="familyName")]
-    pub family_name: String,
+    pub family_name: Option<String>,
 }
 
 impl NestedType for PlayerName {}
@@ -2548,23 +2548,23 @@ pub struct PlayerAchievement {
     /// - "REVEALED" - Achievement is revealed. 
     /// - "UNLOCKED" - Achievement is unlocked.
     #[serde(rename="achievementState")]
-    pub achievement_state: String,
+    pub achievement_state: Option<String>,
     /// The current steps for an incremental achievement.
     #[serde(rename="currentSteps")]
-    pub current_steps: i32,
+    pub current_steps: Option<i32>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerAchievement.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Experience points earned for the achievement. This field is absent for achievements that have not yet been unlocked and 0 for achievements that have been unlocked by testers but that are unpublished.
     #[serde(rename="experiencePoints")]
-    pub experience_points: String,
+    pub experience_points: Option<String>,
     /// The current steps for an incremental achievement as a string.
     #[serde(rename="formattedCurrentStepsString")]
-    pub formatted_current_steps_string: String,
+    pub formatted_current_steps_string: Option<String>,
     /// The timestamp of the last modification to this achievement's state.
     #[serde(rename="lastUpdatedTimestamp")]
-    pub last_updated_timestamp: String,
+    pub last_updated_timestamp: Option<String>,
     /// The ID of the achievement.
-    pub id: String,
+    pub id: Option<String>,
 }
 
 impl Part for PlayerAchievement {}
@@ -2580,26 +2580,26 @@ pub struct RoomP2PStatus {
     /// Possible values are:  
     /// - "CONNECTION_ESTABLISHED" - The client established a P2P connection with the peer. 
     /// - "CONNECTION_FAILED" - The client failed to establish directed presence with the peer.
-    pub status: String,
+    pub status: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomP2PStatus.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The ID of the participant.
     #[serde(rename="participantId")]
-    pub participant_id: String,
+    pub participant_id: Option<String>,
     /// The error code in event of a failure.
     /// Possible values are:  
     /// - "P2P_FAILED" - The client failed to establish a P2P connection with the peer. 
     /// - "PRESENCE_FAILED" - The client failed to register to receive P2P connections. 
     /// - "RELAY_SERVER_FAILED" - The client received an error when trying to use the relay server to establish a P2P connection with the peer.
-    pub error: String,
+    pub error: Option<String>,
     /// More detailed diagnostic message returned in event of a failure.
-    pub error_reason: String,
+    pub error_reason: Option<String>,
     /// The amount of time in milliseconds it took to send packets back and forth on the unreliable channel with this peer.
     #[serde(rename="unreliableRoundtripLatencyMillis")]
-    pub unreliable_roundtrip_latency_millis: i32,
+    pub unreliable_roundtrip_latency_millis: Option<i32>,
     /// The amount of time in milliseconds it took to establish connections with this peer.
     #[serde(rename="connectionSetupLatencyMillis")]
-    pub connection_setup_latency_millis: i32,
+    pub connection_setup_latency_millis: Option<i32>,
 }
 
 impl Part for RoomP2PStatus {}
@@ -2612,12 +2612,12 @@ impl Part for RoomP2PStatus {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct EventPeriodUpdate {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventPeriodUpdate.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The time period being covered by this update.
     #[serde(rename="timePeriod")]
-    pub time_period: EventPeriodRange,
+    pub time_period: Option<EventPeriodRange>,
     /// The updates being made for this time period.
-    pub updates: Vec<EventUpdateRequest>,
+    pub updates: Option<Vec<EventUpdateRequest>>,
 }
 
 impl Part for EventPeriodUpdate {}
@@ -2656,11 +2656,11 @@ impl RequestValue for AchievementUpdateMultipleRequest {}
 pub struct SnapshotListResponse {
     /// Token corresponding to the next page of results. If there are no more results, the token is omitted.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The snapshots.
-    pub items: Vec<Snapshot>,
+    pub items: Option<Vec<Snapshot>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#snapshotListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for SnapshotListResponse {}
@@ -2673,11 +2673,11 @@ impl ResponseResult for SnapshotListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApplicationCategory {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#applicationCategory.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The primary category.
-    pub primary: String,
+    pub primary: Option<String>,
     /// The secondary category.
-    pub secondary: String,
+    pub secondary: Option<String>,
 }
 
 impl Part for ApplicationCategory {}
@@ -2690,17 +2690,17 @@ impl Part for ApplicationCategory {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ScoreSubmission {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#scoreSubmission.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The leaderboard this score is being submitted to.
     #[serde(rename="leaderboardId")]
-    pub leaderboard_id: String,
+    pub leaderboard_id: Option<String>,
     /// The new score being submitted.
-    pub score: String,
+    pub score: Option<String>,
     /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     #[serde(rename="scoreTag")]
-    pub score_tag: String,
+    pub score_tag: Option<String>,
     /// Signature Values will contain URI-safe characters as defined by section 2.3 of RFC 3986.
-    pub signature: String,
+    pub signature: Option<String>,
 }
 
 impl Part for ScoreSubmission {}
@@ -2785,45 +2785,45 @@ pub struct TurnBasedMatch {
     /// - "MATCH_CANCELED" - The match was canceled. 
     /// - "MATCH_EXPIRED" - The match expired due to inactivity. 
     /// - "MATCH_DELETED" - The match should no longer be shown on the client. Returned only for tombstones for matches when sync is called.
-    pub status: String,
+    pub status: Option<String>,
     /// Criteria for auto-matching players into this match.
     #[serde(rename="autoMatchingCriteria")]
-    pub auto_matching_criteria: TurnBasedAutoMatchingCriteria,
+    pub auto_matching_criteria: Option<TurnBasedAutoMatchingCriteria>,
     /// The ID of the participant that invited the user to the match. Not set if the user was not invited to the match.
     #[serde(rename="inviterId")]
-    pub inviter_id: String,
+    pub inviter_id: Option<String>,
     /// The version of this match: an increasing counter, used to avoid out-of-date updates to the match.
     #[serde(rename="matchVersion")]
-    pub match_version: i32,
+    pub match_version: Option<i32>,
     /// The variant / mode of the application being played; can be any integer value, or left blank.
-    pub variant: i32,
+    pub variant: Option<i32>,
     /// Globally unique ID for a turn-based match.
     #[serde(rename="matchId")]
-    pub match_id: String,
+    pub match_id: Option<String>,
     /// The ID of a rematch of this match. Only set for completed matches that have been rematched.
     #[serde(rename="rematchId")]
-    pub rematch_id: String,
+    pub rematch_id: Option<String>,
     /// The results reported for this match.
-    pub results: Vec<ParticipantResult>,
+    pub results: Option<Vec<ParticipantResult>>,
     /// The number of the match in a chain of rematches. Will be set to 1 for the first match and incremented by 1 for each rematch.
     #[serde(rename="matchNumber")]
-    pub match_number: i32,
+    pub match_number: Option<i32>,
     /// The data / game state for the previous match; set for the first turn of rematches only.
     #[serde(rename="previousMatchData")]
-    pub previous_match_data: TurnBasedMatchData,
+    pub previous_match_data: Option<TurnBasedMatchData>,
     /// The ID of the application being played.
     #[serde(rename="applicationId")]
-    pub application_id: String,
+    pub application_id: Option<String>,
     /// This short description is generated by our servers based on turn state and is localized and worded relative to the player requesting the match. It is intended to be displayed when the match is shown in a list.
-    pub description: String,
+    pub description: Option<String>,
     /// The ID of another participant in the match that can be used when describing the participants the user is playing with.
     #[serde(rename="withParticipantId")]
-    pub with_participant_id: String,
+    pub with_participant_id: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatch.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Details about the match creation.
     #[serde(rename="creationDetails")]
-    pub creation_details: TurnBasedMatchModification,
+    pub creation_details: Option<TurnBasedMatchModification>,
     /// The status of the current user in the match. Derived from the match type, match status, the user's participant status, and the pending participant for the match.
     /// Possible values are:  
     /// - "USER_INVITED" - The user has been invited to join the match and has not responded yet. 
@@ -2831,17 +2831,17 @@ pub struct TurnBasedMatch {
     /// - "USER_TURN" - The user has an action to take in the match. 
     /// - "USER_MATCH_COMPLETED" - The match has ended (it is completed, canceled, or expired.)
     #[serde(rename="userMatchStatus")]
-    pub user_match_status: String,
+    pub user_match_status: Option<String>,
     /// The data / game state for this match.
-    pub data: TurnBasedMatchData,
+    pub data: Option<TurnBasedMatchData>,
     /// The participants involved in the match, along with their statuses. Includes participants who have left or declined invitations.
-    pub participants: Vec<TurnBasedMatchParticipant>,
+    pub participants: Option<Vec<TurnBasedMatchParticipant>>,
     /// The ID of the participant that is taking a turn.
     #[serde(rename="pendingParticipantId")]
-    pub pending_participant_id: String,
+    pub pending_participant_id: Option<String>,
     /// Details about the last update to the match.
     #[serde(rename="lastUpdateDetails")]
-    pub last_update_details: TurnBasedMatchModification,
+    pub last_update_details: Option<TurnBasedMatchModification>,
 }
 
 impl ResponseResult for TurnBasedMatch {}
@@ -2881,12 +2881,12 @@ impl RequestValue for EventRecordRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceWebDetails {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceWebDetails.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Launch URL for the game.
     #[serde(rename="launchUrl")]
-    pub launch_url: String,
+    pub launch_url: Option<String>,
     /// Indicates that this instance is the default for new installations.
-    pub preferred: bool,
+    pub preferred: Option<bool>,
 }
 
 impl Part for InstanceWebDetails {}
@@ -2905,11 +2905,11 @@ impl Part for InstanceWebDetails {}
 pub struct CategoryListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The list of categories with usage data.
-    pub items: Vec<Category>,
+    pub items: Option<Vec<Category>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#categoryListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for CategoryListResponse {}
@@ -2923,18 +2923,18 @@ impl ResponseResult for CategoryListResponse {}
 pub struct PlayerEvent {
     /// The ID of the event definition.
     #[serde(rename="definitionId")]
-    pub definition_id: String,
+    pub definition_id: Option<String>,
     /// The ID of the player.
     #[serde(rename="playerId")]
-    pub player_id: String,
+    pub player_id: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerEvent.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The current number of times this event has occurred.
     #[serde(rename="numEvents")]
-    pub num_events: String,
+    pub num_events: Option<String>,
     /// The current number of times this event has occurred, as a string. The formatting of this string depends on the configuration of your event in the Play Games Developer Console.
     #[serde(rename="formattedNumEvents")]
-    pub formatted_num_events: String,
+    pub formatted_num_events: Option<String>,
 }
 
 impl Part for PlayerEvent {}
@@ -2953,26 +2953,26 @@ impl Part for PlayerEvent {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Player {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#player.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The name to display for the player.
     #[serde(rename="displayName")]
-    pub display_name: String,
+    pub display_name: Option<String>,
     /// An object representation of the individual components of the player's name. For some players, these fields may not be present.
-    pub name: PlayerName,
+    pub name: Option<PlayerName>,
     /// The player's title rewarded for their game activities.
-    pub title: String,
+    pub title: Option<String>,
     /// The ID of the player.
     #[serde(rename="playerId")]
-    pub player_id: String,
+    pub player_id: Option<String>,
     /// Details about the last time this player played a multiplayer game with the currently authenticated player. Populated for PLAYED_WITH player collection members.
     #[serde(rename="lastPlayedWith")]
-    pub last_played_with: Played,
+    pub last_played_with: Option<Played>,
     /// An object to represent Play Game experience information for the player.
     #[serde(rename="experienceInfo")]
-    pub experience_info: PlayerExperienceInfo,
+    pub experience_info: Option<PlayerExperienceInfo>,
     /// The base URL for the image that represents the player.
     #[serde(rename="avatarImageUrl")]
-    pub avatar_image_url: String,
+    pub avatar_image_url: Option<String>,
 }
 
 impl Resource for Player {}
@@ -2992,15 +2992,15 @@ impl ResponseResult for Player {}
 pub struct EventUpdateResponse {
     /// The current status of any updated events
     #[serde(rename="playerEvents")]
-    pub player_events: Vec<PlayerEvent>,
+    pub player_events: Option<Vec<PlayerEvent>>,
     /// Any batch-wide failures which occurred applying updates.
     #[serde(rename="batchFailures")]
-    pub batch_failures: Vec<EventBatchRecordFailure>,
+    pub batch_failures: Option<Vec<EventBatchRecordFailure>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventUpdateResponse.
-    pub kind: String,
+    pub kind: Option<String>,
     /// Any failures updating a particular event.
     #[serde(rename="eventFailures")]
-    pub event_failures: Vec<EventRecordFailure>,
+    pub event_failures: Option<Vec<EventRecordFailure>>,
 }
 
 impl ResponseResult for EventUpdateResponse {}
@@ -3018,17 +3018,17 @@ impl ResponseResult for EventUpdateResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionCheckResponse {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#revisionCheckResponse.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The result of the revision check.
     /// Possible values are:  
     /// - "OK" - The revision being used is current. 
     /// - "DEPRECATED" - There is currently a newer version available, but the revision being used still works. 
     /// - "INVALID" - The revision being used is not supported in any released version.
     #[serde(rename="revisionStatus")]
-    pub revision_status: String,
+    pub revision_status: Option<String>,
     /// The version of the API this client revision should use when calling API methods.
     #[serde(rename="apiVersion")]
-    pub api_version: String,
+    pub api_version: Option<String>,
 }
 
 impl ResponseResult for RevisionCheckResponse {}
@@ -3042,7 +3042,7 @@ impl ResponseResult for RevisionCheckResponse {}
 pub struct AchievementUpdateRequest {
     /// The achievement this update is being applied to.
     #[serde(rename="achievementId")]
-    pub achievement_id: String,
+    pub achievement_id: Option<String>,
     /// The type of update being applied.
     /// Possible values are:  
     /// - "REVEAL" - Achievement is revealed. 
@@ -3050,15 +3050,15 @@ pub struct AchievementUpdateRequest {
     /// - "INCREMENT" - Achievement is incremented. 
     /// - "SET_STEPS_AT_LEAST" - Achievement progress is set to at least the passed value.
     #[serde(rename="updateType")]
-    pub update_type: String,
+    pub update_type: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateRequest.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The payload if an update of type SET_STEPS_AT_LEAST was requested for the achievement.
     #[serde(rename="setStepsAtLeastPayload")]
-    pub set_steps_at_least_payload: GamesAchievementSetStepsAtLeast,
+    pub set_steps_at_least_payload: Option<GamesAchievementSetStepsAtLeast>,
     /// The payload if an update of type INCREMENT was requested for the achievement.
     #[serde(rename="incrementPayload")]
-    pub increment_payload: GamesAchievementIncrement,
+    pub increment_payload: Option<GamesAchievementIncrement>,
 }
 
 impl Part for AchievementUpdateRequest {}
@@ -3077,11 +3077,11 @@ impl Part for AchievementUpdateRequest {}
 pub struct LeaderboardListResponse {
     /// Token corresponding to the next page of results.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The leaderboards.
-    pub items: Vec<Leaderboard>,
+    pub items: Option<Vec<Leaderboard>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardListResponse.
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for LeaderboardListResponse {}
@@ -3094,9 +3094,9 @@ impl ResponseResult for LeaderboardListResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct GamesAchievementSetStepsAtLeast {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#GamesAchievementSetStepsAtLeast.
-    pub kind: String,
+    pub kind: Option<String>,
     /// The minimum number of steps for the achievement to be set to.
-    pub steps: i32,
+    pub steps: Option<i32>,
 }
 
 impl Part for GamesAchievementSetStepsAtLeast {}
@@ -4819,16 +4819,20 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -5084,16 +5088,20 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -5333,16 +5341,20 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -5492,7 +5504,7 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: AchievementUpdateMultipleRequest = Default::default();
+/// let mut req = AchievementUpdateMultipleRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -5558,16 +5570,20 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -5791,16 +5807,20 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -6021,16 +6041,20 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -6256,16 +6280,20 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6482,16 +6510,20 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6740,16 +6772,20 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -6975,16 +7011,20 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7210,16 +7250,20 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7466,16 +7510,20 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -7708,16 +7756,20 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -7960,16 +8012,20 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8216,16 +8272,20 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8468,16 +8528,20 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -8718,16 +8782,20 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
@@ -8937,16 +9005,20 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9197,16 +9269,20 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
@@ -9444,16 +9520,20 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -9607,7 +9687,7 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: TurnBasedMatchCreateRequest = Default::default();
+/// let mut req = TurnBasedMatchCreateRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -9678,16 +9758,20 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -9923,16 +10007,20 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
@@ -10172,16 +10260,20 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
@@ -10425,16 +10517,20 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
@@ -10564,7 +10660,7 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: TurnBasedMatchResults = Default::default();
+/// let mut req = TurnBasedMatchResults::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -10661,16 +10757,20 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10916,16 +11016,20 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
@@ -11152,16 +11256,20 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -11326,7 +11434,7 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: TurnBasedMatchTurn = Default::default();
+/// let mut req = TurnBasedMatchTurn::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -11423,16 +11531,20 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -11683,16 +11795,20 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -11937,16 +12053,20 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -12154,16 +12274,20 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -12369,16 +12493,20 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -12525,7 +12653,7 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: RoomLeaveRequest = Default::default();
+/// let mut req = RoomLeaveRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -12622,16 +12750,20 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12861,16 +12993,20 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -13021,7 +13157,7 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: RoomP2PStatuses = Default::default();
+/// let mut req = RoomP2PStatuses::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -13118,16 +13254,20 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13287,7 +13427,7 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: RoomCreateRequest = Default::default();
+/// let mut req = RoomCreateRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -13358,16 +13498,20 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13603,16 +13747,20 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -13839,16 +13987,20 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -13978,7 +14130,7 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: RoomJoinRequest = Default::default();
+/// let mut req = RoomJoinRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -14075,16 +14227,20 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -14337,16 +14493,20 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -14610,16 +14770,20 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -14906,16 +15070,20 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -15103,7 +15271,7 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PlayerScoreSubmissionList = Default::default();
+/// let mut req = PlayerScoreSubmissionList::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -15174,16 +15342,20 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -15443,16 +15615,20 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -15647,7 +15823,7 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PushTokenId = Default::default();
+/// let mut req = PushTokenId::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -15712,16 +15888,20 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -15854,7 +16034,7 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PushToken = Default::default();
+/// let mut req = PushToken::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -15919,16 +16099,20 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -16118,16 +16302,20 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -16342,16 +16530,20 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -16502,7 +16694,7 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: EventRecordRequest = Default::default();
+/// let mut req = EventRecordRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -16573,16 +16765,20 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -16802,16 +16998,20 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -17046,16 +17246,20 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
@@ -17275,16 +17479,20 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

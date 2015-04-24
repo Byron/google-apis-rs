@@ -5,7 +5,7 @@
 
 name = "google-autoscaler1_beta2-cli"
 version = "0.0.1+20141112"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with autoscaler (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/autoscaler1_beta2-cli"
 homepage = "http://developers.google.com/compute/docs/autoscaler"
@@ -23,6 +23,7 @@ yup-oauth2 = "*"
 docopt = "*"
 docopt_macros = "*"
 rustc-serialize = "*"
+yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
 

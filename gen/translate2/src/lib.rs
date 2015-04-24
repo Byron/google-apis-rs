@@ -320,7 +320,7 @@ impl<'a, C, A> Translate<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DetectionsListResponse {
     /// A detections contains detection results of several text
-    pub detections: Vec<DetectionsResource>,
+    pub detections: Option<Vec<DetectionsResource>>,
 }
 
 impl ResponseResult for DetectionsListResponse {}
@@ -338,7 +338,7 @@ impl ResponseResult for DetectionsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LanguagesListResponse {
     /// List of source/target languages supported by the translation API. If target parameter is unspecified, the list is sorted by the ASCII code point order of the language code. If target parameter is specified, the list is sorted by the collation order of the language name in the target language.
-    pub languages: Vec<LanguagesResource>,
+    pub languages: Option<Vec<LanguagesResource>>,
 }
 
 impl ResponseResult for LanguagesListResponse {}
@@ -354,11 +354,11 @@ impl ResponseResult for LanguagesListResponse {}
 pub struct DetectionsResource {
     /// A boolean to indicate is the language detection result reliable.
     #[serde(rename="isReliable")]
-    pub is_reliable: bool,
+    pub is_reliable: Option<bool>,
     /// The confidence of the detection resul of this language.
-    pub confidence: f32,
+    pub confidence: Option<f32>,
     /// The language we detect
-    pub language: String,
+    pub language: Option<String>,
 }
 
 impl Part for DetectionsResource {}
@@ -372,10 +372,10 @@ impl Part for DetectionsResource {}
 pub struct TranslationsResource {
     /// Detected source language if source parameter is unspecified.
     #[serde(rename="detectedSourceLanguage")]
-    pub detected_source_language: String,
+    pub detected_source_language: Option<String>,
     /// The translation.
     #[serde(rename="translatedText")]
-    pub translated_text: String,
+    pub translated_text: Option<String>,
 }
 
 impl Part for TranslationsResource {}
@@ -388,9 +388,9 @@ impl Part for TranslationsResource {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LanguagesResource {
     /// The localized name of the language if target parameter is given.
-    pub name: String,
+    pub name: Option<String>,
     /// The language code.
-    pub language: String,
+    pub language: Option<String>,
 }
 
 impl Part for LanguagesResource {}
@@ -404,11 +404,11 @@ impl Part for LanguagesResource {}
 pub struct DetectionsResourceNested {
     /// A boolean to indicate is the language detection result reliable.
     #[serde(rename="isReliable")]
-    pub is_reliable: bool,
+    pub is_reliable: Option<bool>,
     /// The confidence of the detection resul of this language.
-    pub confidence: f32,
+    pub confidence: Option<f32>,
     /// The language we detect
-    pub language: String,
+    pub language: Option<String>,
 }
 
 impl NestedType for DetectionsResourceNested {}
@@ -427,7 +427,7 @@ impl Part for DetectionsResourceNested {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TranslationsListResponse {
     /// Translations contains list of translation results of given text
-    pub translations: Vec<TranslationsResource>,
+    pub translations: Option<Vec<TranslationsResource>>,
 }
 
 impl ResponseResult for TranslationsListResponse {}

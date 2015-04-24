@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *replicapoolupdater* crate version *0.1.5+20150129*, where *20150129* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *replicapoolupdater* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *replicapoolupdater* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/docs/instance-groups/manager/#applying_rolling_updates_using_the_updater_service).
@@ -362,11 +362,11 @@ pub struct InstanceUpdate {
     /// - "ROLLED_OUT": The instance update is finished, the instance is running the new template. 
     /// - "ROLLED_BACK": The instance update is finished, the instance has been reverted to the previous template. 
     /// - "CANCELLED": The instance update is paused and no longer can be resumed, undefined in which template the instance is running.
-    pub status: String,
+    pub status: Option<String>,
     /// URL of the instance being updated.
-    pub instance: String,
+    pub instance: Option<String>,
     /// Errors that occurred during the instance update.
-    pub error: InstanceUpdateError,
+    pub error: Option<InstanceUpdateError>,
 }
 
 impl Part for InstanceUpdate {}
@@ -385,14 +385,14 @@ impl Part for InstanceUpdate {}
 pub struct InstanceUpdateList {
     /// A token used to continue a truncated list request.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Collection of requested instance updates.
-    pub items: Vec<InstanceUpdate>,
+    pub items: Option<Vec<InstanceUpdate>>,
     /// [Output Only] Type of the resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// [Output Only] The fully qualified URL for the resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for InstanceUpdateList {}
@@ -405,9 +405,9 @@ impl ResponseResult for InstanceUpdateList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarningsData {
     /// [Output Only] Metadata key for this warning.
-    pub key: String,
+    pub key: Option<String>,
     /// [Output Only] Metadata value for this warning.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for OperationWarningsData {}
@@ -421,7 +421,7 @@ impl Part for OperationWarningsData {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceUpdateError {
     /// [Output Only] The array of errors encountered while processing this operation.
-    pub errors: Vec<InstanceUpdateErrorErrors>,
+    pub errors: Option<Vec<InstanceUpdateErrorErrors>>,
 }
 
 impl NestedType for InstanceUpdateError {}
@@ -454,41 +454,39 @@ pub struct RollingUpdate {
     /// - "ROLLED_BACK": The update is finished, all instances have been reverted to the previous template. 
     /// - "CANCELLED": The update is paused and no longer can be resumed, undefined how many instances are running in which template.
     pub status: Option<String>,
+    /// [Output Only] The fully qualified URL for the resource.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+    /// [Output Only] Type of the resource.
+    pub kind: Option<String>,
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
-    /// Fully-qualified URL of an instance group being updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.
+    /// Fully-qualified URL of an instance group being updated. Exactly one of instanceGroupManager and instanceGroup must be set.
     #[serde(rename="instanceGroup")]
     pub instance_group: Option<String>,
-    /// List of fully-qualified URLs of instances to be updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.
-    pub instances: Option<Vec<String>>,
     /// Fully-qualified URL of an instance template to apply.
     #[serde(rename="instanceTemplate")]
     pub instance_template: Option<String>,
-    /// Specifies the action to take for each instance within the instance group. This can be RECREATE which will recreate each instance and is only available for managed instance groups. It can also be REBOOT which performs a soft reboot for each instance and is only available for regular (non-managed) instance groups and explicit lists of instances.
+    /// Specifies the action to take for each instance within the instance group. This can be RECREATE which will recreate each instance and is only available for managed instance groups. It can also be REBOOT which performs a soft reboot for each instance and is only available for regular (non-managed) instance groups.
     #[serde(rename="actionType")]
     pub action_type: Option<String>,
     /// [Output Only] User who requested the update, for example: user@example.com.
     pub user: Option<String>,
-    /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(rename="creationTimestamp")]
-    pub creation_timestamp: Option<String>,
-    /// [Output Only] Unique identifier for the resource; defined by the server.
-    pub id: Option<String>,
-    /// [Output Only] Type of the resource.
-    pub kind: Option<String>,
-    /// [Output Only] The fully qualified URL for the resource.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
-    /// [Output Only] Errors that occurred during rolling update.
+    /// [Output Only] Errors that occurred during the rolling update.
     pub error: Option<RollingUpdateError>,
     /// Parameters of the update process.
     pub policy: Option<RollingUpdatePolicy>,
     /// [Output Only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the update will be complete. This number should be monotonically increasing as the update progresses.
     pub progress: Option<i32>,
+    /// [Output Only] Creation timestamp in RFC3339 text format.
+    #[serde(rename="creationTimestamp")]
+    pub creation_timestamp: Option<String>,
+    /// [Output Only] Unique identifier for the resource; defined by the server.
+    pub id: Option<String>,
     /// [Output Only] An optional textual description of the current status of the update.
     #[serde(rename="statusMessage")]
     pub status_message: Option<String>,
-    /// Fully-qualified URL of an instance group manager being updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.
+    /// Fully-qualified URL of an instance group manager being updated. Exactly one of instanceGroupManager and instanceGroup must be set.
     #[serde(rename="instanceGroupManager")]
     pub instance_group_manager: Option<String>,
 }
@@ -505,11 +503,11 @@ impl ResponseResult for RollingUpdate {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollingUpdateErrorErrors {
     /// [Output Only] An optional, human-readable error message.
-    pub message: String,
+    pub message: Option<String>,
     /// [Output Only] The error type identifier for this error.
-    pub code: String,
-    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.
-    pub location: String,
+    pub code: Option<String>,
+    /// [Output Only] Indicates the field in the request that caused the error. This property is optional.
+    pub location: Option<String>,
 }
 
 impl NestedType for RollingUpdateErrorErrors {}
@@ -522,24 +520,21 @@ impl Part for RollingUpdateErrorErrors {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollingUpdatePolicy {
-    /// Time period after the instance has been restarted but before marking the update of this instance as done. This field is deprecated and ignored by Rolling Updater.
-    #[serde(rename="sleepAfterInstanceRestartSec")]
-    pub sleep_after_instance_restart_sec: i32,
-    /// Maximum amount of time we will wait after finishing all steps until we receive HEALTHY state for instance. If this deadline is exceeded instance update is considered as failed.
-    #[serde(rename="instanceStartupTimeoutSec")]
-    pub instance_startup_timeout_sec: i32,
-    /// Maximum number of instances that can be updated simultaneously (concurrently). An update of an instance starts when the instance is about to be restarted and finishes after the instance has been restarted and the sleep period (defined by sleepAfterInstanceRestartSec) has passed.
-    #[serde(rename="maxNumConcurrentInstances")]
-    pub max_num_concurrent_instances: i32,
-    /// Specifies minimum amount of time we will spend on updating single instance, measuring at the start of the first update action (e.g. Recreate call on Instance Group Manager or Stop call on Instance resource). If actual instance update takes less time we will simply sleep before proceeding with next instance.
-    #[serde(rename="minInstanceUpdateTimeSec")]
-    pub min_instance_update_time_sec: i32,
-    /// Number of instances updated before the update gets automatically paused.
+    /// Number of instances to update before the updater pauses the rolling update.
     #[serde(rename="autoPauseAfterInstances")]
-    pub auto_pause_after_instances: i32,
-    /// Maximum number of instance updates that can fail without failing the group update. Instance update is considered failed if any of it's update actions (e.g. Stop call on Instance resource in Rolling Reboot) failed with permanent failure, or if after finishing all update actions this instance is in UNHEALTHY state.
+    pub auto_pause_after_instances: Option<i32>,
+    /// The maximum amount of time that the updater waits for a HEALTHY state after all of the update steps are complete. If the HEALTHY state is not received before the deadline, the instance update is considered a failure.
+    #[serde(rename="instanceStartupTimeoutSec")]
+    pub instance_startup_timeout_sec: Option<i32>,
+    /// The maximum number of instances that can be updated simultaneously. An instance update is considered complete only after the instance is restarted and initialized.
+    #[serde(rename="maxNumConcurrentInstances")]
+    pub max_num_concurrent_instances: Option<i32>,
+    /// The minimum amount of time that the updater spends to update each instance. Update time is the time it takes to complete all update actions (e.g. Stop call on Instance resource in Rolling Reboot), reboot, and initialize. If the instance update finishes early, the updater pauses for the remainder of the time before it starts the next instance update.
+    #[serde(rename="minInstanceUpdateTimeSec")]
+    pub min_instance_update_time_sec: Option<i32>,
+    /// The maximum number of instance updates that can fail before the group update is considered a failure. An instance update is considered failed if any of its update actions (e.g. Stop call on Instance resource in Rolling Reboot) failed with permanent failure, or if the instance is in an UNHEALTHY state after it finishes all of the update actions.
     #[serde(rename="maxNumFailedInstances")]
-    pub max_num_failed_instances: i32,
+    pub max_num_failed_instances: Option<i32>,
 }
 
 impl NestedType for RollingUpdatePolicy {}
@@ -553,11 +548,11 @@ impl Part for RollingUpdatePolicy {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationErrorErrors {
     /// [Output Only] An optional, human-readable error message.
-    pub message: String,
+    pub message: Option<String>,
     /// [Output Only] The error type identifier for this error.
-    pub code: String,
-    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.
-    pub location: String,
+    pub code: Option<String>,
+    /// [Output Only] Indicates the field in the request that caused the error. This property is optional.
+    pub location: Option<String>,
 }
 
 impl NestedType for OperationErrorErrors {}
@@ -571,11 +566,11 @@ impl Part for OperationErrorErrors {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceUpdateErrorErrors {
     /// [Output Only] An optional, human-readable error message.
-    pub message: String,
+    pub message: Option<String>,
     /// [Output Only] The error type identifier for this error.
-    pub code: String,
-    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.
-    pub location: String,
+    pub code: Option<String>,
+    /// [Output Only] Indicates the field in the request that caused the error. This property is optional.
+    pub location: Option<String>,
 }
 
 impl NestedType for InstanceUpdateErrorErrors {}
@@ -589,7 +584,7 @@ impl Part for InstanceUpdateErrorErrors {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationError {
     /// [Output Only] The array of errors encountered while processing this operation.
-    pub errors: Vec<OperationErrorErrors>,
+    pub errors: Option<Vec<OperationErrorErrors>>,
 }
 
 impl NestedType for OperationError {}
@@ -603,11 +598,11 @@ impl Part for OperationError {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationWarnings {
     /// [Output only] Optional human-readable details for this warning.
-    pub message: String,
+    pub message: Option<String>,
     /// [Output only] The warning type identifier for this warning.
-    pub code: String,
+    pub code: Option<String>,
     /// [Output only] Metadata for this warning in key:value format.
-    pub data: Vec<OperationWarningsData>,
+    pub data: Option<Vec<OperationWarningsData>>,
 }
 
 impl NestedType for OperationWarnings {}
@@ -631,74 +626,74 @@ impl Part for OperationWarnings {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
     /// [Output Only] Status of the operation. Can be one of the following: "PENDING", "RUNNING", or "DONE".
-    pub status: String,
+    pub status: Option<String>,
     /// [Output Only] The time that this operation was requested. This is in RFC 3339 format.
     #[serde(rename="insertTime")]
-    pub insert_time: String,
+    pub insert_time: Option<String>,
     /// no description provided
-    pub warnings: Vec<OperationWarnings>,
+    pub warnings: Option<Vec<OperationWarnings>>,
     /// [Output Only] If errors occurred during processing of this operation, this field will be populated.
-    pub error: OperationError,
+    pub error: Option<OperationError>,
     /// [Output Only] Unique target id which identifies a particular incarnation of the target.
     #[serde(rename="targetId")]
-    pub target_id: String,
-    /// [Output Only] URL of the resource the operation is mutating (output only).
+    pub target_id: Option<String>,
+    /// [Output Only] URL of the resource the operation is mutating.
     #[serde(rename="targetLink")]
-    pub target_link: String,
+    pub target_link: Option<String>,
     /// [Output Only] The time that this operation was started by the server. This is in RFC 3339 format.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
     /// no description provided
     #[serde(rename="clientOperationId")]
-    pub client_operation_id: String,
-    /// [Output Only] Creation timestamp in RFC3339 text format (output only).
+    pub client_operation_id: Option<String>,
+    /// [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(rename="creationTimestamp")]
-    pub creation_timestamp: String,
+    pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource; defined by the server.
-    pub id: String,
+    pub id: Option<String>,
     /// [Output Only] Type of the resource. Always kind#operation for Operation resources.
-    pub kind: String,
-    /// [Output Only] Name of the resource (output only).
-    pub name: String,
-    /// [Output Only] URL of the zone where the operation resides (output only).
-    pub zone: String,
-    /// [Output Only] URL of the region where the operation resides (output only).
-    pub region: String,
+    pub kind: Option<String>,
+    /// [Output Only] Name of the resource.
+    pub name: Option<String>,
+    /// [Output Only] URL of the zone where the operation resides.
+    pub zone: Option<String>,
+    /// [Output Only] URL of the region where the operation resides.
+    pub region: Option<String>,
     /// [Output Only] Server defined URL for the resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
     /// no description provided
     #[serde(rename="operationType")]
-    pub operation_type: String,
+    pub operation_type: Option<String>,
     /// no description provided
     #[serde(rename="httpErrorMessage")]
-    pub http_error_message: String,
+    pub http_error_message: Option<String>,
     /// no description provided
-    pub progress: i32,
+    pub progress: Option<i32>,
     /// no description provided
     #[serde(rename="endTime")]
-    pub end_time: String,
+    pub end_time: Option<String>,
     /// no description provided
     #[serde(rename="httpErrorStatusCode")]
-    pub http_error_status_code: i32,
+    pub http_error_status_code: Option<i32>,
     /// [Output Only] An optional textual description of the current status of the operation.
     #[serde(rename="statusMessage")]
-    pub status_message: String,
+    pub status_message: Option<String>,
     /// no description provided
-    pub user: String,
+    pub user: Option<String>,
 }
 
 impl ResponseResult for Operation {}
 
 
-/// [Output Only] Errors that occurred during rolling update.
+/// [Output Only] Errors that occurred during the rolling update.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollingUpdateError {
     /// [Output Only] The array of errors encountered while processing this operation.
-    pub errors: Vec<RollingUpdateErrorErrors>,
+    pub errors: Option<Vec<RollingUpdateErrorErrors>>,
 }
 
 impl NestedType for RollingUpdateError {}
@@ -718,14 +713,14 @@ impl Part for RollingUpdateError {}
 pub struct RollingUpdateList {
     /// A token used to continue a truncated list request.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Collection of requested updates.
-    pub items: Vec<RollingUpdate>,
+    pub items: Option<Vec<RollingUpdate>>,
     /// [Output Only] Type of the resource.
-    pub kind: String,
+    pub kind: Option<String>,
     /// [Output Only] The fully qualified URL for the resource.
     #[serde(rename="selfLink")]
-    pub self_link: String,
+    pub self_link: Option<String>,
 }
 
 impl ResponseResult for RollingUpdateList {}
@@ -1130,16 +1125,20 @@ impl<'a, C, A> RollingUpdatePauseCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -1384,16 +1383,20 @@ impl<'a, C, A> RollingUpdateRollbackCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -1638,16 +1641,20 @@ impl<'a, C, A> RollingUpdateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -1892,16 +1899,20 @@ impl<'a, C, A> RollingUpdateResumeCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -2164,16 +2175,20 @@ impl<'a, C, A> RollingUpdateListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2258,7 +2273,7 @@ impl<'a, C, A> RollingUpdateListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._max_results = Some(new_value);
         self
     }
-    /// The name of the instance group manager used for filtering.
+    /// The name of the instance group manager. Use this parameter to return only updates to instances that are part of a specific instance group.
     ///
     /// Sets the *instance group manager* query property to the given value.
     pub fn instance_group_manager(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
@@ -2351,7 +2366,7 @@ impl<'a, C, A> RollingUpdateListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: RollingUpdate = Default::default();
+/// let mut req = RollingUpdate::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2445,16 +2460,20 @@ impl<'a, C, A> RollingUpdateInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2717,16 +2736,20 @@ impl<'a, C, A> RollingUpdateListInstanceUpdateCall<'a, C, A> where C: BorrowMut<
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2992,16 +3015,20 @@ impl<'a, C, A> RollingUpdateCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
@@ -3246,16 +3273,20 @@ impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

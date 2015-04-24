@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Monitoring* crate version *0.1.5+20150303*, where *20150303* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *Cloud Monitoring* crate version *0.1.5+20150401*, where *20150401* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Cloud Monitoring* *v2_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/v2beta2/).
@@ -100,7 +100,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: ListMetricDescriptorsRequest = Default::default();
+//! let mut req = ListMetricDescriptorsRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -278,7 +278,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ListMetricDescriptorsRequest = Default::default();
+/// let mut req = ListMetricDescriptorsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -357,10 +357,10 @@ impl<'a, C, A> CloudMonitoring<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointDistributionUnderflowBucket {
     /// The number of events whose values are in the interval defined by this bucket.
-    pub count: String,
+    pub count: Option<String>,
     /// The upper bound of the value interval of this bucket (exclusive).
     #[serde(rename="upperBound")]
-    pub upper_bound: f64,
+    pub upper_bound: Option<f64>,
 }
 
 impl Part for PointDistributionUnderflowBucket {}
@@ -378,12 +378,12 @@ impl Part for PointDistributionUnderflowBucket {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListMetricDescriptorsResponse {
     /// The returned metric descriptors.
-    pub metrics: Vec<MetricDescriptor>,
+    pub metrics: Option<Vec<MetricDescriptor>>,
     /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, pass this value to the pageToken query parameter.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listMetricDescriptorsResponse".
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for ListMetricDescriptorsResponse {}
@@ -433,9 +433,9 @@ impl RequestValue for ListTimeseriesDescriptorsRequest {}
 pub struct TimeseriesPoint {
     /// The descriptor of this time series.
     #[serde(rename="timeseriesDesc")]
-    pub timeseries_desc: TimeseriesDescriptor,
+    pub timeseries_desc: Option<TimeseriesDescriptor>,
     /// The data point in this time series snapshot.
-    pub point: Point,
+    pub point: Option<Point>,
 }
 
 impl Part for TimeseriesPoint {}
@@ -448,13 +448,13 @@ impl Part for TimeseriesPoint {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointDistribution {
     /// The finite buckets.
-    pub buckets: Vec<PointDistributionBucket>,
+    pub buckets: Option<Vec<PointDistributionBucket>>,
     /// The underflow bucket.
     #[serde(rename="underflowBucket")]
-    pub underflow_bucket: PointDistributionUnderflowBucket,
+    pub underflow_bucket: Option<PointDistributionUnderflowBucket>,
     /// The overflow bucket.
     #[serde(rename="overflowBucket")]
-    pub overflow_bucket: PointDistributionOverflowBucket,
+    pub overflow_bucket: Option<PointDistributionOverflowBucket>,
 }
 
 impl Part for PointDistribution {}
@@ -466,12 +466,12 @@ impl Part for PointDistribution {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetricDescriptorTypeDescriptor {
-    /// The type of data that is written to a timeseries point for this metric.
+    /// The data type of of individual points in the metric's time series. See Metric value types.
     #[serde(rename="valueType")]
-    pub value_type: String,
-    /// The method of collecting data for the metric.
+    pub value_type: Option<String>,
+    /// The method of collecting data for the metric. See Metric types.
     #[serde(rename="metricType")]
-    pub metric_type: String,
+    pub metric_type: Option<String>,
 }
 
 impl Part for MetricDescriptorTypeDescriptor {}
@@ -484,9 +484,9 @@ impl Part for MetricDescriptorTypeDescriptor {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetricDescriptorLabelDescriptor {
     /// Label description.
-    pub description: String,
+    pub description: Option<String>,
     /// Label key.
-    pub key: String,
+    pub key: Option<String>,
 }
 
 impl Part for MetricDescriptorLabelDescriptor {}
@@ -499,13 +499,13 @@ impl Part for MetricDescriptorLabelDescriptor {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointDistributionBucket {
     /// The number of events whose values are in the interval defined by this bucket.
-    pub count: String,
+    pub count: Option<String>,
     /// The lower bound of the value interval of this bucket (inclusive).
     #[serde(rename="lowerBound")]
-    pub lower_bound: f64,
+    pub lower_bound: Option<f64>,
     /// The upper bound of the value interval of this bucket (exclusive).
     #[serde(rename="upperBound")]
-    pub upper_bound: f64,
+    pub upper_bound: Option<f64>,
 }
 
 impl Part for PointDistributionBucket {}
@@ -572,7 +572,7 @@ impl ResponseResult for MetricDescriptor {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WriteTimeseriesResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#writeTimeseriesResponse".
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for WriteTimeseriesResponse {}
@@ -590,7 +590,7 @@ impl ResponseResult for WriteTimeseriesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeleteMetricDescriptorResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#deleteMetricDescriptorResponse".
-    pub kind: String,
+    pub kind: Option<String>,
 }
 
 impl ResponseResult for DeleteMetricDescriptorResponse {}
@@ -624,24 +624,24 @@ impl RequestValue for WriteTimeseriesRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Point {
     /// The interval [start, end] is the time period to which the point's value applies. For gauge metrics, whose values are instantaneous measurements, this interval should be empty (start should equal end). For cumulative metrics (of which deltas and rates are special cases), the interval should be non-empty. Both start and end are RFC 3339 strings.
-    pub start: String,
+    pub start: Option<String>,
     /// The value of this data point. Either "true" or "false".
     #[serde(rename="boolValue")]
-    pub bool_value: bool,
+    pub bool_value: Option<bool>,
     /// The interval [start, end] is the time period to which the point's value applies. For gauge metrics, whose values are instantaneous measurements, this interval should be empty (start should equal end). For cumulative metrics (of which deltas and rates are special cases), the interval should be non-empty. Both start and end are RFC 3339 strings.
-    pub end: String,
+    pub end: Option<String>,
     /// The value of this data point as a distribution. A distribution value can contain a list of buckets and/or an underflowBucket and an overflowBucket. The values of these points can be used to create a histogram.
     #[serde(rename="distributionValue")]
-    pub distribution_value: PointDistribution,
+    pub distribution_value: Option<PointDistribution>,
     /// The value of this data point in string format.
     #[serde(rename="stringValue")]
-    pub string_value: String,
+    pub string_value: Option<String>,
     /// The value of this data point as a 64-bit integer.
     #[serde(rename="int64Value")]
-    pub int64_value: String,
+    pub int64_value: Option<String>,
     /// The value of this data point as a double-precision floating-point number.
     #[serde(rename="doubleValue")]
-    pub double_value: f64,
+    pub double_value: Option<f64>,
 }
 
 impl Part for Point {}
@@ -677,9 +677,9 @@ impl Resource for TimeseriesDescriptor {}
 pub struct Timeseries {
     /// The descriptor of this time series.
     #[serde(rename="timeseriesDesc")]
-    pub timeseries_desc: TimeseriesDescriptor,
+    pub timeseries_desc: Option<TimeseriesDescriptor>,
     /// The data points of this time series. The points are listed in order of their end timestamp, from younger to older.
-    pub points: Vec<Point>,
+    pub points: Option<Vec<Point>>,
 }
 
 impl Part for Timeseries {}
@@ -692,10 +692,10 @@ impl Part for Timeseries {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointDistributionOverflowBucket {
     /// The number of events whose values are in the interval defined by this bucket.
-    pub count: String,
+    pub count: Option<String>,
     /// The lower bound of the value interval of this bucket (inclusive).
     #[serde(rename="lowerBound")]
-    pub lower_bound: f64,
+    pub lower_bound: Option<f64>,
 }
 
 impl Part for PointDistributionOverflowBucket {}
@@ -714,15 +714,15 @@ impl Part for PointDistributionOverflowBucket {}
 pub struct ListTimeseriesDescriptorsResponse {
     /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, set this value to the pageToken query parameter.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The youngest timestamp of the interval of this query, as an RFC 3339 string.
-    pub youngest: String,
+    pub youngest: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listTimeseriesDescriptorsResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The oldest timestamp of the interval of this query, as an RFC 3339 string.
-    pub oldest: String,
+    pub oldest: Option<String>,
     /// The returned time series descriptors.
-    pub timeseries: Vec<TimeseriesDescriptor>,
+    pub timeseries: Option<Vec<TimeseriesDescriptor>>,
 }
 
 impl ResponseResult for ListTimeseriesDescriptorsResponse {}
@@ -741,15 +741,15 @@ impl ResponseResult for ListTimeseriesDescriptorsResponse {}
 pub struct ListTimeseriesResponse {
     /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, set the pageToken query parameter to this value. All of the points of a time series will be returned before returning any point of the subsequent time series.
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The youngest timestamp of the interval of this query as an RFC 3339 string.
-    pub youngest: String,
+    pub youngest: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listTimeseriesResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The oldest timestamp of the interval of this query as an RFC 3339 string.
-    pub oldest: String,
+    pub oldest: Option<String>,
     /// The returned time series.
-    pub timeseries: Vec<Timeseries>,
+    pub timeseries: Option<Vec<Timeseries>>,
 }
 
 impl ResponseResult for ListTimeseriesResponse {}
@@ -1055,7 +1055,7 @@ impl<'a, C, A> MetricDescriptorMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ListTimeseriesDescriptorsRequest = Default::default();
+/// let mut req = ListTimeseriesDescriptorsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1190,16 +1190,20 @@ impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1438,7 +1442,7 @@ impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: WriteTimeseriesRequest = Default::default();
+/// let mut req = WriteTimeseriesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1530,16 +1534,20 @@ impl<'a, C, A> TimeseryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1692,7 +1700,7 @@ impl<'a, C, A> TimeseryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ListTimeseriesRequest = Default::default();
+/// let mut req = ListTimeseriesRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1827,16 +1835,20 @@ impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2075,7 +2087,7 @@ impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: ListMetricDescriptorsRequest = Default::default();
+/// let mut req = ListMetricDescriptorsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2182,16 +2194,20 @@ impl<'a, C, A> MetricDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -2448,16 +2464,20 @@ impl<'a, C, A> MetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
@@ -2607,7 +2627,7 @@ impl<'a, C, A> MetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: MetricDescriptor = Default::default();
+/// let mut req = MetricDescriptor::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2699,16 +2719,20 @@ impl<'a, C, A> MetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();

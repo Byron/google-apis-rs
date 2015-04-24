@@ -106,7 +106,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: Channel = Default::default();
+//! let mut req = Channel::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -293,7 +293,7 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Channel = Default::default();
+/// let mut req = Channel::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -386,13 +386,13 @@ impl<'a, C, A> Reports<C, A>
 pub struct Activities {
     /// Token for retrieving the next page
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// Each record in read response.
-    pub items: Vec<Activity>,
+    pub items: Option<Vec<Activity>>,
     /// Kind of list response this is.
-    pub kind: String,
+    pub kind: Option<String>,
     /// ETag of the resource.
-    pub etag: String,
+    pub etag: Option<String>,
 }
 
 impl ResponseResult for Activities {}
@@ -405,9 +405,9 @@ impl ResponseResult for Activities {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReportsWarningsData {
     /// Key associated with a key-value pair to give detailed information on the warning.
-    pub key: String,
+    pub key: Option<String>,
     /// Value associated with a key-value pair to give detailed information on the warning.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for UsageReportsWarningsData {}
@@ -421,15 +421,15 @@ impl Part for UsageReportsWarningsData {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReport {
     /// The date to which the record belongs.
-    pub date: String,
+    pub date: Option<String>,
     /// The kind of object.
-    pub kind: String,
+    pub kind: Option<String>,
     /// ETag of the resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// Parameter value pairs for various applications.
-    pub parameters: Vec<UsageReportParameters>,
+    pub parameters: Option<Vec<UsageReportParameters>>,
     /// Information about the type of the item.
-    pub entity: UsageReportEntity,
+    pub entity: Option<UsageReportEntity>,
 }
 
 impl Part for UsageReport {}
@@ -443,21 +443,21 @@ impl Part for UsageReport {}
 pub struct UsageReportParameters {
     /// Nested message value of the parameter.
     #[serde(rename="msgValue")]
-    pub msg_value: Vec<HashMap<String, String>>,
+    pub msg_value: Option<Vec<HashMap<String, String>>>,
     /// RFC 3339 formatted value of the parameter.
     #[serde(rename="datetimeValue")]
-    pub datetime_value: String,
+    pub datetime_value: Option<String>,
     /// The name of the parameter.
-    pub name: String,
+    pub name: Option<String>,
     /// String value of the parameter.
     #[serde(rename="stringValue")]
-    pub string_value: String,
+    pub string_value: Option<String>,
     /// Boolean value of the parameter.
     #[serde(rename="boolValue")]
-    pub bool_value: bool,
+    pub bool_value: Option<bool>,
     /// Integral value of the parameter.
     #[serde(rename="intValue")]
-    pub int_value: String,
+    pub int_value: Option<String>,
 }
 
 impl NestedType for UsageReportParameters {}
@@ -472,14 +472,14 @@ impl Part for UsageReportParameters {}
 pub struct ActivityActor {
     /// Obfuscated user id of the user.
     #[serde(rename="profileId")]
-    pub profile_id: String,
+    pub profile_id: Option<String>,
     /// Email address of the user.
-    pub email: String,
+    pub email: Option<String>,
     /// For OAuth 2LO API requests, consumer_key of the requestor.
-    pub key: String,
+    pub key: Option<String>,
     /// User or OAuth 2LO request.
     #[serde(rename="callerType")]
-    pub caller_type: String,
+    pub caller_type: Option<String>,
 }
 
 impl NestedType for ActivityActor {}
@@ -494,15 +494,15 @@ impl Part for ActivityActor {}
 pub struct ActivityId {
     /// Application name to which the event belongs.
     #[serde(rename="applicationName")]
-    pub application_name: String,
+    pub application_name: Option<String>,
     /// Unique qualifier if multiple events have the same time.
     #[serde(rename="uniqueQualifier")]
-    pub unique_qualifier: String,
+    pub unique_qualifier: Option<String>,
     /// Obfuscated customer ID of the source customer.
     #[serde(rename="customerId")]
-    pub customer_id: String,
+    pub customer_id: Option<String>,
     /// Time of occurrence of the activity.
-    pub time: String,
+    pub time: Option<String>,
 }
 
 impl NestedType for ActivityId {}
@@ -516,11 +516,11 @@ impl Part for ActivityId {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReportsWarnings {
     /// Human readable message for the warning.
-    pub message: String,
+    pub message: Option<String>,
     /// Machine readable code / warning type.
-    pub code: String,
+    pub code: Option<String>,
     /// Key-Value pairs to give detailed information on the warning.
-    pub data: Vec<UsageReportsWarningsData>,
+    pub data: Option<Vec<UsageReportsWarningsData>>,
 }
 
 impl NestedType for UsageReportsWarnings {}
@@ -541,16 +541,16 @@ impl Part for UsageReportsWarnings {}
 pub struct UsageReports {
     /// Token for retrieving the next page
     #[serde(rename="nextPageToken")]
-    pub next_page_token: String,
+    pub next_page_token: Option<String>,
     /// The kind of object.
-    pub kind: String,
+    pub kind: Option<String>,
     /// ETag of the resource.
-    pub etag: String,
+    pub etag: Option<String>,
     /// Various application parameter records.
     #[serde(rename="usageReports")]
-    pub usage_reports: Vec<UsageReport>,
+    pub usage_reports: Option<Vec<UsageReport>>,
     /// Warnings if any.
-    pub warnings: Vec<UsageReportsWarnings>,
+    pub warnings: Option<Vec<UsageReportsWarnings>>,
 }
 
 impl ResponseResult for UsageReports {}
@@ -563,21 +563,21 @@ impl ResponseResult for UsageReports {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activity {
     /// Kind of resource this is.
-    pub kind: String,
+    pub kind: Option<String>,
     /// ETag of the entry.
-    pub etag: String,
+    pub etag: Option<String>,
     /// Activity events.
-    pub events: Vec<ActivityEvents>,
+    pub events: Option<Vec<ActivityEvents>>,
     /// IP Address of the user doing the action.
     #[serde(rename="ipAddress")]
-    pub ip_address: String,
+    pub ip_address: Option<String>,
     /// Domain of source customer.
     #[serde(rename="ownerDomain")]
-    pub owner_domain: String,
+    pub owner_domain: Option<String>,
     /// User doing the action.
-    pub actor: ActivityActor,
+    pub actor: Option<ActivityActor>,
     /// Unique identifier for each activity record.
-    pub id: ActivityId,
+    pub id: Option<ActivityId>,
 }
 
 impl Part for Activity {}
@@ -591,20 +591,20 @@ impl Part for Activity {}
 pub struct ActivityEventsParameters {
     /// Boolean value of the parameter.
     #[serde(rename="boolValue")]
-    pub bool_value: bool,
+    pub bool_value: Option<bool>,
     /// Multi-string value of the parameter.
     #[serde(rename="multiValue")]
-    pub multi_value: Vec<String>,
+    pub multi_value: Option<Vec<String>>,
     /// The name of the parameter.
-    pub name: String,
+    pub name: Option<String>,
     /// Multi-int value of the parameter.
     #[serde(rename="multiIntValue")]
-    pub multi_int_value: Vec<String>,
+    pub multi_int_value: Option<Vec<String>>,
     /// Integral value of the parameter.
     #[serde(rename="intValue")]
-    pub int_value: String,
+    pub int_value: Option<String>,
     /// String value of the parameter.
-    pub value: String,
+    pub value: Option<String>,
 }
 
 impl NestedType for ActivityEventsParameters {}
@@ -619,11 +619,11 @@ impl Part for ActivityEventsParameters {}
 pub struct ActivityEvents {
     /// Type of event.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Name of event.
-    pub name: String,
+    pub name: Option<String>,
     /// Parameter value pairs for various applications.
-    pub parameters: Vec<ActivityEventsParameters>,
+    pub parameters: Option<Vec<ActivityEventsParameters>>,
 }
 
 impl NestedType for ActivityEvents {}
@@ -638,16 +638,16 @@ impl Part for ActivityEvents {}
 pub struct UsageReportEntity {
     /// Obfuscated user id for the record.
     #[serde(rename="profileId")]
-    pub profile_id: String,
+    pub profile_id: Option<String>,
     /// user's email.
     #[serde(rename="userEmail")]
-    pub user_email: String,
+    pub user_email: Option<String>,
     /// The type of item, can be a customer or user.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// Obfuscated customer id for the record.
     #[serde(rename="customerId")]
-    pub customer_id: String,
+    pub customer_id: Option<String>,
 }
 
 impl NestedType for UsageReportEntity {}
@@ -1015,7 +1015,7 @@ impl<'a, C, A> UserUsageReportMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Channel = Default::default();
+/// let mut req = Channel::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1080,16 +1080,20 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1222,7 +1226,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: Channel = Default::default();
+/// let mut req = Channel::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1356,16 +1360,20 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -1707,16 +1715,20 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2018,16 +2030,20 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
@@ -2296,16 +2312,20 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() {
-                token = dlg.token();
-            }
-            if token.is_none() {
-                dlg.finished(false);
-                return Err(Error::MissingToken)
-            }
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.unwrap().access_token });
+                                                             access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())

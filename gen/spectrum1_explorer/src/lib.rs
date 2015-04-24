@@ -94,7 +94,7 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req: PawsGetSpectrumBatchRequest = Default::default();
+//! let mut req = PawsGetSpectrumBatchRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
@@ -247,7 +247,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PawsGetSpectrumBatchRequest = Default::default();
+/// let mut req = PawsGetSpectrumBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -317,11 +317,11 @@ impl<'a, C, A> Spectrum<C, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoLocation {
     /// The location confidence level, as an integer percentage, may be required, depending on the regulatory domain. When the parameter is optional and not provided, its value is assumed to be 95. Valid values range from 0 to 99, since, in practice, 100-percent confidence is not achievable. The confidence value is meaningful only when geolocation refers to a point with uncertainty.
-    pub confidence: i32,
+    pub confidence: Option<i32>,
     /// If present, indicates that the geolocation represents a region. Database support for regions is optional.
-    pub region: GeoLocationPolygon,
+    pub region: Option<GeoLocationPolygon>,
     /// If present, indicates that the geolocation represents a point. Paradoxically, a point is parameterized using an ellipse, where the center represents the location of the point and the distances along the major and minor axes represent the uncertainty. The uncertainty values may be required, depending on the regulatory domain.
-    pub point: GeoLocationEllipse,
+    pub point: Option<GeoLocationEllipse>,
 }
 
 impl Part for GeoLocation {}
@@ -334,15 +334,15 @@ impl Part for GeoLocation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoLocationEllipse {
     /// A required geo-spatial point representing the center of the ellipse.
-    pub center: GeoLocationPoint,
+    pub center: Option<GeoLocationPoint>,
     /// A floating-point number that expresses the location uncertainty along the minor axis of the ellipse. May be required by the regulatory domain. When the uncertainty is optional, the default value is 0.
     #[serde(rename="semiMinorAxis")]
-    pub semi_minor_axis: f64,
+    pub semi_minor_axis: Option<f64>,
     /// A floating-point number that expresses the orientation of the ellipse, representing the rotation, in degrees, of the semi-major axis from North towards the East. For example, when the uncertainty is greatest along the North-South direction, orientation is 0 degrees; conversely, if the uncertainty is greatest along the East-West direction, orientation is 90 degrees. When orientation is not present, the orientation is assumed to be 0.
-    pub orientation: f64,
+    pub orientation: Option<f64>,
     /// A floating-point number that expresses the location uncertainty along the major axis of the ellipse. May be required by the regulatory domain. When the uncertainty is optional, the default value is 0.
     #[serde(rename="semiMajorAxis")]
-    pub semi_major_axis: f64,
+    pub semi_major_axis: Option<f64>,
 }
 
 impl Part for GeoLocationEllipse {}
@@ -355,7 +355,7 @@ impl Part for GeoLocationEllipse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct VcardTypedText {
     /// The text string associated with this item. For example, for an org field: ACME, inc. For an email field: smith@example.com.
-    pub text: String,
+    pub text: Option<String>,
 }
 
 impl Part for VcardTypedText {}
@@ -409,9 +409,9 @@ impl RequestValue for PawsNotifySpectrumUseRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DeviceOwner {
     /// The vCard contact information for the device operator is optional, but may be required by specific regulatory domains.
-    pub operator: Vcard,
+    pub operator: Option<Vcard>,
     /// The vCard contact information for the individual or business that owns the device is required.
-    pub owner: Vcard,
+    pub owner: Option<Vcard>,
 }
 
 impl Part for DeviceOwner {}
@@ -427,10 +427,10 @@ impl Part for DeviceOwner {}
 pub struct EventTime {
     /// The exclusive end of the event. It will be present.
     #[serde(rename="stopTime")]
-    pub stop_time: String,
+    pub stop_time: Option<String>,
     /// The inclusive start of the event. It will be present.
     #[serde(rename="startTime")]
-    pub start_time: String,
+    pub start_time: Option<String>,
 }
 
 impl Part for EventTime {}
@@ -444,16 +444,16 @@ impl Part for EventTime {}
 pub struct FrequencyRange {
     /// The required inclusive start of the frequency range (in Hertz).
     #[serde(rename="startHz")]
-    pub start_hz: f64,
+    pub start_hz: Option<f64>,
     /// The database may include a channel identifier, when applicable. When it is included, the device should treat it as informative. The length of the identifier should not exceed 16 characters.
     #[serde(rename="channelId")]
-    pub channel_id: String,
+    pub channel_id: Option<String>,
     /// The required exclusive end of the frequency range (in Hertz).
     #[serde(rename="stopHz")]
-    pub stop_hz: f64,
+    pub stop_hz: Option<f64>,
     /// The maximum total power level (EIRP)—computed over the corresponding operating bandwidth—that is permitted within the frequency range. Depending on the context in which the frequency-range element appears, this value may be required. For example, it is required in the available-spectrum response, available-spectrum-batch response, and spectrum-use notification message, but it should not be present (it is not applicable) when the frequency range appears inside a device-capabilities message.
     #[serde(rename="maxPowerDBm")]
-    pub max_power_d_bm: f64,
+    pub max_power_d_bm: Option<f64>,
 }
 
 impl Part for FrequencyRange {}
@@ -472,38 +472,38 @@ impl Part for FrequencyRange {}
 pub struct PawsGetSpectrumBatchResponse {
     /// The available spectrum batch response must contain a geo-spectrum schedule list, The list may be empty if spectrum is not available. The database may return more than one geo-spectrum schedule to represent future changes to the available spectrum. How far in advance a schedule may be provided depends upon the applicable regulatory domain. The database may return available spectrum for fewer geolocations than requested. The device must not make assumptions about the order of the entries in the list, and must use the geolocation value in each geo-spectrum schedule entry to match available spectrum to a location.
     #[serde(rename="geoSpectrumSchedules")]
-    pub geo_spectrum_schedules: Vec<GeoSpectrumSchedule>,
+    pub geo_spectrum_schedules: Option<Vec<GeoSpectrumSchedule>>,
     /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsGetSpectrumBatchResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The database must return in its available spectrum response the device descriptor information it received in the master device's available spectrum batch request.
     #[serde(rename="deviceDesc")]
-    pub device_desc: DeviceDescriptor,
+    pub device_desc: Option<DeviceDescriptor>,
     /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.
     #[serde(rename="databaseChange")]
-    pub database_change: DbUpdateSpec,
+    pub database_change: Option<DbUpdateSpec>,
     /// The database may return a constraint on the allowed maximum total bandwidth (in Hertz), which does not need to be contiguous. A regulatory domain may require the database to return this parameter. When this parameter is present in the available spectrum batch response, the device must apply this constraint to its spectrum-selection logic to ensure that total bandwidth does not exceed this value.
     #[serde(rename="maxTotalBwHz")]
-    pub max_total_bw_hz: f64,
+    pub max_total_bw_hz: Option<f64>,
     /// The database may return a constraint on the allowed maximum contiguous bandwidth (in Hertz). A regulatory domain may require the database to return this parameter. When this parameter is present in the response, the device must apply this constraint to its spectrum-selection logic to ensure that no single block of spectrum has bandwidth that exceeds this value.
     #[serde(rename="maxContiguousBwHz")]
-    pub max_contiguous_bw_hz: f64,
+    pub max_contiguous_bw_hz: Option<f64>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
-    pub version: String,
+    pub version: Option<String>,
     /// The database includes a timestamp of the form, YYYY-MM-DDThh:mm:ssZ (Internet timestamp format per RFC3339), in its available spectrum batch response. The timestamp should be used by the device as a reference for the start and stop times specified in the response spectrum schedules.
-    pub timestamp: String,
+    pub timestamp: Option<String>,
     /// The database should return ruleset information, which identifies the applicable regulatory authority and ruleset for the available spectrum batch response. If included, the device must use the corresponding ruleset to interpret the response. Values provided in the returned ruleset information, such as maxLocationChange, take precedence over any conflicting values provided in the ruleset information returned in a prior initialization response sent by the database to the device.
     #[serde(rename="rulesetInfo")]
-    pub ruleset_info: RulesetInfo,
+    pub ruleset_info: Option<RulesetInfo>,
     /// For regulatory domains that require a spectrum-usage report from devices, the database must return true for this parameter if the geo-spectrum schedules list is not empty; otherwise, the database should either return false or omit this parameter. If this parameter is present and its value is true, the device must send a spectrum use notify message to the database; otherwise, the device should not send the notification.
     #[serde(rename="needsSpectrumReport")]
-    pub needs_spectrum_report: bool,
+    pub needs_spectrum_report: Option<bool>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
     /// 
     /// Required field.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl ResponseResult for PawsGetSpectrumBatchResponse {}
@@ -516,7 +516,7 @@ impl ResponseResult for PawsGetSpectrumBatchResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct VcardTelephone {
     /// A nested telephone URI of the form: tel:+1-123-456-7890.
-    pub uri: String,
+    pub uri: Option<String>,
 }
 
 impl Part for VcardTelephone {}
@@ -530,12 +530,12 @@ impl Part for VcardTelephone {}
 pub struct DeviceValidity {
     /// The validity status: true if the device is valid for operation, false otherwise. It will always be present.
     #[serde(rename="isValid")]
-    pub is_valid: bool,
+    pub is_valid: Option<bool>,
     /// If the device identifier is not valid, the database may include a reason. The reason may be in any language. The length of the value should not exceed 128 characters.
-    pub reason: String,
+    pub reason: Option<String>,
     /// The descriptor of the device for which the validity check was requested. It will always be present.
     #[serde(rename="deviceDesc")]
-    pub device_desc: DeviceDescriptor,
+    pub device_desc: Option<DeviceDescriptor>,
 }
 
 impl Part for DeviceValidity {}
@@ -554,21 +554,21 @@ impl Part for DeviceValidity {}
 pub struct PawsInitResponse {
     /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.
     #[serde(rename="databaseChange")]
-    pub database_change: DbUpdateSpec,
+    pub database_change: Option<DbUpdateSpec>,
     /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsInitResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
-    pub version: String,
+    pub version: Option<String>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
     /// 
     /// Required field.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
     /// The rulesetInfo parameter must be included in the response. This parameter specifies the regulatory domain and parameters applicable to that domain. The database must include the authority field, which defines the regulatory domain for the location specified in the INIT_REQ message.
     #[serde(rename="rulesetInfo")]
-    pub ruleset_info: RulesetInfo,
+    pub ruleset_info: Option<RulesetInfo>,
 }
 
 impl ResponseResult for PawsInitResponse {}
@@ -586,16 +586,16 @@ impl ResponseResult for PawsInitResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PawsNotifySpectrumUseResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsNotifySpectrumUseResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
-    pub version: String,
+    pub version: Option<String>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
     /// 
     /// Required field.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl ResponseResult for PawsNotifySpectrumUseResponse {}
@@ -614,21 +614,21 @@ impl ResponseResult for PawsNotifySpectrumUseResponse {}
 pub struct PawsVerifyDeviceResponse {
     /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.
     #[serde(rename="databaseChange")]
-    pub database_change: DbUpdateSpec,
+    pub database_change: Option<DbUpdateSpec>,
     /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsVerifyDeviceResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
-    pub version: String,
+    pub version: Option<String>,
     /// A device validities list is required in the device validation response to report whether each slave device listed in a previous device validation request is valid. The number of entries must match the number of device descriptors listed in the previous device validation request.
     #[serde(rename="deviceValidities")]
-    pub device_validities: Vec<DeviceValidity>,
+    pub device_validities: Option<Vec<DeviceValidity>>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
     /// 
     /// Required field.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl ResponseResult for PawsVerifyDeviceResponse {}
@@ -642,12 +642,12 @@ impl ResponseResult for PawsVerifyDeviceResponse {}
 pub struct AntennaCharacteristics {
     /// If the height is required, then the height type (AGL for above ground level or AMSL for above mean sea level) is also required. The default is AGL.
     #[serde(rename="heightType")]
-    pub height_type: String,
+    pub height_type: Option<String>,
     /// The height uncertainty in meters. Whether this is required depends on the regulatory domain.
     #[serde(rename="heightUncertainty")]
-    pub height_uncertainty: f64,
+    pub height_uncertainty: Option<f64>,
     /// The antenna height in meters. Whether the antenna height is required depends on the device type and the regulatory domain. Note that the height may be negative.
-    pub height: f64,
+    pub height: Option<f64>,
 }
 
 impl Part for AntennaCharacteristics {}
@@ -660,9 +660,9 @@ impl Part for AntennaCharacteristics {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoLocationPoint {
     /// A required floating-point number that expresses the latitude in degrees using the WGS84 datum. For details on this encoding, see the National Imagery and Mapping Agency's Technical Report TR8350.2.
-    pub latitude: f64,
+    pub latitude: Option<f64>,
     /// A required floating-point number that expresses the longitude in degrees using the WGS84 datum. For details on this encoding, see the National Imagery and Mapping Agency's Technical Report TR8350.2.
-    pub longitude: f64,
+    pub longitude: Option<f64>,
 }
 
 impl Part for GeoLocationPoint {}
@@ -681,18 +681,18 @@ impl Part for GeoLocationPoint {}
 pub struct PawsRegisterResponse {
     /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.
     #[serde(rename="databaseChange")]
-    pub database_change: DbUpdateSpec,
+    pub database_change: Option<DbUpdateSpec>,
     /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsRegisterResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
-    pub version: String,
+    pub version: Option<String>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
     /// 
     /// Required field.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl ResponseResult for PawsRegisterResponse {}
@@ -710,16 +710,16 @@ impl ResponseResult for PawsRegisterResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Vcard {
     /// The organization associated with the registering entity.
-    pub org: VcardTypedText,
+    pub org: Option<VcardTypedText>,
     /// A telephone number that can be used to call the contact.
-    pub tel: VcardTelephone,
+    pub tel: Option<VcardTelephone>,
     /// An email address that can be used to reach the contact.
-    pub email: VcardTypedText,
+    pub email: Option<VcardTypedText>,
     /// The full name of the contact person. For example: John A. Smith.
     #[serde(rename="fn")]
-    pub fn_: String,
+    pub fn_: Option<String>,
     /// The street address of the entity.
-    pub adr: VcardAddress,
+    pub adr: Option<VcardAddress>,
 }
 
 impl Part for Vcard {}
@@ -776,7 +776,7 @@ impl RequestValue for PawsGetSpectrumBatchRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DbUpdateSpec {
     /// A required list of one or more databases. A device should update its preconfigured list of databases to replace (only) the database that provided the response with the specified entries.
-    pub databases: Vec<DatabaseSpec>,
+    pub databases: Option<Vec<DatabaseSpec>>,
 }
 
 impl Part for DbUpdateSpec {}
@@ -794,7 +794,7 @@ pub struct GeoLocationPolygon {
     /// - The edges of a polygon are defined by the shortest path between two points in space (not a geodesic curve). Consequently, the length between two adjacent vertices should be restricted to a maximum of 130 km. 
     /// - All vertices are assumed to be at the same altitude. 
     /// - Polygon shapes should be restricted to a maximum of 15 vertices (16 points that include the repeated vertex).
-    pub exterior: Vec<GeoLocationPoint>,
+    pub exterior: Option<Vec<GeoLocationPoint>>,
 }
 
 impl Part for GeoLocationPolygon {}
@@ -808,9 +808,9 @@ impl Part for GeoLocationPolygon {}
 pub struct GeoSpectrumSchedule {
     /// A list of available spectrum profiles and associated times. It will always be present, and at least one schedule must be included (though it may be empty if there is no available spectrum). More than one schedule may be included to represent future changes to the available spectrum.
     #[serde(rename="spectrumSchedules")]
-    pub spectrum_schedules: Vec<SpectrumSchedule>,
+    pub spectrum_schedules: Option<Vec<SpectrumSchedule>>,
     /// The geolocation identifies the location at which the spectrum schedule applies. It will always be present.
-    pub location: GeoLocation,
+    pub location: Option<GeoLocation>,
 }
 
 impl Part for GeoSpectrumSchedule {}
@@ -853,17 +853,17 @@ impl RequestValue for PawsInitRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct VcardAddress {
     /// The postal code associated with the address. For example: 94423.
-    pub code: String,
+    pub code: Option<String>,
     /// The street number and name. For example: 123 Any St.
-    pub street: String,
+    pub street: Option<String>,
     /// The city or local equivalent portion of the address. For example: San Jose.
-    pub locality: String,
+    pub locality: Option<String>,
     /// The country name. For example: US.
-    pub country: String,
+    pub country: Option<String>,
     /// The state or local equivalent portion of the address. For example: CA.
-    pub region: String,
+    pub region: Option<String>,
     /// An optional post office box number.
-    pub pobox: String,
+    pub pobox: Option<String>,
 }
 
 impl Part for VcardAddress {}
@@ -877,36 +877,36 @@ impl Part for VcardAddress {}
 pub struct DeviceDescriptor {
     /// Specifies the ETSI white space device type. Valid values are single-letter strings, such as A, B, etc. Consult the ETSI documentation for details about the device types.
     #[serde(rename="etsiEnDeviceType")]
-    pub etsi_en_device_type: String,
+    pub etsi_en_device_type: Option<String>,
     /// Specifies the device's FCC certification identifier. The value is an identifier string whose length should not exceed 32 characters. Note that, in practice, a valid FCC ID may be limited to 19 characters.
     #[serde(rename="fccId")]
-    pub fcc_id: String,
+    pub fcc_id: Option<String>,
     /// The manufacturer's device serial number; required by the applicable regulatory domain. The length of the value must not exceed 64 characters.
     #[serde(rename="serialNumber")]
-    pub serial_number: String,
+    pub serial_number: Option<String>,
     /// Specifies the ETSI white space device technology identifier. The string value must not exceed 64 characters in length. Consult the ETSI documentation for details about the device types.
     #[serde(rename="etsiEnTechnologyId")]
-    pub etsi_en_technology_id: String,
+    pub etsi_en_technology_id: Option<String>,
     /// Specifies the TV Band White Space device type, as defined by the FCC. Valid values are FIXED, MODE_1, MODE_2.
     #[serde(rename="fccTvbdDeviceType")]
-    pub fcc_tvbd_device_type: String,
+    pub fcc_tvbd_device_type: Option<String>,
     /// Specifies the ETSI white space device category. Valid values are the strings master and slave. This field is case-insensitive. Consult the ETSI documentation for details about the device types.
     #[serde(rename="etsiEnDeviceCategory")]
-    pub etsi_en_device_category: String,
+    pub etsi_en_device_category: Option<String>,
     /// The list of identifiers for rulesets supported by the device. A database may require that the device provide this list before servicing the device requests. If the database does not support any of the rulesets specified in the list, the database may refuse to service the device requests. If present, the list must contain at least one entry.
     /// 
     /// For information about the valid requests, see section 9.2 of the PAWS specification. Currently, FccTvBandWhiteSpace-2010 is the only supported ruleset.
     #[serde(rename="rulesetIds")]
-    pub ruleset_ids: Vec<String>,
+    pub ruleset_ids: Option<Vec<String>>,
     /// Specifies the ETSI white space device emissions class. The values are represented by numeric strings, such as 1, 2, etc. Consult the ETSI documentation for details about the device types.
     #[serde(rename="etsiEnDeviceEmissionsClass")]
-    pub etsi_en_device_emissions_class: String,
+    pub etsi_en_device_emissions_class: Option<String>,
     /// The manufacturer's ID may be required by the regulatory domain. This should represent the name of the device manufacturer, should be consistent across all devices from the same manufacturer, and should be distinct from that of other manufacturers. The string value must not exceed 64 characters in length.
     #[serde(rename="manufacturerId")]
-    pub manufacturer_id: String,
+    pub manufacturer_id: Option<String>,
     /// The device's model ID may be required by the regulatory domain. The string value must not exceed 64 characters in length.
     #[serde(rename="modelId")]
-    pub model_id: String,
+    pub model_id: Option<String>,
 }
 
 impl Part for DeviceDescriptor {}
@@ -920,15 +920,15 @@ impl Part for DeviceDescriptor {}
 pub struct RulesetInfo {
     /// The identifiers of the rulesets supported for the device's location. The database should include at least one applicable ruleset in the initialization response. The device may use the ruleset identifiers to determine parameters to include in subsequent requests. Within the context of the available-spectrum responses, the database should include the identifier of the ruleset that it used to determine the available-spectrum response. If included, the device must use the specified ruleset to interpret the response. If the device does not support the indicated ruleset, it must not operate in the spectrum governed by the ruleset.
     #[serde(rename="rulesetIds")]
-    pub ruleset_ids: Vec<String>,
+    pub ruleset_ids: Option<Vec<String>>,
     /// The maximum duration, in seconds, between requests for available spectrum. It is required in the initialization response, but optional otherwise. The device must contact the database to get available spectrum no less frequently than this duration. If the new spectrum information indicates that the device is using spectrum that is no longer available, it must immediately cease use of those frequencies under rules for database-managed spectrum. If this value is provided within the context of an available-spectrum response, it takes precedence over the value within the initialization response.
     #[serde(rename="maxPollingSecs")]
-    pub max_polling_secs: i32,
+    pub max_polling_secs: Option<i32>,
     /// The regulatory domain to which the ruleset belongs is required. It must be a 2-letter country code. The device should use this to determine additional device behavior required by the associated regulatory domain.
-    pub authority: String,
+    pub authority: Option<String>,
     /// The maximum location change in meters is required in the initialization response, but optional otherwise. When the device changes location by more than this specified distance, it must contact the database to get the available spectrum for the new location. If the device is using spectrum that is no longer available, it must immediately cease use of the spectrum under rules for database-managed spectrum. If this value is provided within the context of an available-spectrum response, it takes precedence over the value within the initialization response.
     #[serde(rename="maxLocationChange")]
-    pub max_location_change: f64,
+    pub max_location_change: Option<f64>,
 }
 
 impl Part for RulesetInfo {}
@@ -941,9 +941,9 @@ impl Part for RulesetInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseSpec {
     /// The display name for a database.
-    pub name: String,
+    pub name: Option<String>,
     /// The corresponding URI of the database.
-    pub uri: String,
+    pub uri: Option<String>,
 }
 
 impl Part for DatabaseSpec {}
@@ -991,10 +991,10 @@ impl RequestValue for PawsRegisterRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpectrumMessage {
     /// The bandwidth (in Hertz) for which permissible power levels are specified. For example, FCC regulation would require only one spectrum specification at 6MHz bandwidth, but Ofcom regulation would require two specifications, at 0.1MHz and 8MHz. This parameter may be empty if there is no available spectrum. It will be present otherwise.
-    pub bandwidth: f64,
+    pub bandwidth: Option<f64>,
     /// The list of frequency ranges and permissible power levels. The list may be empty if there is no available spectrum, otherwise it will be present.
     #[serde(rename="frequencyRanges")]
-    pub frequency_ranges: Vec<FrequencyRange>,
+    pub frequency_ranges: Option<Vec<FrequencyRange>>,
 }
 
 impl Part for SpectrumMessage {}
@@ -1012,39 +1012,39 @@ impl Part for SpectrumMessage {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PawsGetSpectrumResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsGetSpectrumResponse".
-    pub kind: String,
+    pub kind: Option<String>,
     /// The database must return, in its available spectrum response, the device descriptor information it received in the master device's available spectrum request.
     #[serde(rename="deviceDesc")]
-    pub device_desc: DeviceDescriptor,
+    pub device_desc: Option<DeviceDescriptor>,
     /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.
     #[serde(rename="databaseChange")]
-    pub database_change: DbUpdateSpec,
+    pub database_change: Option<DbUpdateSpec>,
     /// The database may return a constraint on the allowed maximum total bandwidth (in Hertz), which need not be contiguous. A regulatory domain may require the database to return this parameter. When this parameter is present in the available spectrum response, the device must apply this constraint to its spectrum-selection logic to ensure that total bandwidth does not exceed this value.
     #[serde(rename="maxTotalBwHz")]
-    pub max_total_bw_hz: f64,
+    pub max_total_bw_hz: Option<f64>,
     /// The available spectrum response must contain a spectrum schedule list. The list may be empty if spectrum is not available. The database may return more than one spectrum schedule to represent future changes to the available spectrum. How far in advance a schedule may be provided depends on the applicable regulatory domain.
     #[serde(rename="spectrumSchedules")]
-    pub spectrum_schedules: Vec<SpectrumSchedule>,
+    pub spectrum_schedules: Option<Vec<SpectrumSchedule>>,
     /// The database may return a constraint on the allowed maximum contiguous bandwidth (in Hertz). A regulatory domain may require the database to return this parameter. When this parameter is present in the response, the device must apply this constraint to its spectrum-selection logic to ensure that no single block of spectrum has bandwidth that exceeds this value.
     #[serde(rename="maxContiguousBwHz")]
-    pub max_contiguous_bw_hz: f64,
+    pub max_contiguous_bw_hz: Option<f64>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
-    pub version: String,
+    pub version: Option<String>,
     /// The database includes a timestamp of the form YYYY-MM-DDThh:mm:ssZ (Internet timestamp format per RFC3339) in its available spectrum response. The timestamp should be used by the device as a reference for the start and stop times specified in the response spectrum schedules.
-    pub timestamp: String,
+    pub timestamp: Option<String>,
     /// The database should return ruleset information, which identifies the applicable regulatory authority and ruleset for the available spectrum response. If included, the device must use the corresponding ruleset to interpret the response. Values provided in the returned ruleset information, such as maxLocationChange, take precedence over any conflicting values provided in the ruleset information returned in a prior initialization response sent by the database to the device.
     #[serde(rename="rulesetInfo")]
-    pub ruleset_info: RulesetInfo,
+    pub ruleset_info: Option<RulesetInfo>,
     /// For regulatory domains that require a spectrum-usage report from devices, the database must return true for this parameter if the spectrum schedule list is not empty; otherwise, the database will either return false or omit this parameter. If this parameter is present and its value is true, the device must send a spectrum use notify message to the database; otherwise, the device must not send the notification.
     #[serde(rename="needsSpectrumReport")]
-    pub needs_spectrum_report: bool,
+    pub needs_spectrum_report: Option<bool>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
     /// 
     /// Required field.
     #[serde(rename="type")]
-    pub type_: String,
+    pub type_: Option<String>,
 }
 
 impl ResponseResult for PawsGetSpectrumResponse {}
@@ -1058,7 +1058,7 @@ impl ResponseResult for PawsGetSpectrumResponse {}
 pub struct DeviceCapabilities {
     /// An optional list of frequency ranges supported by the device. Each element must contain start and stop frequencies in which the device can operate. Channel identifiers are optional. When specified, the database should not return available spectrum that falls outside these ranges or channel IDs.
     #[serde(rename="frequencyRanges")]
-    pub frequency_ranges: Vec<FrequencyRange>,
+    pub frequency_ranges: Option<Vec<FrequencyRange>>,
 }
 
 impl Part for DeviceCapabilities {}
@@ -1072,9 +1072,9 @@ impl Part for DeviceCapabilities {}
 pub struct SpectrumSchedule {
     /// The event time expresses when the spectrum profile is valid. It will always be present.
     #[serde(rename="eventTime")]
-    pub event_time: EventTime,
+    pub event_time: Option<EventTime>,
     /// A list of spectrum messages representing the usable profile. It will always be present, but may be empty when there is no available spectrum.
-    pub spectra: Vec<SpectrumMessage>,
+    pub spectra: Option<Vec<SpectrumMessage>>,
 }
 
 impl Part for SpectrumSchedule {}
@@ -1325,7 +1325,7 @@ impl<'a, C, A> PawMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PawsNotifySpectrumUseRequest = Default::default();
+/// let mut req = PawsNotifySpectrumUseRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1524,7 +1524,7 @@ impl<'a, C, A> PawNotifySpectrumUseCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PawsRegisterRequest = Default::default();
+/// let mut req = PawsRegisterRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1723,7 +1723,7 @@ impl<'a, C, A> PawRegisterCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PawsGetSpectrumRequest = Default::default();
+/// let mut req = PawsGetSpectrumRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -1922,7 +1922,7 @@ impl<'a, C, A> PawGetSpectrumCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PawsInitRequest = Default::default();
+/// let mut req = PawsInitRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2121,7 +2121,7 @@ impl<'a, C, A> PawInitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PawsGetSpectrumBatchRequest = Default::default();
+/// let mut req = PawsGetSpectrumBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2320,7 +2320,7 @@ impl<'a, C, A> PawGetSpectrumBatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req: PawsVerifyDeviceRequest = Default::default();
+/// let mut req = PawsVerifyDeviceRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.

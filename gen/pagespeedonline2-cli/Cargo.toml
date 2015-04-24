@@ -5,7 +5,7 @@
 
 name = "google-pagespeedonline2-cli"
 version = "0.0.1+20150317"
-authors = ["Sebastian Thiel <byronimo@gmail>"]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with pagespeedonline (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pagespeedonline2-cli"
 homepage = "https://developers.google.com/speed/docs/insights/v2/getting-started"
@@ -23,6 +23,7 @@ yup-oauth2 = "*"
 docopt = "*"
 docopt_macros = "*"
 rustc-serialize = "*"
+yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
 
