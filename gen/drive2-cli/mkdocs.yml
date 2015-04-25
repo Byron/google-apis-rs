@@ -1,0 +1,75 @@
+site_name: drive v0.0.1+20150326
+site_url: http://byron.github.io/google-apis-rs/google-drive2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/drive2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['about_get.md', 'About', 'Get']
+- ['apps_get.md', 'Apps', 'Get']
+- ['apps_list.md', 'Apps', 'List']
+- ['changes_get.md', 'Changes', 'Get']
+- ['changes_list.md', 'Changes', 'List']
+- ['changes_watch.md', 'Changes', 'Watch']
+- ['channels_stop.md', 'Channels', 'Stop']
+- ['children_delete.md', 'Children', 'Delete']
+- ['children_get.md', 'Children', 'Get']
+- ['children_insert.md', 'Children', 'Insert']
+- ['children_list.md', 'Children', 'List']
+- ['comments_delete.md', 'Comments', 'Delete']
+- ['comments_get.md', 'Comments', 'Get']
+- ['comments_insert.md', 'Comments', 'Insert']
+- ['comments_list.md', 'Comments', 'List']
+- ['comments_patch.md', 'Comments', 'Patch']
+- ['comments_update.md', 'Comments', 'Update']
+- ['files_copy.md', 'Files', 'Copy']
+- ['files_delete.md', 'Files', 'Delete']
+- ['files_empty-trash.md', 'Files', 'Empty Trash']
+- ['files_get.md', 'Files', 'Get']
+- ['files_insert.md', 'Files', 'Insert']
+- ['files_list.md', 'Files', 'List']
+- ['files_patch.md', 'Files', 'Patch']
+- ['files_touch.md', 'Files', 'Touch']
+- ['files_trash.md', 'Files', 'Trash']
+- ['files_untrash.md', 'Files', 'Untrash']
+- ['files_update.md', 'Files', 'Update']
+- ['files_watch.md', 'Files', 'Watch']
+- ['parents_delete.md', 'Parents', 'Delete']
+- ['parents_get.md', 'Parents', 'Get']
+- ['parents_insert.md', 'Parents', 'Insert']
+- ['parents_list.md', 'Parents', 'List']
+- ['permissions_delete.md', 'Permissions', 'Delete']
+- ['permissions_get.md', 'Permissions', 'Get']
+- ['permissions_get-id-for-email.md', 'Permissions', 'Get Id For Email']
+- ['permissions_insert.md', 'Permissions', 'Insert']
+- ['permissions_list.md', 'Permissions', 'List']
+- ['permissions_patch.md', 'Permissions', 'Patch']
+- ['permissions_update.md', 'Permissions', 'Update']
+- ['properties_delete.md', 'Properties', 'Delete']
+- ['properties_get.md', 'Properties', 'Get']
+- ['properties_insert.md', 'Properties', 'Insert']
+- ['properties_list.md', 'Properties', 'List']
+- ['properties_patch.md', 'Properties', 'Patch']
+- ['properties_update.md', 'Properties', 'Update']
+- ['realtime_get.md', 'Realtime', 'Get']
+- ['realtime_update.md', 'Realtime', 'Update']
+- ['replies_delete.md', 'Replies', 'Delete']
+- ['replies_get.md', 'Replies', 'Get']
+- ['replies_insert.md', 'Replies', 'Insert']
+- ['replies_list.md', 'Replies', 'List']
+- ['replies_patch.md', 'Replies', 'Patch']
+- ['replies_update.md', 'Replies', 'Update']
+- ['revisions_delete.md', 'Revisions', 'Delete']
+- ['revisions_get.md', 'Revisions', 'Get']
+- ['revisions_list.md', 'Revisions', 'List']
+- ['revisions_patch.md', 'Revisions', 'Patch']
+- ['revisions_update.md', 'Revisions', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

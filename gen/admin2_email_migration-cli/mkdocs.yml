@@ -1,0 +1,17 @@
+site_name: admin v0.0.1+20150303
+site_url: http://byron.github.io/google-apis-rs/google-admin2_email_migration-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/admin2_email_migration-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['mail_insert.md', 'Mail', 'Insert']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

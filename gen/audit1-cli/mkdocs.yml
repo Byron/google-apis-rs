@@ -1,0 +1,17 @@
+site_name: audit v0.0.1+20150419
+site_url: http://byron.github.io/google-apis-rs/google-audit1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/audit1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['activities_list.md', 'Activities', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

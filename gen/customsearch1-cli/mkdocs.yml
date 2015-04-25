@@ -1,0 +1,17 @@
+site_name: customsearch v0.0.1+20131205
+site_url: http://byron.github.io/google-apis-rs/google-customsearch1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/customsearch1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['cse_list.md', 'Cse', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

@@ -32,6 +32,7 @@ ${engine.new(c)}\
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
+    let debug = opts.flag_debug;
     match Engine::new(opts) {
         Err(err) => {
             writeln!(io::stderr(), "{}", err).ok();
@@ -39,8 +40,11 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                writeln!(io::stderr(), "{:?}", err).ok();
-                writeln!(io::stderr(), "{}", err).ok();
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
                 env::set_exit_status(1);
             }
         }

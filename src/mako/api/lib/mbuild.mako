@@ -368,14 +368,15 @@ match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
-        Error::HttpError(_)
+         Error::HttpError(_)
         |Error::MissingAPIKey
         |Error::MissingToken
         |Error::Cancelled
         |Error::UploadSizeLimitExceeded(_, _)
         |Error::Failure(_)
+        |Error::BadRequest(_)
         |Error::FieldClash(_)
-        |Error::JsonDecodeError(_) => println!("{}", e),
+        |Error::JsonDecodeError(_, _) => println!("{}", e),
     },
     Ok(res) => println!("Success: {:?}", res),
 }
@@ -770,12 +771,17 @@ else {
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         ${delegate_finish}(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     % if resumable_media_param:
                     if protocol == "${resumable_media_param.protocol}" {
@@ -836,7 +842,7 @@ if enable_resource_parsing \
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     }\

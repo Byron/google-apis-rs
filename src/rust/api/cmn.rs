@@ -58,12 +58,35 @@ pub trait ToParts {
     fn to_parts(&self) -> String;
 }
 
-
 /// A utility type which can decode a server response that indicates error
 #[derive(Deserialize)]
 pub struct JsonServerError {
     pub error: String,
     pub error_description: Option<String>
+}
+
+/// A utility to represent detailed errors we might see in case there are BadRequests.
+/// The latter happen if the sent parameters or request structures are unsound
+#[derive(Deserialize, Serialize, Debug)]
+pub struct ErrorResponse {
+    error: ServerError,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct ServerError {
+    errors: Vec<ServerMessage>,
+    code: u16,
+    message: String,   
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct ServerMessage {
+    domain: String,
+    reason: String,
+    message: String,
+    #[serde(rename="locationType")]
+    location_type: Option<String>,
+    location: Option<String>
 }
 
 #[derive(Copy, Clone)]
@@ -173,7 +196,7 @@ pub trait Delegate {
     ///
     /// If you choose to retry after a duration, the duration should be chosen using the
     /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
-    fn http_failure(&mut self, _: &hyper::client::Response, Option<JsonServerError>) -> Retry {
+    fn http_failure(&mut self, _: &hyper::client::Response, Option<JsonServerError>, _: Option<ServerError>) -> Retry {
         Retry::Abort
     }
 
@@ -228,6 +251,10 @@ pub enum Error {
     /// even though the maximum upload size is what is stored in field `.1`.
     UploadSizeLimitExceeded(u64, u64),
 
+    /// Represents information about a request that was not understood by the server.
+    /// Details are included.
+    BadRequest(ErrorResponse),
+
     /// We needed an API key for authentication, but didn't obtain one.
     /// Neither through the authenticator, nor through the Delegate.
     MissingAPIKey,
@@ -243,7 +270,7 @@ pub enum Error {
 
     /// Shows that we failed to decode the server response.
     /// This can happen if the protocol changes in conjunction with strict json decoding.
-    JsonDecodeError(serde::json::Error),
+    JsonDecodeError(String, serde::json::Error),
 
     /// Indicates an HTTP repsonse with a non-success status code
     Failure(hyper::client::Response),
@@ -261,13 +288,16 @@ impl Display for Error {
                 writeln!(f, "The application's API key was not found in the configuration").ok();
                 writeln!(f, "It is used as there are no Scopes defined for this method.")
             },
+            Error::BadRequest(ref err) 
+                => writeln!(f, "Bad Requst ({}): {}", err.error.code, err.error.message),
             Error::MissingToken(ref err) =>
                 writeln!(f, "Token retrieval failed with error: {}", err),
             Error::Cancelled => 
                 writeln!(f, "Operation cancelled by delegate"),
             Error::FieldClash(field) =>
                 writeln!(f, "The custom parameter '{}' is already provided natively by the CallBuilder.", field),
-            Error::JsonDecodeError(ref err) => err.fmt(f),
+            Error::JsonDecodeError(ref json_str, ref err) 
+                => writeln!(f, "{}: {}", err, json_str),
             Error::Failure(ref response) => 
                 writeln!(f, "Http status indicates failure: {:?}", response),
         }
@@ -278,7 +308,7 @@ impl error::Error for Error {
     fn description(&self) -> &str {
         match *self {
             Error::HttpError(ref err) => err.description(),
-            Error::JsonDecodeError(ref err) => err.description(),
+            Error::JsonDecodeError(_, ref err) => err.description(),
             _ => "NO DESCRIPTION POSSIBLE - use `Display.fmt()` instead"
         }
     }
@@ -286,7 +316,7 @@ impl error::Error for Error {
     fn cause(&self) -> Option<&error::Error> {
         match *self {
             Error::HttpError(ref err) => err.cause(),
-            Error::JsonDecodeError(ref err) => err.cause(),
+            Error::JsonDecodeError(_, ref err) => err.cause(),
             _ => None
         }
     }
@@ -557,7 +587,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                     let h: &RangeResponseHeader = match headers.get() {
                         Some(hh) if r.status == StatusCode::PermanentRedirect => hh,
                         None|Some(_) => {
-                            if let Retry::After(d) = self.delegate.http_failure(&r, None) {
+                            if let Retry::After(d) = self.delegate.http_failure(&r, None, None) {
                                 sleep_ms(d.num_milliseconds() as u32);
                                 continue;
                             }
@@ -624,7 +654,9 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let Retry::After(d) = self.delegate.http_failure(&res, serde::json::from_str(&json_err).ok()) {
+                        if let Retry::After(d) = self.delegate.http_failure(&res, 
+                                                        serde::json::from_str(&json_err).ok(),
+                                                        serde::json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
