@@ -429,7 +429,7 @@ impl<'a> Read for MultiPartReader<'a> {
                         // before clearing the last part, we will add the boundary that 
                         // will be written last
                         self.last_part_boundary = Some(Cursor::new(
-                                                        format!("{}--{}", LINE_ENDING, BOUNDARY).into_bytes()))
+                                                        format!("{}--{}--", LINE_ENDING, BOUNDARY).into_bytes()))
                     }
                     // We are depleted - this can trigger the next part to come in
                     self.current_part = None;
@@ -517,7 +517,7 @@ impl Header for ContentRange {
 
 impl HeaderFormat for ContentRange {
     fn fmt_header(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        try!(fmt.write_str("bytes="));
+        try!(fmt.write_str("bytes "));
         match self.range {
             Some(ref c) => try!(c.fmt(fmt)),
             None => try!(fmt.write_str("*"))
@@ -538,7 +538,7 @@ impl Header for RangeResponseHeader {
     fn parse_header(raw: &[Vec<u8>]) -> Option<RangeResponseHeader> {
         if let [ref v] = raw {
             if let Ok(s) = std::str::from_utf8(v) {
-                const PREFIX: &'static str = "bytes=";
+                const PREFIX: &'static str = "bytes ";
                 if s.starts_with(PREFIX) {
                     if let Ok(c) = <Chunk as FromStr>::from_str(&s[PREFIX.len()..]) {
                         return  Some(RangeResponseHeader(c))

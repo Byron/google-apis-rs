@@ -21,7 +21,6 @@ mod test_api {
     use self::hyper_mock::*;
     use std::io::Read;
     use std::default::Default;
-    use std::old_path::BytesContainer;
     use hyper;
     use std::str::FromStr;
 
@@ -38,9 +37,9 @@ Content-Length: 25\r\n\
 Content-Type: application/plain\r\n\
 \r\n\
 bar\r\n\
---MDuXWGyeE33QFXGchb2VFWc4Z7945d";
+--MDuXWGyeE33QFXGchb2VFWc4Z7945d--";
 
-    const EXPECTED_LEN: usize= 221;
+    const EXPECTED_LEN: usize= 223;
 
     #[test]
     fn multi_part_reader() {
@@ -130,9 +129,9 @@ bar\r\n\
     #[test]
     fn content_range() {
         for &(ref c, ref expected) in 
-          &[(ContentRange {range: None, total_length: 50 }, "Content-Range: bytes=*/50\r\n"),
+          &[(ContentRange {range: None, total_length: 50 }, "Content-Range: bytes */50\r\n"),
             (ContentRange {range: Some(Chunk { first: 23, last: 40 }), total_length: 45},
-             "Content-Range: bytes=23-40/45\r\n")] {
+             "Content-Range: bytes 23-40/45\r\n")] {
             let mut headers = hyper::header::Headers::new();
             headers.set(c.clone());
             assert_eq!(headers.to_string(), expected.to_string());
@@ -147,7 +146,7 @@ bar\r\n\
 
     #[test]
     fn parse_range_response() {
-        let r: RangeResponseHeader = hyper::header::Header::parse_header(&[b"bytes=2-42".to_vec()]).unwrap();
+        let r: RangeResponseHeader = hyper::header::Header::parse_header(&[b"bytes 2-42".to_vec()]).unwrap();
         assert_eq!(r.0.first, 2);
         assert_eq!(r.0.last, 42);
     }

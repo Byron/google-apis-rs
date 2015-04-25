@@ -496,6 +496,14 @@ match result {
         % for p in field_params:
 <%
     pname = 'self.' + property(p.name)    # property identifier
+    if media_params and 'mediaUpload' in m:
+        upload_type_map = dict()
+        for mp in media_params:
+            if mp.protocol == 'simple':
+                upload_type_map[mp.protocol] = m.mediaUpload.protocols.simple.multipart and 'multipart' or 'media'
+                break
+        # for each meadia param
+    # end build media param map
 %>\
         ## parts can also be derived from the request, but we do that only if it's not set
         % if p.name == 'part' and request_value:
@@ -561,21 +569,21 @@ match result {
         % endif ## response schema
 
         % if media_params:
-        let mut url = \
+        let (mut url, upload_type) = 
             % for mp in media_params:
             % if loop.first:
-if \
+            if \
             % else:
 else if \
             % endif
 protocol == "${mp.protocol}" {
-                "${join_url(rootUrl, mp.path)}".to_string()
+                ("${join_url(rootUrl, mp.path)}".to_string(), "${upload_type_map.get(mp.protocol, mp.protocol)}")
             } \
             % endfor
 else { 
                 unreachable!() 
-        };
-        params.push(("uploadType", protocol.to_string()));
+            };
+        params.push(("uploadType", upload_type.to_string()));
         % else:
         let mut url = "${baseUrl}${m.path}".to_string();
         % endif
@@ -788,9 +796,9 @@ else {
                         ${READER_SEEK | indent_all_but_first_by(6)}
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
-                            let url = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
                             if upload_url_from_server {
-                                dlg.store_upload_url(url);
+                                dlg.store_upload_url(url_str);
                             }
 
                             cmn::ResumableUploadHelper {
@@ -800,7 +808,7 @@ else {
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
                                 auth_header: auth_header.clone(),
-                                url: url,
+                                url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
                                 content_length: size
