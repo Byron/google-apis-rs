@@ -175,7 +175,7 @@ if opt.flag_${flag_name} {
 %>\
     % if is_request_value_property(mc, p):
 <% request_prop_type = prop_type %>\
-let ${prop_name} = api::${prop_type}::default();
+${self._request_value_impl(c, request_cli_schema, prop_name, request_prop_type)}\
     % elif p.type != 'string':
     % if p.get('repeated', False): 
 let ${prop_name}: Vec<${prop_type} = Vec::new();
@@ -259,9 +259,6 @@ ${value_unwrap}\
     }
 }
 % endif # handle call parameters
-% if mc.request_value:
-${self._request_value_impl(c, request_cli_schema, request_prop_type)}\
-% endif # handle struct parsing
 % if mc.media_params:
 let protocol = 
 % for p in mc.media_params:
@@ -337,7 +334,7 @@ if dry_run {
 }\
 </%def>
 
-<%def name="_request_value_impl(c, request_cli_schema, request_prop_type)">
+<%def name="_request_value_impl(c, request_cli_schema, request_prop_name, request_prop_type)">
 <%
     allow_optionals_fn = lambda s: is_schema_with_optionals(schema_markers(s, c, transitive=False))
 
@@ -384,7 +381,7 @@ if dry_run {
     init_fn_map = dict()
     flatten_schema_fields(request_cli_schema, schema_fields, init_fn_map)
 %>\
-let mut request = api::${request_prop_type}::default();
+let mut ${request_prop_name} = api::${request_prop_type}::default();
 let mut field_name = FieldCursor::default();
 for kvarg in ${SOPT + arg_ident(KEY_VALUE_ARG)}.iter() {
     let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -446,5 +443,4 @@ ${opt_suffix}\
         }
     }
 }
-call = call.request(request);
 </%def>
