@@ -272,7 +272,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     rvfrt = lambda spn, sp, sn=None: rnd_arg_val_for_type(trv(spn, sp, sn))
 
     rb_name = 'req'   # name of request binding
-    required_args = request_value and ['&' + rb_name] or []
+    required_args = request_value and [rb_name] or []
     for p in required_props:
         # could also just skip the first element, but ... let's be safe
         if request_value and request_value.id == p.get(TREF):
@@ -370,7 +370,7 @@ match result {
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
         |Error::MissingAPIKey
-        |Error::MissingToken
+        |Error::MissingToken(_)
         |Error::Cancelled
         |Error::UploadSizeLimitExceeded(_, _)
         |Error::Failure(_)

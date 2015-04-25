@@ -2,7 +2,7 @@
 <%!
     from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type, setter_fn_name, ADD_PARAM_FN,
                       upload_action_fn, is_schema_with_optionals, schema_markers, indent_by, method_default_scope,
-                      ADD_SCOPE_FN)
+                      ADD_SCOPE_FN, TREF)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_VALUE_MAP,
@@ -16,7 +16,7 @@
     def borrow_prefix(p):
         ptype = p.get('type', None)
         borrow = ''
-        if ptype not in POD_TYPES or ptype in ('string', None) or p.get('repeated', False):
+        if (ptype not in POD_TYPES or ptype in ('string', None) or p.get('repeated', False)) and ptype is not None:
             borrow = '&'
         return borrow
 
@@ -175,7 +175,7 @@ if opt.flag_${flag_name} {
 %>\
     % if is_request_value_property(mc, p):
 <% request_prop_type = prop_type %>\
-let mut ${prop_name} = api::${prop_type}::default();
+let ${prop_name} = api::${prop_type}::default();
     % elif p.type != 'string':
     % if p.get('repeated', False): 
 let ${prop_name}: Vec<${prop_type} = Vec::new();
@@ -384,6 +384,7 @@ if dry_run {
     init_fn_map = dict()
     flatten_schema_fields(request_cli_schema, schema_fields, init_fn_map)
 %>\
+let mut request = api::${request_prop_type}::default();
 let mut field_name = FieldCursor::default();
 for kvarg in ${SOPT + arg_ident(KEY_VALUE_ARG)}.iter() {
     let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -445,4 +446,5 @@ ${opt_suffix}\
         }
     }
 }
+call = call.request(request);
 </%def>

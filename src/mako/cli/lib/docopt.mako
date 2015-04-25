@@ -39,7 +39,7 @@ Usage:
     # end upload handling
 
     if mc.optional_props or parameters is not UNDEFINED:
-        args.append('[-%s %s]...' % (PARAM_FLAG, '<%s>' % VALUE_ARG))
+        args.append('[-%s %s...]' % (PARAM_FLAG, '<%s>' % VALUE_ARG))
         param_used = True
     # end paramters
     

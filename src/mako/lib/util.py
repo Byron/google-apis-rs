@@ -379,7 +379,7 @@ def activity_input_type(schemas, p):
     if n == 'String':
         n = 'str'
     # pods are copied anyway
-    elif is_pod_property(p):
+    elif is_pod_property(p) or p.get(TREF):
         return n
     return '&%s' % n
 
@@ -535,7 +535,7 @@ def rust_copy_value_s(n, tn, p):
     nc = n + '.clone()'
     if tn == '&str':
         nc = n + '.to_string()'
-    elif is_pod_property(p):
+    elif is_pod_property(p) or p.get(TREF):
         nc = n
     return nc
 
