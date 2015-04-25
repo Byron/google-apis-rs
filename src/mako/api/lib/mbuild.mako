@@ -11,7 +11,7 @@
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, unique_type_name, size_to_bytes, method_default_scope,
-                      is_repeated_property, setter_fn_name)
+                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -173,7 +173,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ${ThisType} 
+    pub fn ${ADD_SCOPE_FN}<T>(mut self, scope: T) -> ${ThisType} 
                                                         where T: AsRef<str> {
         self.${api.properties.scopes}.insert(scope.as_ref().to_string(), ());
         self

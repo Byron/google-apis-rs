@@ -1,7 +1,8 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%!
     from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type, setter_fn_name, ADD_PARAM_FN,
-                      upload_action_fn, is_schema_with_optionals, schema_markers, indent_by)
+                      upload_action_fn, is_schema_with_optionals, schema_markers, indent_by, method_default_scope,
+                      ADD_SCOPE_FN)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_VALUE_MAP,
@@ -284,6 +285,12 @@ if dry_run {
     None
 } else {
     assert!(err.issues.len() == 0);
+    % if method_default_scope(mc.m):
+<% scope_opt = SOPT + flag_ident('scope') %>\
+    if ${scope_opt}.len() > 0 {
+        call = call.${ADD_SCOPE_FN}(&${scope_opt});
+    }
+    % endif
     ## Make the call, handle uploads, handle downloads (also media downloads|json decoding)
     ## TODO: unify error handling
     % if handle_output:

@@ -54,6 +54,7 @@ DEL_METHOD = 'delete'
 METHODS_RESOURCE = 'methods'
 
 ADD_PARAM_FN = 'param'
+ADD_SCOPE_FN = 'add_scope'
 ADD_PARAM_MEDIA_EXAMPLE = "." + ADD_PARAM_FN + '("alt", "media")'
 
 SPACES_PER_TAB = 4

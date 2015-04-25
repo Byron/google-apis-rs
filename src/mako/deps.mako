@@ -75,7 +75,7 @@
 	api_meta_dir = os.path.dirname(api_json)
 	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version + 
 			make.aggregated_target_suffix, json.load(open(api_json, 'r')).get('revision', '00000000'))
-	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.json'
+	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.yaml'
 	type_specific_json = '$(API_DIR)/type-' + make.id + '.yaml'
 	api_json_inputs = api_json + ' $(API_SHARED_INFO) ' + type_specific_json
 	if os.path.isfile(api_json_overrides):
