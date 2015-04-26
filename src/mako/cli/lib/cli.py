@@ -17,6 +17,8 @@ VALUE_ARG = 'v'
 KEY_VALUE_ARG = 'kv'
 SCOPE_FLAG = 'scope'
 CONFIG_DIR_FLAG = 'config-dir'
+DEBUG_FLAG = 'debug'
+DEBUG_AUTH_FLAG = 'debug-auth'
 
 FILE_ARG = '<file>'
 MIME_ARG = '<mime>'
@@ -99,6 +101,9 @@ def arg_ident(name):
 
 def flag_ident(name):
     return 'flag_' + ident(name)
+
+def application_secret_path(program_name):
+    return program_name + '-secret.json'
 
 # Returns identifier for method dealing with options for the given resource-method pair
 def call_method_ident(resource, method):

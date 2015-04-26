@@ -1,19 +1,21 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%!
-    from util import (put_and, supports_scopes)
+    from util import (put_and, supports_scopes, api_index)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg)
+                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG)
 %>\
-<%def name="new(c)">\
+<%def name="new(c, usage_only=False)">\
 <%
     param_used = False
     struct_used = False
     upload_protocols_used = set()
     output_used = False
 %>\
+% if not usage_only:
 docopt!(Options derive Debug, "
 Usage: 
+% endif
 % for resource in sorted(c.rta_map.keys()):
     % for method in sorted(c.rta_map[resource]):
 <%
@@ -53,24 +55,27 @@ Usage:
 % endfor # end for each resource
   ${util.program_name()} --help
 
-All documentation details can be found TODO: <URL to github.io docs here, see #51>
+All documentation details can be found at
+${cargo.doc_base_url + '/' + api_index(cargo.doc_base_url, name, version, make, check_exists=False)}
 
 Configuration:
 % if supports_scopes(auth):
   --${SCOPE_FLAG} <url>  
-            Specify the authentication a method should be executed in. Each scope requires
-            the user to grant this application permission to use it.
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
 % endif scopes
   --${CONFIG_DIR_FLAG} <folder>
-            A directory into which we will store our persistent data. Defaults to a user-writable
-            directory that we will create during the first invocation.
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
             [default: ${CONFIG_DIR}]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed into 
-            the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+  --${DEBUG_FLAG}
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
+  --${DEBUG_AUTH_FLAG}
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
+% if not usage_only:
 ");
+% endif
 </%def>

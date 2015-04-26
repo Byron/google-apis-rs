@@ -832,13 +832,13 @@ def to_extern_crate_name(crate_name):
 def gen_crate_dir(name, version, ti):
     return to_extern_crate_name(library_to_crate_name(library_name(name, version), ti.target_suffix))
 
-def api_index(DOC_ROOT, name, version, ti):
+def api_index(DOC_ROOT, name, version, ti, check_exists=True):
     crate_dir = gen_crate_dir(name, version, ti)
     if ti.documentation_engine == 'rustdoc':
         index_file_path = crate_dir + '/' + crate_dir + '/index.html'
     else:
-        index_file_path = crate_dir + '/' + '/index.html'
-    if os.path.isfile(DOC_ROOT + '/' + index_file_path):
+        index_file_path = crate_dir + '/' + 'index.html'
+    if not check_exists or os.path.isfile(os.path.join(DOC_ROOT, index_file_path)):
         return index_file_path
     return None
 

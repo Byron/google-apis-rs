@@ -493,9 +493,7 @@ match result {
         dlg.begin(MethodInfo { id: "${m.id}", 
                                http_method: ${method_name_to_variant(m.httpMethod)} });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((${len(params) + len(reserved_params)} + ${paddfields}.len()));
-        % for p in field_params:
 <%
-    pname = 'self.' + property(p.name)    # property identifier
     if media_params and 'mediaUpload' in m:
         upload_type_map = dict()
         for mp in media_params:
@@ -504,6 +502,10 @@ match result {
                 break
         # for each meadia param
     # end build media param map
+%>\
+        % for p in field_params:
+<%
+    pname = 'self.' + property(p.name)    # property identifier
 %>\
         ## parts can also be derived from the request, but we do that only if it's not set
         % if p.name == 'part' and request_value:

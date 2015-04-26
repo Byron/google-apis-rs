@@ -6,7 +6,8 @@
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_VALUE_MAP,
-                     KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY)
+                     KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
+                     application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt.'
@@ -101,7 +102,7 @@ self.opt.${cmd_ident(method)} {
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "${util.program_name()}-secret.json", 
+            match cmn::application_secret_from_directory(&config_dir, "${application_secret_path(util.program_name())}", 
                                                          "${api.credentials.replace('"', r'\"')}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
@@ -109,14 +110,14 @@ self.opt.${cmd_ident(method)} {
         };
 
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        ${self._debug_client('debug_auth') | indent_all_but_first_by(10)},
+                                        ${self._debug_client(DEBUG_AUTH_FLAG) | indent_all_but_first_by(10)},
                                         JsonTokenStorage {
                                           program_name: "${util.program_name()}",
                                           db_dir: config_dir.clone(),
                                         }, None);
 
         let client = 
-            ${self._debug_client('debug') | indent_all_but_first_by(3)};
+            ${self._debug_client(DEBUG_FLAG) | indent_all_but_first_by(3)};
         let engine = Engine {
             opt: opt,
             hub: ${hub_type_name}::new(client, auth),
@@ -137,7 +138,7 @@ self.opt.${cmd_ident(method)} {
 </%def>
 
 <%def name="_debug_client(flag_name)" buffered="True">\
-if opt.flag_${flag_name} {
+if opt.flag_${mangle_ident(flag_name)} {
     hyper::Client::with_connector(mock::TeeConnector {
             connector: hyper::net::HttpConnector(None) 
         })
