@@ -5,6 +5,7 @@ api:
     # to allow looking at it at a later point.
     # in beta, there is not a single method !
     - dataflow
+    - cloudsearch
   terms:
     # how to actually do something with the API
     action: doit
