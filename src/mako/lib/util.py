@@ -829,6 +829,19 @@ def crate_version(build_version, revision):
 def to_extern_crate_name(crate_name):
     return crate_name.replace('-', '_')
 
+def gen_crate_dir(name, version, ti):
+    return to_extern_crate_name(library_to_crate_name(library_name(name, version), ti.target_suffix))
+
+def api_index(DOC_ROOT, name, version, ti):
+    crate_dir = gen_crate_dir(name, version, ti)
+    if ti.documentation_engine == 'rustdoc':
+        index_file_path = crate_dir + '/' + crate_dir + '/index.html'
+    else:
+        index_file_path = crate_dir + '/' + '/index.html'
+    if os.path.isfile(DOC_ROOT + '/' + index_file_path):
+        return index_file_path
+    return None
+
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
     return "%sMethods" % singular(canonical_type_name(r))

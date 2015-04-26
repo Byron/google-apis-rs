@@ -1,27 +1,21 @@
 <%
     import os
-    from util import (library_name, library_to_crate_name, to_extern_crate_name)
+    from util import (gen_crate_dir, api_index)
 
-    def gen_crate_dir(name, version):
-        return to_extern_crate_name(library_to_crate_name(library_name(name, version), make.target_suffix))
-
-    def api_index(name, version):
-        crate_dir = gen_crate_dir(name, version)
-        index_file_path = crate_dir + '/' + crate_dir + '/index.html'
-        if os.path.isfile(DOC_ROOT + '/' + index_file_path):
-            return index_file_path
-        return None
-
-    title = 'Google Rust Client API Docs'
+    title = 'Google Service Documentation for Rust'
 
     first_api_prefix = None
-    for an in sorted(api.list.keys()):
-        for v in api.list[an]:
-            if api_index(an, v):
-                first_api_prefix = gen_crate_dir(an, v)
-                break
-        # for each version
-    # for each api name
+    for ti in make.types:
+        if ti.documentation_engine != 'rustdoc':
+            continue
+        for an in sorted(api.list.keys()):
+            for v in api.list[an]:
+                if api_index(DOC_ROOT, an, v, ti):
+                    first_api_prefix = gen_crate_dir(an, v, ti)
+                    break
+            # for each version
+        # for each api name
+    # end for each type
     assert first_api_prefix
 %>\
 <!DOCTYPE html>
@@ -34,6 +28,10 @@ DO NOT EDIT !
 <head>
 <link rel="stylesheet" href="${first_api_prefix}/main.css">
 <style type="text/css">
+.text {
+  color: #000000;
+  font-size: 20px
+}
 .mod {
   color: #4d76ae;
   font-size: 20px
@@ -46,12 +44,28 @@ DO NOT EDIT !
 <ul>
 % for an in sorted(api.list.keys()):
     % for v in api.list[an]:
-    % if not api_index(an, v):
-        <% continue %>\
-    % endif
-    <a class="mod" href="${api_index(an, v)}" title="API docs for ${an} ${v}">${an} ${v}</a><br/>
-    % endfor
-% endfor
+        <% 
+            has_any_index = False
+            types = list()
+            for ti in make.types:
+                if api_index(DOC_ROOT, an, v, ti):
+                    has_any_index = True
+                    types.append(ti)
+            # end for each type
+        %>\
+        % if not has_any_index:
+            <% continue %>\
+        % endif
+        <span class="text">${an} ${v} (
+        % for ti in types:
+            <a class="mod" href="${api_index(DOC_ROOT, an, v, ti)}" title="${ti.id.upper()} docs for the ${an} ${v}">${ti.id.upper()}</a>
+            % if not loop.last:
+, 
+            % endif
+        % endfor # each program type
+        )</span><br/>
+    % endfor # each version
+% endfor # each API
 </ul>
 </body>
 </html>
